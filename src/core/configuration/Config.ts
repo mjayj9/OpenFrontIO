@@ -340,6 +340,9 @@ export class Config {
     );
   }
   nationSpawnImmunityDuration(): Tick {
+    if (this._gameConfig.enhancedAI?.fairResources) {
+      return this.spawnImmunityDuration();
+    }
     if (this._gameConfig.modernMode)
       return this._gameConfig.modernMode.protectionTicks;
     return DEFAULT_SPAWN_IMMUNITY_TICKS;
@@ -426,13 +429,19 @@ export class Config {
     return this._gameConfig.randomSpawn;
   }
   infiniteGold(): boolean {
-    return this._gameConfig.infiniteGold;
+    return (
+      !this._gameConfig.enhancedAI?.fairResources &&
+      this._gameConfig.infiniteGold
+    );
   }
   donateGold(): boolean {
     return this._gameConfig.donateGold;
   }
   infiniteTroops(): boolean {
-    return this._gameConfig.infiniteTroops;
+    return (
+      !this._gameConfig.enhancedAI?.fairResources &&
+      this._gameConfig.infiniteTroops
+    );
   }
   donateTroops(): boolean {
     return this._gameConfig.donateTroops;
@@ -708,16 +717,22 @@ export class Config {
     return info;
   }
 
+  private activeHostCheats(): GameConfig["hostCheats"] {
+    return this._gameConfig.enhancedAI?.fairResources
+      ? undefined
+      : this._gameConfig.hostCheats;
+  }
+
   private hasInfiniteGoldFor(player: Player | PlayerView): boolean {
     if (this.infiniteGold()) return true;
-    const hc = this._gameConfig.hostCheats;
+    const hc = this.activeHostCheats();
     return (hc?.infiniteGold ?? false) && player.isLobbyCreator();
   }
 
   private hasInfiniteTroopsFor(player: Player | PlayerView): boolean {
     if (this.infiniteTroops()) return true;
     return (
-      (this._gameConfig.hostCheats?.infiniteTroops ?? false) &&
+      (this.activeHostCheats()?.infiniteTroops ?? false) &&
       player.isLobbyCreator()
     );
   }
@@ -725,14 +740,14 @@ export class Config {
   private hasInfiniteTroopsForInfo(playerInfo: PlayerInfo): boolean {
     if (this.infiniteTroops()) return true;
     return (
-      (this._gameConfig.hostCheats?.infiniteTroops ?? false) &&
+      (this.activeHostCheats()?.infiniteTroops ?? false) &&
       playerInfo.isLobbyCreator
     );
   }
 
   private goldMultiplierFor(player: Player | PlayerView): number {
     const base = this.goldMultiplier();
-    const hc = this._gameConfig.hostCheats;
+    const hc = this.activeHostCheats();
     if (hc?.goldMultiplier && player.isLobbyCreator()) {
       return hc.goldMultiplier;
     }
@@ -740,6 +755,7 @@ export class Config {
   }
 
   public conquerGoldAmount(captured: Player): Gold {
+    if (this._gameConfig.enhancedAI?.fairResources) return captured.gold() / 2n;
     if (
       captured.type() === PlayerType.Bot ||
       captured.type() === PlayerType.Nation
@@ -752,7 +768,7 @@ export class Config {
 
   private startingGoldFor(playerInfo: PlayerInfo): Gold {
     const base = BigInt(this._gameConfig.startingGold ?? 0);
-    const hc = this._gameConfig.hostCheats;
+    const hc = this.activeHostCheats();
     if (hc?.startingGold && playerInfo.isLobbyCreator) {
       return base + BigInt(hc.startingGold);
     }

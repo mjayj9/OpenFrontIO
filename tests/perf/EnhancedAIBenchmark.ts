@@ -18,6 +18,7 @@ import {
   UnitType,
 } from "../../src/core/game/Game";
 import { GameConfig } from "../../src/core/Schemas";
+import { GOLD_INDEX_WAR, GOLD_INDEX_WORK } from "../../src/core/StatsSchemas";
 import { setup } from "../util/Setup";
 import { UseRealAttackLogic } from "../util/TestConfig";
 import { TickStats } from "./fullgame/Profiler";
@@ -50,6 +51,8 @@ const aggregate = {
     lostTroops: [] as number[],
     netTiles: [] as number[],
     earnedGold: [] as number[],
+    conquestGold: [] as number[],
+    goldAtEnd: [] as number[],
     commands: [] as number[],
     noOpCommands: [] as number[],
   },
@@ -58,6 +61,8 @@ const aggregate = {
     lostTroops: [] as number[],
     netTiles: [] as number[],
     earnedGold: [] as number[],
+    conquestGold: [] as number[],
+    goldAtEnd: [] as number[],
     commands: [] as number[],
     noOpCommands: [] as number[],
   },
@@ -175,7 +180,9 @@ for (let seed = firstSeed; seed < firstSeed + seeds; seed++) {
       const netTiles = p.numTilesOwned() - 5000;
       const commands = commandCounts.get(p.id()) ?? 0;
       const noOps = noOpCounts.get(p.id()) ?? 0;
-      const gold = Number(game.stats().getPlayerStats(p)?.gold?.[0] ?? 0);
+      const goldStats = game.stats().getPlayerStats(p)?.gold;
+      const gold = Number(goldStats?.[GOLD_INDEX_WORK] ?? 0);
+      const conquestGold = Number(goldStats?.[GOLD_INDEX_WAR] ?? 0);
       const data = {
         id: p.id(),
         survivalTicks: tick,
@@ -183,6 +190,8 @@ for (let seed = firstSeed; seed < firstSeed + seeds; seed++) {
         combatAndRetreatTroopsLost: Math.round(lost),
         occupationEfficiency: netTiles > 0 ? netTiles / Math.max(1, lost) : 0,
         workerGoldEarned: gold,
+        conquestGoldEarned: conquestGold,
+        goldAtEnd: Number(p.gold()),
         attackCommands: commands,
         noOpAttackCommands: noOps,
       };
@@ -191,6 +200,8 @@ for (let seed = firstSeed; seed < firstSeed + seeds; seed++) {
       side.lostTroops.push(lost);
       side.netTiles.push(netTiles);
       side.earnedGold.push(gold);
+      side.conquestGold.push(conquestGold);
+      side.goldAtEnd.push(Number(p.gold()));
       side.commands.push(commands);
       side.noOpCommands.push(noOps);
       return data;
@@ -227,6 +238,8 @@ const summary = Object.fromEntries(
   ]),
 );
 const output = {
+  rulesVersion: "fair-2-uniform-half-loot-cheats-disabled-shared-protection",
+  protectionTicks: 0,
   method: `Equal 60000 starting troops, fair economy/combat rules, two 5000-tile halves of Plains, all structures/weapons/alliances disabled, Hard reaction difficulty, 6000-tick cap; ${seeds} seeds x swapped starts, ${controller} controllers. Draws are unfinished at the cap. Losses are troop conservation (combat + retreat), not a classification of unnecessary loss. No-op means an attack execution becomes inactive on its first tick; successful immediate cancellation can also meet that definition.`,
   controller,
   node: process.version,

@@ -530,10 +530,12 @@ export class SinglePlayerModal extends BaseModal {
                   {
                     labelKey: "game_settings.infinite_gold",
                     checked: this.infiniteGold,
+                    hidden: this.enhancedAI?.fairResources,
                   },
                   {
                     labelKey: "game_settings.infinite_troops",
                     checked: this.infiniteTroops,
+                    hidden: this.enhancedAI?.fairResources,
                   },
                   {
                     labelKey: "game_settings.compact_map",
@@ -570,9 +572,7 @@ export class SinglePlayerModal extends BaseModal {
           ></game-config-settings>
           <enhanced-ai-settings
             .value=${this.enhancedAI}
-            @enhanced-ai-change=${(
-              event: CustomEvent<GameConfig["enhancedAI"]>,
-            ) => (this.enhancedAI = event.detail)}
+            @enhanced-ai-change=${this.handleEnhancedAIChange}
           ></enhanced-ai-settings>
         </div>
 
@@ -806,6 +806,19 @@ export class SinglePlayerModal extends BaseModal {
     );
   }
 
+  private clearFairResourceCheats(): void {
+    if (!this.enhancedAI?.fairResources) return;
+    this.infiniteGold = false;
+    this.infiniteTroops = false;
+  }
+
+  private handleEnhancedAIChange = (
+    event: CustomEvent<GameConfig["enhancedAI"]>,
+  ) => {
+    this.enhancedAI = event.detail;
+    this.clearFairResourceCheats();
+  };
+
   private handleConfigOptionToggleChanged = (e: Event) => {
     const customEvent = e as CustomEvent<{
       labelKey: string;
@@ -821,10 +834,10 @@ export class SinglePlayerModal extends BaseModal {
         this.randomSpawn = checked;
         break;
       case "game_settings.infinite_gold":
-        this.infiniteGold = checked;
+        this.infiniteGold = checked && !this.enhancedAI?.fairResources;
         break;
       case "game_settings.infinite_troops":
-        this.infiniteTroops = checked;
+        this.infiniteTroops = checked && !this.enhancedAI?.fairResources;
         break;
       case "game_settings.compact_map":
         this.handleCompactMapChange(checked);
@@ -1084,6 +1097,7 @@ export class SinglePlayerModal extends BaseModal {
   }
 
   private async startGame() {
+    this.clearFairResourceCheats();
     // A second click while the first is still resolving would dispatch a
     // second join-lobby for a different gameID.
     if (this.starting) return;

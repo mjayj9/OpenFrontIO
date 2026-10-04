@@ -489,6 +489,8 @@ async function main(): Promise<void> {
       JSON.stringify(
         {
           options: opts,
+          rulesVersion:
+            "fair-2-uniform-half-loot-cheats-disabled-shared-protection",
           node: process.version,
           tickTiming: summary,
           startupMs,

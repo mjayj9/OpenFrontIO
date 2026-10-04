@@ -1129,7 +1129,7 @@
     "challenge_description": "Challenge: existing difficulty resource bonuses apply to AI, including classic troop/capacity/growth and tribe combat modifiers. The bonuses vary by Easy/Medium/Hard/Impossible; this is not fair competition.",
     "debug_title": "AI decision details",
     "enable": "Enable enhanced AI profiles",
-    "fair_description": "Difficulty adjusts decisions. Human and AI use the same troop/gold rules.",
+    "fair_description": "Difficulty adjusts decisions. Human and AI use the same troop/gold rules and receive half of any defeated controller's gold. Infinite resources and host cheats are disabled; finite global starting gold and income settings apply to everyone.",
     "fair_resources": "Fair competition: equal economy and combat rules",
     "goal": {
       "attack": "Concentrating an offensive",

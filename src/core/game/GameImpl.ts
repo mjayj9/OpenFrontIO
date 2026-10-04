@@ -1596,12 +1596,14 @@ export class GameImpl implements Game {
       }
     }
 
-    // Don't transfer gold when the conquered player didn't play (never attacked anyone)
-    // This is especially important when starting gold is enabled
+    // Classic skips inactive human windfalls. Fair competition applies the same
+    // capture rule to every controller, including players that have not attacked.
     const stats = this._stats.getPlayerStats(conquered);
     const attacksSent = stats?.attacks?.[ATTACK_INDEX_SENT] ?? 0n;
     const skipGoldTransfer =
-      attacksSent === 0n && conquered.type() === PlayerType.Human;
+      !this._config.gameConfig().enhancedAI?.fairResources &&
+      attacksSent === 0n &&
+      conquered.type() === PlayerType.Human;
     const gold = skipGoldTransfer ? 0n : conquered.gold();
     const goldCaptured = skipGoldTransfer
       ? 0n

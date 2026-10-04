@@ -163,6 +163,7 @@ describe("enhanced deterministic AI", () => {
   test("planning uses bounded integer scores and keeps an eligible target", async () => {
     const game = await setup("plains", {
       enhancedAI: { ...SETTINGS, personality: "expansionist" },
+      spawnImmunityDuration: 0,
     });
     const self = add(game, "self"),
       other = add(game, "other");

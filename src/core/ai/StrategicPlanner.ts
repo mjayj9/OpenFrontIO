@@ -110,7 +110,8 @@ export function planStrategy(
       other.isPlayer() &&
       other !== player &&
       other.isAlive() &&
-      !player.isFriendly(other)
+      !player.isFriendly(other) &&
+      player.canAttackPlayer(other)
     )
       pool.set(other.id(), other);
   }
@@ -130,6 +131,7 @@ export function planStrategy(
             other !== player &&
             other.isAlive() &&
             !player.isFriendly(other) &&
+            player.canAttackPlayer(other) &&
             other.largestClusterBoundingBox,
         )
         .map((other) => {

@@ -1580,6 +1580,13 @@ export class AiAttackBehavior {
       this.player.troops() - targetTroops,
     opponent?: Player,
   ): boolean {
+    const config = this.game.config().gameConfig();
+    if (
+      (config.enhancedAI?.fairResources || config.modernMode) &&
+      target.isPlayer() &&
+      !this.player.canAttackPlayer(target)
+    )
+      return false;
     const troops = this.calculateAttackTroops(target, nonBotTroops, opponent);
     if (troops === null) {
       return false;
@@ -1596,6 +1603,12 @@ export class AiAttackBehavior {
   }
 
   private sendBoatAttack(target: Player): boolean {
+    const config = this.game.config().gameConfig();
+    if (
+      (config.enhancedAI?.fairResources || config.modernMode) &&
+      !this.player.canAttackPlayer(target)
+    )
+      return false;
     const route = this.boatRoute(target);
     if (route === null) return false;
     // A beachhead boat is cheap enough to risk past a warship, one at a time

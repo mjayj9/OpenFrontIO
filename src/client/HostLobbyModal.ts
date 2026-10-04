@@ -642,6 +642,7 @@ export class HostLobbyModal extends BaseModal {
               event: CustomEvent<GameConfig["enhancedAI"]>,
             ) => {
               this.enhancedAI = event.detail;
+              this.clearFairResourceCheats();
               void this.putGameConfig();
             }}
           ></enhanced-ai-settings>
@@ -699,10 +700,12 @@ export class HostLobbyModal extends BaseModal {
                   {
                     labelKey: "game_settings.infinite_gold",
                     checked: this.infiniteGold,
+                    hidden: this.enhancedAI?.fairResources,
                   },
                   {
                     labelKey: "game_settings.infinite_troops",
                     checked: this.infiniteTroops,
+                    hidden: this.enhancedAI?.fairResources,
                   },
                   {
                     labelKey: "game_settings.compact_map",
@@ -730,6 +733,7 @@ export class HostLobbyModal extends BaseModal {
                         {
                           labelKey: "host_modal.host_cheats",
                           checked: this.hostCheatsEnabled,
+                          hidden: this.enhancedAI?.fairResources,
                         },
                       ]),
                 ],
@@ -737,7 +741,10 @@ export class HostLobbyModal extends BaseModal {
               },
               hostCheats: {
                 titleKey: "host_modal.host_cheats",
-                visible: this.hostCheatsEnabled && !this.publiclyListed,
+                visible:
+                  this.hostCheatsEnabled &&
+                  !this.publiclyListed &&
+                  !this.enhancedAI?.fairResources,
                 toggles: [
                   {
                     labelKey: "game_settings.infinite_gold",
@@ -1819,7 +1826,21 @@ export class HostLobbyModal extends BaseModal {
     return ids.length > 0 ? ids : undefined;
   }
 
+  private clearFairResourceCheats(): void {
+    if (!this.enhancedAI?.fairResources) return;
+    this.infiniteGold = false;
+    this.infiniteTroops = false;
+    this.hostCheatsEnabled = false;
+    this.hostCheatInfiniteGold = false;
+    this.hostCheatInfiniteTroops = false;
+    this.hostCheatGoldMultiplier = false;
+    this.hostCheatGoldMultiplierValue = undefined;
+    this.hostCheatStartingGold = false;
+    this.hostCheatStartingGoldValue = undefined;
+  }
+
   private async putGameConfig() {
+    this.clearFairResourceCheats();
     const spawnImmunityTicks = this.spawnImmunityDurationMinutes
       ? this.spawnImmunityDurationMinutes * 60 * 10
       : 0;

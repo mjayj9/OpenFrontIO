@@ -1,6 +1,4 @@
 {
-  "rulesVersion": "fair-2-uniform-half-loot-cheats-disabled-shared-protection",
-  "protectionTicks": 0,
   "method": "Equal 60000 starting troops, fair economy/combat rules, two 5000-tile halves of Plains, all structures/weapons/alliances disabled, Hard reaction difficulty, 6000-tick cap; 30 seeds x swapped starts, tribe controllers. Draws are unfinished at the cap. Losses are troop conservation (combat + retreat), not a classification of unnecessary loss. No-op means an attack execution becomes inactive on its first tick; successful immediate cancellation can also meet that definition.",
   "controller": "tribe",
   "node": "v24.15.0",
@@ -17,8 +15,6 @@
       "lostTroops": 1642479.9726878533,
       "netTiles": 3000,
       "earnedGold": 179510,
-      "conquestGold": 71113.33333333333,
-      "goldAtEnd": 213340,
       "commands": 17.333333333333332,
       "noOpCommands": 0.03333333333333333
     },
@@ -27,13 +23,11 @@
       "lostTroops": 1635679.753508898,
       "netTiles": -3000,
       "earnedGold": 179510,
-      "conquestGold": 18641.666666666668,
-      "goldAtEnd": 55925,
       "commands": 12.016666666666667,
       "noOpCommands": 0
     }
   },
-  "heapUsedBytesAtEnd": 104770208,
+  "heapUsedBytesAtEnd": 79657464,
   "rows": [
     {
       "seed": 30,
@@ -50,8 +44,6 @@
           "combatAndRetreatTroopsLost": 1470721,
           "occupationEfficiency": 0.003399693711662469,
           "workerGoldEarned": 155800,
-          "conquestGoldEarned": 77900,
-          "goldAtEnd": 233700,
           "attackCommands": 14,
           "noOpAttackCommands": 0
         },
@@ -62,20 +54,18 @@
           "combatAndRetreatTroopsLost": 1423145,
           "occupationEfficiency": 0,
           "workerGoldEarned": 155800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 8,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1559,
-        "totalMs": 77.51019999999937,
-        "meanMs": 0.049717896087235,
-        "p50Ms": 0.017600000000015825,
-        "p95Ms": 0.14550000000002683,
-        "p99Ms": 0.46119999999996253,
-        "maxMs": 3.679299999999955,
+        "totalMs": 66.82089999999948,
+        "meanMs": 0.04286138550352757,
+        "p50Ms": 0.014999999999986358,
+        "p95Ms": 0.12569999999999482,
+        "p99Ms": 0.478999999999985,
+        "maxMs": 2.7384999999999877,
         "overBudget": 0,
         "slowest": []
       }
@@ -95,8 +85,6 @@
           "combatAndRetreatTroopsLost": 1470075,
           "occupationEfficiency": 0.0034011876482157267,
           "workerGoldEarned": 155800,
-          "conquestGoldEarned": 77900,
-          "goldAtEnd": 233700,
           "attackCommands": 14,
           "noOpAttackCommands": 0
         },
@@ -107,20 +95,18 @@
           "combatAndRetreatTroopsLost": 1423409,
           "occupationEfficiency": 0,
           "workerGoldEarned": 155800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 8,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1559,
-        "totalMs": 49.4916999999993,
-        "meanMs": 0.031745798588838546,
-        "p50Ms": 0.01290000000000191,
-        "p95Ms": 0.10449999999997317,
-        "p99Ms": 0.20029999999997017,
-        "maxMs": 0.7491999999999734,
+        "totalMs": 36.552999999997894,
+        "meanMs": 0.023446440025656122,
+        "p50Ms": 0.010000000000047748,
+        "p95Ms": 0.07269999999999754,
+        "p99Ms": 0.13049999999998363,
+        "maxMs": 0.4966000000000008,
         "overBudget": 0,
         "slowest": []
       }
@@ -140,8 +126,6 @@
           "combatAndRetreatTroopsLost": 1628135,
           "occupationEfficiency": 0.003070999293468979,
           "workerGoldEarned": 177600,
-          "conquestGoldEarned": 88800,
-          "goldAtEnd": 266400,
           "attackCommands": 18,
           "noOpAttackCommands": 0
         },
@@ -152,20 +136,18 @@
           "combatAndRetreatTroopsLost": 1519980,
           "occupationEfficiency": 0,
           "workerGoldEarned": 177600,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 8,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1777,
-        "totalMs": 56.1937999999999,
-        "meanMs": 0.031622847495779344,
-        "p50Ms": 0.017500000000040927,
-        "p95Ms": 0.09849999999994452,
-        "p99Ms": 0.2194000000000642,
-        "maxMs": 1.0229000000000497,
+        "totalMs": 38.11960000000056,
+        "meanMs": 0.02145166010129463,
+        "p50Ms": 0.012600000000020373,
+        "p95Ms": 0.06139999999993506,
+        "p99Ms": 0.11849999999992633,
+        "maxMs": 1.1444000000000187,
         "overBudget": 0,
         "slowest": []
       }
@@ -185,8 +167,6 @@
           "combatAndRetreatTroopsLost": 1628222,
           "occupationEfficiency": 0.0030708337470463,
           "workerGoldEarned": 177600,
-          "conquestGoldEarned": 88800,
-          "goldAtEnd": 266400,
           "attackCommands": 18,
           "noOpAttackCommands": 0
         },
@@ -197,20 +177,18 @@
           "combatAndRetreatTroopsLost": 1520009,
           "occupationEfficiency": 0,
           "workerGoldEarned": 177600,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 8,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1777,
-        "totalMs": 46.48099999999886,
-        "meanMs": 0.026157006190207572,
-        "p50Ms": 0.016200000000026193,
-        "p95Ms": 0.07740000000001146,
-        "p99Ms": 0.14260000000001583,
-        "maxMs": 0.3389000000000806,
+        "totalMs": 39.46159999999952,
+        "meanMs": 0.02220686550365758,
+        "p50Ms": 0.013300000000072032,
+        "p95Ms": 0.06470000000001619,
+        "p99Ms": 0.12619999999992615,
+        "maxMs": 0.6320999999999231,
         "overBudget": 0,
         "slowest": []
       }
@@ -230,8 +208,6 @@
           "combatAndRetreatTroopsLost": 1104534,
           "occupationEfficiency": 0,
           "workerGoldEarned": 135700,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -242,20 +218,18 @@
           "combatAndRetreatTroopsLost": 1109089,
           "occupationEfficiency": 0.004508205712939611,
           "workerGoldEarned": 135700,
-          "conquestGoldEarned": 67850,
-          "goldAtEnd": 203550,
           "attackCommands": 8,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1358,
-        "totalMs": 42.49410000000046,
-        "meanMs": 0.03129167893961742,
-        "p50Ms": 0.015899999999987813,
-        "p95Ms": 0.10469999999997981,
-        "p99Ms": 0.2154000000000451,
-        "maxMs": 1.009999999999991,
+        "totalMs": 28.134400000002074,
+        "meanMs": 0.020717525773197402,
+        "p50Ms": 0.010999999999967258,
+        "p95Ms": 0.06709999999998217,
+        "p99Ms": 0.12860000000000582,
+        "maxMs": 0.6048000000000684,
         "overBudget": 0,
         "slowest": []
       }
@@ -275,8 +249,6 @@
           "combatAndRetreatTroopsLost": 1105466,
           "occupationEfficiency": 0,
           "workerGoldEarned": 135700,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -287,20 +259,18 @@
           "combatAndRetreatTroopsLost": 1110834,
           "occupationEfficiency": 0.004501120934467545,
           "workerGoldEarned": 135700,
-          "conquestGoldEarned": 67850,
-          "goldAtEnd": 203550,
           "attackCommands": 8,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1358,
-        "totalMs": 38.12740000000292,
-        "meanMs": 0.02807614138439096,
-        "p50Ms": 0.015300000000024738,
-        "p95Ms": 0.09920000000010987,
-        "p99Ms": 0.15840000000002874,
-        "maxMs": 0.9642999999999802,
+        "totalMs": 23.25200000000109,
+        "meanMs": 0.017122238586156913,
+        "p50Ms": 0.009700000000066211,
+        "p95Ms": 0.061599999999998545,
+        "p99Ms": 0.09239999999999782,
+        "maxMs": 0.5185999999999922,
         "overBudget": 0,
         "slowest": []
       }
@@ -320,8 +290,6 @@
           "combatAndRetreatTroopsLost": 1495010,
           "occupationEfficiency": 0.0033444593343500847,
           "workerGoldEarned": 163100,
-          "conquestGoldEarned": 81550,
-          "goldAtEnd": 244650,
           "attackCommands": 16,
           "noOpAttackCommands": 0
         },
@@ -332,20 +300,18 @@
           "combatAndRetreatTroopsLost": 1500431,
           "occupationEfficiency": 0,
           "workerGoldEarned": 163100,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1632,
-        "totalMs": 36.05500000000234,
-        "meanMs": 0.022092524509805353,
-        "p50Ms": 0.0072000000000116415,
-        "p95Ms": 0.07519999999999527,
-        "p99Ms": 0.12020000000006803,
-        "maxMs": 0.9084000000000287,
+        "totalMs": 23.36069999999961,
+        "meanMs": 0.014314154411764467,
+        "p50Ms": 0.004900000000020555,
+        "p95Ms": 0.05079999999998108,
+        "p99Ms": 0.08169999999995525,
+        "maxMs": 0.12639999999998963,
         "overBudget": 0,
         "slowest": []
       }
@@ -365,8 +331,6 @@
           "combatAndRetreatTroopsLost": 1495472,
           "occupationEfficiency": 0.0033434265448398295,
           "workerGoldEarned": 163100,
-          "conquestGoldEarned": 81550,
-          "goldAtEnd": 244650,
           "attackCommands": 16,
           "noOpAttackCommands": 0
         },
@@ -377,20 +341,18 @@
           "combatAndRetreatTroopsLost": 1501959,
           "occupationEfficiency": 0,
           "workerGoldEarned": 163100,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1632,
-        "totalMs": 34.00569999999993,
-        "meanMs": 0.020836825980392115,
-        "p50Ms": 0.0072999999999865395,
-        "p95Ms": 0.07180000000005293,
-        "p99Ms": 0.11450000000002092,
-        "maxMs": 0.36980000000005475,
+        "totalMs": 24.590299999999957,
+        "meanMs": 0.015067585784313699,
+        "p50Ms": 0.004700000000070759,
+        "p95Ms": 0.04910000000006676,
+        "p99Ms": 0.08830000000000382,
+        "maxMs": 0.733600000000024,
         "overBudget": 0,
         "slowest": []
       }
@@ -410,8 +372,6 @@
           "combatAndRetreatTroopsLost": 1722205,
           "occupationEfficiency": 0,
           "workerGoldEarned": 200800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         },
@@ -422,20 +382,18 @@
           "combatAndRetreatTroopsLost": 1880576,
           "occupationEfficiency": 0.0026587605238238394,
           "workerGoldEarned": 200800,
-          "conquestGoldEarned": 100400,
-          "goldAtEnd": 301200,
           "attackCommands": 23,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2009,
-        "totalMs": 33.84159999999849,
-        "meanMs": 0.01684499751119885,
-        "p50Ms": 0.006300000000010186,
-        "p95Ms": 0.05739999999991596,
-        "p99Ms": 0.10800000000006094,
-        "maxMs": 0.8087000000000444,
+        "totalMs": 21.84530000000052,
+        "meanMs": 0.010873718267795181,
+        "p50Ms": 0.00430000000005748,
+        "p95Ms": 0.03609999999991942,
+        "p99Ms": 0.07000000000005002,
+        "maxMs": 0.6308999999999969,
         "overBudget": 0,
         "slowest": []
       }
@@ -455,8 +413,6 @@
           "combatAndRetreatTroopsLost": 1722205,
           "occupationEfficiency": 0,
           "workerGoldEarned": 200800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         },
@@ -467,20 +423,18 @@
           "combatAndRetreatTroopsLost": 1880576,
           "occupationEfficiency": 0.0026587605238238394,
           "workerGoldEarned": 200800,
-          "conquestGoldEarned": 100400,
-          "goldAtEnd": 301200,
           "attackCommands": 23,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2009,
-        "totalMs": 31.071399999999244,
-        "meanMs": 0.01546610253857603,
-        "p50Ms": 0.006099999999946704,
-        "p95Ms": 0.05099999999993088,
-        "p99Ms": 0.10350000000005366,
-        "maxMs": 0.9102000000000317,
+        "totalMs": 25.124300000003245,
+        "meanMs": 0.012505873568941386,
+        "p50Ms": 0.004900000000020555,
+        "p95Ms": 0.03989999999998872,
+        "p99Ms": 0.08369999999990796,
+        "maxMs": 0.6814000000000533,
         "overBudget": 0,
         "slowest": []
       }
@@ -500,8 +454,6 @@
           "combatAndRetreatTroopsLost": 1908535,
           "occupationEfficiency": 0.002619810860519994,
           "workerGoldEarned": 202000,
-          "conquestGoldEarned": 101000,
-          "goldAtEnd": 303000,
           "attackCommands": 18,
           "noOpAttackCommands": 0
         },
@@ -512,20 +464,18 @@
           "combatAndRetreatTroopsLost": 1878820,
           "occupationEfficiency": 0,
           "workerGoldEarned": 202000,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 12,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2021,
-        "totalMs": 39.438799999999446,
-        "meanMs": 0.01951449777337924,
-        "p50Ms": 0.007099999999923057,
-        "p95Ms": 0.0625,
-        "p99Ms": 0.11159999999995307,
-        "maxMs": 0.8120000000000118,
+        "totalMs": 32.88179999999852,
+        "meanMs": 0.016270064324591053,
+        "p50Ms": 0.005600000000072214,
+        "p95Ms": 0.05389999999999873,
+        "p99Ms": 0.11030000000005202,
+        "maxMs": 0.3147999999999911,
         "overBudget": 0,
         "slowest": []
       }
@@ -545,8 +495,6 @@
           "combatAndRetreatTroopsLost": 1910199,
           "occupationEfficiency": 0.002617528550344958,
           "workerGoldEarned": 202500,
-          "conquestGoldEarned": 101250,
-          "goldAtEnd": 303750,
           "attackCommands": 18,
           "noOpAttackCommands": 0
         },
@@ -557,20 +505,18 @@
           "combatAndRetreatTroopsLost": 1880675,
           "occupationEfficiency": 0,
           "workerGoldEarned": 202500,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 12,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2026,
-        "totalMs": 36.5868000000022,
-        "meanMs": 0.018058637709774037,
-        "p50Ms": 0.005400000000008731,
-        "p95Ms": 0.0603000000000975,
-        "p99Ms": 0.10940000000005057,
-        "maxMs": 1.0276000000000067,
+        "totalMs": 26.984000000001743,
+        "meanMs": 0.013318854886476675,
+        "p50Ms": 0.004400000000032378,
+        "p95Ms": 0.04329999999993106,
+        "p99Ms": 0.07110000000000127,
+        "maxMs": 0.9007000000000289,
         "overBudget": 0,
         "slowest": []
       }
@@ -590,8 +536,6 @@
           "combatAndRetreatTroopsLost": 1490922,
           "occupationEfficiency": 0.003353630134879679,
           "workerGoldEarned": 157600,
-          "conquestGoldEarned": 78800,
-          "goldAtEnd": 236400,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -602,20 +546,18 @@
           "combatAndRetreatTroopsLost": 1404370,
           "occupationEfficiency": 0,
           "workerGoldEarned": 157600,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 7,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1577,
-        "totalMs": 28.51499999999544,
-        "meanMs": 0.01808180088775868,
-        "p50Ms": 0.009299999999939246,
-        "p95Ms": 0.05700000000001637,
-        "p99Ms": 0.09170000000005984,
-        "maxMs": 0.24529999999992924,
+        "totalMs": 22.623599999998078,
+        "meanMs": 0.014345973367151602,
+        "p50Ms": 0.007100000000036744,
+        "p95Ms": 0.04280000000005657,
+        "p99Ms": 0.07330000000001746,
+        "maxMs": 0.6073999999999842,
         "overBudget": 0,
         "slowest": []
       }
@@ -635,8 +577,6 @@
           "combatAndRetreatTroopsLost": 1491155,
           "occupationEfficiency": 0.003353105963593766,
           "workerGoldEarned": 157600,
-          "conquestGoldEarned": 78800,
-          "goldAtEnd": 236400,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -647,20 +587,18 @@
           "combatAndRetreatTroopsLost": 1404431,
           "occupationEfficiency": 0,
           "workerGoldEarned": 157600,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 7,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1577,
-        "totalMs": 29.954200000001947,
-        "meanMs": 0.018994419784401997,
-        "p50Ms": 0.009200000000078035,
-        "p95Ms": 0.057699999999840657,
-        "p99Ms": 0.11149999999997817,
-        "maxMs": 0.7660999999999376,
+        "totalMs": 22.407999999997173,
+        "meanMs": 0.014209258084969673,
+        "p50Ms": 0.007099999999923057,
+        "p95Ms": 0.044399999999996,
+        "p99Ms": 0.07039999999994961,
+        "maxMs": 0.5255999999999403,
         "overBudget": 0,
         "slowest": []
       }
@@ -680,8 +618,6 @@
           "combatAndRetreatTroopsLost": 1665676,
           "occupationEfficiency": 0.0030017850137054507,
           "workerGoldEarned": 177000,
-          "conquestGoldEarned": 88500,
-          "goldAtEnd": 265500,
           "attackCommands": 16,
           "noOpAttackCommands": 0
         },
@@ -692,20 +628,18 @@
           "combatAndRetreatTroopsLost": 1650419,
           "occupationEfficiency": 0,
           "workerGoldEarned": 177000,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 10,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1771,
-        "totalMs": 29.77710000000343,
-        "meanMs": 0.016813721061549085,
-        "p50Ms": 0.005200000000058935,
-        "p95Ms": 0.05989999999997053,
-        "p99Ms": 0.09040000000004511,
-        "maxMs": 0.6770999999998821,
+        "totalMs": 24.235599999998158,
+        "meanMs": 0.013684697910783828,
+        "p50Ms": 0.004000000000019099,
+        "p95Ms": 0.05010000000004311,
+        "p99Ms": 0.07609999999999673,
+        "maxMs": 0.6393999999999096,
         "overBudget": 0,
         "slowest": []
       }
@@ -725,8 +659,6 @@
           "combatAndRetreatTroopsLost": 1665361,
           "occupationEfficiency": 0.0030023518167044535,
           "workerGoldEarned": 176900,
-          "conquestGoldEarned": 88450,
-          "goldAtEnd": 265350,
           "attackCommands": 16,
           "noOpAttackCommands": 0
         },
@@ -737,20 +669,18 @@
           "combatAndRetreatTroopsLost": 1650798,
           "occupationEfficiency": 0,
           "workerGoldEarned": 176900,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 10,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1770,
-        "totalMs": 28.693700000004583,
-        "meanMs": 0.016211129943505414,
-        "p50Ms": 0.004999999999881766,
-        "p95Ms": 0.05629999999996471,
-        "p99Ms": 0.09120000000007167,
-        "maxMs": 0.7869000000000597,
+        "totalMs": 22.56119999999953,
+        "meanMs": 0.012746440677965836,
+        "p50Ms": 0.0037999999999556167,
+        "p95Ms": 0.044599999999945794,
+        "p99Ms": 0.06899999999995998,
+        "maxMs": 0.19100000000003092,
         "overBudget": 0,
         "slowest": []
       }
@@ -770,8 +700,6 @@
           "combatAndRetreatTroopsLost": 2228884,
           "occupationEfficiency": 0.0022432753518674526,
           "workerGoldEarned": 242500,
-          "conquestGoldEarned": 121250,
-          "goldAtEnd": 363750,
           "attackCommands": 25,
           "noOpAttackCommands": 0
         },
@@ -782,20 +710,18 @@
           "combatAndRetreatTroopsLost": 2271815,
           "occupationEfficiency": 0,
           "workerGoldEarned": 242500,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 19,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2426,
-        "totalMs": 38.545599999997876,
-        "meanMs": 0.015888540807913385,
-        "p50Ms": 0.005099999999856664,
-        "p95Ms": 0.0624000000000251,
-        "p99Ms": 0.09360000000015134,
-        "maxMs": 0.8160000000000309,
+        "totalMs": 32.37879999999859,
+        "meanMs": 0.013346578730419865,
+        "p50Ms": 0.004099999999993997,
+        "p95Ms": 0.04939999999999145,
+        "p99Ms": 0.0906999999999698,
+        "maxMs": 0.862700000000018,
         "overBudget": 0,
         "slowest": []
       }
@@ -815,8 +741,6 @@
           "combatAndRetreatTroopsLost": 2228932,
           "occupationEfficiency": 0.0022432263734061863,
           "workerGoldEarned": 242800,
-          "conquestGoldEarned": 121400,
-          "goldAtEnd": 364200,
           "attackCommands": 25,
           "noOpAttackCommands": 0
         },
@@ -827,20 +751,18 @@
           "combatAndRetreatTroopsLost": 2272270,
           "occupationEfficiency": 0,
           "workerGoldEarned": 242800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 19,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2429,
-        "totalMs": 37.52040000000193,
-        "meanMs": 0.015446850555785067,
-        "p50Ms": 0.004900000000134241,
-        "p95Ms": 0.056300000000192085,
-        "p99Ms": 0.09590000000002874,
-        "maxMs": 0.8125,
+        "totalMs": 29.356199999999944,
+        "meanMs": 0.012085714285714262,
+        "p50Ms": 0.0039999999999054126,
+        "p95Ms": 0.04290000000003147,
+        "p99Ms": 0.06829999999990832,
+        "maxMs": 0.6630999999999858,
         "overBudget": 0,
         "slowest": []
       }
@@ -860,8 +782,6 @@
           "combatAndRetreatTroopsLost": 1160582,
           "occupationEfficiency": 0.004308182878143393,
           "workerGoldEarned": 124200,
-          "conquestGoldEarned": 62100,
-          "goldAtEnd": 186300,
           "attackCommands": 11,
           "noOpAttackCommands": 0
         },
@@ -872,20 +792,18 @@
           "combatAndRetreatTroopsLost": 1085489,
           "occupationEfficiency": 0,
           "workerGoldEarned": 124200,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 5,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1243,
-        "totalMs": 20.617500000000746,
-        "meanMs": 0.01658688656476327,
-        "p50Ms": 0.009000000000014552,
-        "p95Ms": 0.05209999999988213,
-        "p99Ms": 0.07650000000012369,
-        "maxMs": 0.11940000000004147,
+        "totalMs": 17.954999999998336,
+        "meanMs": 0.014444891391792707,
+        "p50Ms": 0.007399999999961437,
+        "p95Ms": 0.04259999999999309,
+        "p99Ms": 0.06949999999994816,
+        "maxMs": 0.8969000000000733,
         "overBudget": 0,
         "slowest": []
       }
@@ -905,8 +823,6 @@
           "combatAndRetreatTroopsLost": 1161360,
           "occupationEfficiency": 0.004305297496113274,
           "workerGoldEarned": 124100,
-          "conquestGoldEarned": 62050,
-          "goldAtEnd": 186150,
           "attackCommands": 11,
           "noOpAttackCommands": 0
         },
@@ -917,20 +833,18 @@
           "combatAndRetreatTroopsLost": 1085560,
           "occupationEfficiency": 0,
           "workerGoldEarned": 124100,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 5,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1242,
-        "totalMs": 21.716099999999187,
-        "meanMs": 0.017484782608694998,
-        "p50Ms": 0.008900000000039654,
-        "p95Ms": 0.05209999999988213,
-        "p99Ms": 0.09020000000009532,
-        "maxMs": 0.7047999999999774,
+        "totalMs": 16.68930000000114,
+        "meanMs": 0.013437439613527488,
+        "p50Ms": 0.007100000000036744,
+        "p95Ms": 0.03999999999996362,
+        "p99Ms": 0.060299999999870124,
+        "maxMs": 0.18600000000014916,
         "overBudget": 0,
         "slowest": []
       }
@@ -950,8 +864,6 @@
           "combatAndRetreatTroopsLost": 1918655,
           "occupationEfficiency": 0.0026059926261310274,
           "workerGoldEarned": 208900,
-          "conquestGoldEarned": 104450,
-          "goldAtEnd": 313350,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         },
@@ -962,20 +874,18 @@
           "combatAndRetreatTroopsLost": 1889296,
           "occupationEfficiency": 0,
           "workerGoldEarned": 208900,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 16,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2090,
-        "totalMs": 27.40659999999798,
-        "meanMs": 0.013113205741625828,
-        "p50Ms": 0.00479999999993197,
-        "p95Ms": 0.04719999999997526,
-        "p99Ms": 0.08159999999998035,
-        "maxMs": 0.17219999999997526,
+        "totalMs": 23.04300000000171,
+        "meanMs": 0.01102535885167546,
+        "p50Ms": 0.004200000000082582,
+        "p95Ms": 0.038600000000087675,
+        "p99Ms": 0.07519999999999527,
+        "maxMs": 0.18899999999985084,
         "overBudget": 0,
         "slowest": []
       }
@@ -995,8 +905,6 @@
           "combatAndRetreatTroopsLost": 1919053,
           "occupationEfficiency": 0.002605451430223469,
           "workerGoldEarned": 208800,
-          "conquestGoldEarned": 104400,
-          "goldAtEnd": 313200,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         },
@@ -1007,20 +915,18 @@
           "combatAndRetreatTroopsLost": 1889332,
           "occupationEfficiency": 0,
           "workerGoldEarned": 208800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 16,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2089,
-        "totalMs": 26.738400000000638,
-        "meanMs": 0.012799617041647027,
-        "p50Ms": 0.004599999999982174,
-        "p95Ms": 0.04610000000002401,
-        "p99Ms": 0.07979999999997744,
-        "maxMs": 0.2299000000000433,
+        "totalMs": 22.610200000003488,
+        "meanMs": 0.010823456199140014,
+        "p50Ms": 0.0036999999999807187,
+        "p95Ms": 0.038600000000087675,
+        "p99Ms": 0.06709999999998217,
+        "maxMs": 0.5616999999999734,
         "overBudget": 0,
         "slowest": []
       }
@@ -1040,8 +946,6 @@
           "combatAndRetreatTroopsLost": 1787199,
           "occupationEfficiency": 0.002797673950577357,
           "workerGoldEarned": 190000,
-          "conquestGoldEarned": 95000,
-          "goldAtEnd": 285000,
           "attackCommands": 17,
           "noOpAttackCommands": 0
         },
@@ -1052,20 +956,18 @@
           "combatAndRetreatTroopsLost": 1736882,
           "occupationEfficiency": 0,
           "workerGoldEarned": 190000,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 10,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1901,
-        "totalMs": 33.012200000000576,
-        "meanMs": 0.017365702261967687,
-        "p50Ms": 0.004899999999906868,
-        "p95Ms": 0.053200000000060754,
-        "p99Ms": 0.09529999999995198,
-        "maxMs": 2.3743000000001757,
+        "totalMs": 22.62820000000238,
+        "meanMs": 0.0119033140452406,
+        "p50Ms": 0.0039999999999054126,
+        "p95Ms": 0.03940000000011423,
+        "p99Ms": 0.05919999999991887,
+        "maxMs": 0.48900000000003274,
         "overBudget": 0,
         "slowest": []
       }
@@ -1085,8 +987,6 @@
           "combatAndRetreatTroopsLost": 1770280,
           "occupationEfficiency": 0.002824412035325874,
           "workerGoldEarned": 190400,
-          "conquestGoldEarned": 95200,
-          "goldAtEnd": 285600,
           "attackCommands": 17,
           "noOpAttackCommands": 0
         },
@@ -1097,20 +997,18 @@
           "combatAndRetreatTroopsLost": 1747373,
           "occupationEfficiency": 0,
           "workerGoldEarned": 190400,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 10,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1905,
-        "totalMs": 28.671000000000276,
-        "meanMs": 0.015050393700787546,
-        "p50Ms": 0.004600000000209548,
-        "p95Ms": 0.0501000000001568,
-        "p99Ms": 0.08470000000011169,
-        "maxMs": 0.4477999999999156,
+        "totalMs": 24.118199999995795,
+        "meanMs": 0.012660472440942675,
+        "p50Ms": 0.004100000000107684,
+        "p95Ms": 0.04369999999994434,
+        "p99Ms": 0.06409999999982574,
+        "maxMs": 0.5157999999998992,
         "overBudget": 0,
         "slowest": []
       }
@@ -1130,8 +1028,6 @@
           "combatAndRetreatTroopsLost": 940447,
           "occupationEfficiency": 0,
           "workerGoldEarned": 122400,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 16,
           "noOpAttackCommands": 1
         },
@@ -1142,20 +1038,18 @@
           "combatAndRetreatTroopsLost": 1022818,
           "occupationEfficiency": 0.00488845382452294,
           "workerGoldEarned": 122400,
-          "conquestGoldEarned": 61200,
-          "goldAtEnd": 183600,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1225,
-        "totalMs": 19.752100000000837,
-        "meanMs": 0.016124163265306805,
-        "p50Ms": 0.005400000000008731,
-        "p95Ms": 0.05869999999981701,
-        "p99Ms": 0.11309999999980391,
-        "maxMs": 0.24099999999998545,
+        "totalMs": 17.11539999999968,
+        "meanMs": 0.013971755102040555,
+        "p50Ms": 0.004999999999881766,
+        "p95Ms": 0.05060000000003129,
+        "p99Ms": 0.07519999999999527,
+        "maxMs": 0.3102000000001226,
         "overBudget": 0,
         "slowest": []
       }
@@ -1175,8 +1069,6 @@
           "combatAndRetreatTroopsLost": 942137,
           "occupationEfficiency": 0,
           "workerGoldEarned": 122500,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 16,
           "noOpAttackCommands": 1
         },
@@ -1187,20 +1079,18 @@
           "combatAndRetreatTroopsLost": 1024633,
           "occupationEfficiency": 0.004879795769427219,
           "workerGoldEarned": 122500,
-          "conquestGoldEarned": 61250,
-          "goldAtEnd": 183750,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1226,
-        "totalMs": 20.209300000004532,
-        "meanMs": 0.016483931484506144,
-        "p50Ms": 0.005699999999933425,
-        "p95Ms": 0.06109999999989668,
-        "p99Ms": 0.08670000000006439,
-        "maxMs": 0.6274999999998272,
+        "totalMs": 18.10989999998833,
+        "meanMs": 0.014771533442078572,
+        "p50Ms": 0.005400000000008731,
+        "p95Ms": 0.0545999999999367,
+        "p99Ms": 0.08009999999990214,
+        "maxMs": 0.5142000000000735,
         "overBudget": 0,
         "slowest": []
       }
@@ -1220,8 +1110,6 @@
           "combatAndRetreatTroopsLost": 1506645,
           "occupationEfficiency": 0.0033186319585762096,
           "workerGoldEarned": 161500,
-          "conquestGoldEarned": 80750,
-          "goldAtEnd": 242250,
           "attackCommands": 13,
           "noOpAttackCommands": 0
         },
@@ -1232,20 +1120,18 @@
           "combatAndRetreatTroopsLost": 1492604,
           "occupationEfficiency": 0,
           "workerGoldEarned": 161500,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 8,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1616,
-        "totalMs": 24.546299999998155,
-        "meanMs": 0.015189542079206779,
-        "p50Ms": 0.004599999999982174,
-        "p95Ms": 0.05079999999998108,
-        "p99Ms": 0.07970000000000255,
-        "maxMs": 0.5217000000000098,
+        "totalMs": 26.272199999993518,
+        "meanMs": 0.016257549504946484,
+        "p50Ms": 0.006099999999833017,
+        "p95Ms": 0.05559999999991305,
+        "p99Ms": 0.0830999999998312,
+        "maxMs": 0.5427999999999429,
         "overBudget": 0,
         "slowest": []
       }
@@ -1265,8 +1151,6 @@
           "combatAndRetreatTroopsLost": 1507043,
           "occupationEfficiency": 0.0033177551340856396,
           "workerGoldEarned": 161500,
-          "conquestGoldEarned": 80750,
-          "goldAtEnd": 242250,
           "attackCommands": 13,
           "noOpAttackCommands": 0
         },
@@ -1277,20 +1161,18 @@
           "combatAndRetreatTroopsLost": 1492948,
           "occupationEfficiency": 0,
           "workerGoldEarned": 161500,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 8,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1616,
-        "totalMs": 23.857100000005403,
-        "meanMs": 0.014763056930696412,
-        "p50Ms": 0.004599999999982174,
-        "p95Ms": 0.0523000000000593,
-        "p99Ms": 0.09259999999994761,
-        "maxMs": 0.13769999999999527,
+        "totalMs": 20.82269999999994,
+        "meanMs": 0.012885334158415805,
+        "p50Ms": 0.0040999999998803105,
+        "p95Ms": 0.047499999999899956,
+        "p99Ms": 0.06629999999995562,
+        "maxMs": 0.14580000000000837,
         "overBudget": 0,
         "slowest": []
       }
@@ -1310,8 +1192,6 @@
           "combatAndRetreatTroopsLost": 1900765,
           "occupationEfficiency": 0.0026305201458859716,
           "workerGoldEarned": 203000,
-          "conquestGoldEarned": 101500,
-          "goldAtEnd": 304500,
           "attackCommands": 18,
           "noOpAttackCommands": 0
         },
@@ -1322,20 +1202,18 @@
           "combatAndRetreatTroopsLost": 1863595,
           "occupationEfficiency": 0,
           "workerGoldEarned": 203000,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 11,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2031,
-        "totalMs": 28.202500000004193,
-        "meanMs": 0.013886016740523975,
-        "p50Ms": 0.00430000000005748,
-        "p95Ms": 0.04780000000005202,
-        "p99Ms": 0.07580000000007203,
-        "maxMs": 0.4193000000000211,
+        "totalMs": 24.95419999999558,
+        "meanMs": 0.012286656819298662,
+        "p50Ms": 0.003300000000081127,
+        "p95Ms": 0.04030000000011569,
+        "p99Ms": 0.0706000000000131,
+        "maxMs": 0.5552000000000135,
         "overBudget": 0,
         "slowest": []
       }
@@ -1355,8 +1233,6 @@
           "combatAndRetreatTroopsLost": 1882665,
           "occupationEfficiency": 0.0026558099394831426,
           "workerGoldEarned": 202000,
-          "conquestGoldEarned": 101000,
-          "goldAtEnd": 303000,
           "attackCommands": 18,
           "noOpAttackCommands": 0
         },
@@ -1367,20 +1243,18 @@
           "combatAndRetreatTroopsLost": 1881409,
           "occupationEfficiency": 0,
           "workerGoldEarned": 202000,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 11,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2021,
-        "totalMs": 29.27790000000141,
-        "meanMs": 0.014486838198912126,
-        "p50Ms": 0.003500000000030923,
-        "p95Ms": 0.05099999999993088,
-        "p99Ms": 0.08629999999993743,
-        "maxMs": 0.6558999999999742,
+        "totalMs": 24.967900000003056,
+        "meanMs": 0.012354230578922838,
+        "p50Ms": 0.0029999999999290594,
+        "p95Ms": 0.043899999999894135,
+        "p99Ms": 0.07429999999999382,
+        "maxMs": 0.5854999999999109,
         "overBudget": 0,
         "slowest": []
       }
@@ -1400,8 +1274,6 @@
           "combatAndRetreatTroopsLost": 1803231,
           "occupationEfficiency": 0.0027728003926566413,
           "workerGoldEarned": 191900,
-          "conquestGoldEarned": 95950,
-          "goldAtEnd": 287850,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -1412,20 +1284,18 @@
           "combatAndRetreatTroopsLost": 1753267,
           "occupationEfficiency": 0,
           "workerGoldEarned": 191900,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 10,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1920,
-        "totalMs": 25.168000000003076,
-        "meanMs": 0.013108333333334936,
-        "p50Ms": 0.0036000000000058208,
-        "p95Ms": 0.048199999999951615,
-        "p99Ms": 0.07359999999994216,
-        "maxMs": 0.49689999999986867,
+        "totalMs": 21.041200000004665,
+        "meanMs": 0.010958958333335763,
+        "p50Ms": 0.0029999999999290594,
+        "p95Ms": 0.039099999999962165,
+        "p99Ms": 0.06079999999997199,
+        "maxMs": 0.40879999999992833,
         "overBudget": 0,
         "slowest": []
       }
@@ -1445,8 +1315,6 @@
           "combatAndRetreatTroopsLost": 1803604,
           "occupationEfficiency": 0.002772227519804278,
           "workerGoldEarned": 191900,
-          "conquestGoldEarned": 95950,
-          "goldAtEnd": 287850,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -1457,20 +1325,18 @@
           "combatAndRetreatTroopsLost": 1753724,
           "occupationEfficiency": 0,
           "workerGoldEarned": 191900,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 10,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1920,
-        "totalMs": 24.14900000000148,
-        "meanMs": 0.012577604166667438,
+        "totalMs": 21.259599999996908,
+        "meanMs": 0.011072708333331722,
         "p50Ms": 0.003400000000056025,
-        "p95Ms": 0.04690000000005057,
-        "p99Ms": 0.06999999999993634,
-        "maxMs": 0.6702000000000226,
+        "p95Ms": 0.04179999999996653,
+        "p99Ms": 0.0627999999999247,
+        "maxMs": 0.18549999999981992,
         "overBudget": 0,
         "slowest": []
       }
@@ -1490,8 +1356,6 @@
           "combatAndRetreatTroopsLost": 1966413,
           "occupationEfficiency": 0.0025427012174679907,
           "workerGoldEarned": 210800,
-          "conquestGoldEarned": 105400,
-          "goldAtEnd": 316200,
           "attackCommands": 20,
           "noOpAttackCommands": 0
         },
@@ -1502,20 +1366,18 @@
           "combatAndRetreatTroopsLost": 1970674,
           "occupationEfficiency": 0,
           "workerGoldEarned": 210800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 14,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2109,
-        "totalMs": 29.12329999999838,
-        "meanMs": 0.013809056424845131,
-        "p50Ms": 0.004500000000007276,
-        "p95Ms": 0.04469999999992069,
-        "p99Ms": 0.07510000000002037,
-        "maxMs": 0.5157999999998992,
+        "totalMs": 25.14279999999917,
+        "meanMs": 0.011921669037458118,
+        "p50Ms": 0.004100000000107684,
+        "p95Ms": 0.04030000000011569,
+        "p99Ms": 0.06290000000012697,
+        "maxMs": 0.15589999999997417,
         "overBudget": 0,
         "slowest": []
       }
@@ -1535,8 +1397,6 @@
           "combatAndRetreatTroopsLost": 2065732,
           "occupationEfficiency": 0.002420449447609849,
           "workerGoldEarned": 219300,
-          "conquestGoldEarned": 109650,
-          "goldAtEnd": 328950,
           "attackCommands": 22,
           "noOpAttackCommands": 0
         },
@@ -1547,20 +1407,18 @@
           "combatAndRetreatTroopsLost": 2057929,
           "occupationEfficiency": 0,
           "workerGoldEarned": 219300,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2194,
-        "totalMs": 32.666400000000294,
-        "meanMs": 0.014888969917958201,
-        "p50Ms": 0.0047000000001844455,
-        "p95Ms": 0.048800000000028376,
-        "p99Ms": 0.07709999999997308,
-        "maxMs": 0.18609999999989668,
+        "totalMs": 27.161500000000615,
+        "meanMs": 0.012379899726527172,
+        "p50Ms": 0.0039000000001578883,
+        "p95Ms": 0.04169999999999163,
+        "p99Ms": 0.06330000000002656,
+        "maxMs": 0.5371000000000095,
         "overBudget": 0,
         "slowest": []
       }
@@ -1580,8 +1438,6 @@
           "combatAndRetreatTroopsLost": 1655336,
           "occupationEfficiency": 0.0030205346511552617,
           "workerGoldEarned": 176000,
-          "conquestGoldEarned": 88000,
-          "goldAtEnd": 264000,
           "attackCommands": 14,
           "noOpAttackCommands": 0
         },
@@ -1592,20 +1448,18 @@
           "combatAndRetreatTroopsLost": 1619849,
           "occupationEfficiency": 0,
           "workerGoldEarned": 176000,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1761,
-        "totalMs": 27.66050000000132,
-        "meanMs": 0.015707268597388597,
-        "p50Ms": 0.005300000000033833,
-        "p95Ms": 0.0524000000000342,
-        "p99Ms": 0.09590000000002874,
-        "maxMs": 1.6156999999998334,
+        "totalMs": 23.586599999991222,
+        "meanMs": 0.013393867120949018,
+        "p50Ms": 0.004299999999830106,
+        "p95Ms": 0.04579999999987194,
+        "p99Ms": 0.08330000000000837,
+        "maxMs": 0.6259000000000015,
         "overBudget": 0,
         "slowest": []
       }
@@ -1625,8 +1479,6 @@
           "combatAndRetreatTroopsLost": 1655613,
           "occupationEfficiency": 0.003020030065868032,
           "workerGoldEarned": 176100,
-          "conquestGoldEarned": 88050,
-          "goldAtEnd": 264150,
           "attackCommands": 14,
           "noOpAttackCommands": 0
         },
@@ -1637,20 +1489,18 @@
           "combatAndRetreatTroopsLost": 1620594,
           "occupationEfficiency": 0,
           "workerGoldEarned": 176100,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1762,
-        "totalMs": 26.447100000000773,
-        "meanMs": 0.015009704880817692,
-        "p50Ms": 0.005499999999983629,
-        "p95Ms": 0.051300000000082946,
-        "p99Ms": 0.07919999999990068,
-        "maxMs": 0.1853000000000975,
+        "totalMs": 22.202499999996462,
+        "meanMs": 0.01260073779795486,
+        "p50Ms": 0.0039000000001578883,
+        "p95Ms": 0.042799999999942884,
+        "p99Ms": 0.06619999999998072,
+        "maxMs": 0.5369000000000597,
         "overBudget": 0,
         "slowest": []
       }
@@ -1670,8 +1520,6 @@
           "combatAndRetreatTroopsLost": 1711925,
           "occupationEfficiency": 0.002920689219737578,
           "workerGoldEarned": 179800,
-          "conquestGoldEarned": 89900,
-          "goldAtEnd": 269700,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -1682,20 +1530,18 @@
           "combatAndRetreatTroopsLost": 1677189,
           "occupationEfficiency": 0,
           "workerGoldEarned": 179800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1799,
-        "totalMs": 30.63709999999378,
-        "meanMs": 0.017030072262364523,
-        "p50Ms": 0.008299999999962893,
-        "p95Ms": 0.05019999999990432,
-        "p99Ms": 0.07629999999994652,
-        "maxMs": 0.7596999999998388,
+        "totalMs": 25.043499999995674,
+        "meanMs": 0.01392078932740171,
+        "p50Ms": 0.005999999999858119,
+        "p95Ms": 0.04120000000011714,
+        "p99Ms": 0.06150000000002365,
+        "maxMs": 0.47869999999988977,
         "overBudget": 0,
         "slowest": []
       }
@@ -1715,8 +1561,6 @@
           "combatAndRetreatTroopsLost": 1711019,
           "occupationEfficiency": 0.00292223584496876,
           "workerGoldEarned": 179700,
-          "conquestGoldEarned": 89850,
-          "goldAtEnd": 269550,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -1727,20 +1571,18 @@
           "combatAndRetreatTroopsLost": 1676152,
           "occupationEfficiency": 0,
           "workerGoldEarned": 179700,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1798,
-        "totalMs": 27.77599999999552,
-        "meanMs": 0.015448275862066473,
-        "p50Ms": 0.006499999999959982,
-        "p95Ms": 0.04750000000012733,
-        "p99Ms": 0.07909999999992579,
-        "maxMs": 0.16039999999998145,
+        "totalMs": 26.63360000000239,
+        "meanMs": 0.014812903225807781,
+        "p50Ms": 0.006900000000086948,
+        "p95Ms": 0.04690000000005057,
+        "p99Ms": 0.07660000000009859,
+        "maxMs": 0.2155999999999949,
         "overBudget": 0,
         "slowest": []
       }
@@ -1760,8 +1602,6 @@
           "combatAndRetreatTroopsLost": 1704950,
           "occupationEfficiency": 0,
           "workerGoldEarned": 198800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         },
@@ -1772,20 +1612,18 @@
           "combatAndRetreatTroopsLost": 1807985,
           "occupationEfficiency": 0.00276550901555805,
           "workerGoldEarned": 198800,
-          "conquestGoldEarned": 99400,
-          "goldAtEnd": 298200,
           "attackCommands": 17,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1989,
-        "totalMs": 30.921999999992977,
-        "meanMs": 0.015546505781796368,
-        "p50Ms": 0.0061000000000603904,
-        "p95Ms": 0.05060000000003129,
-        "p99Ms": 0.08969999999999345,
-        "maxMs": 0.2138999999999669,
+        "totalMs": 27.289899999998852,
+        "meanMs": 0.013720412267470514,
+        "p50Ms": 0.00479999999993197,
+        "p95Ms": 0.04539999999997235,
+        "p99Ms": 0.07909999999992579,
+        "maxMs": 1.5067000000001372,
         "overBudget": 0,
         "slowest": []
       }
@@ -1805,8 +1643,6 @@
           "combatAndRetreatTroopsLost": 1705041,
           "occupationEfficiency": 0,
           "workerGoldEarned": 198800,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         },
@@ -1817,20 +1653,18 @@
           "combatAndRetreatTroopsLost": 1807975,
           "occupationEfficiency": 0.0027655246533632833,
           "workerGoldEarned": 198800,
-          "conquestGoldEarned": 99400,
-          "goldAtEnd": 298200,
           "attackCommands": 17,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1989,
-        "totalMs": 27.51950000000238,
-        "meanMs": 0.013835847159377768,
-        "p50Ms": 0.004899999999906868,
-        "p95Ms": 0.044100000000071304,
-        "p99Ms": 0.07099999999991269,
-        "maxMs": 0.7958000000000993,
+        "totalMs": 32.305599999994,
+        "meanMs": 0.016242131724481648,
+        "p50Ms": 0.004999999999881766,
+        "p95Ms": 0.041999999999916326,
+        "p99Ms": 0.07150000000001455,
+        "maxMs": 5.810899999999947,
         "overBudget": 0,
         "slowest": []
       }
@@ -1850,8 +1684,6 @@
           "combatAndRetreatTroopsLost": 1981689,
           "occupationEfficiency": 0,
           "workerGoldEarned": 229400,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 25,
           "noOpAttackCommands": 0
         },
@@ -1862,20 +1694,18 @@
           "combatAndRetreatTroopsLost": 2110075,
           "occupationEfficiency": 0.00236958444928527,
           "workerGoldEarned": 229400,
-          "conquestGoldEarned": 114700,
-          "goldAtEnd": 344100,
           "attackCommands": 25,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2295,
-        "totalMs": 25.314999999999372,
-        "meanMs": 0.011030501089324345,
-        "p50Ms": 0.00430000000005748,
-        "p95Ms": 0.03520000000003165,
-        "p99Ms": 0.06759999999985666,
-        "maxMs": 0.16239999999993415,
+        "totalMs": 24.900000000007367,
+        "meanMs": 0.010849673202617588,
+        "p50Ms": 0.0041999999998552084,
+        "p95Ms": 0.036599999999907595,
+        "p99Ms": 0.06630000000018299,
+        "maxMs": 0.14510000000018408,
         "overBudget": 0,
         "slowest": []
       }
@@ -1895,8 +1725,6 @@
           "combatAndRetreatTroopsLost": 1979218,
           "occupationEfficiency": 0,
           "workerGoldEarned": 229300,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 25,
           "noOpAttackCommands": 0
         },
@@ -1907,20 +1735,18 @@
           "combatAndRetreatTroopsLost": 2108377,
           "occupationEfficiency": 0.002371492754019624,
           "workerGoldEarned": 229300,
-          "conquestGoldEarned": 114650,
-          "goldAtEnd": 343950,
           "attackCommands": 25,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2294,
-        "totalMs": 25.033200000000534,
-        "meanMs": 0.010912467306015926,
-        "p50Ms": 0.004200000000082582,
-        "p95Ms": 0.03489999999987958,
-        "p99Ms": 0.05919999999991887,
-        "maxMs": 0.8180999999999585,
+        "totalMs": 26.953900000002022,
+        "meanMs": 0.011749738448126426,
+        "p50Ms": 0.004500000000007276,
+        "p95Ms": 0.03690000000005966,
+        "p99Ms": 0.0645999999999276,
+        "maxMs": 0.593900000000076,
         "overBudget": 0,
         "slowest": []
       }
@@ -1940,8 +1766,6 @@
           "combatAndRetreatTroopsLost": 1165964,
           "occupationEfficiency": 0.004288296252866498,
           "workerGoldEarned": 124500,
-          "conquestGoldEarned": 62250,
-          "goldAtEnd": 186750,
           "attackCommands": 11,
           "noOpAttackCommands": 0
         },
@@ -1952,20 +1776,18 @@
           "combatAndRetreatTroopsLost": 1122262,
           "occupationEfficiency": 0,
           "workerGoldEarned": 124500,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 6,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1246,
-        "totalMs": 18.96880000000192,
-        "meanMs": 0.015223756019263178,
-        "p50Ms": 0.0053999999997813575,
-        "p95Ms": 0.05520000000001346,
-        "p99Ms": 0.08350000000018554,
-        "maxMs": 0.24519999999984066,
+        "totalMs": 16.692900000002737,
+        "meanMs": 0.013397191011238152,
+        "p50Ms": 0.004900000000134241,
+        "p95Ms": 0.045200000000022555,
+        "p99Ms": 0.07960000000002765,
+        "maxMs": 0.1693000000000211,
         "overBudget": 0,
         "slowest": []
       }
@@ -1985,8 +1807,6 @@
           "combatAndRetreatTroopsLost": 1165821,
           "occupationEfficiency": 0.004288822241975995,
           "workerGoldEarned": 124600,
-          "conquestGoldEarned": 62300,
-          "goldAtEnd": 186900,
           "attackCommands": 11,
           "noOpAttackCommands": 0
         },
@@ -1997,20 +1817,18 @@
           "combatAndRetreatTroopsLost": 1122423,
           "occupationEfficiency": 0,
           "workerGoldEarned": 124600,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 6,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1247,
-        "totalMs": 19.346899999994548,
-        "meanMs": 0.015514755412986806,
-        "p50Ms": 0.005400000000008731,
-        "p95Ms": 0.05559999999991305,
-        "p99Ms": 0.08349999999995816,
-        "maxMs": 0.31130000000007385,
+        "totalMs": 17.002900000002,
+        "meanMs": 0.013635044105855655,
+        "p50Ms": 0.004900000000134241,
+        "p95Ms": 0.05009999999992942,
+        "p99Ms": 0.07770000000004984,
+        "maxMs": 0.203899999999976,
         "overBudget": 0,
         "slowest": []
       }
@@ -2030,8 +1848,6 @@
           "combatAndRetreatTroopsLost": 1540610,
           "occupationEfficiency": 0.0032454670351457888,
           "workerGoldEarned": 165400,
-          "conquestGoldEarned": 82700,
-          "goldAtEnd": 248100,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -2042,20 +1858,18 @@
           "combatAndRetreatTroopsLost": 1536362,
           "occupationEfficiency": 0,
           "workerGoldEarned": 165400,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 11,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1655,
-        "totalMs": 22.99709999999982,
-        "meanMs": 0.013895528700906235,
+        "totalMs": 21.230900000000474,
+        "meanMs": 0.012828338368580347,
         "p50Ms": 0.00430000000005748,
-        "p95Ms": 0.051899999999932334,
-        "p99Ms": 0.08960000000001855,
-        "maxMs": 0.7734000000000378,
+        "p95Ms": 0.04870000000005348,
+        "p99Ms": 0.07699999999999818,
+        "maxMs": 0.15769999999997708,
         "overBudget": 0,
         "slowest": []
       }
@@ -2075,8 +1889,6 @@
           "combatAndRetreatTroopsLost": 1540460,
           "occupationEfficiency": 0.0032457840856440373,
           "workerGoldEarned": 165300,
-          "conquestGoldEarned": 82650,
-          "goldAtEnd": 247950,
           "attackCommands": 15,
           "noOpAttackCommands": 0
         },
@@ -2087,20 +1899,18 @@
           "combatAndRetreatTroopsLost": 1535896,
           "occupationEfficiency": 0,
           "workerGoldEarned": 165300,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 11,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1654,
-        "totalMs": 21.69789999999375,
-        "meanMs": 0.013118440145099003,
-        "p50Ms": 0.003500000000030923,
-        "p95Ms": 0.051400000000057844,
-        "p99Ms": 0.07679999999982101,
-        "maxMs": 0.28899999999998727,
+        "totalMs": 18.732800000002044,
+        "meanMs": 0.01132575574365299,
+        "p50Ms": 0.003200000000106229,
+        "p95Ms": 0.04189999999994143,
+        "p99Ms": 0.06589999999982865,
+        "maxMs": 0.5919999999998709,
         "overBudget": 0,
         "slowest": []
       }
@@ -2120,8 +1930,6 @@
           "combatAndRetreatTroopsLost": 1444785,
           "occupationEfficiency": 0.0034607234887630164,
           "workerGoldEarned": 156100,
-          "conquestGoldEarned": 78050,
-          "goldAtEnd": 234150,
           "attackCommands": 16,
           "noOpAttackCommands": 0
         },
@@ -2132,20 +1940,18 @@
           "combatAndRetreatTroopsLost": 1436668,
           "occupationEfficiency": 0,
           "workerGoldEarned": 156100,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1562,
-        "totalMs": 23.629699999993363,
-        "meanMs": 0.015127848911647479,
-        "p50Ms": 0.005000000000109139,
-        "p95Ms": 0.0544999999999618,
-        "p99Ms": 0.08310000000005857,
-        "maxMs": 0.20709999999985484,
+        "totalMs": 20.222899999999527,
+        "meanMs": 0.012946798975671912,
+        "p50Ms": 0.0040999999998803105,
+        "p95Ms": 0.046600000000125874,
+        "p99Ms": 0.07130000000006476,
+        "maxMs": 0.22550000000001091,
         "overBudget": 0,
         "slowest": []
       }
@@ -2165,8 +1971,6 @@
           "combatAndRetreatTroopsLost": 1443294,
           "occupationEfficiency": 0.0034642966134077807,
           "workerGoldEarned": 156100,
-          "conquestGoldEarned": 78050,
-          "goldAtEnd": 234150,
           "attackCommands": 16,
           "noOpAttackCommands": 0
         },
@@ -2177,20 +1981,18 @@
           "combatAndRetreatTroopsLost": 1437245,
           "occupationEfficiency": 0,
           "workerGoldEarned": 156100,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1562,
-        "totalMs": 24.3567999999957,
-        "meanMs": 0.015593341869395455,
-        "p50Ms": 0.004599999999982174,
-        "p95Ms": 0.05289999999968131,
-        "p99Ms": 0.08390000000008513,
-        "maxMs": 0.7372000000000298,
+        "totalMs": 19.772499999997763,
+        "meanMs": 0.01265845070422392,
+        "p50Ms": 0.003500000000030923,
+        "p95Ms": 0.04570000000012442,
+        "p99Ms": 0.06690000000003238,
+        "maxMs": 0.17370000000005348,
         "overBudget": 0,
         "slowest": []
       }
@@ -2210,8 +2012,6 @@
           "combatAndRetreatTroopsLost": 1230453,
           "occupationEfficiency": 0.004063543223917451,
           "workerGoldEarned": 133500,
-          "conquestGoldEarned": 66750,
-          "goldAtEnd": 200250,
           "attackCommands": 12,
           "noOpAttackCommands": 0
         },
@@ -2222,20 +2022,18 @@
           "combatAndRetreatTroopsLost": 1186555,
           "occupationEfficiency": 0,
           "workerGoldEarned": 133500,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 7,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1336,
-        "totalMs": 21.968299999992723,
-        "meanMs": 0.016443338323347847,
-        "p50Ms": 0.005799999999908323,
-        "p95Ms": 0.05639999999993961,
-        "p99Ms": 0.07840000000032887,
-        "maxMs": 0.22689999999965949,
+        "totalMs": 18.652699999997367,
+        "meanMs": 0.013961601796405215,
+        "p50Ms": 0.004299999999830106,
+        "p95Ms": 0.04729999999995016,
+        "p99Ms": 0.06739999999990687,
+        "maxMs": 0.7933000000000447,
         "overBudget": 0,
         "slowest": []
       }
@@ -2255,8 +2053,6 @@
           "combatAndRetreatTroopsLost": 1230844,
           "occupationEfficiency": 0.004062251999352667,
           "workerGoldEarned": 133600,
-          "conquestGoldEarned": 66800,
-          "goldAtEnd": 200400,
           "attackCommands": 12,
           "noOpAttackCommands": 0
         },
@@ -2267,20 +2063,18 @@
           "combatAndRetreatTroopsLost": 1186262,
           "occupationEfficiency": 0,
           "workerGoldEarned": 133600,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 7,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1337,
-        "totalMs": 21.060299999990548,
-        "meanMs": 0.015751907255041546,
-        "p50Ms": 0.005000000000109139,
-        "p95Ms": 0.05349999999998545,
-        "p99Ms": 0.08919999999989159,
-        "maxMs": 0.2474000000001979,
+        "totalMs": 17.348799999994753,
+        "meanMs": 0.012975916230362568,
+        "p50Ms": 0.004400000000032378,
+        "p95Ms": 0.04399999999986903,
+        "p99Ms": 0.060899999999946886,
+        "maxMs": 0.14740000000006148,
         "overBudget": 0,
         "slowest": []
       }
@@ -2300,8 +2094,6 @@
           "combatAndRetreatTroopsLost": 1991096,
           "occupationEfficiency": 0,
           "workerGoldEarned": 231400,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         },
@@ -2312,20 +2104,18 @@
           "combatAndRetreatTroopsLost": 2125570,
           "occupationEfficiency": 0.0023523107218122274,
           "workerGoldEarned": 231400,
-          "conquestGoldEarned": 115700,
-          "goldAtEnd": 347100,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2315,
-        "totalMs": 25.84960000000001,
-        "meanMs": 0.011166133909287262,
-        "p50Ms": 0.003400000000056025,
-        "p95Ms": 0.03969999999981155,
-        "p99Ms": 0.07199999999966167,
-        "maxMs": 0.7681999999999789,
+        "totalMs": 22.82159999999635,
+        "meanMs": 0.009858142548594536,
+        "p50Ms": 0.0030999999999039574,
+        "p95Ms": 0.03580000000010841,
+        "p99Ms": 0.06460000000015498,
+        "maxMs": 0.161200000000008,
         "overBudget": 0,
         "slowest": []
       }
@@ -2345,8 +2135,6 @@
           "combatAndRetreatTroopsLost": 1988445,
           "occupationEfficiency": 0,
           "workerGoldEarned": 231400,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         },
@@ -2357,20 +2145,18 @@
           "combatAndRetreatTroopsLost": 2124071,
           "occupationEfficiency": 0.0023539708219664406,
           "workerGoldEarned": 231400,
-          "conquestGoldEarned": 115700,
-          "goldAtEnd": 347100,
           "attackCommands": 21,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2315,
-        "totalMs": 24.53880000000254,
-        "meanMs": 0.010599913606912544,
-        "p50Ms": 0.0033000000003085006,
-        "p95Ms": 0.03850000000011278,
-        "p99Ms": 0.06779999999980646,
-        "maxMs": 0.15039999999999054,
+        "totalMs": 21.74829999999929,
+        "meanMs": 0.009394514038876584,
+        "p50Ms": 0.0028999999999541615,
+        "p95Ms": 0.033599999999978536,
+        "p99Ms": 0.062200000000075306,
+        "maxMs": 0.19139999999993051,
         "overBudget": 0,
         "slowest": []
       }
@@ -2390,8 +2176,6 @@
           "combatAndRetreatTroopsLost": 1393186,
           "occupationEfficiency": 0.0035888958244863424,
           "workerGoldEarned": 145600,
-          "conquestGoldEarned": 72800,
-          "goldAtEnd": 218400,
           "attackCommands": 13,
           "noOpAttackCommands": 0
         },
@@ -2402,20 +2186,18 @@
           "combatAndRetreatTroopsLost": 1346133,
           "occupationEfficiency": 0,
           "workerGoldEarned": 145600,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 7,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1457,
-        "totalMs": 22.622999999982767,
-        "meanMs": 0.015527110501017684,
-        "p50Ms": 0.004899999999906868,
-        "p95Ms": 0.0522000000000844,
-        "p99Ms": 0.08559999999988577,
-        "maxMs": 0.17749999999978172,
+        "totalMs": 18.450600000000122,
+        "meanMs": 0.012663417982155197,
+        "p50Ms": 0.0040999999998803105,
+        "p95Ms": 0.04330000000004475,
+        "p99Ms": 0.058200000000169894,
+        "maxMs": 0.0986000000000331,
         "overBudget": 0,
         "slowest": []
       }
@@ -2435,8 +2217,6 @@
           "combatAndRetreatTroopsLost": 1390900,
           "occupationEfficiency": 0.003594795877302709,
           "workerGoldEarned": 145700,
-          "conquestGoldEarned": 72850,
-          "goldAtEnd": 218550,
           "attackCommands": 13,
           "noOpAttackCommands": 0
         },
@@ -2447,20 +2227,18 @@
           "combatAndRetreatTroopsLost": 1346589,
           "occupationEfficiency": 0,
           "workerGoldEarned": 145700,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 7,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1458,
-        "totalMs": 23.48900000000185,
-        "meanMs": 0.01611042524005614,
-        "p50Ms": 0.005199999999604188,
-        "p95Ms": 0.05150000000003274,
-        "p99Ms": 0.07659999999987122,
-        "maxMs": 0.8043999999999869,
+        "totalMs": 20.56839999999943,
+        "meanMs": 0.014107270233195766,
+        "p50Ms": 0.004599999999982174,
+        "p95Ms": 0.04500000000007276,
+        "p99Ms": 0.06880000000001019,
+        "maxMs": 0.9009000000000924,
         "overBudget": 0,
         "slowest": []
       }
@@ -2480,8 +2258,6 @@
           "combatAndRetreatTroopsLost": 2466970,
           "occupationEfficiency": 0.002026777733698654,
           "workerGoldEarned": 264400,
-          "conquestGoldEarned": 132200,
-          "goldAtEnd": 396600,
           "attackCommands": 27,
           "noOpAttackCommands": 0
         },
@@ -2492,20 +2268,18 @@
           "combatAndRetreatTroopsLost": 2502662,
           "occupationEfficiency": 0,
           "workerGoldEarned": 264400,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 24,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2645,
-        "totalMs": 33.10929999999644,
-        "meanMs": 0.012517693761813399,
-        "p50Ms": 0.004500000000007276,
-        "p95Ms": 0.04579999999987194,
-        "p99Ms": 0.07450000000017099,
-        "maxMs": 0.1797999999998865,
+        "totalMs": 29.599499999998443,
+        "meanMs": 0.011190737240075025,
+        "p50Ms": 0.004200000000082582,
+        "p95Ms": 0.040899999999965075,
+        "p99Ms": 0.06500000000005457,
+        "maxMs": 0.1066000000000713,
         "overBudget": 0,
         "slowest": []
       }
@@ -2525,8 +2299,6 @@
           "combatAndRetreatTroopsLost": 2464796,
           "occupationEfficiency": 0.0020285656687827895,
           "workerGoldEarned": 264100,
-          "conquestGoldEarned": 132050,
-          "goldAtEnd": 396150,
           "attackCommands": 27,
           "noOpAttackCommands": 0
         },
@@ -2537,20 +2309,18 @@
           "combatAndRetreatTroopsLost": 2500933,
           "occupationEfficiency": 0,
           "workerGoldEarned": 264100,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 24,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2642,
-        "totalMs": 34.48419999999396,
-        "meanMs": 0.013052308856924285,
-        "p50Ms": 0.004399999999805004,
-        "p95Ms": 0.04859999999962383,
-        "p99Ms": 0.07690000000002328,
-        "maxMs": 0.8802000000000589,
+        "totalMs": 31.994500000001608,
+        "meanMs": 0.012109954579864348,
+        "p50Ms": 0.004599999999982174,
+        "p95Ms": 0.04550000000017462,
+        "p99Ms": 0.07429999999999382,
+        "maxMs": 0.7898000000000138,
         "overBudget": 0,
         "slowest": []
       }
@@ -2570,8 +2340,6 @@
           "combatAndRetreatTroopsLost": 1315308,
           "occupationEfficiency": 0.0038013902800945088,
           "workerGoldEarned": 139000,
-          "conquestGoldEarned": 69500,
-          "goldAtEnd": 208500,
           "attackCommands": 14,
           "noOpAttackCommands": 0
         },
@@ -2582,20 +2350,18 @@
           "combatAndRetreatTroopsLost": 1235736,
           "occupationEfficiency": 0,
           "workerGoldEarned": 139000,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1391,
-        "totalMs": 19.373300000011113,
-        "meanMs": 0.013927606038828982,
-        "p50Ms": 0.0048000000001593435,
-        "p95Ms": 0.044200000000273576,
-        "p99Ms": 0.07640000000037617,
-        "maxMs": 0.19880000000011933,
+        "totalMs": 15.839500000005955,
+        "meanMs": 0.011387131560033037,
+        "p50Ms": 0.0038999999999305146,
+        "p95Ms": 0.03739999999993415,
+        "p99Ms": 0.058399999999892316,
+        "maxMs": 0.08500000000003638,
         "overBudget": 0,
         "slowest": []
       }
@@ -2615,8 +2381,6 @@
           "combatAndRetreatTroopsLost": 1315224,
           "occupationEfficiency": 0.003801634464231876,
           "workerGoldEarned": 139000,
-          "conquestGoldEarned": 69500,
-          "goldAtEnd": 208500,
           "attackCommands": 14,
           "noOpAttackCommands": 0
         },
@@ -2627,20 +2391,18 @@
           "combatAndRetreatTroopsLost": 1235542,
           "occupationEfficiency": 0,
           "workerGoldEarned": 139000,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 9,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 1391,
-        "totalMs": 18.575499999995827,
-        "meanMs": 0.013354061826021443,
-        "p50Ms": 0.004500000000007276,
-        "p95Ms": 0.04469999999992069,
-        "p99Ms": 0.07009999999991123,
-        "maxMs": 0.22339999999985594,
+        "totalMs": 16.679499999996096,
+        "meanMs": 0.011991013659235153,
+        "p50Ms": 0.0038999999999305146,
+        "p95Ms": 0.04130000000009204,
+        "p99Ms": 0.0644999999999527,
+        "maxMs": 0.18519999999989523,
         "overBudget": 0,
         "slowest": []
       }
@@ -2660,8 +2422,6 @@
           "combatAndRetreatTroopsLost": 1943853,
           "occupationEfficiency": 0.0025722108208976456,
           "workerGoldEarned": 212500,
-          "conquestGoldEarned": 106250,
-          "goldAtEnd": 318750,
           "attackCommands": 26,
           "noOpAttackCommands": 0
         },
@@ -2672,20 +2432,18 @@
           "combatAndRetreatTroopsLost": 1850137,
           "occupationEfficiency": 0,
           "workerGoldEarned": 212500,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 19,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2126,
-        "totalMs": 28.93990000000167,
-        "meanMs": 0.01361237064910709,
-        "p50Ms": 0.005799999999908323,
-        "p95Ms": 0.04239999999981592,
-        "p99Ms": 0.06889999999975771,
-        "maxMs": 0.7984999999998763,
+        "totalMs": 24.45640000000185,
+        "meanMs": 0.011503480714958537,
+        "p50Ms": 0.004599999999982174,
+        "p95Ms": 0.03650000000016007,
+        "p99Ms": 0.06009999999992033,
+        "maxMs": 0.6514999999999418,
         "overBudget": 0,
         "slowest": []
       }
@@ -2705,8 +2463,6 @@
           "combatAndRetreatTroopsLost": 1944481,
           "occupationEfficiency": 0.0025713805242454316,
           "workerGoldEarned": 212400,
-          "conquestGoldEarned": 106200,
-          "goldAtEnd": 318600,
           "attackCommands": 26,
           "noOpAttackCommands": 0
         },
@@ -2717,20 +2473,18 @@
           "combatAndRetreatTroopsLost": 1850407,
           "occupationEfficiency": 0,
           "workerGoldEarned": 212400,
-          "conquestGoldEarned": 0,
-          "goldAtEnd": 0,
           "attackCommands": 19,
           "noOpAttackCommands": 0
         }
       ],
       "tickTiming": {
         "count": 2125,
-        "totalMs": 27.77280000000792,
-        "meanMs": 0.013069552941180198,
-        "p50Ms": 0.005200000000058935,
-        "p95Ms": 0.04250000000001819,
-        "p99Ms": 0.07289999999966312,
-        "maxMs": 0.18200000000024374,
+        "totalMs": 23.733099999999013,
+        "meanMs": 0.01116851764705836,
+        "p50Ms": 0.00430000000005748,
+        "p95Ms": 0.035200000000259024,
+        "p99Ms": 0.060799999999744614,
+        "maxMs": 0.13720000000012078,
         "overBudget": 0,
         "slowest": []
       }

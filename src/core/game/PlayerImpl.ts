@@ -1905,6 +1905,12 @@ export class PlayerImpl implements Player {
   }
 
   public isImmune(): boolean {
+    if (
+      this.mg.config().gameConfig().enhancedAI?.fairResources ||
+      this.mg.config().gameConfig().modernMode
+    ) {
+      return this.mg.isSpawnImmunityActive();
+    }
     if (this.type() === PlayerType.Human) {
       return this.mg.isSpawnImmunityActive();
     }
@@ -1918,8 +1924,12 @@ export class PlayerImpl implements Player {
     player: Player,
     treatAFKFriendly: boolean = false,
   ): boolean {
-    if (this.type() !== PlayerType.Human) {
-      // Only human attackers respect PVP immunity
+    if (
+      this.type() !== PlayerType.Human &&
+      !this.mg.config().gameConfig().enhancedAI?.fairResources &&
+      !this.mg.config().gameConfig().modernMode
+    ) {
+      // Classic AI attackers retain the existing PVP immunity behavior.
       return !this.isFriendly(player, treatAFKFriendly);
     }
     return !player.isImmune() && !this.isFriendly(player, treatAFKFriendly);
