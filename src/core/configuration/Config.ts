@@ -333,11 +333,15 @@ export class Config {
     };
   }
   spawnImmunityDuration(): Tick {
+    if (this._gameConfig.modernMode)
+      return this._gameConfig.modernMode.protectionTicks;
     return (
       this._gameConfig.spawnImmunityDuration ?? DEFAULT_SPAWN_IMMUNITY_TICKS
     );
   }
   nationSpawnImmunityDuration(): Tick {
+    if (this._gameConfig.modernMode)
+      return this._gameConfig.modernMode.protectionTicks;
     return DEFAULT_SPAWN_IMMUNITY_TICKS;
   }
   hasExtendedSpawnImmunity(): boolean {
@@ -437,7 +441,10 @@ export class Config {
     return this._gameConfig.goldMultiplier ?? 1;
   }
   startingGold(playerInfo: PlayerInfo): Gold {
-    if (playerInfo.playerType === PlayerType.Bot) {
+    if (
+      playerInfo.playerType === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       return 0n;
     }
     return this.startingGoldFor(playerInfo);
@@ -825,6 +832,8 @@ export class Config {
   }
 
   percentageTilesOwnedToWin(elapsedGameSeconds: number): number {
+    if (this._gameConfig.modernMode)
+      return this._gameConfig.modernMode.targetPercent;
     const base = PERCENT_TILES_OWNED_TO_WIN;
     const sd = this.overtimeConfig();
     if (!sd.enabled) {
@@ -896,7 +905,12 @@ export class Config {
     if (defender === null) {
       const tickBudget = input.borderSize * 2;
       return {
-        attackerTroopLoss: mag / (attacker.type === PlayerType.Bot ? 10 : 5),
+        attackerTroopLoss:
+          mag /
+          (attacker.type === PlayerType.Bot &&
+          !this._gameConfig.enhancedAI?.fairResources
+            ? 10
+            : 5),
         defenderTroopLoss: 0,
         tickFraction:
           within(
@@ -914,7 +928,8 @@ export class Config {
     if (
       (attacker.type === PlayerType.Human ||
         attacker.type === PlayerType.Nation) &&
-      defender.type === PlayerType.Bot
+      defender.type === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
     ) {
       mag *= BOT_DEFENDER_LOSS_MULT;
     }
@@ -993,7 +1008,10 @@ export class Config {
   }
 
   attackAmount(attacker: Player, defender: Player | TerraNullius) {
-    if (attacker.type() === PlayerType.Bot) {
+    if (
+      attacker.type() === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       return attacker.troops() / 20;
     } else {
       return attacker.troops() / 5;
@@ -1001,6 +1019,11 @@ export class Config {
   }
 
   startManpower(playerInfo: PlayerInfo): number {
+    if (
+      this._gameConfig.enhancedAI?.fairResources &&
+      playerInfo.playerType !== PlayerType.Human
+    )
+      return 25_000;
     if (playerInfo.playerType === PlayerType.Bot) {
       return 10_000;
     }
@@ -1033,6 +1056,7 @@ export class Config {
             .reduce((a, b) => a + b, 0) *
             this.cityTroopIncrease();
 
+    if (this._gameConfig.enhancedAI?.fairResources) return maxTroops;
     if (player.type() === PlayerType.Bot) {
       return maxTroops / 3;
     }
@@ -1063,11 +1087,17 @@ export class Config {
     const ratio = 1 - player.troops() / max;
     toAdd *= ratio;
 
-    if (player.type() === PlayerType.Bot) {
+    if (
+      player.type() === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       toAdd *= 0.5;
     }
 
-    if (player.type() === PlayerType.Nation) {
+    if (
+      player.type() === PlayerType.Nation &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       switch (this._gameConfig.difficulty) {
         case Difficulty.Easy:
           toAdd *= 0.9;
@@ -1092,7 +1122,10 @@ export class Config {
   goldAdditionRate(player: Player | PlayerView): Gold {
     const multiplier = this.goldMultiplierFor(player);
     let baseRate: bigint;
-    if (player.type() === PlayerType.Bot) {
+    if (
+      player.type() === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       baseRate = 50n;
     } else {
       baseRate = 100n;

@@ -18,7 +18,10 @@ vi.mock("src/client/ClientEnv", () => ({
   },
 }));
 
-import { ReplaySpeedChangeEvent } from "../../src/client/InputHandler";
+import {
+  GameSpeedUpIntentEvent,
+  ReplaySpeedChangeEvent,
+} from "../../src/client/InputHandler";
 import { LocalServer } from "../../src/client/LocalServer";
 import { ReplaySpeedMultiplier } from "../../src/client/utilities/ReplaySpeedMultiplier";
 
@@ -59,6 +62,43 @@ describe("LocalServer replay speed", () => {
   afterEach(() => {
     clearInterval((server as any).turnCheckInterval);
     vi.useRealTimers();
+  });
+
+  it("stopped local servers cannot multiply the next game's speed command", () => {
+    vi.useFakeTimers();
+    const bus = new EventBus();
+    const lobby = {
+      gameStartInfo: makeGameStartInfo(),
+      playerName: "TestUser",
+      playerClanTag: null,
+    } as any;
+    lobby.gameStartInfo.config.training = { chapter: "basic" };
+    const old = new LocalServer(lobby, false, bus);
+    old.updateCallback(
+      () => {},
+      () => {},
+    );
+    old.start();
+    old.endGame();
+    // A real singleplayer local server, without archive/heartbeat side effects.
+    server = new LocalServer(lobby, false, bus);
+    server.updateCallback(
+      () => {},
+      () => {},
+    );
+    server.start();
+    const oldMultiplier = (old as any).replaySpeedMultiplier;
+    bus.emit(new GameSpeedUpIntentEvent());
+    expect((server as any).replaySpeedMultiplier).toBe(
+      ReplaySpeedMultiplier.fast,
+    );
+    expect((old as any).replaySpeedMultiplier).toBe(oldMultiplier);
+    bus.emit(new ReplaySpeedChangeEvent(ReplaySpeedMultiplier.slow));
+    expect((server as any).replaySpeedMultiplier).toBe(
+      ReplaySpeedMultiplier.slow,
+    );
+    expect((old as any).replaySpeedMultiplier).toBe(oldMultiplier);
+    server.endGame();
   });
 
   it("emitting ReplaySpeedChangeEvent stretches the turn interval", () => {

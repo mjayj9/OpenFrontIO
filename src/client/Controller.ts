@@ -14,6 +14,9 @@ export interface Controller {
   /** Called once at game start. Subscribe to events / set up state here. */
   init?: () => void;
 
+  /** Release subscriptions and rendering work when this game stops. */
+  dispose?: () => void;
+
   /**
    * Called per game tick (10Hz). Optional — pure event subscribers can omit.
    *

@@ -291,6 +291,11 @@ export class LangSelector extends LitElement {
       "steam-wishlist-button",
       "streaming-now",
       "tutorial-panel",
+      "play-page",
+      "modern-world-modal",
+      "enhanced-ai-settings",
+      "save-panel",
+      "save-manager",
     ];
 
     document.title = this.translateText("main.title") ?? document.title;

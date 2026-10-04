@@ -7,10 +7,16 @@ import {
   TUTORIAL_VIDEO_URL,
 } from "../client/Utils";
 import { assetUrl } from "../core/AssetUrls";
-import { UserSettings } from "../core/game/UserSettings";
+import { getDefaultKeybinds, UserSettings } from "../core/game/UserSettings";
 import { BaseModal } from "./components/BaseModal";
 import "./components/Difficulties";
 import { modalHeader } from "./components/ui/ModalHeader";
+import { requestChapter } from "./education/EducationProgressStore";
+import {
+  EDUCATION_FEATURES,
+  searchEducationFeatures,
+} from "./education/FeatureRegistry";
+import { TUTORIAL_CHAPTERS, TutorialChapterID } from "./hud/Tutorial";
 import { Platform } from "./Platform";
 import { TroubleshootingModal } from "./TroubleshootingModal";
 
@@ -19,6 +25,8 @@ export class HelpModal extends BaseModal {
   protected routerName = "help";
 
   @state() private keybinds: Record<string, string> = this.getKeybinds();
+  @state() private featureQuery = "";
+  @state() private featureChapter = "all";
   @query("#tutorial-video-iframe") private videoIframe?: HTMLIFrameElement;
   @query("#tutorial-video-player") private videoPlayer?: HTMLVideoElement;
 
@@ -28,6 +36,11 @@ export class HelpModal extends BaseModal {
 
   private getKeyLabel(code: string): string {
     if (!code) return "";
+    if (code.includes("+"))
+      return code
+        .split("+")
+        .map((part) => this.getKeyLabel(part))
+        .join(" + ");
 
     const specialLabels: Record<string, string> = {
       ShiftLeft: "⇧ Shift",
@@ -55,6 +68,24 @@ export class HelpModal extends BaseModal {
     if (code.startsWith("Numpad")) return `Num ${code.slice(6)}`;
 
     return code;
+  }
+
+  private keybindLabel(action: string): string {
+    const aliases: Record<string, string> = {
+      moveUpArrow: "moveUp",
+      moveDownArrow: "moveDown",
+      moveLeftArrow: "moveLeft",
+      moveRightArrow: "moveRight",
+      zoomOutMinus: "zoomOut",
+      zoomOutNumpad: "zoomOut",
+      zoomInEqual: "zoomIn",
+      zoomInNumpad: "zoomIn",
+      performanceOverlay: "performanceOverlayLabel",
+    };
+    const key = (aliases[action] ?? action)
+      .replace(/([a-z])([A-Z])/g, "$1_$2")
+      .toLowerCase();
+    return translateText(`user_setting.${key}`);
   }
 
   private renderKey(code: string) {
@@ -94,6 +125,7 @@ export class HelpModal extends BaseModal {
           [&_td:nth-child(2)]:[unicode-bidi:plaintext]
           [&_td:nth-child(3)]:[unicode-bidi:plaintext]"
       >
+          ${this.renderFeatureReference()}
           <!-- In-game tutorial: starts a default solo game with the guide on -->
           <section
             class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/5 rounded-xl border border-white/10 px-5 py-4 mb-8"
@@ -108,8 +140,7 @@ export class HelpModal extends BaseModal {
             </div>
             <button
               class="shrink-0 hover:bg-white/5 px-6 py-2 text-xs font-bold transition-all duration-200 rounded-lg uppercase tracking-widest bg-malibu-blue/20 text-aquarius border border-malibu-blue/30 shadow-[var(--shadow-malibu-blue)]"
-              @click=${() =>
-                document.dispatchEvent(new CustomEvent("start-tutorial"))}
+              @click=${() => this.startChapter("basic")}
             >
               ${translateText("help_modal.in_game_tutorial_start")}
             </button>
@@ -1279,6 +1310,170 @@ export class HelpModal extends BaseModal {
         </div>
       </div>
     `;
+  }
+
+  public openFeature(featureId: string): void {
+    if (!EDUCATION_FEATURES.some((feature) => feature.featureId === featureId))
+      return;
+    this.featureQuery = featureId;
+    this.featureChapter = "all";
+    this.open();
+  }
+
+  private startChapter(chapter: TutorialChapterID): void {
+    requestChapter(chapter);
+    document.dispatchEvent(
+      new CustomEvent("start-tutorial", { detail: { chapter } }),
+    );
+  }
+
+  private renderFeatureReference() {
+    const features = searchEducationFeatures(
+      this.featureQuery,
+      translateText,
+      this.featureChapter,
+    );
+    return html`<section
+      class="mb-8 rounded-xl bg-white/5 border border-white/10 p-4"
+      aria-label=${translateText("education.reference")}
+    >
+      <h3 class="!mt-0">${translateText("education.reference")}</h3>
+      <p>${translateText("education.reference_intro")}</p>
+      <div class="flex flex-wrap gap-2 mb-3">
+        <input
+          class="min-w-0 flex-1 rounded bg-black/30 border border-white/20 p-2 text-white"
+          type="search"
+          .value=${this.featureQuery}
+          placeholder=${translateText("education.search")}
+          aria-label=${translateText("education.search")}
+          @input=${(event: Event) =>
+            (this.featureQuery = (event.target as HTMLInputElement).value)}
+        />
+        <select
+          class="rounded bg-gray-800 border border-white/20 p-2 text-white"
+          aria-label=${translateText("education.chapter")}
+          .value=${this.featureChapter}
+          @change=${(event: Event) =>
+            (this.featureChapter = (event.target as HTMLSelectElement).value)}
+        >
+          <option value="all">
+            ${translateText("education.all_features")}
+          </option>
+          ${TUTORIAL_CHAPTERS.filter((chapter) => chapter.id !== "full").map(
+            (chapter) =>
+              html`<option value=${chapter.id}>
+                ${translateText(`education.chapters.${chapter.id}`)}
+              </option>`,
+          )}
+          <option value="reference">
+            ${translateText("education.reference")}
+          </option>
+          <option value="modern">
+            ${translateText("education.chapters.modern")}
+          </option>
+        </select>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-3">
+        ${TUTORIAL_CHAPTERS.map(
+          (chapter) =>
+            html`<button
+              class="rounded border border-blue-400/30 px-2 py-1 text-xs text-blue-200"
+              @click=${() => this.startChapter(chapter.id)}
+            >
+              ${translateText(`education.chapters.${chapter.id}`)}
+            </button>`,
+        )}
+      </div>
+      <p class="text-xs">
+        ${translateText("education.feature_count", {
+          count: features.length,
+          total: EDUCATION_FEATURES.length,
+        })}
+      </p>
+      ${features.length === 0
+        ? html`<p role="status">${translateText("education.no_results")}</p>`
+        : features.map(
+            (feature) =>
+              html`<details
+                id=${feature.helpAnchor}
+                class="border-t border-white/10 py-2"
+                ?open=${this.featureQuery === feature.featureId}
+              >
+                <summary class="cursor-pointer font-semibold text-white">
+                  ${translateText(
+                    `education.features.${feature.featureId}.title`,
+                  )}
+                  <span class="text-xs text-gray-400"
+                    >${feature.featureId}</span
+                  >
+                </summary>
+                <p class="mt-2">
+                  ${translateText(
+                    `education.features.${feature.featureId}.description`,
+                  )}
+                </p>
+                <dl
+                  class="text-sm grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-gray-300"
+                >
+                  <dt>${translateText("education.prerequisites")}</dt>
+                  <dd>
+                    ${translateText(
+                      `education.features.${feature.featureId}.prerequisites`,
+                    )}
+                  </dd>
+                  <dt>${translateText("education.exercise")}</dt>
+                  <dd>
+                    ${translateText(
+                      `education.features.${feature.featureId}.exercise`,
+                    )}
+                  </dd>
+                  <dt>${translateText("education.completion")}</dt>
+                  <dd>
+                    ${translateText(
+                      `education.features.${feature.featureId}.completion`,
+                    )}
+                  </dd>
+                  <dt>${translateText("education.modes")}</dt>
+                  <dd>
+                    ${feature.modes
+                      .map((mode) =>
+                        translateText(`education.modes_list.${mode}`),
+                      )
+                      .join(", ")}
+                  </dd>
+                </dl>
+                ${feature.featureId === "keybindings"
+                  ? html`<div class="mt-2 grid grid-cols-2 gap-1 text-xs">
+                      ${Object.keys(getDefaultKeybinds(Platform.isMac))
+                        .filter(
+                          (action) =>
+                            action !== "shiftKey" && action !== "altKey",
+                        )
+                        .map(
+                          (action) =>
+                            html`<span>${this.keybindLabel(action)}</span
+                              ><span dir="ltr"
+                                >${this.getKeyLabel(
+                                  new UserSettings().keybinds(Platform.isMac)[
+                                    action
+                                  ] ?? "",
+                                ) || translateText("education.unbound")}</span
+                              >`,
+                        )}
+                    </div>`
+                  : ""}
+                ${feature.kind === "practice"
+                  ? html`<button
+                      class="mt-2 text-blue-300 underline"
+                      @click=${() =>
+                        this.startChapter(feature.chapter as TutorialChapterID)}
+                    >
+                      ${translateText("education.practice_chapter")}
+                    </button>`
+                  : ""}
+              </details>`,
+          )}
+    </section>`;
   }
 
   openTroubleshooting() {

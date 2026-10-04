@@ -1,0 +1,30 @@
+{
+  "saves": {
+    "title": "Saved single-player games",
+    "menu": "Save and objective",
+    "manage": "Manage saves",
+    "save": "Save game",
+    "manual": "Manual save",
+    "review": "Review replay",
+    "saved": "Running game saved successfully.",
+    "name": "Save name (optional)",
+    "autosave": "Automatic save every 60 seconds",
+    "restart": "Restart",
+    "explanation": "These saves contain the running simulation, resources, ownership and AI state. They are separate from settings and course progress. Loading continues a single-player game; it does not enter public rankings.",
+    "compatibility": "Continue with the same game build. Export an important save before deleting it or clearing browser data. If a save cannot be read or is incompatible, keep the file and use a compatible build. Failed operations do not confirm success.",
+    "details": "Tick {tick} · {date} · Build {build}",
+    "continue": "Continue",
+    "export": "Export file",
+    "exported": "Save export requested. Check your browser's downloads.",
+    "import": "Import save file",
+    "imported": "Save file imported successfully.",
+    "delete": "Delete",
+    "deleted": "Save deleted.",
+    "confirm_delete": "Delete saved game “{name}”? Export it first if you want to keep a copy.",
+    "refresh": "Refresh list",
+    "empty": "No saved games yet. Save during a single-player match or import a compatible file.",
+    "working": "Working…",
+    "failed_short": "Save failed. Open this panel for recovery details.",
+    "error": "The save operation failed. Check storage space, file format and game build. Your existing saves remain available."
+  }
+}

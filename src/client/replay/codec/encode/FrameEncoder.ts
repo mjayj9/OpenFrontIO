@@ -53,6 +53,14 @@ export const SEC_UNITS_REMOVED = 1 << 5;
 export const SEC_TERRAIN = 1 << 6;
 
 export class FrameEncoder {
+  private aiStrategies = new Map<string, Record<string, unknown>>();
+  private applyAIStrategies(misc: MiscUpdates | null): void {
+    for (const raw of misc?.AIStatus ?? []) {
+      const status = raw as Record<string, unknown>;
+      if (typeof status.playerID === "string")
+        this.aiStrategies.set(status.playerID, status);
+    }
+  }
   /** Tile state for the whole game so far. */
   readonly tileState: Uint16Array;
   /** Player state as last encoded in the current chunk. */
@@ -90,6 +98,7 @@ export class FrameEncoder {
     frame: NormalizedFrame,
     ctx: EncodeCtx,
   ): void {
+    this.applyAIStrategies(frame.misc);
     this.applyTiles(frame.tiles);
     this.applyTerrain(frame.tiles);
 
@@ -113,12 +122,20 @@ export class FrameEncoder {
     this.prevNames = new Map(frame.names);
     writeNames(w, [...frame.names.values()]);
 
-    writeMisc(w, frame.misc);
+    // Goals are persistent metadata: every seekable chunk needs the complete
+    // current set, while deltas carry only thought-tick changes.
+    writeMisc(
+      w,
+      this.aiStrategies.size === 0
+        ? frame.misc
+        : { ...frame.misc, AIStatus: [...this.aiStrategies.values()] },
+    );
 
     writeTerrain(w, [...this.terrainOverrides.keys()], this.terrain);
   }
 
   encodeDelta(w: BinaryWriter, frame: NormalizedFrame, ctx: EncodeCtx): void {
+    this.applyAIStrategies(frame.misc);
     const tiles = this.applyTiles(frame.tiles);
     const terrain = this.applyTerrain(frame.tiles);
 

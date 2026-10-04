@@ -71,6 +71,10 @@ export class EventsDisplay extends LitElement implements Controller {
   private active: boolean = false;
   private events: GameEvent[] = [];
   private userSettings = new UserSettings();
+  private subscribedEventBus: EventBus | null = null;
+  private readonly allianceRequestSent = (
+    event: SendAllianceRequestIntentEvent,
+  ) => this.onAllianceRequestSentConfirmation(event);
 
   @state() private _isVisible: boolean = false;
 
@@ -145,10 +149,20 @@ export class EventsDisplay extends LitElement implements Controller {
   }
 
   init() {
-    this.eventBus.on(
+    // The page reuses this HUD element when continuing or switching games.
+    // Historical messages and old bus subscriptions belong to the old match.
+    this.events = [];
+    this.active = false;
+    this._isVisible = false;
+    this._shouldScrollToBottom = true;
+    this._shouldScrollImportantToBottom = true;
+    this.subscribedEventBus?.off(
       SendAllianceRequestIntentEvent,
-      this.onAllianceRequestSentConfirmation.bind(this),
+      this.allianceRequestSent,
     );
+    this.subscribedEventBus = this.eventBus;
+    this.eventBus.on(SendAllianceRequestIntentEvent, this.allianceRequestSent);
+    this.requestUpdate();
   }
 
   private onAllianceRequestSentConfirmation(e: SendAllianceRequestIntentEvent) {

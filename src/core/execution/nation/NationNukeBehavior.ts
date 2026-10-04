@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AI_WEIGHTS, aiProfile } from "../../ai/AIProfile";
 import {
   Difficulty,
   Game,
@@ -157,6 +158,24 @@ export class NationNukeBehavior {
       return;
     }
     const range = this.game.config().nukeMagnitudes(nukeType).outer;
+    const profile = aiProfile(
+      config.gameConfig(),
+      this.player.id(),
+      this.player.type(),
+    );
+    if (profile !== null) {
+      const actualCost = this.cost(nukeType);
+      // Nuclear spending must leave a replacement economic base. A defended
+      // opponent's retaliation matters independently of difficulty.
+      if (this.player.gold() < actualCost + this.cost(UnitType.City)) return;
+      if (
+        !this.isUnderHeavyAttack() &&
+        nukeTarget.unitCount(UnitType.MissileSilo) >
+          this.player.unitCount(UnitType.SAMLauncher) &&
+        AI_WEIGHTS[profile.personality].risk < 110
+      )
+        return;
+    }
 
     const structures = nukeTarget.units(Structures.types);
     const structureTiles = structures.map((u) => u.tile());
@@ -177,6 +196,17 @@ export class NationNukeBehavior {
 
     outer: for (const tile of new Set(allTiles)) {
       if (tile === null) continue;
+      if (
+        profile !== null &&
+        this.game
+          .nearbyUnits(tile, range, Structures.types)
+          .some(
+            ({ unit }) =>
+              unit.owner() === this.player ||
+              this.player.isFriendly(unit.owner()),
+          )
+      )
+        continue;
       const boundingBox = boundingBoxTiles(this.game, tile, range)
         // Add radius / 2 in case there is a piece of unwanted territory inside the outer radius that we miss.
         .concat(boundingBoxTiles(this.game, tile, Math.floor(range / 2)));
@@ -199,14 +229,20 @@ export class NationNukeBehavior {
 
       // On Hard & Impossible, avoid trajectories that can be intercepted by enemy SAMs
       if (
-        (difficulty === Difficulty.Hard ||
+        (profile !== null ||
+          difficulty === Difficulty.Hard ||
           difficulty === Difficulty.Impossible) &&
         this.isTrajectoryInterceptableBySam(spawnTile, tile)
       ) {
         continue;
       }
 
-      const value = this.nukeTileScore(tile, silos, structures, nukeType);
+      const value =
+        profile === null
+          ? this.nukeTileScore(tile, silos, structures, nukeType)
+          : Math.round(this.nukeTileScore(tile, silos, structures, nukeType));
+      if (profile !== null && value * 50 < Number(this.cost(nukeType)))
+        continue;
       if (value > bestValue) {
         bestTile = tile;
         bestValue = value;
@@ -217,7 +253,7 @@ export class NationNukeBehavior {
       (bestValue > 0 || difficulty !== Difficulty.Impossible)
     ) {
       this.sendNuke(bestTile, nukeType, nukeTarget);
-    } else if (difficulty === Difficulty.Impossible) {
+    } else if (difficulty === Difficulty.Impossible && profile === null) {
       this.maybeDestroyEnemySam(nukeTarget);
     }
   }

@@ -242,7 +242,9 @@ describe("Client.initialize() booted from Main.ts module scope", () => {
     // listener, join-lobby listener and slider wiring are all in place.
     await vi.waitFor(() => expect(mocks.userAuth).toHaveBeenCalled());
     await new Promise((resolve) => setTimeout(resolve, 25));
-  }, 20_000);
+    // This imports the full UI graph once. Allow concurrent-suite startup on
+    // slower hosts without relaxing any assertion or individual test timeout.
+  }, 60_000);
 
   it("runs the signed-out boot: onUserMe(false) and the missing-version warn", () => {
     // renderNavVersion() === 0 branch (line 411).
@@ -630,7 +632,28 @@ describe("Client.initialize() booted from Main.ts module scope", () => {
 
   // Last: the viewer replaces the menu, and any later hash change would
   // then leave the page.
-  it("opens the replay viewer when the hash changes to one, though closing the join modal resets the URL", async () => {
+  it("opens review from a live game on popstate, stops its worker and preserves the handed-over record URL", async () => {
+    const stop = vi.fn((force?: boolean) => force === true);
+    mocks.joinLobby.mockClear();
+    mocks.joinLobby.mockReturnValueOnce({
+      prestart: new Promise<void>(() => {}),
+      join: Promise.resolve(),
+      stop,
+    });
+    document.dispatchEvent(
+      new CustomEvent("join-lobby", {
+        detail: { gameID: "Revw1234", source: "private" },
+        bubbles: true,
+      }),
+    );
+    await vi.waitFor(() => expect(mocks.joinLobby).toHaveBeenCalledTimes(1));
+    await vi.waitFor(() => expect(window.location.search).toBe("?live"));
+    const resultDialog = Object.assign(
+      document.querySelector("win-modal") ??
+        document.createElement("win-modal"),
+      { hide: vi.fn() },
+    );
+    document.body.appendChild(resultDialog);
     const joinModal = document.querySelector("join-lobby-modal") as unknown as {
       close: () => void;
     };
@@ -638,14 +661,28 @@ describe("Client.initialize() booted from Main.ts module scope", () => {
     const closeSpy = vi
       .spyOn(joinModal, "close")
       .mockImplementation(() => history.replaceState(null, "", "/"));
-    window.location.hash = "#replay-viewer=dqKzit4cWu";
+    history.replaceState(
+      null,
+      "",
+      "/game/Revw1234?live#replay-viewer=Revw1234",
+    );
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    // Chrome subsequently emits hashchange for the same entry. It must not
+    // stop or open a second viewer.
     window.dispatchEvent(new Event("hashchange"));
     await vi.waitFor(() =>
       expect(
         (document.querySelector("replay-viewer") as { gameID?: string } | null)
           ?.gameID,
-      ).toBe("dqKzit4cWu"),
+      ).toBe("Revw1234"),
     );
+    expect(stop).toHaveBeenCalledExactlyOnceWith(true);
+    expect(resultDialog.hide).toHaveBeenCalledExactlyOnceWith();
+    expect(window.location.search).toBe("?live");
+    expect(window.location.hash).toBe("#replay-viewer=Revw1234");
+    expect(document.querySelectorAll("replay-viewer")).toHaveLength(1);
+    expect(closeSpy).not.toHaveBeenCalled();
     closeSpy.mockRestore();
+    resultDialog.remove();
   });
 });

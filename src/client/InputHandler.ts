@@ -400,14 +400,14 @@ export class InputHandler {
       const nextDirection = !this.uiState.rocketDirectionUp;
       this.eventBus.emit(new SwapRocketDirectionEvent(nextDirection));
     });
-    this.addKeybindAndEvent("Shift+KeyD", () => {
+    this.addKeybindAndEvent(this.keybinds.performanceOverlay, () => {
       this.eventBus.emit(new TogglePerformanceOverlayEvent());
     });
     this.addKeybindAndEvent(this.keybinds.toggleView, () => {
       this.alternateView = false;
       this.eventBus.emit(new AlternateViewEvent(false));
     });
-    const resetKey = this.keybinds.resetGfx ?? "KeyR";
+    const resetKey = this.keybinds.resetGfx;
     this.addKeybindAndEvent(
       resetKey,
       () => {
@@ -493,7 +493,7 @@ export class InputHandler {
       this.addKeybindAndEvent(
         i,
         (e: KeyboardEvent) => {
-          const matchedBuild = this.resolveBuildKeybind(e.code, e.shiftKey);
+          const matchedBuild = this.resolveBuildKeybind(e.code, e.shiftKey, e);
 
           if (matchedBuild !== null) {
             this.setGhostStructure(matchedBuild);
@@ -501,7 +501,7 @@ export class InputHandler {
         },
         () => this.canUseBuildKeybinds(),
         (e: KeyboardEvent) =>
-          this.resolveBuildKeybind(e.code, e.shiftKey) !== null,
+          this.resolveBuildKeybind(e.code, e.shiftKey, e) !== null,
       );
     }
   }
@@ -605,29 +605,30 @@ export class InputHandler {
       let deltaX = 0;
       let deltaY = 0;
 
-      // Skip if select warship modifier is held down
-      if (this.activeKeys.has(this.keybinds.boxSelectWarships)) {
+      // Keep the camera steady during a live warship selection. Explicit
+      // Shift camera bindings still work when no selection is being dragged.
+      if (this.selectionBoxActive || this.multiSelectionActive) {
         return;
       }
 
       if (
-        this.activeKeys.has(this.keybinds.moveUp) ||
-        this.activeKeys.has("ArrowUp")
+        this.heldKeybind(this.keybinds.moveUp) ||
+        this.heldKeybind(this.keybinds.moveUpArrow)
       )
         deltaY += this.PAN_SPEED;
       if (
-        this.activeKeys.has(this.keybinds.moveDown) ||
-        this.activeKeys.has("ArrowDown")
+        this.heldKeybind(this.keybinds.moveDown) ||
+        this.heldKeybind(this.keybinds.moveDownArrow)
       )
         deltaY -= this.PAN_SPEED;
       if (
-        this.activeKeys.has(this.keybinds.moveLeft) ||
-        this.activeKeys.has("ArrowLeft")
+        this.heldKeybind(this.keybinds.moveLeft) ||
+        this.heldKeybind(this.keybinds.moveLeftArrow)
       )
         deltaX += this.PAN_SPEED;
       if (
-        this.activeKeys.has(this.keybinds.moveRight) ||
-        this.activeKeys.has("ArrowRight")
+        this.heldKeybind(this.keybinds.moveRight) ||
+        this.heldKeybind(this.keybinds.moveRightArrow)
       )
         deltaX -= this.PAN_SPEED;
 
@@ -639,16 +640,16 @@ export class InputHandler {
       const cy = window.innerHeight / 2;
 
       if (
-        this.activeKeys.has(this.keybinds.zoomOut) ||
-        this.activeKeys.has("Minus") ||
-        this.activeKeys.has("NumpadSubtract")
+        this.heldKeybind(this.keybinds.zoomOut) ||
+        this.heldKeybind(this.keybinds.zoomOutMinus) ||
+        this.heldKeybind(this.keybinds.zoomOutNumpad)
       ) {
         this.eventBus.emit(new ZoomEvent(cx, cy, this.ZOOM_SPEED));
       }
       if (
-        this.activeKeys.has(this.keybinds.zoomIn) ||
-        this.activeKeys.has("Equal") ||
-        this.activeKeys.has("NumpadAdd")
+        this.heldKeybind(this.keybinds.zoomIn) ||
+        this.heldKeybind(this.keybinds.zoomInEqual) ||
+        this.heldKeybind(this.keybinds.zoomInNumpad)
       ) {
         this.eventBus.emit(new ZoomEvent(cx, cy, -this.ZOOM_SPEED));
       }
@@ -726,7 +727,9 @@ export class InputHandler {
             e.code === "NumpadSubtract");
 
         const isConfiguredKeybind =
-          Object.values(this.keybinds).includes(e.code) ||
+          Object.values(this.keybinds).some(
+            (key) => this.parseKeybind(key).code === e.code,
+          ) ||
           this.keybindAndEvent.some(([k]) => this.keybindMatchesEvent(e, k));
 
         if (isConfiguredKeybind && !isBrowserZoomCombo) {
@@ -742,24 +745,30 @@ export class InputHandler {
             this.keybinds.moveRight,
             this.keybinds.zoomOut,
             this.keybinds.zoomIn,
-            "ArrowUp",
-            "ArrowLeft",
-            "ArrowDown",
-            "ArrowRight",
-            "Minus",
-            "Equal",
-            "NumpadAdd",
-            "NumpadSubtract",
+            this.keybinds.moveUpArrow,
+            this.keybinds.moveLeftArrow,
+            this.keybinds.moveDownArrow,
+            this.keybinds.moveRightArrow,
+            this.keybinds.zoomOutMinus,
+            this.keybinds.zoomInEqual,
+            this.keybinds.zoomInNumpad,
+            this.keybinds.zoomOutNumpad,
             this.keybinds.attackRatioDown,
             this.keybinds.attackRatioUp,
             this.keybinds.centerCamera,
             "ControlLeft",
             "ControlRight",
+            "AltLeft",
+            "AltRight",
+            "ShiftLeft",
+            "ShiftRight",
+            "MetaLeft",
+            "MetaRight",
             this.keybinds.boxSelectWarships,
             this.keybinds.emojiMenuModifier,
             this.keybinds.buildMenuModifier,
             this.keybinds.altKey,
-          ].includes(e.code)
+          ].some((value) => this.parseKeybind(value).code === e.code)
         ) {
           this.activeKeys.add(e.code);
         }
@@ -810,6 +819,7 @@ export class InputHandler {
             }
             e.preventDefault();
             item[1].handler(e);
+            break;
           }
         }
         this.activeKeys.delete(e.code);
@@ -1159,11 +1169,16 @@ export class InputHandler {
    * e.g. "Shift+KeyB" → { shift: true, code: "KeyB" }
    *      "KeyB"       → { shift: false, code: "KeyB" }
    */
-  private parseKeybind(value: string): { shift: boolean; code: string } {
-    if (value?.startsWith("Shift+")) {
-      return { shift: true, code: value.slice(6) };
-    }
-    return { shift: false, code: value };
+  private parseKeybind(value: string) {
+    const parts = value?.split("+") ?? [];
+    const code = parts.pop() ?? "";
+    return {
+      code,
+      shift: parts.includes("Shift"),
+      ctrl: parts.includes("Ctrl"),
+      alt: parts.includes("Alt"),
+      meta: parts.includes("Meta"),
+    };
   }
 
   /**
@@ -1171,11 +1186,44 @@ export class InputHandler {
    * including optional Shift+ prefix support.
    */
   private keybindMatchesEvent(
-    e: KeyboardEvent | { shiftKey: boolean; code: string },
+    e:
+      | KeyboardEvent
+      | {
+          shiftKey: boolean;
+          code: string;
+          ctrlKey?: boolean;
+          altKey?: boolean;
+          metaKey?: boolean;
+        },
     keybindValue: string,
   ): boolean {
     const parsed = this.parseKeybind(keybindValue);
-    return e.code === parsed.code && e.shiftKey === parsed.shift;
+    const graphicsReset = keybindValue === this.keybinds.resetGfx;
+    return (
+      e.code === parsed.code &&
+      e.shiftKey === parsed.shift &&
+      (graphicsReset ||
+        (!!e.ctrlKey === parsed.ctrl &&
+          !!e.altKey === parsed.alt &&
+          !!e.metaKey === parsed.meta))
+    );
+  }
+
+  private heldKeybind(value: string): boolean {
+    const key = this.parseKeybind(value);
+    return (
+      this.activeKeys.has(key.code) &&
+      key.shift ===
+        (this.activeKeys.has("ShiftLeft") ||
+          this.activeKeys.has("ShiftRight")) &&
+      key.ctrl ===
+        (this.activeKeys.has("ControlLeft") ||
+          this.activeKeys.has("ControlRight")) &&
+      key.alt ===
+        (this.activeKeys.has("AltLeft") || this.activeKeys.has("AltRight")) &&
+      key.meta ===
+        (this.activeKeys.has("MetaLeft") || this.activeKeys.has("MetaRight"))
+    );
   }
 
   /**
@@ -1227,7 +1275,7 @@ export class InputHandler {
       handler: event,
       conditions,
     };
-    this.keybindAndEvent.push([keybind, entry]);
+    if (keybind) this.keybindAndEvent.push([keybind, entry]);
   }
 
   /**
@@ -1237,6 +1285,7 @@ export class InputHandler {
   private resolveBuildKeybind(
     code: string,
     shiftKey: boolean,
+    modifiers: { ctrlKey?: boolean; altKey?: boolean; metaKey?: boolean } = {},
   ): PlayerBuildableUnitType | null {
     const buildKeybinds: ReadonlyArray<{
       key: string;
@@ -1254,11 +1303,29 @@ export class InputHandler {
       { key: "buildMIRV", type: UnitType.MIRV },
     ];
     for (const { key, type } of buildKeybinds) {
-      if (this.keybindMatchesEvent({ code, shiftKey }, this.keybinds[key]))
+      if (
+        this.keybindMatchesEvent(
+          { code, shiftKey, ...modifiers },
+          this.keybinds[key],
+        )
+      )
         return type;
     }
+    // A numpad key explicitly assigned to another action must not also act as a digit alias.
+    if (
+      Object.values(this.keybinds).some((value) =>
+        this.keybindMatchesEvent({ code, shiftKey, ...modifiers }, value),
+      )
+    )
+      return null;
     for (const { key, type } of buildKeybinds) {
-      if (this.buildKeybindMatchesDigit(code, shiftKey, this.keybinds[key]))
+      const parsed = this.parseKeybind(this.keybinds[key]);
+      if (
+        parsed.ctrl === !!modifiers.ctrlKey &&
+        parsed.alt === !!modifiers.altKey &&
+        parsed.meta === !!modifiers.metaKey &&
+        this.buildKeybindMatchesDigit(code, shiftKey, this.keybinds[key])
+      )
         return type;
     }
     return null;

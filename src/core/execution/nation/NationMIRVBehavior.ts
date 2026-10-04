@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { aiProfile } from "../../ai/AIProfile";
+import { safeMIRVWarhead } from "../../ai/WeaponSafety";
 import {
   AllPlayers,
   Difficulty,
@@ -6,6 +8,7 @@ import {
   Gold,
   Player,
   PlayerType,
+  Structures,
   UnitType,
 } from "../../game/Game";
 import { TileRef } from "../../game/GameMap";
@@ -141,25 +144,48 @@ export class NationMIRVBehavior {
     if (this.player.gold() < this.cost(UnitType.MIRV)) {
       return false;
     }
+    if (
+      aiProfile(
+        this.game.config().gameConfig(),
+        this.player.id(),
+        this.player.type(),
+      ) !== null &&
+      (this.game.config().isUnitDisabled(UnitType.MissileSilo) ||
+        this.player.gold() <
+          this.cost(UnitType.MIRV) + this.cost(UnitType.City))
+    )
+      return false;
 
     if (this.random.chance(this.hesitationOdds)) {
       return false;
     }
 
     const inboundMIRVSender = this.selectCounterMirvTarget();
-    if (inboundMIRVSender && !this.wasRecentlyMirved(inboundMIRVSender)) {
+    if (
+      inboundMIRVSender &&
+      !this.wasRecentlyMirved(inboundMIRVSender) &&
+      this.worthStrategicMIRV(inboundMIRVSender)
+    ) {
       this.maybeSendMIRV(inboundMIRVSender);
       return true;
     }
 
     const victoryDenialTarget = this.selectVictoryDenialTarget();
-    if (victoryDenialTarget && !this.wasRecentlyMirved(victoryDenialTarget)) {
+    if (
+      victoryDenialTarget &&
+      !this.wasRecentlyMirved(victoryDenialTarget) &&
+      this.worthStrategicMIRV(victoryDenialTarget)
+    ) {
       this.maybeSendMIRV(victoryDenialTarget);
       return true;
     }
 
     const steamrollStopTarget = this.selectSteamrollStopTarget();
-    if (steamrollStopTarget && !this.wasRecentlyMirved(steamrollStopTarget)) {
+    if (
+      steamrollStopTarget &&
+      !this.wasRecentlyMirved(steamrollStopTarget) &&
+      this.worthStrategicMIRV(steamrollStopTarget)
+    ) {
       this.maybeSendMIRV(steamrollStopTarget);
       return true;
     }
@@ -268,14 +294,83 @@ export class NationMIRVBehavior {
   private getValidMirvTargetPlayers(): Player[] {
     if (this.player === null) throw new Error("not initialized");
 
+    const enhanced =
+      aiProfile(
+        this.game.config().gameConfig(),
+        this.player.id(),
+        this.player.type(),
+      ) !== null;
     return this.game.players().filter((p) => {
       return (
         p !== this.player &&
         p.isPlayer() &&
         p.type() !== PlayerType.Bot &&
-        !this.player!.isOnSameTeam(p)
+        !this.player!.isOnSameTeam(p) &&
+        (!enhanced || !this.player.isFriendly(p))
       );
     });
+  }
+
+  private worthStrategicMIRV(enemy: Player): boolean {
+    if (
+      aiProfile(
+        this.game.config().gameConfig(),
+        this.player.id(),
+        this.player.type(),
+      ) === null
+    )
+      return true;
+    const center = this.strategicMIRVCenter(enemy);
+    if (
+      center === null ||
+      this.player.canBuild(UnitType.MIRV, center) === false ||
+      !safeMIRVWarhead(this.game, this.player, center)
+    )
+      return false;
+    // Replacement prices come from the live rules. Land value is a labelled
+    // strategic proxy, with integers rather than real-world economic claims.
+    const assets = enemy
+      .units(Structures.types)
+      .reduce(
+        (sum, unit) =>
+          sum +
+          this.game.unitInfo(unit.type()).cost(this.game, enemy) *
+            BigInt(unit.level()),
+        0n,
+      );
+    return (
+      assets + BigInt(enemy.numTilesOwned()) * 500n >=
+      this.cost(UnitType.MIRV) / 2n
+    );
+  }
+
+  private strategicMIRVCenter(enemy: Player): TileRef | null {
+    const box = enemy.largestClusterBoundingBox;
+    const candidates = [
+      this.calculateTerritoryCenter(enemy),
+      enemy.spawnTile() ?? null,
+    ];
+    if (box)
+      candidates.push(
+        this.game.ref(
+          Math.floor((box.min.x + box.max.x) / 2),
+          Math.floor((box.min.y + box.max.y) / 2),
+        ),
+      );
+    candidates.push(
+      ...enemy
+        .units(Structures.types)
+        .slice(0, 12)
+        .map((unit) => unit.tile()),
+    );
+    return (
+      candidates.find(
+        (tile) =>
+          tile !== null &&
+          this.game.owner(tile) === enemy &&
+          safeMIRVWarhead(this.game, this.player, tile),
+      ) ?? null
+    );
   }
 
   private isInboundMIRVFrom(attacker: Player): boolean {
@@ -299,7 +394,14 @@ export class NationMIRVBehavior {
 
     this.emojiBehavior.maybeSendAttackEmoji(enemy);
 
-    const centerTile = this.calculateTerritoryCenter(enemy);
+    const centerTile =
+      aiProfile(
+        this.game.config().gameConfig(),
+        this.player.id(),
+        this.player.type(),
+      ) === null
+        ? this.calculateTerritoryCenter(enemy)
+        : this.strategicMIRVCenter(enemy);
     if (centerTile && this.player.canBuild(UnitType.MIRV, centerTile)) {
       this.game.addExecution(new MirvExecution(this.player, centerTile));
       this.recordMirvHit(enemy);

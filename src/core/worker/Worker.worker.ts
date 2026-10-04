@@ -171,12 +171,30 @@ ctx.addEventListener("message", async (e: MessageEvent<MainThreadMessage>) => {
           sendMessage({
             type: "initialized",
             id: message.id,
+            ...(message.snapshot ? { initialView: gr.fullViewUpdate() } : {}),
           } as InitializedMessage);
           return gr;
         });
+        void gameRunner.catch((error) =>
+          sendMessage({
+            type: "game_error",
+            id: message.id,
+            error: {
+              errMsg: String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+            },
+          }),
+        );
       } catch (error) {
         console.error("Failed to initialize game runner:", error);
-        throw error;
+        sendMessage({
+          type: "game_error",
+          id: message.id,
+          error: {
+            errMsg: String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          },
+        });
       }
       break;
 

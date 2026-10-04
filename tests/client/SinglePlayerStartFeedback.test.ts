@@ -1,6 +1,9 @@
 import { render } from "lit";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { PlayerCosmetics } from "../../src/core/Schemas";
+import {
+  GameStartInfoSchema,
+  type PlayerCosmetics,
+} from "../../src/core/Schemas";
 
 const cosmeticsMocks = vi.hoisted(() => ({
   getPlayerCosmetics: vi.fn(),
@@ -19,6 +22,7 @@ import {
   SinglePlayerModal,
   START_PREPARE_DEADLINE_MS,
 } from "../../src/client/SinglePlayerModal";
+import * as clientUtils from "../../src/client/Utils";
 
 type Internals = {
   startGame(): Promise<void>;
@@ -386,10 +390,35 @@ describe("SinglePlayerModal start feedback", () => {
     expect(cosmeticsMocks.prewarmCosmetics).toHaveBeenCalledTimes(1);
   });
 
-  it("prewarms cosmetics on the tutorial path, which never opens the modal", async () => {
+  it("starts dedicated offline training without account or cosmetics requests", async () => {
+    // Reproduce the Korean UI: translated captions are not valid core names.
+    vi.spyOn(clientUtils, "translateText").mockImplementation((key) =>
+      key === "education.trainee" ? "훈련생" : key,
+    );
     await modal.startTutorial();
 
-    expect(cosmeticsMocks.prewarmCosmetics).toHaveBeenCalled();
+    expect(cosmeticsMocks.prewarmCosmetics).not.toHaveBeenCalled();
+    expect(cosmeticsMocks.getPlayerCosmetics).not.toHaveBeenCalled();
     expect(joins).toHaveLength(1);
+    expect(joins[0].detail.source).toBe("singleplayer");
+    expect(joins[0].detail.gameStartInfo.players[0].username).toBe(
+      "Training Player",
+    );
+    expect(
+      GameStartInfoSchema.safeParse(joins[0].detail.gameStartInfo).success,
+    ).toBe(true);
+    expect(joins[0].detail.gameStartInfo.config).toMatchObject({
+      training: true,
+      gameMap: "Four Islands",
+      gameType: "Singleplayer",
+      gameMode: "Free For All",
+      bots: 1,
+      nations: 1,
+      startingGold: 10_000_000,
+      infiniteGold: false,
+      infiniteTroops: false,
+      instantBuild: false,
+      randomSpawn: false,
+    });
   });
 });

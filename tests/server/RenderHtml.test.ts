@@ -10,6 +10,7 @@ import {
   renderHtmlContent,
   setAppShellCacheHeaders,
 } from "../../src/server/RenderHtml";
+import * as RuntimeAssets from "../../src/server/RuntimeAssetManifest";
 import { ServerEnv } from "../../src/server/ServerEnv";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -346,9 +347,17 @@ describe("RenderHtml environment-only render", () => {
   // to leave it byte-for-byte identical — same order, same eight-space
   // indentation, same trailing commas.
   it("still emits every guarded line, in place, when the locals are supplied", async () => {
+    // Pin this fixture independently of whether a production build has
+    // generated static/asset-manifest.json in the local checkout.
+    const manifest = vi
+      .spyOn(RuntimeAssets, "getRuntimeAssetManifest")
+      .mockResolvedValueOnce({});
     const html = await renderHtmlContent(REAL_TEMPLATE);
+    manifest.mockRestore();
 
-    expect(html).toContain(
+    // Git's Windows checkout may supply CRLF template lines while EJS inserts
+    // LF lines. Keep content, indentation and order exact on either platform.
+    expect(html.replace(/\r\n/g, "\n")).toContain(
       [
         "      window.BOOTSTRAP_CONFIG = {",
         '        gitCommit: "abc",',

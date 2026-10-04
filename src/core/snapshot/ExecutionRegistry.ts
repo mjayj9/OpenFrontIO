@@ -19,6 +19,7 @@ import { FactoryExecutionSnapshot } from "../execution/FactoryExecution";
 import { MarkDisconnectedExecutionSnapshot } from "../execution/MarkDisconnectedExecution";
 import { MirvExecutionSnapshot } from "../execution/MIRVExecution";
 import { MissileSiloExecutionSnapshot } from "../execution/MissileSiloExecution";
+import { ModernWorldExecutionSnapshot } from "../execution/ModernWorldExecution";
 import { MoveWarshipExecutionSnapshot } from "../execution/MoveWarshipExecution";
 import { NationExecutionSnapshot } from "../execution/NationExecution";
 import { NoOpExecutionSnapshot } from "../execution/NoOpExecution";
@@ -37,6 +38,7 @@ import { SpawnTimerExecutionSnapshot } from "../execution/SpawnTimerExecution";
 import { TargetPlayerExecutionSnapshot } from "../execution/TargetPlayerExecution";
 import { TradeShipExecutionSnapshot } from "../execution/TradeShipExecution";
 import { TrainExecutionSnapshot } from "../execution/TrainExecution";
+import { TrainingExecutionSnapshot } from "../execution/TrainingExecution";
 import { TrainStationExecutionSnapshot } from "../execution/TrainStationExecution";
 import { TransportShipExecutionSnapshot } from "../execution/TransportShipExecution";
 import { TribeExecutionSnapshot } from "../execution/TribeExecution";
@@ -53,6 +55,8 @@ import type { ExecutionSnapshotType } from "./ExecutionSnapshot";
  * replaced it.
  */
 export const EXECUTION_SNAPSHOT_TYPES = [
+  ModernWorldExecutionSnapshot,
+  TrainingExecutionSnapshot,
   AllianceExtensionExecutionSnapshot,
   AllianceRejectExecutionSnapshot,
   AllianceRequestExecutionSnapshot,

@@ -22,6 +22,7 @@ vi.mock("../../src/client/InGameModal", () => ({
 }));
 vi.mock("../../src/client/Utils", () => ({
   translateText: (key: string) => key,
+  textDirection: () => "ltr",
   reloadForUpdate: vi.fn(),
   createCanvas: () => document.createElement("canvas"),
   homeHref: () => "/",
@@ -73,7 +74,7 @@ import {
   ClientGameRunner,
   LobbyConfig,
 } from "../../src/client/ClientGameRunner";
-import { MouseUpEvent } from "../../src/client/InputHandler";
+import { MouseMoveEvent, MouseUpEvent } from "../../src/client/InputHandler";
 import {
   SendAttackIntentEvent,
   SendBoatAttackIntentEvent,
@@ -85,13 +86,14 @@ const CLICK = { x: 10, y: 20 };
 
 // Runner around fully mocked collaborators; started so clicks are handled.
 function makeRunner(overrides: {
+  eventBus?: EventBus;
   inSpawnPhase?: boolean;
   hasOwner?: boolean;
   playerByClientID?: () => unknown;
   actions?: Record<string, unknown>;
   boatDistSquared?: number;
 }) {
-  const eventBus = new EventBus();
+  const eventBus = overrides.eventBus ?? new EventBus();
   const myPlayer = {
     actions: vi.fn(async () => overrides.actions ?? {}),
     troops: () => 100,
@@ -144,6 +146,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  document.body.innerHTML = "";
   vi.restoreAllMocks();
 });
 
@@ -237,6 +240,61 @@ describe("auto boat", () => {
 });
 
 describe("stop() (OPE-411)", () => {
+  it("removes old input handlers before a new runner uses the same bus", async () => {
+    const bus = new EventBus();
+    const old = makeRunner({ eventBus: bus, actions: { canAttack: true } });
+    old.runner.stop();
+    const next = makeRunner({ eventBus: bus, actions: { canAttack: true } });
+    const attacks: SendAttackIntentEvent[] = [];
+    bus.on(SendAttackIntentEvent, (event) => attacks.push(event));
+    const oldMoves = (old.runner as any).lastMousePosition;
+    bus.emit(new MouseMoveEvent(12, 34));
+    bus.emit(new MouseUpEvent(CLICK.x, CLICK.y));
+    await flushPromises();
+    expect(old.myPlayer.actions).not.toHaveBeenCalled();
+    expect((old.runner as any).lastMousePosition).toBe(oldMoves);
+    expect(next.myPlayer.actions).toHaveBeenCalledOnce();
+    expect(attacks).toHaveLength(1);
+    next.runner.stop();
+  });
+
+  it("drops a pending old attack response after restart", async () => {
+    const bus = new EventBus();
+    const old = makeRunner({ eventBus: bus });
+    let resolveAction!: (actions: any) => void;
+    old.myPlayer.actions.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+    const attacks: SendAttackIntentEvent[] = [];
+    bus.on(SendAttackIntentEvent, (event) => attacks.push(event));
+    bus.emit(new MouseUpEvent(CLICK.x, CLICK.y));
+    old.runner.stop();
+    const next = makeRunner({ eventBus: bus, actions: { canAttack: true } });
+    resolveAction({ canAttack: true });
+    await flushPromises();
+    expect(attacks).toHaveLength(0);
+    bus.emit(new MouseUpEvent(CLICK.x, CLICK.y));
+    await flushPromises();
+    expect(attacks).toHaveLength(1);
+    next.runner.stop();
+  });
+
+  it("cancels the delayed connection watchdog when stopped before twenty seconds", () => {
+    vi.useFakeTimers();
+    try {
+      const { runner } = makeRunner({});
+      runner.stop();
+      vi.advanceTimersByTime(21_000);
+      expect((runner as any).connectionCheckInterval).toBeNull();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("calls input.destroy()", () => {
     const { runner, input } = makeRunner({});
 

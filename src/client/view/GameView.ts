@@ -38,6 +38,7 @@ import { TrailManager } from "../render/frame/TrailManager";
 import type { FrameData, NameEntry } from "../render/types";
 import { STRUCTURE_TYPES } from "../render/types";
 import { TRAIL_TYPES } from "../render/types/UnitType";
+import { themeProvider } from "../theme/ThemeProvider";
 import { resolveTeamClanTag } from "../Utils";
 import type { CosmeticVisibility } from "./CosmeticVisibility";
 import {
@@ -274,6 +275,9 @@ export class GameView implements GameMap {
     if (gu.updates[GameUpdateType.Win].length > 0) {
       this._gameOver = true;
     }
+    for (const update of gu.updates[GameUpdateType.GamePaused]) {
+      this._isPaused = update.paused;
+    }
 
     const myDisplayName = formatPlayerDisplayName(
       this._myUsername,
@@ -299,6 +303,10 @@ export class GameView implements GameMap {
     // all smallIDs registered before pass 2 can translate embargo PlayerIDs.
     // PlayerUpdate is now partial: only `id` is guaranteed; everything else
     // is present only when its value changed since the last emission.
+    themeProvider.preparePlayers(
+      gu.updates[GameUpdateType.Player].filter((p) => !this._players.has(p.id)),
+      this.config().gameConfig?.(),
+    );
     gu.updates[GameUpdateType.Player].forEach((pu) => {
       // First-emission (new player) — must have all static fields populated.
       // Subsequent emissions for an existing player carry only changed fields.
@@ -342,13 +350,16 @@ export class GameView implements GameMap {
           // directly on the update (see PlayerUpdate.nationFlag) rather than
           // being looked up by name — some maps define multiple nations with
           // the same display name (e.g. India's and Pakistan's "Punjab").
-          this._cosmetics.get(pu.clientID ?? "") ??
-            (pu.playerType === PlayerType.Nation && pu.nationFlag
+          {
+            ...(this._cosmetics.get(pu.clientID ?? "") ?? {}),
+            ...((pu.playerType === PlayerType.Nation ||
+              this.config().gameConfig?.().modernMode) &&
+            pu.nationFlag
               ? ({
                   flag: `/flags/${pu.nationFlag}.svg`,
                 } satisfies PlayerCosmetics)
-              : undefined) ??
-            {},
+              : {}),
+          },
         );
         this._players.set(pu.id, player);
         this._playerStates.set(pu.smallID!, player.state);
@@ -362,6 +373,9 @@ export class GameView implements GameMap {
         this._teamClanTags = null;
       }
     });
+
+    for (const status of gu.updates[GameUpdateType.AIStatus] ?? [])
+      this._players.get(status.playerID)?.updateAIStrategy(status);
 
     // Pass 2: translate engine embargoes (Set<PlayerID>) → renderer-format
     // smallIDs. Only re-translate when embargoes changed (field present);
@@ -824,8 +838,13 @@ export class GameView implements GameMap {
   // Set once the sim has decided the game (WinUpdate). Play may go on for
   // those who stay, but the server archives the record at that point.
   private _gameOver = false;
+  private _isPaused = false;
   gameOver(): boolean {
     return this._gameOver;
+  }
+
+  isPaused(): boolean {
+    return this._isPaused;
   }
 
   inSpawnPhase(): boolean {

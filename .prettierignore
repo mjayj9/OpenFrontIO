@@ -1,0 +1,6 @@
+# Preserve pinned Natural Earth input bytes and their recorded source hashes.
+map-generator/modern-world/source/*.geojson
+# Reproducible machine-generated ownership data; finalized by the map generator.
+src/core/game/ModernWorldData.json
+resources/maps/modernworld/scenario.json
+map-generator/modern-world/scenario.input.json

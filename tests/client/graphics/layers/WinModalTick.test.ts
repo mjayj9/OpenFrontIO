@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fetchCosmetics } from "../../../../src/client/Cosmetics";
+import {
+  fetchCosmetics,
+  resolveCosmetics,
+} from "../../../../src/client/Cosmetics";
 import "../../../../src/client/hud/layers/WinModal";
 import type { WinModal } from "../../../../src/client/hud/layers/WinModal";
+import { PlaySoundEffectEvent } from "../../../../src/client/sound/Sounds";
 import { SendWinnerEvent } from "../../../../src/client/Transport";
 import type { GameView } from "../../../../src/client/view";
 import { EventBus } from "../../../../src/core/EventBus";
@@ -187,5 +191,120 @@ describe("WinModal tick win handling", () => {
 
     expect(events).toHaveLength(0);
     expect(modal!.isVisible).toBe(false);
+  });
+
+  it("hides the prior result and clears its title and ranked actions on same-page restart", async () => {
+    const oldGame = makeGame({ winner: ["team", "Blue"], myTeam: "Blue" });
+    oldGame.config = () =>
+      ({ gameConfig: () => ({ rankedType: "1v1" }) }) as never;
+    setup(oldGame);
+    Object.assign(modal!, { rand: 0.75 });
+    document.body.appendChild(modal!);
+    modal!.tick();
+    await modal!.updateComplete;
+    expect(modal!.isVisible).toBe(true);
+    expect(modal!.querySelector("h2")?.textContent).toContain(
+      "win_modal.your_team",
+    );
+    expect(
+      modal!.querySelector("o-button[translationKey='win_modal.requeue']"),
+    ).not.toBeNull();
+
+    modal!.game = makeGame({ winner: undefined });
+    modal!.init();
+    await modal!.updateComplete;
+    expect(modal!.isVisible).toBe(false);
+    expect(modal!.querySelector("h2")?.textContent?.trim()).toBe("");
+    expect(
+      modal!.querySelector("o-button[translationKey='win_modal.requeue']"),
+    ).toBeNull();
+  });
+
+  it("can report death again in a new match after the prior death modal was dismissed", () => {
+    const deathGame = () => {
+      const game = makeGame({ winner: undefined });
+      game.myPlayer = () =>
+        ({ isAlive: () => false, hasSpawned: () => true }) as never;
+      game.updatesSinceLastTick = () => null;
+      return game;
+    };
+    setup(deathGame());
+    const sounds: string[] = [];
+    modal!.eventBus.on(PlaySoundEffectEvent, (event) =>
+      sounds.push(event.effect),
+    );
+    modal!.init();
+    modal!.tick();
+    modal!.hide();
+    modal!.tick();
+    expect(sounds).toEqual(["defeat"]);
+    modal!.game = deathGame();
+    modal!.init();
+    modal!.tick();
+    expect(modal!.isVisible).toBe(true);
+    expect(sounds).toEqual(["defeat", "defeat"]);
+  });
+
+  it("does not repopulate the next match with a late cosmetic response from the old result", async () => {
+    let resolveFetch!: (value: null) => void;
+    vi.mocked(fetchCosmetics).mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveFetch = resolve;
+      }),
+    );
+    vi.mocked(resolveCosmetics).mockReturnValueOnce([
+      {
+        type: "pattern",
+        cosmetic: {
+          name: "old-promo",
+          pattern: "AAAAAA",
+          priceHard: 120,
+          rarity: "rare",
+        },
+        relationship: "purchasable",
+        colorPalette: null,
+        key: "pattern:old-promo",
+      },
+    ] as never);
+    setup(makeGame({ winner: ["team", "Blue"], myTeam: "Blue" }));
+    Object.assign(modal!, { rand: 0.75 });
+    document.body.appendChild(modal!);
+    const showing = modal!.show();
+    await vi.waitFor(() => expect(resolveFetch).toBeDefined());
+    modal!.init();
+    resolveFetch(null);
+    await showing;
+    await modal!.updateComplete;
+    expect(modal!.isVisible).toBe(false);
+    expect(modal!.querySelectorAll("[data-win-cosmetic-promo]")).toHaveLength(
+      0,
+    );
+    vi.mocked(resolveCosmetics).mockReset().mockReturnValue([]);
+  });
+
+  it("shows the restored match's authoritative winner after clearing the previous result", async () => {
+    const events = setup(
+      makeGame({ winner: ["team", "Blue"], myTeam: "Blue" }),
+    );
+    Object.assign(modal!, { rand: 0.75 });
+    document.body.appendChild(modal!);
+    modal!.tick();
+    await modal!.updateComplete;
+    expect(modal!.querySelector("h2")?.textContent).toContain(
+      "win_modal.your_team",
+    );
+    modal!.game = makeGame({ winner: ["team", "Red"], myTeam: "Blue" });
+    modal!.init();
+    expect(modal!.isVisible).toBe(false);
+    modal!.tick();
+    await modal!.updateComplete;
+    expect(modal!.isVisible).toBe(true);
+    expect(modal!.querySelector("h2")?.textContent).toContain(
+      "win_modal.other_team",
+    );
+    expect(events.map((event) => event.winner)).toEqual([
+      ["team", "Blue"],
+      ["team", "Red"],
+    ]);
   });
 });

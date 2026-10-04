@@ -244,15 +244,7 @@ export class UserSettingModal extends BaseModal {
   ) {
     const { action, value, key, prevValue } = e.detail;
 
-    const activeKeybinds = { ...this.defaultKeybinds };
-    for (const [k, v] of Object.entries(this.userKeybinds)) {
-      const normalizedValue = v.value;
-      if (normalizedValue === "Null") {
-        delete activeKeybinds[k];
-      } else {
-        activeKeybinds[k] = normalizedValue;
-      }
-    }
+    const activeKeybinds = this.userSettings.keybinds(Platform.isMac);
 
     const values = Object.entries(activeKeybinds)
       .filter(([k]) => k !== action)
@@ -338,7 +330,7 @@ export class UserSettingModal extends BaseModal {
 
   private getKeyValue(action: string): string | undefined {
     const entry = this.userKeybinds[action];
-    if (!entry) return undefined;
+    if (!entry) return this.userSettings.keybinds(Platform.isMac)[action] ?? "";
     const normalizedValue = entry.value;
     if (normalizedValue === "Null") return "";
     return normalizedValue || undefined;
@@ -346,7 +338,10 @@ export class UserSettingModal extends BaseModal {
 
   private getKeyChar(action: string): string {
     const entry = this.userKeybinds[action];
-    if (!entry) return formatKeyForDisplay(this.defaultKeybinds[action] || "");
+    if (!entry)
+      return formatKeyForDisplay(
+        this.userSettings.keybinds(Platform.isMac)[action] || "",
+      );
     return entry.key || formatKeyForDisplay(entry.value || "");
   }
 
@@ -1623,6 +1618,28 @@ export class UserSettingModal extends BaseModal {
         .display=${this.getKeyChar("moveRight")}
         @change=${this.handleKeybindChange}
       ></setting-keybind>
+      ${[
+        ["moveUpArrow", "move_up"],
+        ["moveDownArrow", "move_down"],
+        ["moveLeftArrow", "move_left"],
+        ["moveRightArrow", "move_right"],
+        ["zoomOutMinus", "zoom_out"],
+        ["zoomOutNumpad", "zoom_out"],
+        ["zoomInEqual", "zoom_in"],
+        ["zoomInNumpad", "zoom_in"],
+        ["performanceOverlay", "performance_overlay_label"],
+      ].map(
+        ([action, key]) =>
+          html`<setting-keybind
+            .action=${action}
+            .label=${translateText("user_setting." + key)}
+            .description=${translateText("controls.alternate_key")}
+            .defaultKey=${this.defaultKeybinds[action]}
+            .value=${this.getKeyValue(action)}
+            .display=${this.getKeyChar(action)}
+            @change=${this.handleKeybindChange}
+          ></setting-keybind>`,
+      )}
     `;
   }
 

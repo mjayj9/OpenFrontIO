@@ -74,7 +74,7 @@ import { ReplayGameView } from "./ReplayGameAdapter";
 import { ReplayNukedLayers } from "./ReplayNukedLayers";
 import type { ReplayPalette } from "./ReplayPalette";
 import { ReplayPlayback, TICKS_PER_SECOND } from "./ReplayPlayback";
-import { fetchReplayRecord } from "./ReplayRecord";
+import { fetchReplayRecord, hasHandedOverRecord } from "./ReplayRecord";
 import "./ReplayStatus";
 import type { Preparing } from "./ReplayStatus";
 import { replayStore } from "./ReplayStore";
@@ -189,14 +189,18 @@ export class ReplayViewer extends LitElement {
   }
 
   /**
-   * Open the stored replay if there is one. Otherwise fetch the record and
-   * process it here, playing it as it grows. A game from another build is
+   * Process a newly handed record first; seeded local games may reuse ids.
+   * Otherwise open the stored replay, or fetch and process the record while
+   * playing it as it grows. A game from another build is
    * redirected to that build's versioned shell.
    */
   private async open(): Promise<void> {
-    const stored = await replayStore.get(this.gameID);
+    const stored = hasHandedOverRecord(this.gameID)
+      ? undefined
+      : await replayStore.get(this.gameID);
     if (this.abort.signal.aborted) return;
-    if (stored !== undefined) {
+    // A newer local review can arrive while the asynchronous store read waits.
+    if (stored !== undefined && !hasHandedOverRecord(this.gameID)) {
       this.fromStore = true;
       if ((await this.load(stored)) !== "unreadable") return;
       // A damaged copy: forget it and process the game again.

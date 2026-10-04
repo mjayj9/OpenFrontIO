@@ -105,6 +105,7 @@ export type ClientMessage =
   | ClientLogMessage
   | ClientHashMessage
   | ClientSpectateMessage
+  | ClientSelectCountryMessage
   | ClientReportMessage;
 
 export type ServerMessage =
@@ -117,7 +118,11 @@ export type ServerMessage =
   | ServerLobbyInfoMessage
   | ServerNewLobbyMessage
   | ServerPongMessage
-  | ServerRedirectMessage;
+  | ServerRedirectMessage
+  | ServerModernLobbyStatus;
+export type ServerModernLobbyStatus = z.infer<
+  typeof ServerModernLobbyStatusSchema
+>;
 
 export type ServerTurnMessage = z.infer<typeof ServerTurnMessageSchema>;
 export type ServerStartGameMessage = z.infer<
@@ -149,6 +154,9 @@ export type ClientRejoinMessage = z.infer<typeof ClientRejoinMessageSchema>;
 export type ClientLogMessage = z.infer<typeof ClientLogMessageSchema>;
 export type ClientHashMessage = z.infer<typeof ClientHashSchema>;
 export type ClientSpectateMessage = z.infer<typeof ClientSpectateMessageSchema>;
+export type ClientSelectCountryMessage = z.infer<
+  typeof ClientSelectCountryMessageSchema
+>;
 
 export type AllPlayersStats = z.infer<typeof AllPlayersStatsSchema>;
 export type Player = z.infer<typeof PlayerSchema>;
@@ -320,6 +328,11 @@ const ClientInfoSchema = z.object({
   // preview can honour the pins instead of re-deriving teams that the server
   // will overrule at start. Absent when the game isn't matchmade.
   teamIndex: zb.uint().optional(),
+  // Server-owned modern lobby reservation; independent of the client/player id.
+  countryId: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .optional(),
 });
 
 export const GameInfoSchema = z.object({
@@ -431,6 +444,7 @@ export class GroupTokenEvent implements GameEvent {
 }
 
 export interface ClientInfo {
+  countryId?: string;
   clientID: ClientID;
   username: string;
   clanTag: string | null;
@@ -528,8 +542,40 @@ export const PoolConfigSchema = z
 export type PoolConfig = z.infer<typeof PoolConfigSchema>;
 
 export const GameConfigSchema = z.object({
+  training: z.boolean().optional(),
+  // Offline scenario identity is part of settings, snapshots and game records.
+  modernMode: z
+    .object({
+      scenario: z.literal("modern-world-v1"),
+      version: zb.uint({ min: 1, max: 1 }),
+      dataHash: z.string().regex(/^[a-f0-9]{64}$/),
+      countryId: z.string().regex(/^[A-Z]{3}$/),
+      balance: z.enum(["balanced", "asymmetric"]),
+      victory: z.enum(["territory", "capitals", "timed", "total"]),
+      targetPercent: zb.uint({ min: 10, max: 100 }),
+      protectionTicks: zb.uint({ max: 6000 }),
+      capitalElimination: z.boolean(),
+    })
+    .optional(),
   gameMap: z.enum(GameMapType),
   difficulty: z.enum(Difficulty),
+  // Opt-in; omitted configs keep the exact classic simulation and PRNG stream.
+  enhancedAI: z
+    .object({
+      tribePercent: zb.uint({ max: 100 }),
+      nationPercent: zb.uint({ max: 100 }),
+      personality: z.enum([
+        "mixed",
+        "expansionist",
+        "defensive",
+        "economic",
+        "diplomatic",
+        "naval",
+      ]),
+      fairResources: z.boolean(),
+      seed: zb.uint(),
+    })
+    .optional(),
   donateGold: z.boolean(), // Configures donations to humans only
   donateTroops: z.boolean(), // Configures donations to humans only
   gameType: z.enum(GameType),
@@ -957,6 +1003,10 @@ export const PlayerSchema = z.object({
   // game's team list). Feeds deterministic team assignment, so it must be
   // identical for every client (like clanTag/friends).
   teamIndex: zb.uint().optional(),
+  countryId: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .optional(),
 });
 
 // A purchased bot tribe name in use this game (active names are globally
@@ -1100,6 +1150,25 @@ export const ServerRedirectMessageSchema = z.object({
   gameID: ID,
 });
 
+// A nonfatal lobby response. Keep rejected reservations connected and allow retry.
+export const ServerModernLobbyStatusSchema = z.object({
+  type: z.literal("modern_lobby_status"),
+  countryId: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .optional(),
+  error: z
+    .enum([
+      "taken",
+      "unsupported",
+      "not_player",
+      "closed",
+      "not_ready",
+      "invalid_rules",
+    ])
+    .optional(),
+});
+
 export const ServerMessageSchema = zb.discriminatedUnion("type", [
   ServerTurnMessageSchema,
   ServerPrestartMessageSchema,
@@ -1112,6 +1181,7 @@ export const ServerMessageSchema = zb.discriminatedUnion("type", [
   ServerPongMessageSchema,
   // Appended, never inserted: variant order is the wire tag (zbin/README.md).
   ServerRedirectMessageSchema,
+  ServerModernLobbyStatusSchema,
 ]);
 
 //
@@ -1253,6 +1323,11 @@ export const ClientSpectateMessageSchema = z.object({
   spectator: z.boolean(),
 });
 
+export const ClientSelectCountryMessageSchema = z.object({
+  type: z.literal("select_country"),
+  countryId: z.string().regex(/^[A-Z]{3}$/),
+});
+
 export const ClientMessageSchema = zb.discriminatedUnion("type", [
   ClientSendWinnerSchema,
   ClientSendLiveStatsSchema,
@@ -1264,6 +1339,7 @@ export const ClientMessageSchema = zb.discriminatedUnion("type", [
   ClientHashSchema,
   ClientSpectateMessageSchema,
   ClientReportMessageSchema,
+  ClientSelectCountryMessageSchema,
 ]);
 
 //

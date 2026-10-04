@@ -18,6 +18,7 @@ import {
   GameMode,
   UnitType,
 } from "../core/game/Game";
+import { modernWorld } from "../core/game/ModernWorld";
 import { UserSettings } from "../core/game/UserSettings";
 import {
   ClientInfo,
@@ -32,12 +33,14 @@ import "./components/baseComponents/Modal";
 import { BaseModal } from "./components/BaseModal";
 import "./components/ConfirmDialog";
 import { CopyButton } from "./components/CopyButton";
+import "./components/EnhancedAISettings";
 import "./components/GameConfigSettings";
 import "./components/InputCard";
 import "./components/InsufficientCurrencyDialog";
 import "./components/ListLobbyDialog";
 import { ListLobbyOptions } from "./components/ListLobbyDialog";
 import "./components/LobbyPlayerView";
+import "./components/ModernLobbyPicker";
 import "./components/PlutoniumIcon";
 import "./components/ToggleInputCard";
 import { inviteFriendsButton } from "./components/ui/InviteFriendsButton";
@@ -65,6 +68,11 @@ export class HostLobbyModal extends BaseModal {
   @state() private nations: number = 0;
   @state() private defaultNationCount: number = 0;
   @state() private gameMode: GameMode = GameMode.FFA;
+  @state() private modernMode: GameConfig["modernMode"];
+  @state() private enhancedAI: GameConfig["enhancedAI"];
+  @state() private modernNukes = false;
+  @state() private modernAlliances = true;
+  private hydratedLobby = false;
   @state() private teamCount: TeamCountConfig = 2;
 
   constructor() {
@@ -158,6 +166,23 @@ export class HostLobbyModal extends BaseModal {
     this.lobbyCreatorClientID = lobby.lobbyCreatorClientID ?? "";
     if (lobby.clients) {
       this.clients = lobby.clients;
+    }
+    if (!this.hydratedLobby && lobby.gameConfig) {
+      this.hydratedLobby = true;
+      this.modernMode = lobby.gameConfig.modernMode;
+      this.enhancedAI = lobby.gameConfig.enhancedAI;
+      if (this.modernMode) {
+        this.selectedMap = GameMapType.ModernWorld;
+        this.compactMap = false;
+        this.bots = 0;
+        this.nations = modernWorld.countries.length;
+        this.gameMode = GameMode.FFA;
+        this.selectedDifficulty = lobby.gameConfig.difficulty;
+        this.modernNukes = !lobby.gameConfig.disabledUnits?.includes(
+          UnitType.AtomBomb,
+        );
+        this.modernAlliances = !lobby.gameConfig.disableAlliances;
+      }
     }
     // The server can delist on its own (duplicate creator / cap overflow
     // resolved by the master); follow its state unless our own toggle
@@ -597,7 +622,31 @@ export class HostLobbyModal extends BaseModal {
             : nothing}
           <!-- Players joined a listed lobby for its advertised settings, so
                they are frozen (the server rejects changes too). -->
+          <label class="block p-3 rounded border border-white/20 text-white">
+            <input
+              type="checkbox"
+              .checked=${Boolean(this.modernMode)}
+              ?disabled=${this.publiclyListed}
+              @change=${(event: Event) =>
+                this.setModernPreset(
+                  (event.target as HTMLInputElement).checked,
+                )}
+            />
+            ${translateText("modern_lobby.preset")}
+          </label>
+          ${this.modernMode ? this.renderModernSettings() : nothing}
+          <enhanced-ai-settings
+            .value=${this.enhancedAI}
+            ?inert=${this.publiclyListed}
+            @enhanced-ai-change=${(
+              event: CustomEvent<GameConfig["enhancedAI"]>,
+            ) => {
+              this.enhancedAI = event.detail;
+              void this.putGameConfig();
+            }}
+          ></enhanced-ai-settings>
           <game-config-settings
+            ?hidden=${Boolean(this.modernMode)}
             class="block ${this.publiclyListed ? "opacity-60" : ""}"
             ?inert=${this.publiclyListed}
             .sectionGapClass=${"space-y-10"}
@@ -721,6 +770,15 @@ export class HostLobbyModal extends BaseModal {
             @unit-toggle-changed=${this.handleConfigUnitToggleChanged}
           ></game-config-settings>
 
+          ${this.modernMode
+            ? html`<modern-lobby-picker
+                .clients=${this.clients}
+                .currentClientID=${this.lobbyCreatorClientID}
+                .eventBus=${this.eventBus}
+                .mode=${this.modernMode}
+              ></modern-lobby-picker>`
+            : nothing}
+
           <lobby-player-view
             class="mt-10"
             .gameMode=${this.gameMode}
@@ -749,7 +807,12 @@ export class HostLobbyModal extends BaseModal {
             .title=${statusLabel}
             .uppercase=${secondsRemaining === null}
             ?disable=${this.queued ||
-            (this.lobbyStartAt === null && this.clients.length < 2)}
+            (this.lobbyStartAt === null &&
+              (this.clients.filter((c) => !c.spectator).length < 2 ||
+                Boolean(
+                  this.modernMode &&
+                  this.clients.some((c) => !c.spectator && !c.countryId),
+                )))}
             @click=${this.toggleGameStartTimer}
           ></o-button>
         </div>
@@ -961,6 +1024,11 @@ export class HostLobbyModal extends BaseModal {
 
     // Reset all transient form state to ensure clean slate
     this.selectedMap = GameMapType.World;
+    this.modernMode = undefined;
+    this.enhancedAI = undefined;
+    this.modernNukes = false;
+    this.modernAlliances = true;
+    this.hydratedLobby = false;
     this.selectedDifficulty = Difficulty.Easy;
     this.nations = 0;
     this.defaultNationCount = 0;
@@ -1023,11 +1091,228 @@ export class HostLobbyModal extends BaseModal {
     this.putGameConfig();
   }
 
+  private setModernPreset(enabled: boolean): void {
+    this.modernMode = enabled
+      ? {
+          scenario: "modern-world-v1",
+          version: 1,
+          dataHash: modernWorld.hash,
+          countryId: "KOR",
+          balance: "balanced",
+          victory: "territory",
+          targetPercent: 60,
+          protectionTicks: 300,
+          capitalElimination: false,
+        }
+      : undefined;
+    this.selectedMap = enabled ? GameMapType.ModernWorld : GameMapType.World;
+    this.compactMap = false;
+    this.gameMode = GameMode.FFA;
+    this.bots = enabled ? 0 : 400;
+    this.nations = enabled ? modernWorld.countries.length : 0;
+    this.defaultNationCount = enabled ? modernWorld.countries.length : 0;
+    this.randomSpawn = false;
+    if (enabled) {
+      this.infiniteGold = this.infiniteTroops = this.instantBuild = false;
+      this.donateGold = this.donateTroops = true;
+      this.maxTimer = true;
+      this.maxTimerValue = 30;
+      this.enhancedAI = {
+        tribePercent: 0,
+        nationPercent: 25,
+        personality: "mixed",
+        fairResources: true,
+        seed: 1,
+      };
+    }
+    void this.loadNationCount().then(() => this.putGameConfig());
+  }
+
+  private changeModern(
+    patch: Partial<NonNullable<GameConfig["modernMode"]>>,
+  ): void {
+    this.modernMode = { ...this.modernMode!, ...patch };
+    void this.putGameConfig();
+  }
+
+  private renderModernSettings() {
+    const mode = this.modernMode!;
+    return html`<fieldset
+      class="p-4 border border-white/20 rounded-xl text-white space-y-3"
+      ?inert=${this.publiclyListed}
+    >
+      <legend>${translateText("modern.title")}</legend>
+      <p>
+        ${translateText("modern.scope", {
+          count: modernWorld.countries.length,
+          width: modernWorld.width,
+          height: modernWorld.height,
+        })}
+      </p>
+      <p>${translateText("modern_lobby.rules")}</p>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <label
+          >${translateText("modern.difficulty")}<select
+            class="block bg-gray-800 p-2 w-full"
+            .value=${this.selectedDifficulty}
+            @change=${(event: Event) => {
+              this.selectedDifficulty = (event.target as HTMLSelectElement)
+                .value as Difficulty;
+              void this.putGameConfig();
+            }}
+          >
+            ${Object.values(Difficulty).map(
+              (d) =>
+                html`<option
+                  value=${d}
+                  ?selected=${d === this.selectedDifficulty}
+                >
+                  ${translateText(`difficulty.${d.toLowerCase()}`)}
+                </option>`,
+            )}
+          </select></label
+        >
+        <label
+          >${translateText("modern.balance")}<select
+            class="block bg-gray-800 p-2 w-full"
+            .value=${mode.balance}
+            @change=${(event: Event) =>
+              this.changeModern({
+                balance: (event.target as HTMLSelectElement)
+                  .value as typeof mode.balance,
+              })}
+          >
+            ${["balanced", "asymmetric"].map(
+              (b) =>
+                html`<option value=${b} ?selected=${b === mode.balance}>
+                  ${translateText(`modern.${b}`)}
+                </option>`,
+            )}
+          </select></label
+        >
+        <label
+          >${translateText("modern.victory")}<select
+            class="block bg-gray-800 p-2 w-full"
+            .value=${mode.victory}
+            @change=${(event: Event) =>
+              this.changeModern({
+                victory: (event.target as HTMLSelectElement)
+                  .value as typeof mode.victory,
+              })}
+          >
+            ${["territory", "capitals", "timed", "total"].map(
+              (v) =>
+                html`<option value=${v} ?selected=${v === mode.victory}>
+                  ${translateText(`modern.${v}`)}
+                </option>`,
+            )}
+          </select></label
+        >
+        <label
+          >${translateText("modern.target")}<input
+            type="number"
+            min="10"
+            max="100"
+            class="block bg-gray-800 p-2 w-full"
+            .value=${String(mode.targetPercent)}
+            @change=${(event: Event) =>
+              this.changeModern({
+                targetPercent: Math.min(
+                  100,
+                  Math.max(
+                    10,
+                    Math.round(
+                      Number((event.target as HTMLInputElement).value) || 60,
+                    ),
+                  ),
+                ),
+              })}
+        /></label>
+        <label
+          >${translateText("modern.protection")}<input
+            type="number"
+            min="0"
+            max="600"
+            class="block bg-gray-800 p-2 w-full"
+            .value=${String(mode.protectionTicks / 10)}
+            @change=${(event: Event) =>
+              this.changeModern({
+                protectionTicks: Math.min(
+                  6000,
+                  Math.max(
+                    0,
+                    Math.round(
+                      (Number((event.target as HTMLInputElement).value) || 0) *
+                        10,
+                    ),
+                  ),
+                ),
+              })}
+        /></label>
+        <label
+          >${translateText("game_settings.max_timer")}<input
+            type="number"
+            min="1"
+            max="120"
+            class="block bg-gray-800 p-2 w-full"
+            .value=${String(this.maxTimerValue ?? 30)}
+            @change=${(event: Event) => {
+              this.maxTimer = true;
+              this.maxTimerValue = Math.min(
+                120,
+                Math.max(
+                  1,
+                  Math.round(
+                    Number((event.target as HTMLInputElement).value) || 30,
+                  ),
+                ),
+              );
+              void this.putGameConfig();
+            }}
+        /></label>
+        <label
+          ><input
+            type="checkbox"
+            .checked=${this.modernNukes}
+            @change=${(event: Event) => {
+              this.modernNukes = (event.target as HTMLInputElement).checked;
+              void this.putGameConfig();
+            }}
+          />${translateText("modern.nukes")}</label
+        >
+        <label
+          ><input
+            type="checkbox"
+            .checked=${this.modernAlliances}
+            @change=${(event: Event) => {
+              this.modernAlliances = (event.target as HTMLInputElement).checked;
+              void this.putGameConfig();
+            }}
+          />${translateText("modern.alliances")}</label
+        >
+        <label
+          ><input
+            type="checkbox"
+            .checked=${mode.capitalElimination}
+            @change=${(event: Event) =>
+              this.changeModern({
+                capitalElimination: (event.target as HTMLInputElement).checked,
+              })}
+          />${translateText("modern.capital_elimination")}</label
+        >
+      </div>
+    </fieldset>`;
+  }
+
   private handleConfigRandomMapSelected = () => {
     void this.handleSelectRandomMap();
   };
 
   private async handleMapSelection(value: GameMapType) {
+    if (value === GameMapType.ModernWorld) {
+      this.setModernPreset(true);
+      return;
+    }
     this.selectedMap = value;
     this.useRandomMap = false;
     await this.loadNationCount();
@@ -1544,6 +1829,15 @@ export class HostLobbyModal extends BaseModal {
       new CustomEvent("update-game-config", {
         detail: {
           config: {
+            modernMode: this.modernMode,
+            enhancedAI: this.enhancedAI ?? {
+              tribePercent: 0,
+              nationPercent: 0,
+              personality: "mixed",
+              fairResources: false,
+              seed: 1,
+            },
+            disableAlliances: this.modernMode ? !this.modernAlliances : null,
             gameMap: this.selectedMap,
             gameMapSize: this.compactMap
               ? GameMapSize.Compact
@@ -1557,7 +1851,11 @@ export class HostLobbyModal extends BaseModal {
             instantBuild: this.instantBuild,
             randomSpawn: this.randomSpawn,
             gameMode: this.gameMode,
-            disabledUnits: this.disabledUnits,
+            disabledUnits: this.modernMode
+              ? this.modernNukes
+                ? []
+                : [UnitType.AtomBomb, UnitType.HydrogenBomb, UnitType.MIRV]
+              : this.disabledUnits,
             spawnImmunityDuration: this.spawnImmunity
               ? spawnImmunityTicks
               : null,

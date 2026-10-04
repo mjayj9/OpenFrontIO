@@ -104,23 +104,56 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
   }
 
   private lastMouseUpdate = 0;
+  private subscribedEventBus: EventBus | null = null;
+  private profileRequestVersion = 0;
+  private readonly onMouseMove = (event: MouseMoveEvent) =>
+    this.onMouseEvent(event);
+  private readonly onContextMenu = (event: ContextMenuEvent) =>
+    this.maybeShow(event.x, event.y);
+  private readonly onTouch = (event: TouchEvent) =>
+    this.maybeShow(event.x, event.y);
+  private readonly onRadialClose = () => this.hide();
+  private readonly onSpawnBarVisible = (event: SpawnBarVisibleEvent) => {
+    this.spawnBarVisible = event.visible;
+  };
+  private readonly onImmunityBarVisible = (event: ImmunityBarVisibleEvent) => {
+    this.immunityBarVisible = event.visible;
+  };
 
   init() {
-    this.eventBus.on(MouseMoveEvent, (e: MouseMoveEvent) =>
-      this.onMouseEvent(e),
-    );
-    this.eventBus.on(ContextMenuEvent, (e: ContextMenuEvent) =>
-      this.maybeShow(e.x, e.y),
-    );
-    this.eventBus.on(TouchEvent, (e: TouchEvent) => this.maybeShow(e.x, e.y));
-    this.eventBus.on(CloseRadialMenuEvent, () => this.hide());
-    this.eventBus.on(SpawnBarVisibleEvent, (e) => {
-      this.spawnBarVisible = e.visible;
-    });
-    this.eventBus.on(ImmunityBarVisibleEvent, (e) => {
-      this.immunityBarVisible = e.visible;
-    });
+    this.dispose();
+    this.spawnBarVisible = false;
+    this.immunityBarVisible = false;
+    this.lastMouseUpdate = 0;
+    this.subscribedEventBus = this.eventBus;
+    this.eventBus.on(MouseMoveEvent, this.onMouseMove);
+    this.eventBus.on(ContextMenuEvent, this.onContextMenu);
+    this.eventBus.on(TouchEvent, this.onTouch);
+    this.eventBus.on(CloseRadialMenuEvent, this.onRadialClose);
+    this.eventBus.on(SpawnBarVisibleEvent, this.onSpawnBarVisible);
+    this.eventBus.on(ImmunityBarVisibleEvent, this.onImmunityBarVisible);
     this._isActive = true;
+    this.requestUpdate();
+  }
+
+  dispose(): void {
+    this.subscribedEventBus?.off(MouseMoveEvent, this.onMouseMove);
+    this.subscribedEventBus?.off(ContextMenuEvent, this.onContextMenu);
+    this.subscribedEventBus?.off(TouchEvent, this.onTouch);
+    this.subscribedEventBus?.off(CloseRadialMenuEvent, this.onRadialClose);
+    this.subscribedEventBus?.off(SpawnBarVisibleEvent, this.onSpawnBarVisible);
+    this.subscribedEventBus?.off(
+      ImmunityBarVisibleEvent,
+      this.onImmunityBarVisible,
+    );
+    this.subscribedEventBus = null;
+    this._isActive = false;
+    this.hide();
+  }
+
+  disconnectedCallback() {
+    this.dispose();
+    super.disconnectedCallback();
   }
 
   private onMouseEvent(event: MouseMoveEvent) {
@@ -133,12 +166,15 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
   }
 
   public hide() {
+    this.profileRequestVersion++;
     this.setVisible(false);
     this.unit = null;
     this.player = null;
+    this.playerProfile = null;
   }
 
   public maybeShow(x: number, y: number) {
+    if (!this._isActive) return;
     this.hide();
     const worldCoord = this.transform.screenToWorldCoordinates(x, y);
     if (!this.game.isValidCoord(worldCoord.x, worldCoord.y)) {
@@ -152,8 +188,15 @@ export class PlayerInfoOverlay extends LitElement implements Controller {
 
     if (owner && owner.isPlayer()) {
       this.player = owner as PlayerView;
+      const requestVersion = this.profileRequestVersion;
       this.player.profile().then((p) => {
-        this.playerProfile = p;
+        if (
+          this._isActive &&
+          requestVersion === this.profileRequestVersion &&
+          this.player === owner
+        ) {
+          this.playerProfile = p;
+        }
       });
       this.setVisible(true);
     } else if (!this.game.isLand(tile)) {

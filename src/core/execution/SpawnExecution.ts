@@ -59,6 +59,12 @@ export class SpawnExecution implements Execution {
 
   tick(ticks: number) {
     this.active = false;
+    // Scenario controllers cannot re-roll away from their initial borders.
+    if (
+      this.mg.config().gameConfig().modernMode ||
+      this.mg.config().gameConfig().training
+    )
+      return;
 
     // Security: `tile` arrives straight off a spawn intent. A fractional or
     // out-of-range ref indexes past the terrain buffers, so downstream lookups

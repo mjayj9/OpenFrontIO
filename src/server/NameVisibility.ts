@@ -192,6 +192,7 @@ export class NameVisibility {
           clientID: c.clientID,
           spectator: c.spectator || undefined,
           teamIndex: this.view.teamIndex(c),
+          ...(!c.spectator && c.countryId ? { countryId: c.countryId } : {}),
         };
       }
       // A TEAMMATE reveal is deliberately narrower than the others. Seeing a
@@ -210,6 +211,7 @@ export class NameVisibility {
         verified: c.cosmetics?.verified,
         spectator: c.spectator || undefined,
         teamIndex: this.view.teamIndex(c),
+        ...(!c.spectator && c.countryId ? { countryId: c.countryId } : {}),
       };
     });
   }

@@ -54,6 +54,21 @@ describe("control-panel attack ratio", () => {
     expect(uiState.attackRatio).toBeCloseTo(0.2);
   });
 
+  it("restores an absolute session ratio into the slider and commands without changing preferences", async () => {
+    panel.game = {
+      inSpawnPhase: () => false,
+      myPlayer: () => ({ isAlive: () => true, troops: () => 100_000 }),
+    } as unknown as GameView;
+    panel.setVisibile(true);
+    panel.onAttackRatioChange(1);
+    await panel.updateComplete;
+    expect(uiState.attackRatio).toBe(1);
+    const slider = panel.querySelector<HTMLInputElement>('input[type="range"]');
+    expect(slider?.value).toBe("100");
+    expect(panel.textContent).toContain("100%");
+    expect(new UserSettings().attackRatio()).toBe(0.2);
+  });
+
   it("renders the calculated troop count alongside percentage in mobile view", async () => {
     panel.game = {
       inSpawnPhase: () => false,

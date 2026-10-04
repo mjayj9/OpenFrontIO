@@ -1,6 +1,11 @@
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
+import "../ModernWorldModal";
+import { ModernWorldModal } from "../ModernWorldModal";
+import "../SaveManager";
+import { SaveManager } from "../SaveManager";
+import { translateText } from "../Utils";
 import "./CosmeticBackground";
 import "./NavAccountMenu";
 import "./NavUtilityIcons";
@@ -20,6 +25,13 @@ export class PlayPage extends LitElement {
         id="page-play"
         class="flex flex-col gap-2 w-full px-0 lg:px-4 min-h-0"
       >
+        <button
+          class="p-3 rounded-xl bg-surface text-white"
+          @click=${() =>
+            (this.querySelector("save-manager") as SaveManager)?.open()}
+        >
+          ${translateText("saves.title")}</button
+        ><save-manager></save-manager>
         <token-login class="absolute"></token-login>
         <rewards-modal class="absolute"></rewards-modal>
 
@@ -118,6 +130,14 @@ export class PlayPage extends LitElement {
         </div>
 
         <game-mode-selector></game-mode-selector>
+        <button
+          class="p-4 rounded-xl bg-blue-800 text-white"
+          @click=${() =>
+            this.querySelector<ModernWorldModal>("modern-world-modal")?.open()}
+        >
+          ${translateText("modern.title")}
+        </button>
+        <modern-world-modal></modern-world-modal>
 
         <!-- Desktop gets the compact footer button instead. -->
         <steam-wishlist

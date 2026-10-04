@@ -18,10 +18,14 @@
  * tests rely on that.
  */
 
+import { aiProfile } from "../../core/ai/AIProfile";
 import type { Config } from "../../core/configuration/Config";
 import type { PlayerType, Team, UnitType } from "../../core/game/Game";
 import type { TileRef } from "../../core/game/GameMap";
-import { GameUpdateType } from "../../core/game/GameUpdates";
+import {
+  GameUpdateType,
+  type AIStatusUpdate,
+} from "../../core/game/GameUpdates";
 import { OWNER_MASK } from "../render/gl/utils/TileCodec";
 import type {
   NameEntry,
@@ -80,6 +84,12 @@ export class ReplayUnitView {
 }
 
 export class ReplayPlayerView {
+  enhancedAI() {
+    return aiProfile(this.game.config().gameConfig(), this.id(), this.type());
+  }
+  aiStrategy(): Readonly<AIStatusUpdate> | null {
+    return this.game.aiStrategyOf(this.id());
+  }
   // Written by ReplayGameView.sync, read through the accessors below.
   /** The current frame's state, undefined before the player appears. */
   current: PlayerState | undefined;
@@ -269,6 +279,9 @@ export class ReplayPlayerView {
 }
 
 export class ReplayGameView {
+  aiStrategyOf(id: string): AIStatusUpdate | null {
+    return this.frame?.aiStrategies?.get(id) ?? null;
+  }
   private readonly bySmallID = new Map<number, ReplayPlayerView>();
   private readonly order: ReplayPlayerView[] = [];
   private frame: ReplayFrame | null = null;

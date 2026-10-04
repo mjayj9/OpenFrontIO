@@ -22,6 +22,7 @@ import {
   MouseUpEvent,
   SwapRocketDirectionEvent,
 } from "../../InputHandler";
+import { themeProvider } from "../../theme/ThemeProvider";
 import {
   PlayerReportedEvent,
   SendAllianceRequestIntentEvent,
@@ -40,6 +41,7 @@ import {
   translateText,
 } from "../../Utils";
 import { GameView, PlayerView } from "../../view";
+import { forecastVisibleAttack } from "../../view/AttackForecast";
 import { ChatModal } from "./ChatModal";
 import { EmojiTable } from "./EmojiTable";
 import "./PlayerModerationModal";
@@ -67,7 +69,11 @@ export class PlayerPanel extends LitElement implements Controller {
 
   private actions: PlayerActions | null = null;
   private tile: TileRef | null = null;
-  private _profileForPlayerId: number | null = null;
+  private _profileForPlayerId: string | null = null;
+  private pendingProfileForPlayerId: string | null = null;
+  private matchGeneration = 0;
+  private selectionGeneration = 0;
+  private subscribedEventBus: EventBus | null = null;
   private kickedPlayerIDs = new Set<string>();
 
   @state() private sendTarget: PlayerView | null = null;
@@ -96,36 +102,47 @@ export class PlayerPanel extends LitElement implements Controller {
   }
 
   private ctModal: ChatModal;
+  private readonly onCloseView = () => {
+    if (this.isVisible) this.hide();
+  };
+  private readonly onSwapRocketDirection = (
+    event: SwapRocketDirectionEvent,
+  ) => {
+    this.uiState.rocketDirectionUp = event.rocketDirectionUp;
+    this.requestUpdate();
+  };
+  private readonly onPlayerReported = (event: PlayerReportedEvent) => {
+    this.reportedClientIDs.add(event.reported);
+    this.requestUpdate();
+    showToast(translateText("player_panel.report_sent"), "green");
+  };
+  private readonly onMouseUp = () => {
+    if (this.suppressNextHide) {
+      this.suppressNextHide = false;
+      return;
+    }
+    this.hide();
+  };
 
   createRenderRoot() {
     return this;
   }
 
   initEventBus(eventBus: EventBus) {
+    this.unsubscribe();
     this.eventBus = eventBus;
-    eventBus.on(CloseViewEvent, (e) => {
-      if (this.isVisible) {
-        this.hide();
-      }
-    });
-    eventBus.on(SwapRocketDirectionEvent, (event) => {
-      this.uiState.rocketDirectionUp = event.rocketDirectionUp;
-      this.requestUpdate();
-    });
-    eventBus.on(PlayerReportedEvent, (event) => {
-      this.reportedClientIDs.add(event.reported);
-      this.requestUpdate();
-      showToast(translateText("player_panel.report_sent"), "green");
-    });
+    this.subscribedEventBus = eventBus;
+    eventBus.on(CloseViewEvent, this.onCloseView);
+    eventBus.on(SwapRocketDirectionEvent, this.onSwapRocketDirection);
+    eventBus.on(PlayerReportedEvent, this.onPlayerReported);
+    eventBus.on(MouseUpEvent, this.onMouseUp);
   }
   init() {
-    this.eventBus.on(MouseUpEvent, () => {
-      if (this.suppressNextHide) {
-        this.suppressNextHide = false;
-        return;
-      }
-      this.hide();
-    });
+    this.dispose();
+    this.initEventBus(this.eventBus);
+    this.kickedPlayerIDs.clear();
+    this.reportedClientIDs.clear();
+    this.gameListed = false;
 
     this.ctModal = document.querySelector("chat-modal") as ChatModal;
     if (!this.ctModal) {
@@ -134,36 +151,102 @@ export class PlayerPanel extends LitElement implements Controller {
 
     // Only private games can be listed.
     if (this.g.config().gameConfig().gameType === GameType.Private) {
-      void fetchLobbyListed(this.g.gameID()).then((listed) => {
-        this.gameListed = listed;
-      });
+      const game = this.g;
+      const generation = this.matchGeneration;
+      void fetchLobbyListed(game.gameID())
+        .then((listed) => {
+          if (generation === this.matchGeneration && game === this.g)
+            this.gameListed = listed;
+        })
+        .catch((error) => {
+          if (generation === this.matchGeneration)
+            console.warn("Failed to fetch lobby visibility:", error);
+        });
     }
+  }
+
+  private unsubscribe(): void {
+    this.subscribedEventBus?.off(CloseViewEvent, this.onCloseView);
+    this.subscribedEventBus?.off(
+      SwapRocketDirectionEvent,
+      this.onSwapRocketDirection,
+    );
+    this.subscribedEventBus?.off(PlayerReportedEvent, this.onPlayerReported);
+    this.subscribedEventBus?.off(MouseUpEvent, this.onMouseUp);
+    this.subscribedEventBus = null;
+  }
+
+  dispose(): void {
+    this.matchGeneration++;
+    this.unsubscribe();
+    this.hide();
+    this.actions = null;
+    this.tile = null;
+    this.resetProfile();
+  }
+
+  disconnectedCallback() {
+    this.dispose();
+    super.disconnectedCallback();
+  }
+
+  private resetProfile(): void {
+    this._profileForPlayerId = null;
+    this.pendingProfileForPlayerId = null;
+    this.otherProfile = null;
+    this.allianceExpirySeconds = null;
+    this.allianceExpiryText = null;
   }
 
   async tick() {
     if (this.isVisible && this.tile) {
-      const owner = this.g.owner(this.tile);
+      const game = this.g;
+      const tile = this.tile;
+      const generation = this.matchGeneration;
+      const selection = this.selectionGeneration;
+      const isCurrent = () =>
+        generation === this.matchGeneration &&
+        selection === this.selectionGeneration &&
+        game === this.g &&
+        this.isVisible;
+      const owner = game.owner(tile);
       if (owner && owner.isPlayer()) {
         const pv = owner as PlayerView;
-        const id = pv.id();
+        const id = String(pv.id());
         // fetch only if we don't have it or the player changed
-        if (this._profileForPlayerId !== Number(id)) {
-          this.otherProfile = await pv.profile();
-          this._profileForPlayerId = Number(id);
+        if (
+          this._profileForPlayerId !== id &&
+          this.pendingProfileForPlayerId !== id
+        ) {
+          this.pendingProfileForPlayerId = id;
+          try {
+            const profile = await pv.profile();
+            if (!isCurrent()) return;
+            this.otherProfile = profile;
+            this._profileForPlayerId = id;
+          } catch (error) {
+            if (!isCurrent()) return;
+            console.warn("Failed to refresh player panel profile:", error);
+          } finally {
+            if (isCurrent()) this.pendingProfileForPlayerId = null;
+          }
         }
       }
 
       // Refresh actions & alliance expiry
-      const myPlayer = this.g.myPlayer();
+      const myPlayer = game.myPlayer();
       if (myPlayer !== null && myPlayer.isAlive()) {
         try {
-          this.actions = await myPlayer.actions(this.tile, null);
+          const actions = await myPlayer.actions(tile, null);
+          if (!isCurrent()) return;
+          this.actions = actions;
         } catch (error) {
+          if (!isCurrent()) return;
           console.warn("Failed to refresh player panel actions:", error);
         }
         if (this.actions?.interaction?.allianceInfo?.expiresAt !== undefined) {
           const expiresAt = this.actions.interaction.allianceInfo.expiresAt;
-          const remainingTicks = expiresAt - this.g.ticks();
+          const remainingTicks = expiresAt - game.ticks();
           const remainingSeconds = Math.max(0, Math.floor(remainingTicks / 10)); // 10 ticks per second
 
           if (remainingTicks > 0) {
@@ -185,6 +268,8 @@ export class PlayerPanel extends LitElement implements Controller {
   }
 
   public show(actions: PlayerActions, tile: TileRef) {
+    this.selectionGeneration++;
+    this.resetProfile();
     this.actions = actions;
     this.tile = tile;
     this.moderationTarget = null;
@@ -198,6 +283,8 @@ export class PlayerPanel extends LitElement implements Controller {
     tile: TileRef,
     target: PlayerView,
   ) {
+    this.selectionGeneration++;
+    this.resetProfile();
     this.suppressNextHide = true;
     this.actions = actions;
     this.tile = tile;
@@ -210,6 +297,8 @@ export class PlayerPanel extends LitElement implements Controller {
   }
 
   public hide() {
+    this.selectionGeneration++;
+    this.suppressNextHide = false;
     this.isVisible = false;
     this.sendMode = "none";
     this.sendTarget = null;
@@ -317,7 +406,10 @@ export class PlayerPanel extends LitElement implements Controller {
 
   private handleEmojiClick(e: Event, myPlayer: PlayerView, other: PlayerView) {
     e.stopPropagation();
+    const game = this.g;
+    const generation = this.matchGeneration;
     this.emojiTable.showTable((emoji: string) => {
+      if (generation !== this.matchGeneration || game !== this.g) return;
       if (myPlayer === other) {
         this.eventBus.emit(
           new SendEmojiIntentEvent(
@@ -579,6 +671,9 @@ export class PlayerPanel extends LitElement implements Controller {
         ? Countries.find((c) => c.code === flagCode)
         : undefined;
 
+    const enhanced = other.enhancedAI?.();
+    const team = other.team?.() ?? null;
+    const aiStatus = other.aiStrategy?.();
     const chip =
       other.type() === PlayerType.Human
         ? null
@@ -620,8 +715,73 @@ export class PlayerPanel extends LitElement implements Controller {
             </span>`
           : html``}
       </div>
+      ${team !== null
+        ? html`<p class="text-xs text-zinc-300 mt-1">
+            <span
+              class="inline-block h-2 w-2 rounded-full mr-1"
+              style=${`background:${themeProvider.current().teamColor(team).toHex()}`}
+              aria-hidden="true"
+            ></span
+            >${translateText("leaderboard.team")}: ${team}
+          </p>`
+        : ""}
+      ${enhanced
+        ? html`<p class="text-xs text-cyan-200 mt-1" role="status">
+            ${translateText("enhanced_ai.badge")} ·
+            ${translateText(`difficulty.${enhanced.difficulty.toLowerCase()}`)}
+            ·
+            ${translateText("enhanced_ai.personality_" + enhanced.personality)}
+          </p>`
+        : ""}
+      ${aiStatus
+        ? html`<p class="text-xs text-zinc-300" role="status">
+              ${translateText("enhanced_ai.goal." + aiStatus.goal)}
+            </p>
+            ${import.meta.env.DEV
+              ? html`<details class="text-xs text-zinc-400">
+                  <summary>${translateText("enhanced_ai.debug_title")}</summary>
+                  <p>
+                    ${translateText("enhanced_ai.reason." + aiStatus.reason)}
+                  </p>
+                  <p>
+                    ${translateText("enhanced_ai.reserve", {
+                      troops: renderTroops(aiStatus.reserve),
+                    })}
+                  </p>
+                  <p>
+                    ${translateText("enhanced_ai.priority", {
+                      units: aiStatus.buildingPriority
+                        .map((type) =>
+                          translateText(
+                            "unit_type." +
+                              type.toLowerCase().replace(/ /g, "_"),
+                          ),
+                        )
+                        .join(", "),
+                    })}
+                  </p>
+                  <p>
+                    ${translateText("enhanced_ai.candidates", {
+                      count: aiStatus.candidateCount,
+                    })}
+                  </p>
+                </details>`
+              : ""}`
+        : ""}
       ${this.renderTraitorBadge(other)}
       ${this.renderRelationPillIfNation(other, my)}
+      <details class="text-xs text-zinc-300 mt-2">
+        <summary>${translateText("controls.map_legend")}</summary>
+        <p>
+          👤 ${translateText("player_type.player")} · ⚔️
+          ${translateText("player_type.bot")} · 🏛️
+          ${translateText("player_type.nation")}
+        </p>
+        <p>
+          ${translateText("enhanced_ai.marker")} —
+          ${translateText("controls.ai_legend")}
+        </p>
+      </details>
     `;
   }
 
@@ -655,6 +815,43 @@ export class PlayerPanel extends LitElement implements Controller {
         </div>
       </div>
     `;
+  }
+
+  private renderAttackForecast(my: PlayerView, other: PlayerView) {
+    if (
+      this.tile === null ||
+      !this.actions?.canAttack ||
+      my === other ||
+      my.isFriendly(other)
+    )
+      return html``;
+    const forecast = forecastVisibleAttack(
+      this.g,
+      my,
+      other,
+      this.tile,
+      this.uiState.attackRatio,
+    );
+    return html`<div
+      class="rounded-lg border border-white/10 bg-white/5 p-2 text-xs text-zinc-200"
+      role="status"
+      data-attack-forecast
+    >
+      <p>
+        ${translateText("attack_preview.commitment", {
+          troops: renderTroops(forecast.committed),
+          percent: forecast.percent,
+          remaining: renderTroops(forecast.remaining),
+        })}
+      </p>
+      <p>
+        ${translateText("attack_preview.risk", {
+          risk: translateText("attack_preview." + forecast.risk),
+          defenses: forecast.defensePosts,
+        })}
+      </p>
+      <p class="text-zinc-400">${translateText("attack_preview.uncertain")}</p>
+    </div>`;
   }
 
   private renderRocketDirectionToggle() {
@@ -1111,6 +1308,9 @@ export class PlayerPanel extends LitElement implements Controller {
 
                     <!-- Resources -->
                     ${this.renderResources(other)}
+                    ${!isSpectator
+                      ? this.renderAttackForecast(viewer, other)
+                      : ""}
 
                     <!-- Rocket direction toggle -->
                     ${other === viewer && !isSpectator

@@ -523,6 +523,50 @@ export class GameImpl implements Game {
     return this._ticks;
   }
 
+  /** Read-only display bootstrap after restore; does not advance the sim. */
+  fullViewUpdate(): import("./GameUpdates").GameUpdateViewData {
+    const updates = createGameUpdatesMap();
+    updates[GameUpdateType.Player] = this.allPlayers().map((p) =>
+      (p as PlayerImpl).toFullUpdate(),
+    );
+    updates[GameUpdateType.Unit] = this.units().map((u) => u.toUpdate());
+    if (this._winner !== null)
+      updates[GameUpdateType.Win].push({
+        type: GameUpdateType.Win,
+        winner: this.makeWinner(this._winner),
+        allPlayersStats: this.stats().stats(),
+      });
+    const rails = new Set<number>();
+    for (const station of this.railNetwork().stationManager().getAll()) {
+      for (const rail of station.getRailroads()) {
+        if (rails.has(rail.id)) continue;
+        rails.add(rail.id);
+        updates[GameUpdateType.RailroadConstructionEvent].push({
+          type: GameUpdateType.RailroadConstructionEvent,
+          id: rail.id,
+          tiles: rail.tiles,
+        });
+      }
+    }
+    if (this.startTick !== null)
+      updates[GameUpdateType.SpawnPhaseEnd].push({
+        type: GameUpdateType.SpawnPhaseEnd,
+        startTick: this.startTick,
+      });
+    updates[GameUpdateType.GamePaused].push({
+      type: GameUpdateType.GamePaused,
+      paused: this.isPaused(),
+    });
+    const pairs = new Uint32Array(this.width() * this.height() * 2);
+    for (let tile = 0; tile < this.width() * this.height(); tile++) {
+      pairs[tile * 2] = tile;
+      pairs[tile * 2 + 1] =
+        (this.map().tileState(tile) & 0xffff) |
+        (this.map().terrainByte(tile) << 16);
+    }
+    return { tick: this.ticks(), updates, packedTileUpdates: pairs };
+  }
+
   executeNextTick(): GameUpdates {
     this.updates = createGameUpdatesMap();
     this.tileUpdatePairs.length = 0;

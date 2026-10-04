@@ -108,6 +108,13 @@ export function assetUrl(path: string): string {
   return buildAssetUrl(path, getAssetManifest(), getCdnBase());
 }
 
+/** Inline Blob workers need absolute URLs even when the site has no CDN. */
+export function getWorkerCdnBase(): string {
+  return typeof window === "undefined"
+    ? getCdnBase()
+    : new URL(getCdnBase() || "/", window.location.href).href;
+}
+
 // Rewrites Vite's emitted /assets/... references in the built index.html to
 // use the cdnBaseRaw EJS placeholder, so RenderHtml.ts can prefix them with
 // CDN_BASE at request time. Scoped to src=/href= attribute values so inline

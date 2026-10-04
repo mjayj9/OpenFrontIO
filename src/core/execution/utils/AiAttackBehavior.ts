@@ -1,4 +1,13 @@
 import { z } from "zod";
+import { AI_WEIGHTS, aiProfile, AIProfile } from "../../ai/AIProfile";
+import {
+  defensiveReserve,
+  MAX_AI_ROUTES,
+  newStrategicState,
+  planStrategy,
+  StrategicState,
+  StrategicStateSchema,
+} from "../../ai/StrategicPlanner";
 import {
   Attack,
   Cell,
@@ -17,6 +26,7 @@ import {
   UnitType,
 } from "../../game/Game";
 import { TileRef } from "../../game/GameMap";
+import { GameUpdateType } from "../../game/GameUpdates";
 import {
   canBuildTransportShip,
   targetTransportTile,
@@ -51,6 +61,7 @@ import {
 } from "../nation/NationEmojiBehavior";
 import { findJuiciestTarget, findRunawayLeader } from "../nation/NationUtils";
 import type { NationWarshipBehavior } from "../nation/NationWarshipBehavior";
+import { RetreatExecution } from "../RetreatExecution";
 import { TransportShipExecution } from "../TransportShipExecution";
 import { closestTwoTiles } from "../Util";
 
@@ -75,6 +86,7 @@ function boxGap(a: Box, b: Box): number {
 }
 
 export class AiAttackBehavior {
+  private strategicState: StrategicState | null = null;
   private botAttackTroopsSent: number = 0;
   // Our boat attacks (landed beachheads) already followed up by land, while they last
   private followedLandings: Attack[] = [];
@@ -102,6 +114,7 @@ export class AiAttackBehavior {
       triggerRatio: this.triggerRatio,
       reserveRatio: this.reserveRatio,
       expandRatio: this.expandRatio,
+      strategicState: this.strategicState,
     });
   }
 
@@ -130,6 +143,7 @@ export class AiAttackBehavior {
     this.triggerRatio = s.triggerRatio;
     this.reserveRatio = s.reserveRatio;
     this.expandRatio = s.expandRatio;
+    this.strategicState = s.strategicState;
     // Scratch buffer: always written before it is read.
     this.nbuf = [0, 0, 0, 0];
   }
@@ -139,15 +153,167 @@ export class AiAttackBehavior {
     this.boatRoutes = routes;
     let landFront = false;
     try {
-      this.chooseAttack();
+      const profile = aiProfile(
+        this.game.config().gameConfig(),
+        this.player.id(),
+        this.player.type(),
+      );
+      if (profile === null) this.chooseAttack();
+      else this.chooseStrategicAttack(profile);
       for (const neighbor of this.landNeighbors ?? []) {
         if (!this.player.isFriendly(neighbor)) landFront = true;
       }
     } finally {
+      const profile = aiProfile(
+        this.game.config().gameConfig(),
+        this.player.id(),
+        this.player.type(),
+      );
+      const status = this.strategicState;
+      if (profile !== null && status !== null)
+        this.game.addUpdate({
+          type: GameUpdateType.AIStatus,
+          playerID: this.player.id(),
+          goal: status.goal,
+          target: status.target,
+          reason: status.reason,
+          reserve: status.reserve,
+          candidateCount: status.candidateCount,
+          buildingPriority: (profile.controller === "tribe"
+            ? [
+                status.goal === "defend"
+                  ? UnitType.DefensePost
+                  : profile.personality === "economic"
+                    ? UnitType.Factory
+                    : UnitType.City,
+              ]
+            : [...AI_WEIGHTS[profile.personality].buildings]
+          ).filter((type) => !this.game.config().isUnitDisabled(type)),
+        });
       this.landNeighbors = null;
       this.boatRoutes = null;
     }
     this.clearBlockedLane(routes, landFront);
+  }
+
+  /** Public developer inspection. UI may translate goal/reason independently. */
+  strategyStatus(): Readonly<StrategicState> | null {
+    return this.strategicState;
+  }
+
+  private chooseStrategicAttack(profile: AIProfile): void {
+    const nearby = this.player.nearby();
+    this.landNeighbors = new Set(
+      nearby.filter(
+        (p): p is Player => p.isPlayer() && this.player.sharesBorderWith(p),
+      ),
+    );
+    const plan = planStrategy(
+      this.game,
+      this.player,
+      profile,
+      this.strategicState ?? newStrategicState(),
+      nearby.some((p) => !p.isPlayer()),
+    );
+    this.strategicState = plan.state;
+    // Reassess deteriorated pushes. One withdrawal per thought tick bounds commands.
+    for (const attack of this.player.outgoingAttacks()) {
+      const target = attack.target();
+      if (
+        !target.isPlayer() ||
+        attack.retreating() ||
+        attack.sourceTile() !== null
+      )
+        continue;
+      if (
+        attack.troops() * 6 < target.troops() &&
+        (this.player.troops() < plan.state.reserve || attack.borderSize() === 0)
+      ) {
+        this.game.addExecution(new RetreatExecution(this.player, attack.id()));
+        break;
+      }
+    }
+    if (
+      this.player.incomingAttacks().length > 0 &&
+      (profile.controller === "tribe"
+        ? this.retaliate()
+        : this.strategicCounterAttack(profile))
+    ) {
+      this.strategicState.goal = "defend";
+      this.strategicState.reason = "counter_active_attack";
+      return;
+    }
+    if (
+      profile.personality === "diplomatic" &&
+      this.allianceBehavior &&
+      this.assistAllies()
+    ) {
+      this.strategicState.goal = "support";
+      this.strategicState.reason = "allied_front_under_pressure";
+      return;
+    }
+    if (this.allianceBehavior)
+      this.allianceBehavior.maybeSendAllianceRequests(
+        plan.candidates.slice(0, 4).map((c) => c.player),
+      );
+    if (plan.state.goal === "expand") {
+      this.sendAttack(this.game.terraNullius());
+      return;
+    }
+    if (plan.state.goal !== "attack") {
+      // Island nations may seek unclaimed islands with the existing safe transport planner.
+      if (
+        profile.controller === "nation" &&
+        plan.candidates.length === 0 &&
+        this.player.incomingAttacks().length === 0 &&
+        AI_WEIGHTS[profile.personality].naval >= 100
+      )
+        this.attackWithRandomBoat();
+      return;
+    }
+    const held = plan.candidates.find(
+      (c) => c.player.id() === plan.state.target,
+    );
+    const choices = held
+      ? [held, ...plan.candidates.filter((c) => c !== held)]
+      : plan.candidates;
+    let routes = 0;
+    for (const candidate of choices) {
+      if (candidate.score <= 70) break;
+      if (!candidate.land) {
+        if (profile.controller === "tribe" || routes++ >= MAX_AI_ROUTES)
+          continue;
+        if (!this.canReach(candidate.player)) continue;
+      }
+      // Concentrate on one enemy; reinforce only when the current push is weak.
+      const committed = this.troopsAttacking(candidate.player);
+      if (committed >= candidate.player.troops() * 0.65) return;
+      if (this.sendAttack(candidate.player)) {
+        this.strategicState.target = candidate.player.id();
+        return;
+      }
+    }
+    this.strategicState.reason = "route_or_reserve_blocked";
+  }
+
+  private strategicCounterAttack(profile: AIProfile): boolean {
+    const attacker = this.findIncomingAttackPlayer();
+    if (!attacker || !this.player.sharesBorderWith(attacker)) return false;
+    const incoming = this.player
+      .incomingAttacks()
+      .filter((a) => a.attacker() === attacker)
+      .reduce((sum, a) => sum + a.troops(), 0);
+    const pressing = this.troopsAttacking(attacker);
+    const reserve = defensiveReserve(this.game, this.player, profile, attacker);
+    const available = Math.max(0, Math.floor(this.player.troops() - reserve));
+    // Cancel the approaching stack before committing to its weakened home army.
+    const counter = Math.min(
+      available,
+      Math.ceil(Math.max(0, incoming - pressing) + attacker.troops() * 0.7),
+    );
+    return (
+      counter > 0 && this.sendLandAttack(attacker, () => counter, attacker)
+    );
   }
 
   // Called every tick. Hard & Impossible boats are beachheads: the moment one lands
@@ -1269,6 +1435,17 @@ export class AiAttackBehavior {
 
   // troopSendCap() without the allowance for nations under attack
   private neighborTroopCap(ignore?: Player): number {
+    const profile = aiProfile(
+      this.game.config().gameConfig(),
+      this.player.id(),
+      this.player.type(),
+    );
+    if (profile !== null)
+      return Math.max(
+        0,
+        Math.floor(this.player.troops()) -
+          defensiveReserve(this.game, this.player, profile, ignore),
+      );
     if (this.player.type() === PlayerType.Bot) return Infinity;
     if (this.game.config().gameConfig().gameMode === GameMode.Team)
       return Infinity;
@@ -1320,6 +1497,11 @@ export class AiAttackBehavior {
     opponent?: Player,
   ): number | null {
     const maxTroops = this.game.config().maxTroops(this.player);
+    const profile = aiProfile(
+      this.game.config().gameConfig(),
+      this.player.id(),
+      this.player.type(),
+    );
     const botWithStructures =
       target.isPlayer() &&
       target.type() === PlayerType.Bot &&
@@ -1328,13 +1510,17 @@ export class AiAttackBehavior {
     // recapture those structures ASAP, even before reaching the normal reserve.
     const useReserve = target.isPlayer() && !botWithStructures;
     const reserveRatio = useReserve ? this.reserveRatio : this.expandRatio;
-    const targetTroops = maxTroops * reserveRatio;
+    const targetTroops =
+      profile === null
+        ? maxTroops * reserveRatio
+        : defensiveReserve(this.game, this.player, profile, opponent);
 
     let troops;
     const isBotAttack =
       target.isPlayer() &&
       target.type() === PlayerType.Bot &&
-      this.player.type() !== PlayerType.Bot;
+      this.player.type() !== PlayerType.Bot &&
+      !this.game.config().gameConfig().enhancedAI?.fairResources;
     if (isBotAttack) {
       troops = this.calculateBotAttackTroops(
         target,
@@ -1351,6 +1537,16 @@ export class AiAttackBehavior {
         ? this.troopSendCap(opponent)
         : this.troopSendCapForExpansion(),
     );
+    if (profile !== null) {
+      troops = Math.floor(troops);
+      // Avoid feeding small repeated stacks into a superior defender, on every difficulty.
+      if (
+        target.isPlayer() &&
+        this.player.incomingAttacks().length === 0 &&
+        troops + this.troopsAttacking(target) < target.troops() / 4
+      )
+        return null;
+    }
 
     if (troops < 1) {
       return null;
@@ -1859,16 +2055,18 @@ export class AiAttackBehavior {
 
 export const AiAttackBehaviorSnapshot = snapshotType({
   name: "AiAttackBehavior",
-  version: 2,
+  version: 3,
   schema: z.object({
     botAttackTroopsSent: zNum(),
     followedLandings: z.array(zRef()),
     triggerRatio: zNum(),
     reserveRatio: zNum(),
     expandRatio: zNum(),
+    strategicState: StrategicStateSchema.nullable(),
   }),
   migrations: {
     // v1 nations never followed up landings
     1: (d) => ({ ...d, followedLandings: [] }),
+    2: (d) => ({ ...d, strategicState: null }),
   },
 });

@@ -35,6 +35,7 @@ import "./components/CopyButton";
 import { GameStartAlertController } from "./components/GameStartAlertController";
 import "./components/LobbyConfigItem";
 import "./components/LobbyPlayerView";
+import "./components/ModernLobbyPicker";
 import { inviteFriendsButton } from "./components/ui/InviteFriendsButton";
 import { DEFAULT_TITLE_CLASS, modalHeader } from "./components/ui/ModalHeader";
 import { openReplayViewer } from "./replay/ReplayEntry";
@@ -241,6 +242,14 @@ export class JoinLobbyModal extends BaseModal {
               `
             : html`
                 ${this.gameConfig ? this.renderGameConfig() : html``}
+                ${this.gameConfig?.modernMode
+                  ? html`<modern-lobby-picker
+                      .clients=${this.players}
+                      .currentClientID=${this.currentClientID}
+                      .eventBus=${this.eventBus}
+                      .mode=${this.gameConfig.modernMode}
+                    ></modern-lobby-picker>`
+                  : html``}
                 ${this.players.length > 0
                   ? html`
                       <lobby-player-view

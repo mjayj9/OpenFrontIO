@@ -11,6 +11,7 @@ import {
 import { UserSettings } from "../../../core/game/UserSettings";
 import { Controller } from "../../Controller";
 import { ToggleStructureEvent } from "../../InputHandler";
+import { Platform } from "../../Platform";
 import { UIState } from "../../UIState";
 import { renderNumber, translateText } from "../../Utils";
 import { GameView } from "../../view";
@@ -35,7 +36,15 @@ export class UnitDisplay extends LitElement implements Controller {
   public eventBus: EventBus;
   public uiState: UIState;
   private playerBuildables: BuildableUnit[] | null = null;
-  private keybinds: Record<string, { value: string; key: string }> = {};
+  private keybinds: Record<string, string> = {};
+  private mobileSide: "left" | "right" =
+    new UserSettings().mobileControlsSide();
+  private suppressMouseUntil = 0;
+  private touchTarget: {
+    unit: PlayerBuildableUnitType;
+    element: HTMLElement;
+    cancelled: boolean;
+  } | null = null;
   private _cities = 0;
   private _warships = 0;
   private _factories = 0;
@@ -55,7 +64,7 @@ export class UnitDisplay extends LitElement implements Controller {
     const config = this.game.config();
     const userSettings = new UserSettings();
 
-    this.keybinds = userSettings.parsedUserKeybinds();
+    this.keybinds = userSettings.keybinds(Platform.isMac);
 
     this.allDisabled = BuildMenus.types.every((u) => config.isUnitDisabled(u));
 
@@ -113,6 +122,7 @@ export class UnitDisplay extends LitElement implements Controller {
   tick() {
     const player = this.game?.myPlayer();
     if (!player) return;
+    this.keybinds = new UserSettings().keybinds(Platform.isMac);
     player.buildables(undefined, BuildMenus.types).then((buildables) => {
       this.playerBuildables = buildables;
     });
@@ -141,81 +151,213 @@ export class UnitDisplay extends LitElement implements Controller {
     }
 
     return html`
-      <div class="border-t border-white/10 p-0.5 w-full">
-        <div class="grid grid-rows-1 grid-flow-col gap-0.5 w-fit mx-auto">
+      <style>
+        @media (max-width: 1023px), (pointer: coarse) {
+          .unit-hotbar {
+            position: fixed;
+            top: 22%;
+            width: 52px;
+            max-height: 56vh;
+            overflow-y: auto;
+            background: rgba(20, 30, 45, 0.94);
+            border-radius: 8px;
+            padding: 3px;
+            z-index: 35;
+          }
+          .unit-hotbar.left {
+            left: max(4px, env(safe-area-inset-left));
+          }
+          .unit-hotbar.right {
+            right: max(4px, env(safe-area-inset-right));
+          }
+          .unit-hotbar-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+          }
+          .unit-hotbar-item {
+            min-width: 44px;
+            min-height: 42px;
+            justify-content: center;
+            touch-action: none;
+          }
+          .unit-hotbar-key {
+            display: none;
+          }
+          .unit-hotbar-mobile-control {
+            display: block !important;
+          }
+          .unit-hotbar-tooltip {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            translate: 0;
+            transform: translateX(-50%);
+            max-width: min(320px, 86vw);
+            width: 300px;
+            white-space: normal;
+          }
+        }
+      </style>
+      <div
+        class="unit-hotbar ${this
+          .mobileSide} border-t border-white/10 p-0.5 w-full"
+      >
+        <div
+          class="unit-hotbar-grid grid grid-rows-1 grid-flow-col gap-0.5 w-fit mx-auto"
+        >
+          <button
+            class="unit-hotbar-mobile-control lg:hidden text-white text-sm min-h-9"
+            title=${translateText("controls.swap_side")}
+            aria-label=${translateText("controls.swap_side")}
+            @click=${() => {
+              this.mobileSide = this.mobileSide === "left" ? "right" : "left";
+              new UserSettings().setMobileControlsSide(this.mobileSide);
+              this.requestUpdate();
+            }}
+          >
+            ↔
+          </button>
+          <button
+            class="unit-hotbar-mobile-control lg:hidden text-white text-sm min-h-9"
+            title=${translateText("controls.cancel_placement")}
+            aria-label=${translateText("controls.cancel_placement")}
+            @click=${() => {
+              this.uiState.ghostStructure = null;
+              this.requestUpdate();
+            }}
+          >
+            ✕
+          </button>
           ${this.renderUnitItem(
             cityIcon,
             this._cities,
             UnitType.City,
             "city",
-            this.keybinds["buildCity"]?.key ?? "1",
+            this.keybinds["buildCity"] ?? "",
           )}
           ${this.renderUnitItem(
             factoryIcon,
             this._factories,
             UnitType.Factory,
             "factory",
-            this.keybinds["buildFactory"]?.key ?? "2",
+            this.keybinds["buildFactory"] ?? "",
           )}
           ${this.renderUnitItem(
             portIcon,
             this._port,
             UnitType.Port,
             "port",
-            this.keybinds["buildPort"]?.key ?? "3",
+            this.keybinds["buildPort"] ?? "",
           )}
           ${this.renderUnitItem(
             defensePostIcon,
             this._defensePost,
             UnitType.DefensePost,
             "defense_post",
-            this.keybinds["buildDefensePost"]?.key ?? "4",
+            this.keybinds["buildDefensePost"] ?? "",
           )}
           ${this.renderUnitItem(
             missileSiloIcon,
             this._missileSilo,
             UnitType.MissileSilo,
             "missile_silo",
-            this.keybinds["buildMissileSilo"]?.key ?? "5",
+            this.keybinds["buildMissileSilo"] ?? "",
           )}
           ${this.renderUnitItem(
             samLauncherIcon,
             this._samLauncher,
             UnitType.SAMLauncher,
             "sam_launcher",
-            this.keybinds["buildSamLauncher"]?.key ?? "6",
+            this.keybinds["buildSamLauncher"] ?? "",
           )}
           ${this.renderUnitItem(
             warshipIcon,
             this._warships,
             UnitType.Warship,
             "warship",
-            this.keybinds["buildWarship"]?.key ?? "7",
+            this.keybinds["buildWarship"] ?? "",
           )}
           ${this.renderUnitItem(
             atomBombIcon,
             null,
             UnitType.AtomBomb,
             "atom_bomb",
-            this.keybinds["buildAtomBomb"]?.key ?? "8",
+            this.keybinds["buildAtomBomb"] ?? "",
           )}
           ${this.renderUnitItem(
             hydrogenBombIcon,
             null,
             UnitType.HydrogenBomb,
             "hydrogen_bomb",
-            this.keybinds["buildHydrogenBomb"]?.key ?? "9",
+            this.keybinds["buildHydrogenBomb"] ?? "",
           )}
           ${this.renderUnitItem(
             mirvIcon,
             null,
             UnitType.MIRV,
             "mirv",
-            this.keybinds["buildMIRV"]?.key ?? "0",
+            this.keybinds["buildMIRV"] ?? "",
           )}
         </div>
       </div>
     `;
+  }
+
+  private startTouch(event: TouchEvent, unit: PlayerBuildableUnitType) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.suppressMouseUntil = Date.now() + 800;
+    this.touchTarget = {
+      unit,
+      element: event.currentTarget as HTMLElement,
+      cancelled: false,
+    };
+    this._hoveredUnit = unit;
+    this.requestUpdate();
+  }
+
+  private moveTouch(event: TouchEvent) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    const target = this.touchTarget;
+    if (!target || !touch) return;
+    const rect = target.element.getBoundingClientRect();
+    if (
+      touch.clientX < rect.left ||
+      touch.clientX > rect.right ||
+      touch.clientY < rect.top ||
+      touch.clientY > rect.bottom
+    ) {
+      target.cancelled = true;
+      this._hoveredUnit = null;
+      this.requestUpdate();
+    }
+  }
+
+  private endTouch(event: TouchEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.suppressMouseUntil = Date.now() + 800;
+    const target = this.touchTarget;
+    const touch = event.changedTouches[0];
+    if (target && touch) {
+      const rect = target.element.getBoundingClientRect();
+      if (
+        touch.clientX < rect.left ||
+        touch.clientX > rect.right ||
+        touch.clientY < rect.top ||
+        touch.clientY > rect.bottom
+      )
+        target.cancelled = true;
+    }
+    if (target && !target.cancelled && this.canBuild(target.unit)) {
+      this.uiState.ghostStructure =
+        this.uiState.ghostStructure === target.unit ? null : target.unit;
+    }
+    this.touchTarget = null;
+    this._hoveredUnit = null;
+    this.requestUpdate();
   }
 
   private renderUnitItem(
@@ -239,6 +381,7 @@ export class UnitDisplay extends LitElement implements Controller {
       <div
         class="flex flex-col items-center relative"
         @mouseenter=${() => {
+          if (Date.now() < this.suppressMouseUntil) return;
           this._hoveredUnit = unitType;
           this.requestUpdate();
         }}
@@ -250,12 +393,12 @@ export class UnitDisplay extends LitElement implements Controller {
         ${hovered
           ? html`
               <div
-                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-gray-200 text-center w-max text-xs bg-gray-800/90 backdrop-blur-xs rounded-sm p-1 z-[100] shadow-lg pointer-events-none"
+                class="unit-hotbar-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-gray-200 text-center w-max text-xs bg-gray-800/90 backdrop-blur-xs rounded-sm p-1 z-[100] shadow-lg pointer-events-none"
               >
                 <div class="font-bold text-sm mb-1">
-                  ${translateText(
-                    "unit_type." + structureKey,
-                  )}${` [${displayHotkey}]`}
+                  ${translateText("unit_type." + structureKey)}${displayHotkey
+                    ? ` [${displayHotkey}]`
+                    : ""}
                 </div>
                 <div class="p-2">
                   ${translateText("build_menu.desc." + structureKey)}
@@ -273,17 +416,51 @@ export class UnitDisplay extends LitElement implements Controller {
                     >${renderNumber(this.cost(unitType))}</span
                   >
                 </div>
+                ${!this.canBuild(unitType)
+                  ? html`<p class="text-amber-200">
+                      ${this.cost(unitType) >
+                      (this.game.myPlayer()?.gold() ?? 0n)
+                        ? translateText("build_menu.not_enough_money")
+                        : translateText("controls.unit_requirements")}
+                    </p>`
+                  : ""}
+                <p class="lg:hidden mt-1">
+                  ${translateText("controls.touch_preview")}
+                </p>
               </div>
             `
           : null}
         <div
-          class="${this.canBuild(unitType)
+          class="unit-hotbar-item ${this.canBuild(unitType)
             ? ""
             : "opacity-40"} border border-slate-500 rounded-sm px-0.5 pb-0.5 flex items-center gap-0.5 cursor-pointer
              ${selected ? "hover:bg-gray-400/10" : "hover:bg-gray-800"}
              rounded-sm text-white ${selected ? "bg-slate-400/20" : ""}
              ${this.tutorialHighlight === unitType ? "tutorial-highlight" : ""}"
+          role="button"
+          tabindex="0"
+          aria-label=${translateText("unit_type." + structureKey)}
+          @keydown=${(e: KeyboardEvent) => {
+            if ((e.key !== "Enter" && e.key !== " ") || e.repeat) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (this.canBuild(unitType)) {
+              this.uiState.ghostStructure =
+                this.uiState.ghostStructure === unitType ? null : unitType;
+              this.requestUpdate();
+            }
+          }}
+          @touchstart=${(e: TouchEvent) => this.startTouch(e, unitType)}
+          @touchmove=${(e: TouchEvent) => this.moveTouch(e)}
+          @touchend=${(e: TouchEvent) => this.endTouch(e)}
+          @touchcancel=${(e: TouchEvent) => {
+            e.preventDefault();
+            this.touchTarget = null;
+            this._hoveredUnit = null;
+            this.requestUpdate();
+          }}
           @click=${() => {
+            if (Date.now() < this.suppressMouseUntil) return;
             if (selected) {
               this.uiState.ghostStructure = null;
             } else if (this.canBuild(unitType)) {
@@ -312,7 +489,9 @@ export class UnitDisplay extends LitElement implements Controller {
           @mouseleave=${() =>
             this.eventBus?.emit(new ToggleStructureEvent(null))}
         >
-          ${html`<div class="ml-0.5 text-[10px] relative -top-1 text-gray-400">
+          ${html`<div
+            class="unit-hotbar-key ml-0.5 text-[10px] relative -top-1 text-gray-400"
+          >
             ${displayHotkey}
           </div>`}
           <div class="flex items-center gap-0.5 pt-0.5">

@@ -43,6 +43,8 @@ vi.mock("../../../../src/client/Utils", () => ({
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { EventsDisplay } from "../../../../src/client/hud/layers/EventsDisplay";
 import { PlaySoundEffectEvent } from "../../../../src/client/sound/Sounds";
+import { SendAllianceRequestIntentEvent } from "../../../../src/client/Transport";
+import { EventBus } from "../../../../src/core/EventBus";
 import { MessageType } from "../../../../src/core/game/Game";
 import { GameUpdateType } from "../../../../src/core/game/GameUpdates";
 
@@ -100,6 +102,57 @@ describe("EventsDisplay handlers", () => {
   });
 
   describe("tick", () => {
+    it("clears previous-match warnings when the DOM element is initialized again", () => {
+      (ed as unknown as Ed).eventBus = new EventBus();
+      ed.init();
+      ed.onUnitIncomingEvent({
+        type: GameUpdateType.UnitIncoming,
+        unitID: 7,
+        message: "Previous match invasion",
+        messageType: MessageType.NAVAL_INVASION_INBOUND,
+        playerID: 1,
+      });
+      ed.tick();
+      expect(events()).toHaveLength(1);
+      ed.init();
+      ed.tick();
+      expect(events()).toEqual([]);
+      ed.onUnitIncomingEvent({
+        type: GameUpdateType.UnitIncoming,
+        unitID: 8,
+        message: "Current match invasion",
+        messageType: MessageType.NAVAL_INVASION_INBOUND,
+        playerID: 1,
+      });
+      expect(events().map((event) => event.description)).toEqual([
+        "Current match invasion",
+      ]);
+    });
+
+    it("keeps one alliance subscription and removes it from the previous game bus", () => {
+      const oldBus = new EventBus();
+      (ed as unknown as Ed).eventBus = oldBus;
+      game.myPlayer = () => ({ ...myPlayer, id: () => "me" });
+      const request = new SendAllianceRequestIntentEvent(
+        { id: () => "me" } as never,
+        {
+          displayName: () => "Friend",
+          isRequestingAllianceWith: () => false,
+        } as never,
+      );
+      ed.init();
+      ed.init();
+      oldBus.emit(request);
+      expect(events()).toHaveLength(1);
+      const currentBus = new EventBus();
+      (ed as unknown as Ed).eventBus = currentBus;
+      ed.init();
+      oldBus.emit(request);
+      expect(events()).toEqual([]);
+      currentBus.emit(request);
+      expect(events()).toHaveLength(1);
+    });
+
     it("dispatches queued updates through updateMap", () => {
       game.updatesSinceLastTick = () => ({
         [GameUpdateType.DisplayEvent]: [

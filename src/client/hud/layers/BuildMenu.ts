@@ -128,34 +128,49 @@ export class BuildMenu extends LitElement implements Controller {
   public game: GameView;
   public eventBus: EventBus;
   public uiState: UIState;
-  private clickedTile: TileRef;
+  private clickedTile: TileRef | undefined;
   public playerBuildables: BuildableUnit[] | null = null;
   private filteredBuildTable: BuildItemDisplay[][] = buildTable;
   public transformHandler: TransformHandler;
+  private subscribedBus: EventBus | null = null;
+  private disposed = false;
+  private menuGeneration = 0;
+  private nextRequest = 0;
+  private pendingRequest: number | null = null;
+  private readonly onHideMenu = () => this.hideMenu();
+  private readonly onShowBuildMenu = (e: ShowBuildMenuEvent) => {
+    if (this.disposed || !this.game.myPlayer()?.isAlive() || !this._hidden) {
+      // Players sometimes hold control while building a unit, so keep an
+      // already open menu at its original location.
+      return;
+    }
+    const clickedCell = this.transformHandler.screenToWorldCoordinates(
+      e.x,
+      e.y,
+    );
+    if (!this.game.isValidCoord(clickedCell.x, clickedCell.y)) return;
+    this.showMenu(this.game.ref(clickedCell.x, clickedCell.y));
+  };
 
   init() {
-    this.eventBus.on(ShowBuildMenuEvent, (e) => {
-      if (!this.game.myPlayer()?.isAlive()) {
-        return;
-      }
-      if (!this._hidden) {
-        // Players sometimes hold control while building a unit,
-        // so if the menu is already open, ignore the event.
-        return;
-      }
-      const clickedCell = this.transformHandler.screenToWorldCoordinates(
-        e.x,
-        e.y,
-      );
-      if (!this.game.isValidCoord(clickedCell.x, clickedCell.y)) {
-        return;
-      }
-      const tile = this.game.ref(clickedCell.x, clickedCell.y);
-      this.showMenu(tile);
-    });
-    this.eventBus.on(CloseViewEvent, () => this.hideMenu());
-    this.eventBus.on(ShowEmojiMenuEvent, () => this.hideMenu());
-    this.eventBus.on(MouseDownEvent, () => this.hideMenu());
+    this.dispose();
+    this.disposed = false;
+    this.subscribedBus = this.eventBus;
+    this.eventBus.on(ShowBuildMenuEvent, this.onShowBuildMenu);
+    this.eventBus.on(CloseViewEvent, this.onHideMenu);
+    this.eventBus.on(ShowEmojiMenuEvent, this.onHideMenu);
+    this.eventBus.on(MouseDownEvent, this.onHideMenu);
+  }
+
+  dispose() {
+    this.subscribedBus?.off(ShowBuildMenuEvent, this.onShowBuildMenu);
+    this.subscribedBus?.off(CloseViewEvent, this.onHideMenu);
+    this.subscribedBus?.off(ShowEmojiMenuEvent, this.onHideMenu);
+    this.subscribedBus?.off(MouseDownEvent, this.onHideMenu);
+    this.subscribedBus = null;
+    this.disposed = true;
+    this.hideMenu();
+    this.filteredBuildTable = buildTable;
   }
 
   tick() {
@@ -383,6 +398,7 @@ export class BuildMenu extends LitElement implements Controller {
   }
 
   public sendBuildOrUpgrade(buildableUnit: BuildableUnit, tile: TileRef): void {
+    if (this.disposed || this._hidden) return;
     if (buildableUnit.canUpgrade !== false) {
       this.eventBus.emit(
         new SendUpgradeStructureIntentEvent(
@@ -426,6 +442,7 @@ export class BuildMenu extends LitElement implements Controller {
                   <button
                     class="build-button"
                     @click=${() =>
+                      this.clickedTile !== undefined &&
                       this.sendBuildOrUpgrade(buildableUnit, this.clickedTile)}
                     ?disabled=${!enabled}
                     title=${!enabled
@@ -473,27 +490,52 @@ export class BuildMenu extends LitElement implements Controller {
   }
 
   hideMenu() {
+    this.menuGeneration++;
     this._hidden = true;
+    this.clickedTile = undefined;
+    this.playerBuildables = null;
+    this.pendingRequest = null;
     this.requestUpdate();
   }
 
   showMenu(clickedTile: TileRef) {
+    if (this.disposed) return;
+    this.menuGeneration++;
     this.clickedTile = clickedTile;
+    this.playerBuildables = null;
+    this.pendingRequest = null;
     this._hidden = false;
     this.refresh();
   }
 
   private refresh() {
-    this.game
-      .myPlayer()
-      ?.buildables(this.clickedTile, BuildMenus.types)
-      .then((buildables) => {
-        this.playerBuildables = buildables;
-        this.requestUpdate();
-      });
-
     // remove disabled buildings from the buildtable
     this.filteredBuildTable = this.getBuildableUnits();
+    if (this.disposed || this._hidden || this.pendingRequest !== null) return;
+    const game = this.game;
+    const player = game.myPlayer();
+    const tile = this.clickedTile;
+    if (!player || tile === undefined) return;
+    const generation = this.menuGeneration;
+    const request = ++this.nextRequest;
+    this.pendingRequest = request;
+    const release = () => {
+      if (this.pendingRequest === request) this.pendingRequest = null;
+    };
+    void player.buildables(tile, BuildMenus.types).then((buildables) => {
+      if (
+        !this.disposed &&
+        !this._hidden &&
+        this.game === game &&
+        this.clickedTile === tile &&
+        this.menuGeneration === generation &&
+        this.pendingRequest === request
+      ) {
+        this.playerBuildables = buildables;
+        this.requestUpdate();
+      }
+      release();
+    }, release);
   }
 
   private getBuildableUnits(): BuildItemDisplay[][] {

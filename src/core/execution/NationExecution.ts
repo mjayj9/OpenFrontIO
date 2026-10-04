@@ -124,6 +124,8 @@ export class NationExecution implements Execution {
     }
 
     if (this.mg.inSpawnPhase()) {
+      if (this.mg.config().gameConfig().modernMode && this.player.hasSpawned())
+        return;
       if (this.player.hasSpawned()) {
         // Already on the map — periodically re-spawn so the nation
         // visibly hops to different locations during the spawn phase.
@@ -193,7 +195,8 @@ export class NationExecution implements Execution {
 
     if (!this.behaviorsInitialized) {
       this.initializeBehaviors();
-      this.attackBehavior.forceSendAttack(this.mg.terraNullius());
+      if (!this.mg.config().gameConfig().modernMode)
+        this.attackBehavior.forceSendAttack(this.mg.terraNullius());
       return;
     }
 
@@ -386,6 +389,12 @@ export class NationExecution implements Execution {
 
   isActive(): boolean {
     return this.active;
+  }
+
+  strategyStatus() {
+    return this.behaviorsInitialized
+      ? this.attackBehavior.strategyStatus()
+      : null;
   }
 
   activeDuringSpawnPhase(): boolean {

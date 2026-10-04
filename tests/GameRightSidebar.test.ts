@@ -56,6 +56,7 @@ function createSidebar(overrides: Partial<TimerState> = {}) {
     inSpawnPhase: () => state.inSpawnPhase,
     myPlayer: () => undefined,
     ticks: () => state.ticks,
+    isPaused: () => false,
   } as unknown as GameView;
 
   const sidebar = new GameRightSidebar();

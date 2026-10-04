@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { aiProfile } from "../ai/AIProfile";
+import { safeMIRVWarhead } from "../ai/WeaponSafety";
 import {
   Execution,
   Game,
@@ -206,7 +208,14 @@ export class MirvExecution implements Execution {
   private finalizeDestinations(additionalAttempts = 500): void {
     // Re-check target tile ownership at tick 10
     this.stagedTargets = this.stagedTargets.filter(
-      (tile) => tile === this.dst || this.mg.owner(tile) === this.targetPlayer,
+      (tile) =>
+        (tile === this.dst || this.mg.owner(tile) === this.targetPlayer) &&
+        (aiProfile(
+          this.mg.config().gameConfig(),
+          this.player.id(),
+          this.player.type(),
+        ) === null ||
+          safeMIRVWarhead(this.mg, this.player, tile)),
     );
 
     // Top-up loop using specified attempt budget if targets were lost or not yet filled
@@ -285,6 +294,15 @@ export class MirvExecution implements Execution {
       if (this.isOverlapping(x, y, taken)) {
         continue;
       }
+      if (
+        aiProfile(
+          this.mg.config().gameConfig(),
+          this.player.id(),
+          this.player.type(),
+        ) !== null &&
+        !safeMIRVWarhead(this.mg, this.player, tile)
+      )
+        continue;
 
       return tile;
     }

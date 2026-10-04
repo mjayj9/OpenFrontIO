@@ -45,6 +45,15 @@ export function getDefaultKeybinds(isMac: boolean): Record<string, string> {
     moveLeft: "KeyA",
     moveDown: "KeyS",
     moveRight: "KeyD",
+    moveUpArrow: "ArrowUp",
+    moveDownArrow: "ArrowDown",
+    moveLeftArrow: "ArrowLeft",
+    moveRightArrow: "ArrowRight",
+    zoomOutMinus: "Minus",
+    zoomOutNumpad: "NumpadSubtract",
+    zoomInEqual: "Equal",
+    zoomInNumpad: "NumpadAdd",
+    performanceOverlay: "Shift+KeyD",
     buildMenuModifier: isMac ? "MetaLeft" : "ControlLeft",
     emojiMenuModifier: "AltLeft",
     boxSelectWarships: "ShiftLeft",
@@ -56,6 +65,46 @@ export function getDefaultKeybinds(isMac: boolean): Record<string, string> {
     gameSpeedDown: "Comma",
     altKey: "AltLeft",
   };
+}
+
+/** Saved choices own their keys; newly introduced defaults remain unbound on conflict. */
+export function normalizeKeybind(value: string): string {
+  const parts = value.split("+");
+  const code = parts.pop() ?? "";
+  return [
+    ...["Ctrl", "Alt", "Shift", "Meta"].filter((m) => parts.includes(m)),
+    code,
+  ].join("+");
+}
+
+export function mergeKeybinds(
+  defaults: Record<string, string>,
+  saved: Record<string, string>,
+): Record<string, string> {
+  const result: Record<string, string> = {};
+  const owners = new Map<string, string[]>();
+  const canShare = (a: string, b: string, key: string) =>
+    (key.startsWith("Alt") &&
+      [a, b].every((v) => ["altKey", "emojiMenuModifier"].includes(v))) ||
+    (key.startsWith("Shift") &&
+      [a, b].every((v) => ["shiftKey", "boxSelectWarships"].includes(v)));
+  const assign = (action: string, value: string) => {
+    if (value === "Null" || value === "") return;
+    const key = normalizeKeybind(value);
+    const occupied = owners.get(key) ?? [];
+    if (occupied.some((other) => !canShare(action, other, key))) return;
+    result[action] = key;
+    owners.set(key, [...occupied, action]);
+  };
+  for (const [action, value] of Object.entries(saved)) {
+    if (Object.prototype.hasOwnProperty.call(defaults, action))
+      assign(action, value);
+  }
+  for (const [action, value] of Object.entries(defaults)) {
+    if (!Object.prototype.hasOwnProperty.call(saved, action))
+      assign(action, value);
+  }
+  return result;
 }
 
 export const USER_SETTINGS_CHANGED_EVENT = "event:user-settings-changed";
@@ -1102,20 +1151,20 @@ export class UserSettings {
   }
 
   keybinds(isMac: boolean): Record<string, string> {
-    const merged = {
-      ...getDefaultKeybinds(isMac),
-      ...this.normalizedUserKeybinds(),
-    };
-    // Actually unbind key: if Unbind is clicked in UserSettingsModal, eg. for Attack Ratio Up,
-    // keybind is "Null". Even if it is in default kindbinds (Y), it should not work anymore.
-    // The key (Y) can now be bound to another action like Boat Attack, and no two actions listen to the same key.
-    for (const k in merged) {
-      if (merged[k] === "Null") {
-        delete merged[k];
-      }
-    }
+    return mergeKeybinds(
+      getDefaultKeybinds(isMac),
+      this.normalizedUserKeybinds(),
+    );
+  }
 
-    return merged;
+  mobileControlsSide(): "left" | "right" {
+    return this.getString("settings.mobileControlsSide") === "right"
+      ? "right"
+      : "left";
+  }
+
+  setMobileControlsSide(side: "left" | "right"): void {
+    this.setString("settings.mobileControlsSide", side);
   }
 
   setKeybinds(value: string | Record<string, any>): void {

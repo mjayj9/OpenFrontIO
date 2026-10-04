@@ -4,7 +4,8 @@ import { EventBus, GameEvent } from "../../../core/EventBus";
 import { Controller } from "../../Controller";
 import { CloseViewEvent } from "../../InputHandler";
 import { PlaySoundEffectEvent } from "../../sound/Sounds";
-import { getSvgAspectRatio, translateText } from "../../Utils";
+import { getSvgAspectRatio, renderTroops, translateText } from "../../Utils";
+import { forecastVisibleAttack } from "../../view/AttackForecast";
 import {
   CenterButtonElement,
   MenuElement,
@@ -54,6 +55,7 @@ type RequiredRadialMenuConfig = Required<RadialMenuConfig>;
 export class RadialMenu implements Controller {
   private menuElement: d3.Selection<HTMLDivElement, unknown, null, undefined>;
   private tooltipElement: HTMLDivElement | null = null;
+  private tooltipStyleElement: HTMLStyleElement | null = null;
   private isVisible: boolean = false;
 
   private currentLevel: number = 0; // Current menu level (0 = main menu, 1 = submenu, etc.)
@@ -95,6 +97,10 @@ export class RadialMenu implements Controller {
   private centerButtonIconSize: number;
 
   private params: MenuElementParams | null = null;
+  private suppressMouseUntil = 0;
+  private centerTouchTarget: Element | null = null;
+  private initialized = false;
+  private readonly onCloseView = () => this.hideRadialMenu();
 
   constructor(
     private eventBus: EventBus,
@@ -123,11 +129,30 @@ export class RadialMenu implements Controller {
   }
 
   init() {
+    if (this.initialized) return;
+    this.initialized = true;
     this.createMenuElement();
     this.createTooltipElement();
-    this.eventBus.on(CloseViewEvent, (e) => {
-      this.hideRadialMenu();
-    });
+    this.eventBus.on(CloseViewEvent, this.onCloseView);
+  }
+
+  dispose() {
+    if (!this.initialized) return;
+    this.eventBus.off(CloseViewEvent, this.onCloseView);
+    window.removeEventListener("resize", this.handleResize);
+    this.menuElement.selectAll("*").interrupt();
+    this.menuElement.interrupt().remove();
+    this.tooltipElement?.remove();
+    this.tooltipElement = null;
+    this.tooltipStyleElement?.remove();
+    this.tooltipStyleElement = null;
+    this.params = null;
+    this.isVisible = false;
+    this.centerTouchTarget = null;
+    this.menuGroups.clear();
+    this.menuPaths.clear();
+    this.menuIcons.clear();
+    this.initialized = false;
   }
 
   private createMenuElement() {
@@ -196,12 +221,48 @@ export class RadialMenu implements Controller {
       .style("cursor", "pointer")
       .on("click", (event) => {
         event.stopPropagation();
+        if (Date.now() < this.suppressMouseUntil) return;
         this.handleCenterButtonClick();
       })
-      .on("touchstart", (event: Event) => {
+      .on("touchstart", (event: TouchEvent) => {
         event.preventDefault();
         event.stopPropagation();
-        this.handleCenterButtonClick();
+        this.suppressMouseUntil = Date.now() + 800;
+        this.centerTouchTarget = event.currentTarget as Element;
+        this.onCenterButtonHover(true);
+      })
+      .on("touchmove", (event: TouchEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const touch = event.touches[0];
+        if (
+          !touch ||
+          document.elementFromPoint(touch.clientX, touch.clientY) !==
+            this.centerTouchTarget
+        ) {
+          this.centerTouchTarget = null;
+          this.onCenterButtonHover(false);
+        }
+      })
+      .on("touchcancel", (event: TouchEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.centerTouchTarget = null;
+        this.onCenterButtonHover(false);
+      })
+      .on("touchend", (event: TouchEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const touch = event.changedTouches[0];
+        const target = this.centerTouchTarget;
+        this.centerTouchTarget = null;
+        this.onCenterButtonHover(false);
+        if (
+          target &&
+          touch &&
+          document.elementFromPoint(touch.clientX, touch.clientY) === target
+        )
+          this.handleCenterButtonClick();
       })
       .on("mouseover", () => this.onCenterButtonHover(true))
       .on("mouseout", () => this.onCenterButtonHover(false));
@@ -240,6 +301,7 @@ export class RadialMenu implements Controller {
     document.body.appendChild(this.tooltipElement);
 
     const style = document.createElement("style");
+    this.tooltipStyleElement = style;
     style.textContent = `
       .radial-tooltip .title {
         font-weight: bold;
@@ -450,6 +512,7 @@ export class RadialMenu implements Controller {
     level: number,
   ) {
     const onHover = (d: d3.PieArcDatum<MenuElement>, path: any) => {
+      if (Date.now() < this.suppressMouseUntil) return;
       const disabled = this.params === null || d.data.disabled(this.params);
       if (d.data.tooltipItems && d.data.tooltipItems.length > 0) {
         this.showTooltip(d.data.tooltipItems);
@@ -556,14 +619,59 @@ export class RadialMenu implements Controller {
         handleMouseMove(event as MouseEvent);
       });
 
-      path.on("click", function (event) {
+      let touchPending = false;
+      path.on("click", (event) => {
+        if (Date.now() < this.suppressMouseUntil) return;
         onClick(d, event);
       });
 
-      path.on("touchstart", function (event) {
+      path.on("touchstart", (event: TouchEvent) => {
         event.preventDefault();
         event.stopPropagation();
-        onClick(d, event);
+        this.suppressMouseUntil = Date.now() + 800;
+        touchPending = true;
+        this.showTooltip(d.data.tooltipItems ?? d.data.tooltipKeys ?? []);
+        if (this.tooltipElement) {
+          Object.assign(this.tooltipElement.style, {
+            position: "fixed",
+            left: "50%",
+            top: "auto",
+            bottom: "90px",
+            transform: "translateX(-50%)",
+            maxWidth: "min(320px, 90vw)",
+          });
+        }
+      });
+      path.on("touchmove", (event: TouchEvent) => {
+        event.preventDefault();
+        const touch = event.touches[0];
+        if (
+          !touch ||
+          document.elementFromPoint(touch.clientX, touch.clientY) !==
+            path.node()
+        ) {
+          touchPending = false;
+          this.hideTooltip();
+        }
+      });
+      path.on("touchcancel", (event: TouchEvent) => {
+        event.preventDefault();
+        touchPending = false;
+        this.hideTooltip();
+      });
+      path.on("touchend", (event: TouchEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.suppressMouseUntil = Date.now() + 800;
+        const touch = event.changedTouches[0];
+        const sameTarget =
+          !touch ||
+          document.elementFromPoint(touch.clientX, touch.clientY) ===
+            path.node();
+        const execute = touchPending && sameTarget;
+        touchPending = false;
+        this.hideTooltip();
+        if (execute) onClick(d, event);
       });
     });
   }
@@ -899,6 +1007,7 @@ export class RadialMenu implements Controller {
 
     this.menuElement.style("display", "none");
     this.isVisible = false;
+    this.centerTouchTarget = null;
     this.selectedItemId = null;
     this.hideTooltip();
 
@@ -1011,7 +1120,59 @@ export class RadialMenu implements Controller {
   }
 
   private onCenterButtonHover(isHovering: boolean) {
+    if (!isHovering) this.hideTooltip();
     if (!this.isCenterButtonEnabled()) return;
+    const params = this.params;
+    if (
+      isHovering &&
+      this.centerButtonState === "default" &&
+      params?.selected &&
+      params.playerActions.canAttack &&
+      !params.game.inSpawnPhase() &&
+      !params.myPlayer.isFriendly(params.selected)
+    ) {
+      const forecast = forecastVisibleAttack(
+        params.game,
+        params.myPlayer,
+        params.selected,
+        params.tile,
+        params.uiState?.attackRatio ?? 0.2,
+      );
+      this.showTooltip([
+        {
+          key: "attack_preview.commitment",
+          className: "title",
+          params: {
+            troops: renderTroops(forecast.committed),
+            percent: forecast.percent,
+            remaining: renderTroops(forecast.remaining),
+          },
+        },
+        {
+          key: "attack_preview.risk",
+          className: "",
+          params: {
+            risk: translateText("attack_preview." + forecast.risk),
+            defenses: forecast.defensePosts,
+          },
+        },
+        { key: "attack_preview.uncertain", className: "" },
+      ]);
+      if (this.tooltipElement)
+        Object.assign(this.tooltipElement.style, {
+          left:
+            Math.max(8, Math.min(window.innerWidth - 258, this.anchorX + 20)) +
+            "px",
+          top:
+            Math.max(
+              8,
+              Math.min(
+                window.innerHeight - 105,
+                this.anchorY + this.config.centerButtonSize + 12,
+              ),
+            ) + "px",
+        });
+    }
 
     const scale = isHovering ? 1.2 : 1;
 
@@ -1365,7 +1526,13 @@ export class RadialMenu implements Controller {
       this.tooltipElement.appendChild(div);
     }
 
-    this.tooltipElement.style.display = "block";
+    Object.assign(this.tooltipElement.style, {
+      position: "absolute",
+      bottom: "auto",
+      transform: "none",
+      maxWidth: "250px",
+    });
+    this.tooltipElement.style.display = items.length ? "block" : "none";
   }
 
   private hideTooltip() {

@@ -628,3 +628,59 @@ describe("UserSettings replay viewer", () => {
     expect(new UserSettings().replayViewer()).toBe(false);
   });
 });
+
+describe("UserSettings keybind upgrade conflicts", () => {
+  beforeEach(resetUserSettingsState);
+
+  it("preserves saved arrow and zoom keys and leaves new defaults unbound", () => {
+    const settings = new UserSettings();
+    settings.setKeybinds({ boatAttack: "ArrowUp", groundAttack: "Minus" });
+    const keys = settings.keybinds(false);
+    expect(keys.boatAttack).toBe("ArrowUp");
+    expect(keys.groundAttack).toBe("Minus");
+    expect(keys.moveUpArrow).toBeUndefined();
+    expect(keys.zoomOutMinus).toBeUndefined();
+    expect(keys.moveDownArrow).toBe("ArrowDown");
+    expect(keys.zoomIn).toBe("KeyE");
+  });
+
+  it("normalizes legacy nested/array values and ignores stale actions", () => {
+    const settings = new UserSettings();
+    settings.setKeybinds({
+      boatAttack: { value: ["ArrowUp"] },
+      deletedAction: "Digit1",
+    });
+    expect(settings.keybinds(false).boatAttack).toBe("ArrowUp");
+    expect(settings.keybinds(false).moveUpArrow).toBeUndefined();
+    expect(settings.keybinds(false).buildCity).toBe("Digit1");
+    expect(settings.keybinds(false).deletedAction).toBeUndefined();
+  });
+
+  it("keeps Null unbound and preserves intentional shared modifiers", () => {
+    const settings = new UserSettings();
+    settings.setKeybinds({ moveUpArrow: "Null", boatAttack: "ArrowUp" });
+    const keys = settings.keybinds(true);
+    expect(keys.moveUpArrow).toBeUndefined();
+    expect(keys.boatAttack).toBe("ArrowUp");
+    expect(keys.buildMenuModifier).toBe("MetaLeft");
+    expect(keys.altKey).toBe(keys.emojiMenuModifier);
+    expect(keys.shiftKey).toBe(keys.boxSelectWarships);
+  });
+
+  it("normalizes modifier order and deterministically removes duplicate saved actions", () => {
+    const settings = new UserSettings();
+    settings.setKeybinds({
+      boatAttack: "Shift+Ctrl+KeyG",
+      groundAttack: "Ctrl+Shift+KeyG",
+    });
+    expect(settings.keybinds(false).boatAttack).toBe("Ctrl+Shift+KeyG");
+    expect(settings.keybinds(false).groundAttack).toBeUndefined();
+  });
+
+  it("remembers the mobile controls side", () => {
+    const settings = new UserSettings();
+    expect(settings.mobileControlsSide()).toBe("left");
+    settings.setMobileControlsSide("right");
+    expect(new UserSettings().mobileControlsSide()).toBe("right");
+  });
+});

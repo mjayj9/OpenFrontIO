@@ -159,6 +159,7 @@ import "./components/BannedModal";
 import "./components/DesktopStatusBar";
 import "./components/MarketingConsentToast";
 import "./components/PurchaseNudgeModal";
+import type { WinModal } from "./hud/layers/WinModal";
 import { classicReplayHref } from "./replay/ReplayEntry";
 import { parseReplayViewerHash } from "./replay/ReplayViewerRoute";
 import { initAudioMixer } from "./sound/AudioMixer";
@@ -250,6 +251,7 @@ declare global {
 }
 
 export interface JoinLobbyEvent {
+  savedGame?: import("./SingleplayerSaves").SavedGame;
   // Multiplayer games only have gameID, gameConfig is not known until game starts.
   gameID: string;
   // GameConfig only exists when playing a singleplayer game.
@@ -1010,6 +1012,13 @@ class Client {
     };
 
     const onPopState = () => {
+      // A review started from the running local game is a same-document
+      // navigation. Chrome emits popstate before hashchange; route it before
+      // the live-game back-button guard can reload and discard the record.
+      if (parseReplayViewerHash(window.location.hash) !== null) {
+        onHashUpdate();
+        return;
+      }
       // Steam hardware back button fix (Issue #5514):
       // If we navigate back to root on Steam, push state forward so the back button doesn't exit the app
       // and show the blank 'Starting' screen.
@@ -1109,6 +1118,16 @@ class Client {
     // get here (CrazyGames awaits its SDK first). Only the first opens it.
     if (this.replayViewerID !== null) return;
     this.replayViewerID = gameID;
+    // Explicitly entering review also ends the live simulation. Keep the
+    // document and hash: handleLeaveLobby resets both to the homepage.
+    this.mostRecentJoinEvent = performance.now();
+    this.joinInFlight = false;
+    this.lobbyHandle?.stop(true);
+    // Result dialogs are shared page elements above the viewer's canvas.
+    // The stopped match no longer owns them when review takes over.
+    document.querySelector<WinModal>("win-modal")?.hide?.();
+    this.lobbyHandle = null;
+    this.currentUrl = null;
     let ReplayViewer: typeof import("./replay/ReplayViewer").ReplayViewer;
     try {
       ({ ReplayViewer } = await import("./replay/ReplayViewer"));
@@ -1457,7 +1476,12 @@ class Client {
 
   private async handleJoinLobby(event: CustomEvent<JoinLobbyEvent>) {
     const lobby = event.detail;
-    if (this.usernameInput && !this.usernameInput.canPlay()) {
+    const offline = Boolean(
+      lobby.savedGame ??
+      lobby.gameStartInfo?.config.modernMode ??
+      lobby.gameStartInfo?.config.training,
+    );
+    if (!offline && this.usernameInput && !this.usernameInput.canPlay()) {
       // The singleplayer modal shows the starting overlay before dispatching
       // join-lobby; a refused join must release it or it stays over the menu.
       const startingModal = document.querySelector("game-starting-modal");
@@ -1536,16 +1560,16 @@ class Client {
     // local game (offline on Steam it waits out the 5s ticket timeout):
     // read the cached JWT and refresh in the background instead.
     const isSingleplayer = lobby.source === "singleplayer";
-    if (isSingleplayer) {
+    if (isSingleplayer && !offline) {
       void userAuth();
     }
-    const auth = await userAuth(!isSingleplayer);
+    const auth = offline ? false : await userAuth(!isSingleplayer);
     const playerRole = auth !== false ? (auth.claims.role ?? null) : null;
     // Ensure the one-shot Steam name-seed has settled before reading
     // getUsername(), mirroring how getClanCheck() runs in parallel with the
     // handshake. whenSeeded() always resolves (falling back to the generated
     // anon name on failure/timeout), so this can only delay, never block.
-    await this.usernameInput?.whenSeeded();
+    if (!offline) await this.usernameInput?.whenSeeded();
     // One resolution for the whole join: the name and the verified badge have
     // to describe the same decision, so they are read together rather than
     // asked for separately.
@@ -1553,13 +1577,19 @@ class Client {
       this.usernameInput?.resolvedName() ?? fallbackPlayerName();
     const newLobbyHandle = joinLobby(this.eventBus, {
       gameID: lobby.gameID,
-      cosmetics: await getPlayerCosmeticsRefs({
-        verified: resolvedName.verified,
-      }),
-      turnstileToken: await this.getTurnstileToken(lobby),
-      playerName: resolvedName.name,
-      playerClanTag: this.usernameInput?.getClanTag() ?? null,
-      clanTagCheck: this.usernameInput?.getClanCheck(),
+      cosmetics: offline
+        ? {}
+        : await getPlayerCosmeticsRefs({
+            verified: resolvedName.verified,
+          }),
+      turnstileToken: offline ? null : await this.getTurnstileToken(lobby),
+      playerName: offline
+        ? lobby.gameStartInfo!.players[0].username
+        : resolvedName.name,
+      playerClanTag: offline
+        ? null
+        : (this.usernameInput?.getClanTag() ?? null),
+      clanTagCheck: offline ? undefined : this.usernameInput?.getClanCheck(),
       playerRole,
       gameStartInfo:
         lobby.gameStartInfo ??
@@ -1569,6 +1599,7 @@ class Client {
           ? toWireGameStartInfo(lobby.gameRecord.info)
           : undefined),
       gameRecord: lobby.gameRecord,
+      savedGame: lobby.savedGame,
       spectator: lobby.spectator,
       creatorToken: lobby.creatorToken,
     });

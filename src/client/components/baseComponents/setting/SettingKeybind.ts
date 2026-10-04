@@ -121,8 +121,14 @@ export class SettingKeybind extends LitElement {
     // Prevent default only for keys we're actually capturing
     e.preventDefault();
 
-    const code = e.shiftKey ? `Shift+${e.code}` : e.code;
-    const displayKey = e.shiftKey ? `Shift+${e.key.toUpperCase()}` : e.key;
+    const modifiers = [
+      ...(e.ctrlKey ? ["Ctrl"] : []),
+      ...(e.altKey ? ["Alt"] : []),
+      ...(e.shiftKey ? ["Shift"] : []),
+      ...(e.metaKey ? ["Meta"] : []),
+    ];
+    const code = [...modifiers, e.code].join("+");
+    const displayKey = [...modifiers, e.key.toUpperCase()].join("+");
     const prevValue = this.value;
 
     // Temporarily set the value to the new code for validation in parent

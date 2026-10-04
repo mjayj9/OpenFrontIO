@@ -37,6 +37,7 @@ export class WinModal extends LitElement implements Controller {
   public eventBus: EventBus;
 
   private hasShownDeathModal = false;
+  private matchGeneration = 0;
 
   @state()
   isVisible = false;
@@ -77,6 +78,22 @@ export class WinModal extends LitElement implements Controller {
           ${this.innerHtml()}
         </div>
         <div class="mt-4 flex justify-between gap-2.5 shrink-0">
+          ${this.game?.config().gameConfig().modernMode ||
+          this.game?.config().gameConfig().training
+            ? html`<button
+                  class="p-2 rounded bg-blue-700"
+                  @click=${() =>
+                    document.dispatchEvent(new Event("fork-review-game"))}
+                >
+                  ${translateText("saves.review")}</button
+                ><button
+                  class="p-2 rounded bg-blue-700"
+                  @click=${() =>
+                    document.dispatchEvent(new Event("fork-restart-game"))}
+                >
+                  ${translateText("saves.restart")}
+                </button>`
+            : null}
           <o-button
             variant="primary"
             width="block"
@@ -110,6 +127,22 @@ export class WinModal extends LitElement implements Controller {
   }
 
   innerHtml() {
+    const mode = this.game?.config().gameConfig().modernMode;
+    if (mode)
+      return html`<p>
+        ${translateText("modern.result", {
+          objective: translateText(`modern.${mode.victory}`),
+          requirement: ["territory", "capitals"].includes(mode.victory)
+            ? translateText("modern.threshold", { target: mode.targetPercent })
+            : "",
+          minutes: this.game.config().gameConfig().maxTimerValue ?? 30,
+          territory:
+            Math.round(
+              ((this.game.myPlayer()?.numTilesOwned() ?? 0) * 1000) /
+                this.game.numLandTiles(),
+            ) / 10,
+        })}
+      </p>`;
     // The Steam desktop build has nothing to wishlist — fall through to the
     // other promos so the box is never empty.
     const canWishlist = !steamSDK.isOnSteam();
@@ -182,9 +215,10 @@ export class WinModal extends LitElement implements Controller {
     `;
   }
 
-  async loadPatternContent() {
+  async loadPatternContent(generation = this.matchGeneration) {
     const me = await getUserMe();
     const cosmetics = await fetchCosmetics();
+    if (generation !== this.matchGeneration) return;
 
     const purchasable = resolveCosmetics(cosmetics, me, null).filter(
       (r) => r.type === "pattern" && r.relationship === "purchasable",
@@ -302,7 +336,20 @@ export class WinModal extends LitElement implements Controller {
     );
   }
 
-  init() {}
+  init() {
+    this.dispose();
+    this.hasShownDeathModal = false;
+    this.isWin = false;
+    this.isRankedGame = false;
+    this._title = "";
+    this.patternContent = null;
+    this.requestUpdate();
+  }
+
+  dispose(): void {
+    this.matchGeneration++;
+    this.hide();
+  }
 
   tick() {
     const myPlayer = this.game.myPlayer();

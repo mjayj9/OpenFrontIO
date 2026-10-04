@@ -19,6 +19,7 @@ export class TrainStationExecution implements Execution {
   private numCars: number = 5;
   private lastSpawnTick: number = 0;
   private ticksCooldown: number = 10; // Minimum cooldown between two trains
+  private connectAtTick: number = 0;
   constructor(
     private unit: Unit,
     private spawnTrains?: boolean, // If set, the station will spawn trains
@@ -32,6 +33,13 @@ export class TrainStationExecution implements Execution {
 
   init(mg: Game, ticks: number): void {
     this.mg = mg;
+    // Modern starts with hundreds of ready factories. Connect their initial
+    // stations in stable unit-id order, at most one every two ticks, so the
+    // first active tick does not perform every rail path search at once.
+    // Later construction and every classic game retain immediate connection.
+    if (mg.config().gameConfig().modernMode && ticks <= 4) {
+      this.connectAtTick = 4 + this.unit.id() * 2;
+    }
     if (this.spawnTrains) {
       this.random = new PseudoRandom(mg.ticks());
     }
@@ -45,6 +53,10 @@ export class TrainStationExecution implements Execution {
       return;
     }
     if (this.station === null) {
+      if (ticks < this.connectAtTick) {
+        if (!this.unit.isActive()) this.active = false;
+        return;
+      }
       // Can't create new executions on init, so it has to be done in the tick
       this.station = new TrainStation(this.mg, this.unit);
       this.mg.railNetwork().connectStation(this.station);
@@ -124,6 +136,7 @@ export class TrainStationExecution implements Execution {
       numCars: this.numCars,
       lastSpawnTick: this.lastSpawnTick,
       ticksCooldown: this.ticksCooldown,
+      connectAtTick: this.connectAtTick,
     });
   }
 
@@ -137,6 +150,7 @@ export class TrainStationExecution implements Execution {
     this.numCars = s.numCars;
     this.lastSpawnTick = s.lastSpawnTick;
     this.ticksCooldown = s.ticksCooldown;
+    this.connectAtTick = s.connectAtTick;
   }
 }
 
@@ -150,12 +164,14 @@ const TrainStationExecStateSchema = z.object({
   numCars: zInt(),
   lastSpawnTick: zInt(),
   ticksCooldown: zInt(),
+  connectAtTick: zInt(),
 });
 type TrainStationExecState = z.infer<typeof TrainStationExecStateSchema>;
 
 export const TrainStationExecutionSnapshot = execSnapshotType({
   name: "TrainStation",
-  version: 1,
+  version: 2,
   schema: TrainStationExecStateSchema,
   cls: () => TrainStationExecution,
+  migrations: { 1: (d) => ({ ...d, connectAtTick: 0 }) },
 });

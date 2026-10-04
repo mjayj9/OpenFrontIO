@@ -10,6 +10,28 @@
 
 This is a fork/rewrite of WarFront.io. Credit to https://github.com/WarFrontIO.
 
+This personal fork adds opt-in deterministic enhanced AI, searchable English/Korean
+education and prepared training, modern country ownership, and real singleplayer
+snapshot saves. See [Enhanced AI](docs/EnhancedAI.md), [education](docs/Education.md),
+[Modern World](docs/ModernWorld.md), and [private modern rooms](docs/ModernLobby.md).
+The source and asset licenses and existing copyright notices are retained.
+
+For modern singleplayer or training without the separate account/ranked API:
+
+```bash
+npm run inst
+npm run build-prod
+npm run preview:fork
+```
+
+Open `http://127.0.0.1:9002`. Choose **Modern countries** or **Tutorial** on the
+main page. The **Saved singleplayer games** button manages complete running-game
+saves; the in-game **Saves and victory objective** menu saves and restarts a match.
+Modern World v1 uses 198 scenario controllers at 2000×1000, with explicit tiny
+territory and dependency/dispute policies. This preview does not provide public
+matchmaking, accounts, or private room hosting; those use the existing deployment.
+Classic stays available and enhanced AI remains an explicit setting.
+
 ![CI](https://github.com/openfrontio/OpenFrontIO/actions/workflows/ci.yml/badge.svg)
 [![Crowdin](https://badges.crowdin.net/openfront-mls/localized.svg)](https://crowdin.com/project/openfront-mls)
 [![CLA assistant](https://cla-assistant.io/readme/badge/openfrontio/OpenFrontIO)](https://cla-assistant.io/openfrontio/OpenFrontIO)
@@ -83,7 +105,7 @@ npm run dev
 
 This will:
 
-- Start the webpack dev server for the client
+- Start the Vite dev server for the client
 - Launch the game server with development settings
 - Open the game in your default browser (to disable this behavior, set `SKIP_BROWSER_OPEN=true` in your environment)
 

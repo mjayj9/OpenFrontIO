@@ -106,6 +106,7 @@ export enum GameUpdateType {
   SpawnPhaseEnd,
   GamePaused,
   DonateEvent,
+  AIStatus,
 }
 
 export type GameUpdate =
@@ -131,7 +132,22 @@ export type GameUpdate =
   | EmbargoUpdate
   | SpawnPhaseEndUpdate
   | GamePausedUpdate
-  | DonateEventUpdate;
+  | DonateEventUpdate
+  | AIStatusUpdate;
+
+/** Worker-local, read-only AI inspection. No server/network response is used
+ * by the planner. State itself lives in its versioned execution snapshot.
+ */
+export interface AIStatusUpdate {
+  type: GameUpdateType.AIStatus;
+  playerID: PlayerID;
+  goal: "expand" | "attack" | "recover" | "defend" | "economy" | "support";
+  target: PlayerID | null;
+  reason: string;
+  reserve: number;
+  candidateCount: number;
+  buildingPriority: UnitType[];
+}
 
 export interface BonusEventUpdate {
   type: GameUpdateType.BonusEvent;

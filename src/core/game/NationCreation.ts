@@ -10,6 +10,11 @@ import {
   PlayerInfo,
   PlayerType,
 } from "./Game";
+import {
+  modernHumanCountryIds,
+  modernPlayerInfo,
+  modernWorld,
+} from "./ModernWorld";
 import { AdditionalNation, Nation as ManifestNation } from "./TerrainMapLoader";
 
 /**
@@ -32,6 +37,18 @@ export function createNationsForGame(
   numHumans: number,
   random: PseudoRandom,
 ): Nation[] {
+  if (gameStart.config.modernMode) {
+    const humans = modernHumanCountryIds(gameStart);
+    return modernWorld.countries
+      .filter((c) => !humans.has(c.id))
+      .map(
+        (c) =>
+          new Nation(
+            new Cell(c.capital[0], c.capital[1]),
+            modernPlayerInfo(c, gameStart),
+          ),
+      );
+  }
   const toNation = (n: ManifestNation): Nation =>
     new Nation(
       n.coordinates !== undefined

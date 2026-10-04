@@ -33,6 +33,10 @@ export interface TutorialContext {
   inSpawnPhase: boolean;
   /** Any outgoing attack, wilderness or player. */
   attacking: boolean;
+  /** Actual owned land; an attack command alone is not a successful conquest. */
+  tilesOwned: number;
+  /** Opponents actually conquered since this guide began. */
+  conqueredPlayers: number;
   /** The attack ratio changed this tick (slider drag or hotkey). */
   attackRatioMoved: boolean;
   boatsDisabled: boolean;
@@ -94,7 +98,7 @@ export interface TutorialStep {
   applies?: (ctx: TutorialContext) => boolean;
   /** Informational steps complete when the player clicks "Got it". */
   manual?: true;
-  isDone?: (ctx: TutorialContext) => boolean;
+  isDone?: (ctx: TutorialContext, baseline: TutorialContext) => boolean;
 }
 
 export const TUTORIAL_STEPS: readonly TutorialStep[] = [
@@ -106,7 +110,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
   {
     id: "attack_wilderness",
     highlight: "territory",
-    isDone: (c) => c.attacking,
+    isDone: (c, baseline) => c.tilesOwned > baseline.tilesOwned,
   },
   { id: "troops", highlight: "troops", manual: true },
   { id: "troop_rate", highlight: "troop_rate", manual: true },
@@ -115,14 +119,13 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     highlight: "attack_ratio",
     isDone: (c) => c.attackRatioMoved,
   },
-  // Long-running: stays up (with the nearest tribes marked with the target
-  // crosshair) until the player has banked enough gold for the City step.
+  // A conquest anywhere in this chapter counts, including a tribe defeated
+  // during the earlier expansion exercise. The panel latches actual events.
   {
     id: "capture_tribes",
     highlight: "tribes",
-    applies: (c) => c.botsExist && !c.cityDisabled,
-    isDone: (c) =>
-      c.cities > 0 || (c.cityCost !== null && c.gold >= c.cityCost),
+    applies: (c) => c.botsExist || c.conqueredPlayers > 0,
+    isDone: (c) => c.conqueredPlayers > 0,
   },
   {
     id: "buy_city",
@@ -130,7 +133,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.City,
     hotkey: "buildCity",
     applies: (c) => !c.cityDisabled,
-    isDone: (c) => c.cities > 0,
+    isDone: (c, baseline) => c.cities > baseline.cities,
   },
   // Marks the nearest nation with the target crosshair; done once the
   // nation accepts (nations may decline — Skip is the way past that).
@@ -152,7 +155,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.Factory,
     hotkey: "buildFactory",
     applies: (c) => !c.factoryDisabled,
-    isDone: (c) => c.factories > 0,
+    isDone: (c, baseline) => c.factories > baseline.factories,
   },
   {
     id: "factory_info",
@@ -171,7 +174,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.Port,
     hotkey: "buildPort",
     applies: (c) => !c.portDisabled,
-    isDone: (c) => c.ports > 0,
+    isDone: (c, baseline) => c.ports > baseline.ports,
   },
   {
     id: "port_info",
@@ -185,7 +188,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.DefensePost,
     hotkey: "buildDefensePost",
     applies: (c) => !c.defensePostDisabled,
-    isDone: (c) => c.defensePosts > 0,
+    isDone: (c, baseline) => c.defensePosts > baseline.defensePosts,
   },
   // Warships are built from ports, so this step needs one.
   {
@@ -194,7 +197,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.Warship,
     hotkey: "buildWarship",
     applies: (c) => !c.warshipDisabled && !c.portDisabled,
-    isDone: (c) => c.warships > 0,
+    isDone: (c, baseline) => c.warships > baseline.warships,
   },
   {
     id: "buy_silo",
@@ -202,7 +205,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.MissileSilo,
     hotkey: "buildMissileSilo",
     applies: (c) => !c.siloDisabled,
-    isDone: (c) => c.silos > 0,
+    isDone: (c, baseline) => c.silos > baseline.silos,
   },
   // Waits (via the earn-gold text) until the bomb is affordable, then asks
   // for a launch; done as soon as one of ours is in flight.
@@ -244,6 +247,70 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
 /** Ticks a completed step stays on screen (with its checkmark) before advancing. */
 export const STEP_DONE_LINGER_TICKS = 15;
 
+export const EDUCATION_VERSION = 2;
+export const TUTORIAL_CHAPTERS = [
+  {
+    id: "basic",
+    stepIds: [
+      "spawn",
+      "attack_wilderness",
+      "troops",
+      "troop_rate",
+      "attack_ratio",
+      "capture_tribes",
+      "buy_city",
+    ],
+  },
+  {
+    id: "economy",
+    stepIds: ["buy_city", "buy_factory", "factory_info", "buy_defense_post"],
+  },
+  {
+    id: "naval",
+    stepIds: ["send_boat", "buy_port", "port_info", "buy_warship"],
+  },
+  { id: "diplomacy", stepIds: ["propose_alliance", "alliance_info"] },
+  {
+    id: "weapons",
+    stepIds: [
+      "buy_silo",
+      "launch_atom",
+      "atom_info",
+      "hydrogen_info",
+      "mirv_info",
+      "sam_info",
+    ],
+  },
+  { id: "full", stepIds: TUTORIAL_STEPS.map((step) => step.id) },
+] as const;
+export type TutorialChapterID = (typeof TUTORIAL_CHAPTERS)[number]["id"];
+export type TutorialOutcome = "practiced" | "read" | "skipped" | "unavailable";
+export interface TutorialProgressSnapshot {
+  version: number;
+  stepId: string | null;
+  outcomes: Record<string, TutorialOutcome>;
+  doneTicks?: number | null;
+  baseline?: TutorialEvidence;
+}
+type TutorialEvidence = Pick<
+  TutorialContext,
+  | "tilesOwned"
+  | "conqueredPlayers"
+  | "cities"
+  | "factories"
+  | "ports"
+  | "defensePosts"
+  | "warships"
+  | "silos"
+>;
+
+export function chapterSteps(id: TutorialChapterID): readonly TutorialStep[] {
+  const chapter = TUTORIAL_CHAPTERS.find((c) => c.id === id)!;
+  return chapter.stepIds.map(
+    (stepId) => TUTORIAL_STEPS.find((s) => s.id === stepId)!,
+  );
+}
+
 /**
  * Cursor over the step list. Pure: feed it a context once per tick and read
  * back the current step. Steps whose `applies` is false for the current
@@ -261,6 +328,9 @@ export class TutorialProgress {
    * isDone) always uses the live context.
    */
   private countCtx: TutorialContext | null = null;
+  private baseline: TutorialContext | null = null;
+  private restoredBaseline: TutorialEvidence | null = null;
+  private outcomes: Record<string, TutorialOutcome> = {};
 
   constructor(
     private readonly steps: readonly TutorialStep[] = TUTORIAL_STEPS,
@@ -278,6 +348,72 @@ export class TutorialProgress {
     return this.doneTicks !== null;
   }
 
+  result(): Readonly<Record<string, TutorialOutcome>> {
+    return this.outcomes;
+  }
+
+  snapshot(): TutorialProgressSnapshot {
+    const baseline = this.baseline;
+    return {
+      version: EDUCATION_VERSION,
+      stepId: this.current()?.id ?? null,
+      outcomes: { ...this.outcomes },
+      doneTicks: this.doneTicks,
+      baseline: baseline
+        ? {
+            tilesOwned: baseline.tilesOwned,
+            conqueredPlayers: baseline.conqueredPlayers,
+            cities: baseline.cities,
+            factories: baseline.factories,
+            ports: baseline.ports,
+            defensePosts: baseline.defensePosts,
+            warships: baseline.warships,
+            silos: baseline.silos,
+          }
+        : undefined,
+    };
+  }
+
+  /** Reject a different course version; the caller can retain the original file. */
+  restore(snapshot: TutorialProgressSnapshot): boolean {
+    if (
+      !snapshot ||
+      snapshot.version !== EDUCATION_VERSION ||
+      !snapshot.outcomes ||
+      typeof snapshot.outcomes !== "object" ||
+      Array.isArray(snapshot.outcomes)
+    )
+      return false;
+    if (
+      snapshot.baseline &&
+      Object.values(snapshot.baseline).some(
+        (value) => !Number.isSafeInteger(value) || value < 0,
+      )
+    )
+      return false;
+    const index =
+      snapshot.stepId === null
+        ? this.steps.length
+        : this.steps.findIndex((s) => s.id === snapshot.stepId);
+    if (index < 0) return false;
+    this.index = index;
+    this.outcomes = Object.fromEntries(
+      Object.entries(snapshot.outcomes).filter(
+        ([id, outcome]) =>
+          this.steps.some((s) => s.id === id) &&
+          ["practiced", "read", "skipped", "unavailable"].includes(outcome),
+      ),
+    );
+    this.doneTicks =
+      this.outcomes[snapshot.stepId ?? ""] === "practiced" ||
+      this.outcomes[snapshot.stepId ?? ""] === "read"
+        ? 0
+        : null;
+    this.baseline = null;
+    this.restoredBaseline = snapshot.baseline ?? null;
+    return true;
+  }
+
   /** 1-based position of the current step among the steps that apply. */
   position(ctx: TutorialContext): number {
     return this.applicable(this.countCtx ?? ctx, this.index) + 1;
@@ -292,14 +428,19 @@ export class TutorialProgress {
     const step = this.current();
     if (step?.manual && this.doneTicks === null) {
       this.doneTicks = 0;
+      this.outcomes[step.id] = "read";
     }
   }
 
   /** Moves past the current step without completing it. */
   skip(): void {
     if (this.finished()) return;
+    this.outcomes[this.current()!.id] =
+      this.doneTicks === null ? "skipped" : this.outcomes[this.current()!.id];
     this.index++;
     this.doneTicks = null;
+    this.baseline = null;
+    this.restoredBaseline = null;
   }
 
   update(ctx: TutorialContext): void {
@@ -309,13 +450,20 @@ export class TutorialProgress {
       if (this.doneTicks < STEP_DONE_LINGER_TICKS) return;
       this.index++;
       this.doneTicks = null;
+      this.baseline = null;
+      this.restoredBaseline = null;
     }
     while (!this.finished() && !this.stepApplies(this.index, ctx)) {
+      this.outcomes[this.current()!.id] = "unavailable";
       this.index++;
+      this.baseline = null;
+      this.restoredBaseline = null;
     }
     const step = this.current();
-    if (step?.isDone?.(ctx)) {
+    this.baseline ??= { ...ctx, ...this.restoredBaseline };
+    if (step?.isDone?.(ctx, this.baseline)) {
       this.doneTicks = 0;
+      this.outcomes[step.id] = "practiced";
     }
   }
 

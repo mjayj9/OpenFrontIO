@@ -1,4 +1,4 @@
-import { getCdnBase } from "../AssetUrls";
+import { getWorkerCdnBase } from "../AssetUrls";
 import {
   BuildableUnit,
   Cell,
@@ -26,8 +26,12 @@ async function createGameWorker(): Promise<Worker> {
 }
 
 export class WorkerClient {
+  public initialView: GameUpdateViewData | undefined;
   private worker: Worker | null = null;
   private isInitialized = false;
+  private disposed = false;
+  private initializationTimeout: ReturnType<typeof setTimeout> | null = null;
+  private rejectInitialization: ((reason: Error) => void) | null = null;
   private messageHandlers: Map<string, (message: WorkerMessage) => void>;
   private gameUpdateCallback?: (
     update: GameUpdateViewData | ErrorUpdate,
@@ -43,6 +47,7 @@ export class WorkerClient {
   }
 
   private handleWorkerMessage(event: MessageEvent<WorkerMessage>) {
+    if (this.disposed) return;
     const message = event.data;
 
     switch (message.type) {
@@ -59,7 +64,10 @@ export class WorkerClient {
         }
         break;
       case "game_error":
-        if (this.gameUpdateCallback && message.error) {
+        if (message.id && this.messageHandlers.has(message.id)) {
+          this.messageHandlers.get(message.id)!(message);
+          this.messageHandlers.delete(message.id);
+        } else if (this.gameUpdateCallback && message.error) {
           this.gameUpdateCallback(message.error);
         }
         break;
@@ -76,35 +84,59 @@ export class WorkerClient {
   }
 
   async initialize(): Promise<void> {
+    if (this.disposed) throw new Error("Worker initialization cancelled");
     const worker = await createGameWorker();
+    // The inline worker chunk can finish loading after the game was closed.
+    if (this.disposed) {
+      worker.terminate();
+      throw new Error("Worker initialization cancelled");
+    }
     this.worker = worker;
     worker.addEventListener("message", this.handleWorkerMessage.bind(this));
 
     return new Promise((resolve, reject) => {
       const messageId = generateID();
+      this.rejectInitialization = reject;
+      const finish = () => {
+        if (this.initializationTimeout !== null) {
+          clearTimeout(this.initializationTimeout);
+          this.initializationTimeout = null;
+        }
+        this.rejectInitialization = null;
+      };
 
       this.messageHandlers.set(messageId, (message) => {
         if (message.type === "initialized") {
+          finish();
           this.isInitialized = true;
+          this.initialView = message.initialView;
           resolve();
+        } else if (message.type === "game_error") {
+          finish();
+          worker.terminate();
+          this.worker = null;
+          reject(
+            new Error(message.error?.errMsg ?? "Worker initialization failed"),
+          );
         }
       });
+
+      this.initializationTimeout = setTimeout(() => {
+        finish();
+        this.messageHandlers.delete(messageId);
+        worker.terminate();
+        this.worker = null;
+        reject(new Error("Worker initialization timeout"));
+      }, 60000);
 
       worker.postMessage({
         type: "init",
         id: messageId,
         gameStartInfo: this.gameStartInfo,
         clientID: this.clientID,
-        cdnBase: getCdnBase(),
+        cdnBase: getWorkerCdnBase(),
         snapshot: this.snapshotToRestore,
       });
-
-      setTimeout(() => {
-        if (!this.isInitialized) {
-          this.messageHandlers.delete(messageId);
-          reject(new Error("Worker initialization timeout"));
-        }
-      }, 60000);
     });
   }
 
@@ -358,7 +390,16 @@ export class WorkerClient {
   }
 
   cleanup() {
+    this.disposed = true;
+    this.isInitialized = false;
     this.worker?.terminate();
+    this.worker = null;
+    if (this.initializationTimeout !== null) {
+      clearTimeout(this.initializationTimeout);
+      this.initializationTimeout = null;
+    }
+    this.rejectInitialization?.(new Error("Worker initialization cancelled"));
+    this.rejectInitialization = null;
     this.messageHandlers.clear();
     this.gameUpdateCallback = undefined;
   }

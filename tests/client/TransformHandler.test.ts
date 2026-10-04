@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DragEvent } from "../../src/client/InputHandler";
 import {
   GOTO_INTERVAL_MS,
   GoToPositionEvent,
@@ -23,6 +24,21 @@ function makeHandler() {
 }
 
 describe("TransformHandler", () => {
+  it("stops camera animation and shared-bus input after disposal", () => {
+    vi.useFakeTimers();
+    try {
+      const { handler, eventBus } = makeHandler();
+      eventBus.emit(new GoToPositionEvent(500, 500));
+      handler.dispose();
+      const before = [handler.offsetX, handler.offsetY];
+      eventBus.emit(new DragEvent(100, 100));
+      vi.advanceTimersByTime(GOTO_INTERVAL_MS * 5);
+      expect([handler.offsetX, handler.offsetY]).toEqual(before);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it("starts with the default camera and no pending changes", () => {
     const { handler } = makeHandler();
     expect(handler.scale).toBe(1.8);

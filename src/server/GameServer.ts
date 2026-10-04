@@ -16,6 +16,7 @@ import {
   RankedType,
 } from "../core/game/Game";
 import { maps } from "../core/game/Maps.gen";
+import { modernWorld, validateModernStart } from "../core/game/ModernWorld";
 import {
   assignTeamsLobbyPreview,
   resolveTeamsList,
@@ -41,6 +42,7 @@ import {
   ServerDesyncSchema,
   ServerErrorMessage,
   ServerLobbyInfoMessage,
+  ServerModernLobbyStatus,
   ServerNewLobbyMessage,
   ServerPongMessage,
   ServerPrestartMessageSchema,
@@ -345,6 +347,11 @@ export class GameServer {
 
   public updateGameConfig(gameConfig: Partial<GameConfig>): void {
     applyGameConfigPatch(this.gameConfig, gameConfig);
+    if (!this.gameConfig.modernMode) {
+      this.clients.active().forEach((c) => {
+        c.countryId = undefined;
+      });
+    }
   }
 
   // Dispatch a control/gameplay intent from either a websocket client or the
@@ -430,6 +437,11 @@ export class GameServer {
         if (this.startsAt) {
           this.startsAt = undefined;
         } else {
+          if (!this.modernLobbyReady())
+            return finish({
+              status: 409,
+              error: "modern_country_selection_required",
+            });
           this.setStartsAt(
             Date.now() + (this.gameConfig.startDelay ?? 0) * 1000,
           );
@@ -660,6 +672,20 @@ export class GameServer {
     // Client connection accepted. Added before the first
     // markClientDisconnected: that call consults the roster to tell a
     // spectator from a player.
+    if (
+      this.stage !== "started" &&
+      this.gameConfig.modernMode &&
+      !client.spectator
+    ) {
+      const previous = Array.from(this.clients.all().values())
+        .reverse()
+        .find((c) => c.persistentID === client.persistentID)?.countryId;
+      if (
+        previous &&
+        !this.clients.players().some((c) => c.countryId === previous)
+      )
+        client.countryId = previous;
+    }
     this.clients.add(client);
     client.lastPing = Date.now();
     this.markClientDisconnected(client.clientID, false);
@@ -796,6 +822,10 @@ export class GameServer {
       }
       case "spectate": {
         this.setSpectator(client, clientMsg.spectator);
+        break;
+      }
+      case "select_country": {
+        this.selectCountry(client, clientMsg.countryId);
         break;
       }
       case "winner": {
@@ -1079,11 +1109,14 @@ export class GameServer {
     if (this.stage === "started" || this.ended) {
       return;
     }
-    this.stage = "started";
-    this._startTime = Date.now();
-    // Set last ping to start so we don't immediately stop the game
-    // if no client connects/pings.
-    this.lastPingUpdate = Date.now();
+    // Recheck the live roster after the countdown. A late join or released
+    // reservation must not freeze an incomplete or duplicate controller list.
+    if (!this.modernLobbyReady()) {
+      this.stage = "lobby";
+      this.startsAt = undefined;
+      this.broadcastLobbyInfo();
+      return;
+    }
 
     this.convertClanOverflowToSpectators();
 
@@ -1110,6 +1143,7 @@ export class GameServer {
         isLobbyCreator: this.lobbyCreatorID === c.clientID,
         friends: friendsFor(c),
         teamIndex: this.matchmakingTeamIndex(c),
+        ...(c.countryId ? { countryId: c.countryId } : {}),
       })),
       tribes: this.tribes,
     });
@@ -1118,6 +1152,9 @@ export class GameServer {
       this.log.error("Error parsing game start info", { message: error });
       return;
     }
+    this.stage = "started";
+    this._startTime = Date.now();
+    this.lastPingUpdate = this._startTime;
     this.gameStartInfo = result.data satisfies GameStartInfo;
     this.telemetry.emit(
       "match_started",
@@ -1330,9 +1367,79 @@ export class GameServer {
       if (max !== undefined && this.playerCount() >= max) return;
     }
     client.spectator = spectator;
+    if (spectator && this.stage !== "started") client.countryId = undefined;
     // The lobby list is derived from this flag, so everyone's view of who is
     // playing has to be refreshed rather than waiting out the next tick.
     this.broadcastLobbyInfo();
+  }
+
+  private modernLobbyStatus(
+    client: Client,
+    status: Omit<ServerModernLobbyStatus, "type">,
+  ): void {
+    if (client.ws.readyState !== WebSocket.OPEN) return;
+    client.ws.send(
+      encodeServerMessage(
+        { type: "modern_lobby_status", ...status },
+        this.zbinCtx,
+      ),
+    );
+  }
+
+  private selectCountry(client: Client, countryId: string): void {
+    if (
+      this.stage === "started" ||
+      this.ended ||
+      !this.gameConfig.modernMode ||
+      this.gameConfig.gameType !== GameType.Private
+    ) {
+      this.modernLobbyStatus(client, { error: "closed" });
+      return;
+    }
+    if (client.spectator || !this.clients.isConnected(client)) {
+      this.modernLobbyStatus(client, { error: "not_player" });
+      return;
+    }
+    if (!modernWorld.countries.some((c) => c.id === countryId)) {
+      this.modernLobbyStatus(client, { error: "unsupported" });
+      return;
+    }
+    if (
+      this.clients
+        .players()
+        .some((c) => c !== client && c.countryId === countryId)
+    ) {
+      this.modernLobbyStatus(client, { error: "taken" });
+      return;
+    }
+    client.countryId = countryId;
+    this.modernLobbyStatus(client, { countryId });
+    this.broadcastLobbyInfo();
+  }
+
+  /** This runs synchronously with reservation writes; no async start race. */
+  private modernLobbyReady(): boolean {
+    if (!this.gameConfig.modernMode) return true;
+    let error: ServerModernLobbyStatus["error"] = "not_ready";
+    try {
+      validateModernStart({
+        gameID: this.id,
+        lobbyCreatedAt: this.createdAt,
+        config: this.gameConfig,
+        players: this.clients.players().map((c) => ({
+          clientID: c.clientID,
+          username: c.username,
+          clanTag: c.clanTag,
+          countryId: c.countryId,
+        })),
+      });
+      return true;
+    } catch {
+      if (this.clients.players().every((c) => c.countryId !== undefined))
+        error = "invalid_rules";
+    }
+    this.clients.active().forEach((c) => this.modernLobbyStatus(c, { error }));
+    return false;
   }
 
   // Pin a publicId to a team slot after the lobby exists, so a lobby that fills

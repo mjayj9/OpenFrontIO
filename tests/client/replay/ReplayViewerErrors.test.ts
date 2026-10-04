@@ -17,7 +17,10 @@ import {
   type ProcessingHandlers,
 } from "../../../src/client/replay/LocalProcessing";
 import { ReplayPlayback } from "../../../src/client/replay/ReplayPlayback";
-import { fetchReplayRecord } from "../../../src/client/replay/ReplayRecord";
+import {
+  fetchReplayRecord,
+  hasHandedOverRecord,
+} from "../../../src/client/replay/ReplayRecord";
 import { replayStore } from "../../../src/client/replay/ReplayStore";
 import { ReplayViewer } from "../../../src/client/replay/ReplayViewer";
 import { loadTerrainMap } from "../../../src/core/game/TerrainMapLoader";
@@ -25,6 +28,7 @@ import type { GameRecord } from "../../../src/core/Schemas";
 
 vi.mock("../../../src/client/replay/ReplayRecord", () => ({
   fetchReplayRecord: vi.fn(),
+  hasHandedOverRecord: vi.fn(),
 }));
 vi.mock("../../../src/client/replay/ReplayStore", () => ({
   replayStore: { get: vi.fn(), put: vi.fn(), remove: vi.fn() },
@@ -116,6 +120,7 @@ async function processing() {
 
 beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
+  vi.mocked(hasHandedOverRecord).mockReturnValue(false);
   vi.mocked(replayStore.get).mockResolvedValue(undefined);
   vi.mocked(replayStore.put).mockResolvedValue();
   vi.mocked(replayStore.remove).mockResolvedValue();
@@ -133,6 +138,50 @@ test("a replay this browser kept opens without fetching or processing", async ()
   expect(v.status).toBe("ready");
   expect(fetchReplayRecord).not.toHaveBeenCalled();
   expect(processInBrowser).not.toHaveBeenCalled();
+});
+
+test("a newly handed record bypasses a stale stored replay with the same game id", async () => {
+  const latest = { ...RECORD, info: { ...RECORD.info, num_turns: 77 } };
+  vi.mocked(hasHandedOverRecord).mockReturnValue(true);
+  vi.mocked(replayStore.get).mockResolvedValue(STORED);
+  vi.mocked(fetchReplayRecord).mockResolvedValue({
+    kind: "record",
+    record: latest,
+  });
+  vi.mocked(processInBrowser).mockReturnValue({ cancel: vi.fn() });
+  const { v, start } = viewer();
+  await v.open();
+  expect(replayStore.get).not.toHaveBeenCalled();
+  expect(start).not.toHaveBeenCalled();
+  expect(fetchReplayRecord).toHaveBeenCalledExactlyOnceWith("dqKzit4cWu");
+  expect(processInBrowser).toHaveBeenCalledExactlyOnceWith(
+    latest,
+    expect.anything(),
+  );
+  expect(v.gameLength).toBe(77);
+  expect(v.status).toBe("processing");
+  expect(replayStore.remove).not.toHaveBeenCalled();
+});
+
+test("a local record arriving during a store read also takes precedence", async () => {
+  vi.mocked(hasHandedOverRecord)
+    .mockReturnValueOnce(false)
+    .mockReturnValue(true);
+  vi.mocked(replayStore.get).mockResolvedValue(STORED);
+  vi.mocked(fetchReplayRecord).mockResolvedValue({
+    kind: "record",
+    record: RECORD,
+  });
+  vi.mocked(processInBrowser).mockReturnValue({ cancel: vi.fn() });
+  const { v, start } = viewer();
+  await v.open();
+  expect(replayStore.get).toHaveBeenCalledExactlyOnceWith("dqKzit4cWu");
+  expect(start).not.toHaveBeenCalled();
+  expect(processInBrowser).toHaveBeenCalledExactlyOnceWith(
+    RECORD,
+    expect.anything(),
+  );
+  expect(replayStore.remove).not.toHaveBeenCalled();
 });
 
 test("a stored replay that won't open is forgotten, and the game processed again", async () => {

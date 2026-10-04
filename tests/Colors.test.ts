@@ -222,3 +222,90 @@ describe("selectDistinctColor", () => {
     ]).toContainEqual(rgb);
   });
 });
+
+describe.each(["default", "colorblind"] as const)(
+  "large shared color allocations — %s",
+  (themeName) => {
+    const player = (type: PlayerType, id: string, enhanced = false) =>
+      ({
+        team: () => null,
+        type: () => type,
+        id: () => id,
+        enhancedAI: () => (enhanced ? { enhanced: true } : null),
+      }) as unknown as PlayerView;
+
+    it("does not recycle colors after 125 humans and 107 nations", () => {
+      const theme = new SettingsTheme(createThemeSettings(themeName));
+      const colors = [
+        ...Array.from({ length: 125 }, (_, i) =>
+          theme.territoryColor(player(PlayerType.Human, "h-" + i)).toHex(),
+        ),
+        ...Array.from({ length: 107 }, (_, i) =>
+          theme.territoryColor(player(PlayerType.Nation, "n-" + i)).toHex(),
+        ),
+        ...Array.from({ length: 80 }, (_, i) =>
+          theme.territoryColor(player(PlayerType.Bot, "e-" + i, true)).toHex(),
+        ),
+      ];
+      expect(new Set(colors).size).toBe(colors.length);
+      expect(colors).not.toContain(theme.teamColor(ColoredTeams.Bot).toHex());
+    });
+
+    it("rebuilds the same colors after restore for the same sorted identities", () => {
+      const sequence = [
+        player(PlayerType.Human, "human"),
+        player(PlayerType.Bot, "enhanced", true),
+        player(PlayerType.Nation, "nation"),
+      ];
+      const allocate = () => {
+        const theme = new SettingsTheme(createThemeSettings(themeName));
+        return sequence.map((p) => theme.territoryColor(p).toHex());
+      };
+      expect(allocate()).toEqual(allocate());
+    });
+
+    it("preserves unique team variations for 198 country controllers", () => {
+      const theme = new SettingsTheme(createThemeSettings(themeName));
+      const colors = Array.from({ length: 198 }, (_, i) =>
+        theme.teamColorForPlayer(ColoredTeams.Nations, "world" + i).toHex(),
+      );
+      expect(new Set(colors).size).toBe(198);
+    });
+
+    it("gives logical Bot-team enhanced tribes unique fills while retaining base gray", () => {
+      const theme = new SettingsTheme(createThemeSettings(themeName));
+      const enhanced = Array.from(
+        { length: 20 },
+        (_, i) =>
+          ({
+            id: () => "tribe-" + i,
+            team: () => ColoredTeams.Bot,
+            type: () => PlayerType.Bot,
+            enhancedAI: () => ({ enhanced: true }),
+          }) as unknown as PlayerView,
+      );
+      const fills = enhanced.map((p) => theme.territoryColor(p).toHex());
+      expect(new Set(fills).size).toBe(20);
+      expect(fills).not.toContain(theme.teamColor(ColoredTeams.Bot).toHex());
+      const basic = {
+        id: () => "basic",
+        team: () => ColoredTeams.Bot,
+        type: () => PlayerType.Bot,
+        enhancedAI: () => null,
+      } as unknown as PlayerView;
+      expect(theme.territoryColor(basic).toHex()).toBe(
+        theme.teamColor(ColoredTeams.Bot).toHex(),
+      );
+    });
+
+    it("retains gray basic tribes and gives enhanced tribes a separate fill", () => {
+      const theme = new SettingsTheme(createThemeSettings(themeName));
+      const basic = theme.territoryColor(player(PlayerType.Bot, "basic"));
+      const enhanced = theme.territoryColor(
+        player(PlayerType.Bot, "enhanced", true),
+      );
+      expect(basic.isEqual(theme.teamColor(ColoredTeams.Bot))).toBe(true);
+      expect(enhanced.isEqual(basic)).toBe(false);
+    });
+  },
+);

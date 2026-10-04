@@ -6,9 +6,9 @@ import { AStar, AStarAdapter } from "./AStar";
 export class AStarRail implements PathFinder<number> {
   private readonly aStar: AStar;
 
-  constructor(gameMap: GameMap) {
+  constructor(gameMap: GameMap, maxIterations?: number) {
     const adapter = new RailAdapter(gameMap);
-    this.aStar = new AStar({ adapter });
+    this.aStar = new AStar({ adapter, maxIterations });
   }
 
   findPath(from: number | number[], to: number): number[] | null {

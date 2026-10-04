@@ -29,6 +29,11 @@ export function handOverRecord(gameID: string, record: GameRecord): void {
   handedOver = { gameID, record };
 }
 
+/** A newly handed local record must take precedence over a cached replay. */
+export function hasHandedOverRecord(gameID: string): boolean {
+  return handedOver?.gameID === gameID;
+}
+
 export async function fetchReplayRecord(
   gameID: string,
   opts: {

@@ -11,6 +11,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -122,7 +123,7 @@ func processMap(ctx context.Context, name string, isTest bool) (string, error) {
 	// Generate maps
 	result, err := GenerateMap(ctx, GeneratorArgs{
 		ImageBuffer: imageBuffer,
-		RemoveSmall: !isTest, // Don't remove small islands for test maps
+		RemoveSmall: !isTest && manifest["preserve_small_islands"] != true,
 		Name:        name,
 	})
 	if err != nil {
@@ -210,6 +211,14 @@ func processMap(ctx context.Context, name string, isTest bool) (string, error) {
 	manifestOutPath := filepath.Join(mapDir, "manifest.json")
 	if err := os.WriteFile(manifestOutPath, updatedManifest, 0644); err != nil {
 		return "", fmt.Errorf("failed to write manifest for %s: %w", name, err)
+	}
+	if name == "modernworld" && !isTest {
+		python := os.Getenv("MODERN_WORLD_PYTHON")
+		if python == "" { python = "python" }
+		cmd := exec.Command(python, filepath.Join("modern-world", "finalize.py"))
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil { return "", fmt.Errorf("modern-world ownership generation: %w", err) }
 	}
 	return manifestOutPath, nil
 }

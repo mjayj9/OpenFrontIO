@@ -1,4 +1,5 @@
 import {
+  chapterSteps,
   STEP_DONE_LINGER_TICKS,
   TUTORIAL_STEPS,
   TutorialContext,
@@ -10,6 +11,8 @@ function ctx(overrides: Partial<TutorialContext> = {}): TutorialContext {
     hasSpawned: false,
     inSpawnPhase: false,
     attacking: false,
+    tilesOwned: 0,
+    conqueredPlayers: 0,
     attackRatioMoved: false,
     boatsDisabled: false,
     boatSent: false,
@@ -47,6 +50,53 @@ function settle(progress: TutorialProgress, c: TutorialContext) {
 }
 
 describe("TutorialProgress", () => {
+  it("credits a tribe conquered during early expansion even after the last tribe is gone", () => {
+    const p = new TutorialProgress(chapterSteps("basic"));
+    const initial = ctx({ hasSpawned: true, tilesOwned: 1200 });
+    settle(p, initial);
+    expect(p.current()?.id).toBe("attack_wilderness");
+    const conquered = {
+      ...initial,
+      tilesOwned: 1320,
+      conqueredPlayers: 1,
+      botsExist: false,
+    };
+    settle(p, conquered);
+    expect(p.current()?.id).toBe("troops");
+    p.acknowledge();
+    settle(p, conquered);
+    expect(p.current()?.id).toBe("troop_rate");
+    p.acknowledge();
+    settle(p, conquered);
+    expect(p.current()?.id).toBe("attack_ratio");
+    settle(p, { ...conquered, attackRatioMoved: true });
+    expect(p.current()?.id).toBe("capture_tribes");
+    settle(p, conquered);
+    expect(p.current()?.id).toBe("buy_city");
+    settle(p, { ...conquered, cities: 1 });
+    expect(p.finished()).toBe(true);
+    expect(
+      Object.values(p.result()).filter((outcome) => outcome === "practiced"),
+    ).toHaveLength(5);
+    expect(
+      Object.values(p.result()).filter((outcome) => outcome === "read"),
+    ).toHaveLength(2);
+    expect(p.result().capture_tribes).toBe("practiced");
+  });
+
+  it("keeps conquest practice independent of city availability and skips an absent unpracticed target", () => {
+    const step = TUTORIAL_STEPS.find((s) => s.id === "capture_tribes")!;
+    const disabledCity = new TutorialProgress([step]);
+    disabledCity.update(ctx({ cityDisabled: true }));
+    expect(disabledCity.result()).toEqual({});
+    disabledCity.update(ctx({ cityDisabled: true, conqueredPlayers: 1 }));
+    expect(disabledCity.result().capture_tribes).toBe("practiced");
+    const missingTarget = new TutorialProgress([step]);
+    missingTarget.update(ctx({ botsExist: false }));
+    expect(missingTarget.finished()).toBe(true);
+    expect(missingTarget.result().capture_tribes).toBe("unavailable");
+  });
+
   it("walks the steps in order as the player acts", () => {
     const p = new TutorialProgress();
     p.update(ctx());
@@ -60,7 +110,7 @@ describe("TutorialProgress", () => {
     settle(p, ctx({ hasSpawned: true }));
     expect(p.current()?.id).toBe("attack_wilderness");
 
-    settle(p, ctx({ hasSpawned: true, attacking: true }));
+    settle(p, ctx({ hasSpawned: true, attacking: true, tilesOwned: 1 }));
     expect(p.current()?.id).toBe("troops");
 
     p.acknowledge();
@@ -84,6 +134,7 @@ describe("TutorialProgress", () => {
         attacking: true,
         gold: 125_000n,
         cityCost: 125_000n,
+        conqueredPlayers: 1,
       }),
     );
     expect(p.current()?.id).toBe("buy_city");
@@ -117,7 +168,7 @@ describe("TutorialProgress", () => {
     const p = new TutorialProgress();
     const c = ctx({ hasSpawned: true, attacking: true });
     settle(p, c);
-    settle(p, c);
+    settle(p, { ...c, tilesOwned: 1 });
     expect(p.current()?.id).toBe("troops");
 
     for (let i = 0; i < 100; i++) p.update(c);
@@ -159,7 +210,7 @@ describe("TutorialProgress", () => {
     expect(p.total(c)).toBe(TUTORIAL_STEPS.length - 17);
 
     settle(p, c);
-    settle(p, c);
+    settle(p, { ...c, tilesOwned: 1 });
     expect(p.current()?.id).toBe("troops");
     expect(p.position(c)).toBe(3);
 
@@ -195,7 +246,7 @@ describe("TutorialProgress", () => {
     expect(q.current()?.id).toBe("buy_factory");
   });
 
-  it("gates the tribes step on affordable gold, then the city step on the city existing", () => {
+  it("requires real conquest and a completed city rather than earned gold or a sent attack", () => {
     const p = new TutorialProgress([
       TUTORIAL_STEPS.find((s) => s.id === "capture_tribes")!,
       TUTORIAL_STEPS.find((s) => s.id === "buy_city")!,
@@ -207,8 +258,10 @@ describe("TutorialProgress", () => {
     expect(p.stepDone()).toBe(false);
 
     p.update(ctx({ gold: 125_000n, cityCost: 125_000n }));
+    expect(p.stepDone()).toBe(false);
+    p.update(ctx({ conqueredPlayers: 1 }));
     expect(p.stepDone()).toBe(true);
-    settle(p, ctx({ gold: 125_000n, cityCost: 125_000n }));
+    settle(p, ctx({ conqueredPlayers: 1 }));
     expect(p.current()?.id).toBe("buy_city");
 
     // Spending the gold elsewhere doesn't complete the step; the city does.
@@ -325,5 +378,65 @@ describe("TutorialProgress step counter", () => {
     p.update(after);
     expect(p.total(after)).toBe(total);
     expect(p.position(after)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("TutorialProgress evidence and outcomes", () => {
+  it("does not mark attack launch as successful land capture", () => {
+    const step = TUTORIAL_STEPS.find((s) => s.id === "attack_wilderness")!;
+    const progress = new TutorialProgress([step]);
+    progress.update(ctx({ tilesOwned: 50 }));
+    progress.update(ctx({ tilesOwned: 50, attacking: true }));
+    expect(progress.stepDone()).toBe(false);
+    progress.acknowledge();
+    expect(progress.stepDone()).toBe(false);
+    progress.update(ctx({ tilesOwned: 51, attacking: false }));
+    expect(progress.stepDone()).toBe(true);
+    expect(progress.result().attack_wilderness).toBe("practiced");
+  });
+
+  it("repeated construction requires a new completed facility", () => {
+    const progress = new TutorialProgress([
+      TUTORIAL_STEPS.find((s) => s.id === "buy_city")!,
+    ]);
+    progress.update(ctx({ cities: 2 }));
+    progress.update(ctx({ cities: 2, gold: 1_000_000n }));
+    expect(progress.stepDone()).toBe(false);
+    progress.update(ctx({ cities: 3 }));
+    expect(progress.stepDone()).toBe(true);
+  });
+
+  it("retains the practical baseline through save and restore", () => {
+    const step = TUTORIAL_STEPS.find((s) => s.id === "attack_wilderness")!;
+    const progress = new TutorialProgress([step]);
+    progress.update(ctx({ tilesOwned: 50 }));
+    const restored = new TutorialProgress([step]);
+    expect(restored.restore(progress.snapshot())).toBe(true);
+    restored.update(ctx({ tilesOwned: 51 }));
+    expect(restored.stepDone()).toBe(true);
+    const completed = new TutorialProgress([step]);
+    expect(completed.restore(restored.snapshot())).toBe(true);
+    expect(completed.stepDone()).toBe(true);
+    settle(completed, ctx({ tilesOwned: 51 }));
+    expect(completed.finished()).toBe(true);
+  });
+
+  it("distinguishes skipped, read, practiced and unavailable lessons", () => {
+    const progress = new TutorialProgress([
+      { id: "skip", isDone: () => false },
+      { id: "read", manual: true },
+      { id: "practice", isDone: (c) => c.hasSpawned },
+      { id: "disabled", applies: () => false },
+    ]);
+    progress.skip();
+    progress.acknowledge();
+    settle(progress, ctx({ hasSpawned: true }));
+    settle(progress, ctx({ hasSpawned: true }));
+    expect(progress.result()).toEqual({
+      skip: "skipped",
+      read: "read",
+      practice: "practiced",
+      disabled: "unavailable",
+    });
   });
 });

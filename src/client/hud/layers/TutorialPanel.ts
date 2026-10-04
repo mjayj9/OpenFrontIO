@@ -2,8 +2,15 @@ import { LitElement, html, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { EventBus } from "../../../core/EventBus";
 import { PlayerType, Relation, UnitType } from "../../../core/game/Game";
+import { GameUpdateType } from "../../../core/game/GameUpdates";
 import { UserSettings } from "../../../core/game/UserSettings";
 import { Controller } from "../../Controller";
+import {
+  EducationProgressStore,
+  consumeRequestedChapter,
+} from "../../education/EducationProgressStore";
+import { EDUCATION_FEATURES } from "../../education/FeatureRegistry";
+import { HelpModal } from "../../HelpModal";
 import { Platform } from "../../Platform";
 import { GoToPlayerEvent } from "../../TransformHandler";
 import { UIState } from "../../UIState";
@@ -11,11 +18,15 @@ import { renderNumber, textDirection, translateText } from "../../Utils";
 import { GameView } from "../../view";
 import { PlayerView } from "../../view/PlayerView";
 import {
+  TUTORIAL_CHAPTERS,
+  TutorialChapterID,
   TutorialContext,
   TutorialHighlight,
   TutorialHighlightEvent,
   TutorialProgress,
+  TutorialProgressSnapshot,
   TutorialStep,
+  chapterSteps,
 } from "../Tutorial";
 
 /** How often (in ticks) to ask the worker for current build costs. */
@@ -42,8 +53,6 @@ const UNIT_NAME_KEYS: Partial<Record<UnitType, string>> = {
   [UnitType.MissileSilo]: "missile_silo",
   [UnitType.AtomBomb]: "atom_bomb",
 };
-/** Ticks the "you're ready" message stays up before the panel closes. */
-const COMPLETE_LINGER_TICKS = 50;
 
 /** How many of the nearest attack targets get a marker during the tribes step. */
 const NEARBY_TRIBE_MARK_COUNT = 3;
@@ -73,17 +82,6 @@ const TOUCH_TEXT_STEPS = new Set([
   "launch_atom",
 ]);
 
-/** Defaults shown when the player hasn't rebound the action (see UnitDisplay). */
-const HOTKEY_FALLBACKS = {
-  buildCity: "1",
-  buildFactory: "2",
-  buildPort: "3",
-  buildDefensePost: "4",
-  buildWarship: "7",
-  buildMissileSilo: "5",
-  buildAtomBomb: "8",
-} as const;
-
 @customElement("tutorial-panel")
 export class TutorialPanel extends LitElement implements Controller {
   public game: GameView;
@@ -94,11 +92,20 @@ export class TutorialPanel extends LitElement implements Controller {
   @state() private active = false;
   @state() private confirmingClose = false;
   @state() private ctx: TutorialContext | null = null;
+  @state() private chapter: TutorialChapterID = "basic";
+  @state() private guidePaused = false;
+  @state() private showingHint = false;
+  @state() private storageError = false;
 
-  private progress = new TutorialProgress();
+  private progress = new TutorialProgress(chapterSteps("basic"));
+  private progressStore = new EducationProgressStore();
+  private lastSavedProgress = "";
+  private conqueredPlayers = 0;
+  private lastConquestTick = -1;
   private started = false;
+  private chapterRequested = false;
+  private gameGeneration = 0;
   private costs = new Map<UnitType, bigint>();
-  private keybinds: Record<string, { key?: string }> | null = null;
   private mapMarksActive = false;
   /** Latched: an atom bomb of ours was seen in flight at least once. */
   private atomLaunchSeen = false;
@@ -126,12 +133,51 @@ export class TutorialPanel extends LitElement implements Controller {
     return this;
   }
 
+  /** The DOM panel is reused across matches; game evidence is not. */
+  init(): void {
+    this.gameGeneration++;
+    this.active = false;
+    this.classList.add("hidden");
+    this.started = false;
+    this.chapterRequested = false;
+    this.progress = new TutorialProgress(chapterSteps("basic"));
+    this.chapter = "basic";
+    this.ctx = null;
+    this.completeTicks = null;
+    this.guidePaused = false;
+    this.showingHint = false;
+    this.confirmingClose = false;
+    this.storageError = false;
+    this.lastSavedProgress = "";
+    this.conqueredPlayers = 0;
+    this.lastConquestTick = -1;
+    this.costs.clear();
+    this.mapMarksActive = false;
+    this.atomLaunchSeen = false;
+    this.boatSeen = false;
+    this.lastAttackRatio = null;
+    this.nationRelations.clear();
+    this.borderingIds = null;
+    this.hasCoast = null;
+    this.borderFetch = null;
+    this.attackNations = false;
+    this.highlight = null;
+  }
+
   tick() {
     // Deferred to the first tick so every controller's init() has already
     // subscribed to TutorialStateEvent.
     if (!this.started) {
       this.started = true;
-      this.setActive(!this.userSettings.tutorialDismissed());
+      const requested = consumeRequestedChapter();
+      if (requested) this.startChapter(requested);
+      // Fully occupied scenarios cannot teach the Classic wilderness course
+      // automatically. Explicit practice/resume remains available.
+      this.setActive(
+        this.chapterRequested ||
+          (!this.game.config().gameConfig().modernMode &&
+            !this.userSettings.tutorialDismissed()),
+      );
     }
     if (!this.active) return;
 
@@ -146,19 +192,26 @@ export class TutorialPanel extends LitElement implements Controller {
     }
 
     if (this.completeTicks !== null) {
-      if (++this.completeTicks >= COMPLETE_LINGER_TICKS) this.dismissForever();
       return;
     }
 
     if (this.game.ticks() % COST_POLL_TICKS === 0) {
-      player.buildables(undefined, COST_POLL_TYPES).then((buildables) => {
-        this.costs = new Map(buildables.map((b) => [b.type, b.cost]));
-      });
+      const generation = this.gameGeneration;
+      player
+        .buildables(undefined, COST_POLL_TYPES)
+        .then((buildables) => {
+          if (generation !== this.gameGeneration) return;
+          this.costs = new Map(buildables.map((b) => [b.type, b.cost]));
+        })
+        .catch(() => {
+          /* Retain unknown costs until the current worker responds. */
+        });
     }
 
     const ctx = this.buildContext(player);
-    this.progress.update(ctx);
+    if (!this.guidePaused) this.progress.update(ctx);
     this.ctx = ctx;
+    this.saveProgress();
 
     if (this.progress.finished()) {
       this.completeTicks = 0;
@@ -170,7 +223,9 @@ export class TutorialPanel extends LitElement implements Controller {
       this.refreshBordering(player);
     }
     const target =
-      step && !this.progress.stepDone() ? (step.highlight ?? null) : null;
+      step && !this.progress.stepDone() && !this.guidePaused
+        ? (step.highlight ?? null)
+        : null;
     this.setHighlight(target);
     this.syncMapMarkers(target);
     this.game.setOwnSpawnRing(target === "territory");
@@ -277,21 +332,28 @@ export class TutorialPanel extends LitElement implements Controller {
       this.borderFetch !== null
     )
       return;
-    this.borderFetch = player.borderTiles().then((bt) => {
-      this.borderFetch = null;
-      const myID = player.smallID();
-      const ids = new Set<number>();
-      let coast = false;
-      for (const tile of bt.borderTiles) {
-        if (this.game.isShore(tile)) coast = true;
-        for (const n of this.game.neighbors(tile)) {
-          const owner = this.game.ownerID(n);
-          if (owner !== 0 && owner !== myID) ids.add(owner);
+    const generation = this.gameGeneration;
+    this.borderFetch = player
+      .borderTiles()
+      .then((bt) => {
+        if (generation !== this.gameGeneration) return;
+        this.borderFetch = null;
+        const myID = player.smallID();
+        const ids = new Set<number>();
+        let coast = false;
+        for (const tile of bt.borderTiles) {
+          if (this.game.isShore(tile)) coast = true;
+          for (const n of this.game.neighbors(tile)) {
+            const owner = this.game.ownerID(n);
+            if (owner !== 0 && owner !== myID) ids.add(owner);
+          }
         }
-      }
-      this.borderingIds = ids;
-      this.hasCoast = coast;
-    });
+        this.borderingIds = ids;
+        this.hasCoast = coast;
+      })
+      .catch(() => {
+        if (generation === this.gameGeneration) this.borderFetch = null;
+      });
   }
 
   /**
@@ -312,15 +374,22 @@ export class TutorialPanel extends LitElement implements Controller {
     if (this.game.ticks() % 20 !== 0) return;
     const me = this.game.myPlayer();
     if (me === null) return;
+    const generation = this.gameGeneration;
     for (const id of ids) {
       const nation = this.game.playerBySmallID(id);
       if (!nation.isPlayer()) continue;
-      (nation as PlayerView).profile().then((profile) => {
-        this.nationRelations.set(
-          id,
-          profile.relations[me.smallID()] ?? Relation.Neutral,
-        );
-      });
+      (nation as PlayerView)
+        .profile()
+        .then((profile) => {
+          if (generation !== this.gameGeneration) return;
+          this.nationRelations.set(
+            id,
+            profile.relations[me.smallID()] ?? Relation.Neutral,
+          );
+        })
+        .catch(() => {
+          /* Unknown relations remain neutral while reconnecting. */
+        });
     }
   }
 
@@ -330,10 +399,25 @@ export class TutorialPanel extends LitElement implements Controller {
     const attackRatioMoved =
       this.lastAttackRatio !== null && attackRatio !== this.lastAttackRatio;
     this.lastAttackRatio = attackRatio;
+    // Only a real conquest event validates defeating an opponent. Neither
+    // issuing an attack nor banking gold counts as completing this practice.
+    if (this.lastConquestTick !== this.game.ticks()) {
+      this.lastConquestTick = this.game.ticks();
+      this.conqueredPlayers += (
+        this.game.updatesSinceLastTick()?.[GameUpdateType.ConquestEvent] ?? []
+      ).filter((c) => c.conquerorId === player.id()).length;
+    }
+    const completed = (type: UnitType) =>
+      player
+        .units(type)
+        .filter((unit) => unit.isActive() && !unit.isUnderConstruction())
+        .length;
     return {
       hasSpawned: player.hasSpawned(),
       inSpawnPhase: this.game.inSpawnPhase(),
       attacking: attacks.length > 0,
+      tilesOwned: player.numTilesOwned(),
+      conqueredPlayers: this.conqueredPlayers,
       attackRatioMoved,
       boatsDisabled: this.game.config().isUnitDisabled(UnitType.TransportShip),
       boatSent: (this.boatSeen ||=
@@ -349,19 +433,19 @@ export class TutorialPanel extends LitElement implements Controller {
       gold: player.gold(),
       cityCost: this.costs.get(UnitType.City) ?? null,
       cityDisabled: this.game.config().isUnitDisabled(UnitType.City),
-      cities: player.units(UnitType.City).length,
+      cities: completed(UnitType.City),
       portDisabled: this.game.config().isUnitDisabled(UnitType.Port),
-      ports: player.units(UnitType.Port).length,
+      ports: completed(UnitType.Port),
       defensePostDisabled: this.game
         .config()
         .isUnitDisabled(UnitType.DefensePost),
-      defensePosts: player.units(UnitType.DefensePost).length,
+      defensePosts: completed(UnitType.DefensePost),
       factoryDisabled: this.game.config().isUnitDisabled(UnitType.Factory),
-      factories: player.units(UnitType.Factory).length,
+      factories: completed(UnitType.Factory),
       warshipDisabled: this.game.config().isUnitDisabled(UnitType.Warship),
-      warships: player.units(UnitType.Warship).length,
+      warships: completed(UnitType.Warship),
       siloDisabled: this.game.config().isUnitDisabled(UnitType.MissileSilo),
-      silos: player.units(UnitType.MissileSilo).length,
+      silos: completed(UnitType.MissileSilo),
       atomDisabled: this.game.config().isUnitDisabled(UnitType.AtomBomb),
       // Mirrors PlayerImpl.nukeSpawn's ready-silo filter.
       siloReady: player
@@ -381,8 +465,105 @@ export class TutorialPanel extends LitElement implements Controller {
 
   private hotkeyFor(step: TutorialStep): string {
     if (!step.hotkey) return "";
-    this.keybinds ??= this.userSettings.parsedUserKeybinds();
-    return this.keybinds[step.hotkey]?.key ?? HOTKEY_FALLBACKS[step.hotkey];
+    const binding = this.userSettings.keybinds(Platform.isMac)[step.hotkey];
+    return binding
+      ? binding
+          .split("+")
+          .map((key) => key.replace(/^Key|^Digit/, ""))
+          .join(" + ")
+      : translateText("education.unbound");
+  }
+
+  public startChapter(id: TutorialChapterID, resume = false): void {
+    this.chapterRequested = true;
+    this.chapter = id;
+    this.progress = new TutorialProgress(chapterSteps(id));
+    if (!resume) {
+      this.conqueredPlayers = 0;
+      // An update already delivered before this chapter began is old evidence.
+      this.lastConquestTick = this.game.ticks();
+    }
+    if (resume) {
+      const saved = this.progressStore.load(id);
+      if (saved) this.progress.restore(saved);
+    }
+    this.completeTicks = null;
+    this.confirmingClose = false;
+    this.guidePaused = false;
+    this.showingHint = false;
+    this.lastSavedProgress = "";
+    this.userSettings?.setTutorialDismissed(false);
+    this.setActive(true);
+  }
+
+  public educationSnapshot() {
+    return {
+      panelVersion: 1 as const,
+      active: this.active,
+      guidePaused: this.guidePaused,
+      chapter: this.chapter,
+      progress: this.progress.snapshot(),
+      evidence: {
+        conqueredPlayers: this.conqueredPlayers,
+        atomLaunchSeen: this.atomLaunchSeen,
+        boatSeen: this.boatSeen,
+      },
+    };
+  }
+
+  public restoreEducationSnapshot(saved: {
+    panelVersion?: 1;
+    active?: boolean;
+    guidePaused?: boolean;
+    chapter: TutorialChapterID;
+    progress: TutorialProgressSnapshot;
+    evidence?: {
+      conqueredPlayers: number;
+      atomLaunchSeen: boolean;
+      boatSeen: boolean;
+    };
+  }): boolean {
+    if (!TUTORIAL_CHAPTERS.some((c) => c.id === saved.chapter)) return false;
+    if (
+      (saved.panelVersion !== undefined && saved.panelVersion !== 1) ||
+      (saved.active !== undefined && typeof saved.active !== "boolean") ||
+      (saved.guidePaused !== undefined &&
+        typeof saved.guidePaused !== "boolean")
+    )
+      return false;
+    const progress = new TutorialProgress(chapterSteps(saved.chapter));
+    if (!progress.restore(saved.progress)) return false;
+    this.chapter = saved.chapter;
+    this.progress = progress;
+    // Previous saves captured a basic cursor even when the panel was hidden.
+    // Missing visibility must never turn that cursor into a Modern lesson.
+    const active =
+      saved.active ??
+      (!this.game.config().gameConfig().modernMode &&
+        !this.userSettings.tutorialDismissed());
+    this.started = true;
+    this.chapterRequested = active;
+    this.guidePaused = saved.guidePaused ?? false;
+    this.completeTicks = progress.finished() ? 0 : null;
+    this.confirmingClose = false;
+    this.showingHint = false;
+    this.lastSavedProgress = "";
+    if (saved.evidence) {
+      this.conqueredPlayers = saved.evidence.conqueredPlayers;
+      this.atomLaunchSeen = saved.evidence.atomLaunchSeen;
+      this.boatSeen = saved.evidence.boatSeen;
+    }
+    this.lastConquestTick = this.game.ticks();
+    this.setActive(active);
+    return true;
+  }
+
+  private saveProgress(): void {
+    const snapshot = this.progress.snapshot();
+    const serialized = JSON.stringify(snapshot);
+    if (serialized === this.lastSavedProgress) return;
+    this.storageError = !this.progressStore.save(this.chapter, snapshot);
+    if (!this.storageError) this.lastSavedProgress = serialized;
   }
 
   private setHighlight(target: TutorialHighlight | null) {
@@ -440,7 +621,96 @@ export class TutorialPanel extends LitElement implements Controller {
             </button>
           </span>
         </div>
+        <div class="flex flex-wrap items-center gap-2 mb-1 text-xs">
+          <label>
+            ${translateText("education.chapter")}
+            <select
+              class="bg-gray-900 border border-gray-500 rounded px-1 py-0.5"
+              .value=${this.chapter}
+              @change=${(event: Event) =>
+                this.startChapter(
+                  (event.target as HTMLSelectElement)
+                    .value as TutorialChapterID,
+                )}
+            >
+              ${TUTORIAL_CHAPTERS.map(
+                (chapter) =>
+                  html`<option value=${chapter.id}>
+                    ${translateText(`education.chapters.${chapter.id}`)}
+                  </option>`,
+              )}
+            </select>
+          </label>
+          <button
+            class="underline"
+            @click=${() => this.startChapter(this.chapter)}
+          >
+            ${translateText("education.repeat")}
+          </button>
+          <button
+            class="underline"
+            @click=${() => this.startChapter(this.chapter, true)}
+          >
+            ${translateText("education.resume")}
+          </button>
+          <button
+            class="underline"
+            @click=${() => (this.guidePaused = !this.guidePaused)}
+          >
+            ${translateText(
+              this.guidePaused
+                ? "education.resume_guide"
+                : "education.pause_guide",
+            )}
+          </button>
+          <button
+            class="underline"
+            @click=${() => (this.showingHint = !this.showingHint)}
+          >
+            ${translateText("education.hint")}
+          </button>
+          <button
+            class="underline"
+            @click=${() => {
+              const stepId = this.progress.current()?.id;
+              const feature = EDUCATION_FEATURES.find((feature) =>
+                feature.tutorialSteps.includes(stepId ?? ""),
+              );
+              const help = document.querySelector(
+                "help-modal",
+              ) as HelpModal | null;
+              if (feature && help) help.openFeature(feature.featureId);
+            }}
+          >
+            ${translateText("main.help")}
+          </button>
+        </div>
+        ${this.game.config().gameConfig().training
+          ? html`<p class="text-xs text-blue-200 mb-1">
+              <strong>${translateText("education.trainee")}:</strong>
+              ${translateText("education.training_rules")}
+            </p>`
+          : nothing}
         ${this.confirmingClose ? this.renderCloseChoice() : this.renderStep()}
+        ${this.showingHint
+          ? html`<p class="text-xs text-blue-200 mt-1">
+              ${translateText(
+                Platform.isTouch
+                  ? "education.touch_hint"
+                  : "education.practice_hint",
+              )}
+            </p>`
+          : nothing}
+        ${this.guidePaused
+          ? html`<p class="text-xs text-yellow-200">
+              ${translateText("education.guide_paused")}
+            </p>`
+          : nothing}
+        ${this.storageError
+          ? html`<p role="status" class="text-xs text-yellow-200">
+              ${translateText("education.storage_error")}
+            </p>`
+          : nothing}
       </div>
     `;
   }
@@ -502,7 +772,15 @@ export class TutorialPanel extends LitElement implements Controller {
 
   private renderStep() {
     if (this.completeTicks !== null) {
-      return html`<p>${translateText("tutorial.complete")}</p>`;
+      const outcomes = Object.values(this.progress.result());
+      return html`<p>
+        ${translateText("education.chapter_complete", {
+          practiced: outcomes.filter((outcome) => outcome === "practiced")
+            .length,
+          read: outcomes.filter((outcome) => outcome === "read").length,
+          skipped: outcomes.filter((outcome) => outcome === "skipped").length,
+        })}
+      </p>`;
     }
     const step = this.progress.current();
     if (step === null) return nothing;
@@ -525,11 +803,22 @@ export class TutorialPanel extends LitElement implements Controller {
               )}
             </ul>`
           : html`<span dir="auto">${this.stepText(step, done)}</span>`}
+        ${done
+          ? html`<span class="block text-xs text-green-200 mt-1"
+              >${translateText(
+                step.manual
+                  ? "education.read_confirmed"
+                  : "education.practice_confirmed",
+              )}</span
+            >`
+          : nothing}
       </p>
     `;
   }
 
   private stepText(step: TutorialStep, done: boolean): string {
+    if (step.id === "spawn" && this.game.config().gameConfig().training)
+      return translateText("education.training_spawn");
     // Multiplayer: the spot is picked but the spawn timer is still running,
     // so don't keep asking the player to pick one.
     if (!done && step.id === "spawn" && this.ctx?.hasSpawned) {
@@ -562,6 +851,13 @@ export class TutorialPanel extends LitElement implements Controller {
       !done && step.id === "capture_tribes" && this.attackNations
         ? "attack_nations"
         : step.id;
+    if (
+      id === "attack_wilderness" ||
+      id === "capture_tribes" ||
+      id === "attack_nations"
+    ) {
+      return translateText(`education.practice.${id}`);
+    }
     const block =
       Platform.isTouch && TOUCH_TEXT_STEPS.has(id) ? "step_touch" : "step";
     return translateText(`tutorial.${block}.${id}`, {

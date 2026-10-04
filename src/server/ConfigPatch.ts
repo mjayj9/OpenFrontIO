@@ -1,4 +1,5 @@
 import { GameConfig } from "../core/Schemas";
+import { GameMapType } from "../core/game/Game";
 
 // The host edits its lobby through update_game_config, which carries a
 // partial GameConfig. Only the keys listed here are taken from it. gameType,
@@ -30,6 +31,8 @@ const COPIED_KEYS = [
   "anonymizeNames",
   "nameReveals",
   "nameRevealPublicIds",
+  "enhancedAI",
+  "modernMode",
 ] as const satisfies readonly (keyof GameConfig)[];
 
 // `.nullable().optional()` in the schema: the wire says null to clear a
@@ -81,6 +84,12 @@ export function applyGameConfigPatch(
   }
   for (const key of NULLABLE_KEYS) {
     copyNullable(target, patch, key);
+  }
+  if (
+    patch.gameMap !== undefined &&
+    patch.gameMap !== GameMapType.ModernWorld
+  ) {
+    delete target.modernMode;
   }
   // Unconditional on purpose: the host clears cheats by omitting hostCheats
   // (the full config it sends has hostCheats: undefined when the toggle is
