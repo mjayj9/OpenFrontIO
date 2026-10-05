@@ -20,17 +20,17 @@ core와 구별하여 기록한다. 최종 mixed 두 표본의 p95 증가는8.60%
 
 ## 검증 소스와 게시 식별자
 
-| 단계                            | 식별자·범위                                             | 이 보고서의 사용                                                                                                                                |
-| ------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| 고정 원본                       | `e02eeba66b4801ebae0b686e1b0e4bc03fbf3654`              | 기존 디자인·아이콘·병력 곡선 비교                                                                                                               |
-| 사용자 보고 버전                | `36d5ddebc37e1a731dadca9912ea39d0992297c8`              | 새 재현과 동일 조건 성능 비교 전 소스                                                                                                           |
-| 성능 측정 동결                  | core fingerprint `4bd7f36b1403`                         | 새 프로세스 9회 순차 측정. 이후 후보의 수치로 표시하지 않음                                                                                     |
-| 실제 입력·교육 후보             | core `64a4a035a0e4`, client `index-1gRSTbfm.js`         | 데스크톱·CDP 터치·세 기지·공군5/지도지휘12 실습 및 동결 전체 검사                                                                               |
-| 문구 보완 뒤 저장 후보          | 같은 core `64a4a035a0e4`, client `index-Ij_RIZI-.js`    | 일반400K 시작·이동/대기열 저장·이어하기. 앞 후보와 client fingerprint가 다른 단계                                                               |
-| native Port 수정·새 저장        | core `84bebb823344`, client `index-CYaFHMjv.js`         | 실제 거절573713·보정627705→631703·유료 완공, 새 같은 빌드 저장·복원. 전체 portable 7,742개 검사 단계                                            |
-| 저장 패널·모바일 저장 버튼 배치 | 같은 core `84bebb823344`, client `index-C0kthejy.js`    | SavePanel1002 실제 클릭, 1000×760/CDP DPR2의 두 유효 곡선. 이전 client와 구별                                                                   |
-| 최종 배포 UI                    | core `84bebb823344`, client `index-BQUAIhRR.js`         | 도움말 [] 표시·모바일 저장 버튼·SavePanel1002, 저장48/복원·실제 재개·DPR2·재시작·리플레이. 마지막 UI 범위4파일11검사와 build/lint를 별도로 실행 |
-| 최종 게시                       | Git commit: **게시 후 기록**, 기존 draft PR **#1 유지** | core fingerprint와 Git commit을 혼동하지 않음                                                                                                   |
+| 단계                            | 식별자·범위                                                                       | 이 보고서의 사용                                                                                                                                |
+| ------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 고정 원본                       | `e02eeba66b4801ebae0b686e1b0e4bc03fbf3654`                                        | 기존 디자인·아이콘·병력 곡선 비교                                                                                                               |
+| 사용자 보고 버전                | `36d5ddebc37e1a731dadca9912ea39d0992297c8`                                        | 새 재현과 동일 조건 성능 비교 전 소스                                                                                                           |
+| 성능 측정 동결                  | core fingerprint `4bd7f36b1403`                                                   | 새 프로세스 9회 순차 측정. 이후 후보의 수치로 표시하지 않음                                                                                     |
+| 실제 입력·교육 후보             | core `64a4a035a0e4`, client `index-1gRSTbfm.js`                                   | 데스크톱·CDP 터치·세 기지·공군5/지도지휘12 실습 및 동결 전체 검사                                                                               |
+| 문구 보완 뒤 저장 후보          | 같은 core `64a4a035a0e4`, client `index-Ij_RIZI-.js`                              | 일반400K 시작·이동/대기열 저장·이어하기. 앞 후보와 client fingerprint가 다른 단계                                                               |
+| native Port 수정·새 저장        | core `84bebb823344`, client `index-CYaFHMjv.js`                                   | 실제 거절573713·보정627705→631703·유료 완공, 새 같은 빌드 저장·복원. 전체 portable 7,742개 검사 단계                                            |
+| 저장 패널·모바일 저장 버튼 배치 | 같은 core `84bebb823344`, client `index-C0kthejy.js`                              | SavePanel1002 실제 클릭, 1000×760/CDP DPR2의 두 유효 곡선. 이전 client와 구별                                                                   |
+| 최종 배포 UI                    | core `84bebb823344`, client `index-BQUAIhRR.js`                                   | 도움말 [] 표시·모바일 저장 버튼·SavePanel1002, 저장48/복원·실제 재개·DPR2·재시작·리플레이. 마지막 UI 범위4파일11검사와 build/lint를 별도로 실행 |
+| 검증 코드·게시                  | Git commit: `2107742e010f5e8cbc5f5f25260c97148be42eff`, 기존 draft PR **#1 유지** | 같은 소스의 후속 문서 커밋과 core fingerprint를 구별함                                                                                          |
 
 ## 증상과 실제 원인
 
@@ -347,7 +347,7 @@ preview 주소·포트는 실행 출력에서 확인한다. 브라우저 검증�
 
 | 최종 추가 수정 후 확정할 항목                                | 결과                                                                                                                                                          |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 게시 commit / production core·client fingerprint             | Git commit: **게시 후 기록**. core `84bebb823344` / client `index-BQUAIhRR.js` / 기록 build `01021f0d…a5a29`                                                  |
+| 검증 코드 commit / production core·client fingerprint        | Git commit: `2107742e010f5e8cbc5f5f25260c97148be42eff`. core `84bebb823344` / client `index-BQUAIhRR.js` / 기록 build `01021f0d…a5a29`                        |
 | 최종 build-prod / lint / portable / server                   | 최종 release tsc/vite0·자산2,151개·lint0. native Port 포함 portable615파일7,742PASS/1skip, server81파일904PASS(중복). 이후 UI 범위4파일11PASS(중복 합산 없음) |
 | native Port 거절573713·실제 배치 보정627705→631703·확정 race | core84/clientCYa 실제 거절·ghost·50tick 유료 완공 PASS. 확정 race는 자동 회귀, 실제 race 플레이는 미실행                                                      |
 | SavePanel 가림·클릭·저장·복원·재개·재시작·리플레이           | 최종 BQU client의 SavePanel1002 실제 클릭·DPR2 경로,48tick 동일 저장/복원,64→141 실제 재개,142→22 새 재시작·초기화, 공개 파일 리플레이 앞뒤 이동 확인         |
@@ -361,6 +361,15 @@ preview 주소·포트는 실행 출력에서 확인한다. 브라우저 검증�
 `HelpModal.ts`, `SavePanel.ts`와 EN/KO 교육·언어 자료이다. 파일별 검증은 위
 세부 보고서와 새 회귀 검사에 연결한다. 기존 draft PR#1을 유지하며 준비 완료로
 전환하거나 이전 미달을 삭제하지 않는다.
+
+검증 코드 커밋은 [2107742e0](https://github.com/mjayj9/OpenFrontIO/commit/2107742e010f5e8cbc5f5f25260c97148be42eff)이다.
+후속 커밋은 이 게시 식별자와 문서만 기록하며 실행 소스를 바꾸지 않는다.
+커밋 전후 `src`·`zbin`·`package-lock.json`의 기록 build hash는
+`01021f0de686da860e30a6c96f8a06a16e5771c91d10a30d2a24db95027a5a29`로 같았다.
+최종 문서·증거 JSON·obsolete 번역 키 목록의 서식 정리는 데이터 값과 실행 소스를
+바꾸지 않았으며, 현재 체크아웃에는 `npm run inst`의 ignore-scripts 설치 때문에
+Husky hook 경로가 설정되어 있지 않았다. 별도로 실행한 lint·build·서식 검사 결과를
+hook 실행으로 표시하지 않는다. 현재 게시 head는 기존 draft PR#1에서 확인할 수 있다.
 
 ## 남은 검증 범위
 
