@@ -93,6 +93,26 @@ const TOUCH_TEXT_STEPS = new Set([
   "launch_atom",
 ]);
 
+const MODERN_TOUCH_TEXT_STEPS = new Set([
+  "modern_camera",
+  "modern_branches",
+  "modern_select",
+  "modern_box_select",
+  "modern_cursor",
+  "modern_army_move",
+  "modern_queue",
+  "modern_stop",
+  "modern_armybase",
+  "modern_army_train",
+  "modern_navybase",
+  "modern_navy_move",
+  "modern_airbase",
+  "modern_air_produce",
+  "modern_air_launch",
+  "modern_air_return",
+  "modern_air_intercept",
+]);
+
 @customElement("tutorial-panel")
 export class TutorialPanel extends LitElement implements Controller {
   public game: GameView;
@@ -104,6 +124,7 @@ export class TutorialPanel extends LitElement implements Controller {
   @state() private confirmingClose = false;
   @state() private ctx: TutorialContext | null = null;
   @state() private chapter: TutorialChapterID = "basic";
+  @state() private showingOptions = false;
   @state() private guidePaused = false;
   @state() private showingHint = false;
   @state() private storageError = false;
@@ -151,6 +172,9 @@ export class TutorialPanel extends LitElement implements Controller {
   private modernPortRecoveries = new Set<string>();
   private modernNuclearTargets = new Map<number, [number, number]>();
   private modernNuclearImpacts = new Set<number>();
+  private modernHighlightElement: HTMLElement | null = null;
+  private modernQueuedOrderIds = new Set<string>();
+  private guideHome: { parent: Node; next: ChildNode | null } | null = null;
 
   createRenderRoot() {
     return this;
@@ -158,10 +182,35 @@ export class TutorialPanel extends LitElement implements Controller {
 
   /** The DOM panel is reused across matches; game evidence is not. */
   init(): void {
+    // The original bottom HUD forms a z=200 stacking context. Modern practice
+    // sits near the top of the map and must remain clickable above z=900
+    // leaderboards; preserve the original DOM placement for Classic.
+    const modern = this.game.config().gameConfig().modernMode?.version === 2;
+    if (modern && this.parentNode && this.parentNode !== document.body) {
+      this.guideHome ??= { parent: this.parentNode, next: this.nextSibling };
+      document.body.append(this);
+    } else if (!modern && this.guideHome) {
+      const { parent, next } = this.guideHome;
+      if (parent.isConnected)
+        parent.insertBefore(this, next?.parentNode === parent ? next : null);
+      this.guideHome = null;
+    }
+    for (const name of [
+      "fixed",
+      "inset-x-0",
+      "top-0",
+      "z-[960]",
+      "pointer-events-none",
+    ])
+      this.classList.toggle(name, modern);
+    this.modernHighlightElement?.classList.remove("ring-2", "ring-yellow-300");
+    this.modernHighlightElement = null;
+    this.modernQueuedOrderIds.clear();
     this.gameGeneration++;
     this.active = false;
     this.classList.add("hidden");
     this.started = false;
+    this.showingOptions = false;
     this.chapterRequested = false;
     this.progress = new TutorialProgress(chapterSteps("basic"));
     this.chapter = "basic";
@@ -194,6 +243,32 @@ export class TutorialPanel extends LitElement implements Controller {
     this.modernPortRecoveries.clear();
     this.modernNuclearTargets.clear();
     this.modernNuclearImpacts.clear();
+    this.uiState.modernCameraMoves = 0;
+    this.uiState.modernZoomChanges = 0;
+    this.uiState.modernBoxSelections = 0;
+    this.uiState.modernAdditionalSelections = 0;
+    this.uiState.modernCursorPreviewCount = 0;
+    this.uiState.modernQueuedOrders = 0;
+  }
+
+  dispose(): void {
+    this.gameGeneration++;
+    this.setActive(false);
+    this.modernHighlightElement?.classList.remove("ring-2", "ring-yellow-300");
+    this.modernHighlightElement = null;
+    if (this.guideHome) {
+      const { parent, next } = this.guideHome;
+      if (parent.isConnected)
+        parent.insertBefore(this, next?.parentNode === parent ? next : null);
+      this.guideHome = null;
+    }
+    this.classList.remove(
+      "fixed",
+      "inset-x-0",
+      "top-0",
+      "z-[960]",
+      "pointer-events-none",
+    );
   }
 
   tick() {
@@ -271,6 +346,7 @@ export class TutorialPanel extends LitElement implements Controller {
         : null;
     this.setHighlight(target);
     this.syncMapMarkers(target);
+    this.syncModernHighlight(step?.id ?? null);
     this.game.setOwnSpawnRing(target === "territory");
   }
 
@@ -553,6 +629,19 @@ export class TutorialPanel extends LitElement implements Controller {
       (force) => force.playerId === player.id(),
     );
     for (const force of forces) {
+      // A submitted Intent is not success. Count only orders acknowledged in
+      // the worker's actual queue, and keep identities across save/resume.
+      for (const order of force.queue ?? []) {
+        const id = `${force.id}:${order.issuedTick}:${order.kind}:${order.target}`;
+        if (
+          !this.modernQueuedOrderIds.has(id) &&
+          this.modernQueuedOrderIds.size < 1024
+        ) {
+          this.modernQueuedOrderIds.add(id);
+          this.uiState.modernQueuedOrders =
+            (this.uiState.modernQueuedOrders ?? 0) + 1;
+        }
+      }
       const previous = this.modernPhases.get(force.id);
       if (force.branch === "air" && previous !== force.phase) {
         if (force.phase === "outbound") this.modernAirOutbounds++;
@@ -623,6 +712,36 @@ export class TutorialPanel extends LitElement implements Controller {
               faction.population.air,
       ),
       branchesUsed: [...(this.uiState.modernBranchesUsed ?? [])],
+      cameraMoves: this.uiState.modernCameraMoves ?? 0,
+      zoomChanges: this.uiState.modernZoomChanges ?? 0,
+      cursorPreviews: this.uiState.modernCursorPreviewCount ?? 0,
+      boxSelections: this.uiState.modernBoxSelections ?? 0,
+      additionalSelections: this.uiState.modernAdditionalSelections ?? 0,
+      queuedOrders: this.uiState.modernQueuedOrders ?? 0,
+      armyBasesCompleted: (systems.completedProduction ?? [])
+        .filter(
+          (entry) =>
+            entry.playerId === player.id() && entry.kind === "armybase",
+        )
+        .reduce((n, entry) => n + entry.count, 0),
+      armyTrained: (systems.completedProduction ?? [])
+        .filter(
+          (entry) => entry.playerId === player.id() && entry.kind === "army",
+        )
+        .reduce((n, entry) => n + entry.count, 0),
+      navalBasesCompleted: (systems.completedProduction ?? [])
+        .filter(
+          (entry) =>
+            entry.playerId === player.id() && entry.kind === "navybase",
+        )
+        .reduce((n, entry) => n + entry.count, 0),
+      aircraftProduced: (systems.completedProduction ?? [])
+        .filter(
+          (entry) =>
+            entry.playerId === player.id() &&
+            ["fighter", "strike"].includes(entry.kind),
+        )
+        .reduce((n, entry) => n + entry.count, 0),
       selectionCount: this.uiState.modernSelectedForceIds?.length ?? 0,
       armyMissions: forces
         .filter((force) => force.branch === "army")
@@ -643,7 +762,11 @@ export class TutorialPanel extends LitElement implements Controller {
         .filter((force) => force.branch === "army")
         .reduce((sum, force) => sum + force.casualties, 0),
       airBases: systems.bases.filter(
-        (base) => base.playerId === player.id() && base.health > 0,
+        (base) =>
+          base.playerId === player.id() &&
+          (base.branch ?? "air") === "air" &&
+          base.health > 0 &&
+          (base.completesTick ?? 0) <= this.game.ticks(),
       ).length,
       completedTraining: own.completedTraining,
       portCaptures: ports.reduce((sum, port) => sum + port.captureCount, 0),
@@ -667,7 +790,12 @@ export class TutorialPanel extends LitElement implements Controller {
 
   private hotkeyFor(step: TutorialStep): string {
     if (!step.hotkey) return "";
-    const binding = this.userSettings.keybinds(Platform.isMac)[step.hotkey];
+    const binding = this.userSettings.effectiveKeybinds(
+      this.game.config().gameConfig().modernMode?.version === 2
+        ? "modern"
+        : "classic",
+      Platform.isMac,
+    )[step.hotkey];
     return binding
       ? binding
           .split("+")
@@ -737,6 +865,13 @@ export class TutorialPanel extends LitElement implements Controller {
           blockades: [...this.modernBlockades],
           branches: this.uiState.modernBranchesUsed ?? [],
           completedStops: this.uiState.modernCompletedStops ?? 0,
+          cameraMoves: this.uiState.modernCameraMoves ?? 0,
+          zoomChanges: this.uiState.modernZoomChanges ?? 0,
+          boxSelections: this.uiState.modernBoxSelections ?? 0,
+          additionalSelections: this.uiState.modernAdditionalSelections ?? 0,
+          cursorPreviews: this.uiState.modernCursorPreviewCount ?? 0,
+          queuedOrders: this.uiState.modernQueuedOrders ?? 0,
+          queuedOrderIds: [...this.modernQueuedOrderIds],
           climatePreviewAdapted:
             this.uiState.modernClimatePreviewAdapted ?? false,
           climatePreviewHarsh: this.uiState.modernClimatePreviewHarsh ?? false,
@@ -774,6 +909,13 @@ export class TutorialPanel extends LitElement implements Controller {
         blockades: string[];
         branches: string[];
         completedStops: number;
+        cameraMoves?: number;
+        zoomChanges?: number;
+        boxSelections?: number;
+        additionalSelections?: number;
+        cursorPreviews?: number;
+        queuedOrders?: number;
+        queuedOrderIds?: string[];
         climatePreviewAdapted: boolean;
         climatePreviewHarsh: boolean;
         aiInfoInspected?: boolean;
@@ -809,6 +951,15 @@ export class TutorialPanel extends LitElement implements Controller {
     const modernEvidence = evidence?.modern;
     if (
       modernEvidence &&
+      (!Array.isArray(modernEvidence.queuedOrderIds ?? []) ||
+        (modernEvidence.queuedOrderIds ?? []).length > 1024 ||
+        !(modernEvidence.queuedOrderIds ?? []).every(
+          (id) => typeof id === "string" && id.length <= 256,
+        ))
+    )
+      return false;
+    if (
+      modernEvidence &&
       (!Array.isArray(modernEvidence.nuclearTargets ?? []) ||
         (modernEvidence.nuclearTargets ?? []).length > 64 ||
         !(modernEvidence.nuclearTargets ?? []).every(
@@ -831,6 +982,12 @@ export class TutorialPanel extends LitElement implements Controller {
         modernEvidence.returns,
         modernEvidence.rearms,
         modernEvidence.completedStops,
+        modernEvidence.cameraMoves ?? 0,
+        modernEvidence.zoomChanges ?? 0,
+        modernEvidence.boxSelections ?? 0,
+        modernEvidence.additionalSelections ?? 0,
+        modernEvidence.cursorPreviews ?? 0,
+        modernEvidence.queuedOrders ?? 0,
         modernEvidence.adaptedBattles ?? 0,
         modernEvidence.harshBattles ?? 0,
       ].every((value) => Number.isSafeInteger(value) && value >= 0) ||
@@ -893,6 +1050,7 @@ export class TutorialPanel extends LitElement implements Controller {
       this.boatSeen = saved.evidence.boatSeen;
       if (saved.evidence.modern) {
         const modern = saved.evidence.modern;
+        this.modernQueuedOrderIds = new Set(modern.queuedOrderIds ?? []);
         this.modernPhases = new Map(modern.phases);
         this.modernAirOutbounds = modern.outbounds;
         this.modernAirReturns = modern.returns;
@@ -900,6 +1058,13 @@ export class TutorialPanel extends LitElement implements Controller {
         this.modernBlockades = new Set(modern.blockades);
         this.uiState.modernBranchesUsed = [...modern.branches];
         this.uiState.modernCompletedStops = modern.completedStops;
+        this.uiState.modernCameraMoves = modern.cameraMoves ?? 0;
+        this.uiState.modernZoomChanges = modern.zoomChanges ?? 0;
+        this.uiState.modernBoxSelections = modern.boxSelections ?? 0;
+        this.uiState.modernAdditionalSelections =
+          modern.additionalSelections ?? 0;
+        this.uiState.modernCursorPreviewCount = modern.cursorPreviews ?? 0;
+        this.uiState.modernQueuedOrders = modern.queuedOrders ?? 0;
         this.uiState.modernClimatePreviewAdapted = modern.climatePreviewAdapted;
         this.uiState.modernClimatePreviewHarsh = modern.climatePreviewHarsh;
         this.uiState.modernAIInfoInspected = modern.aiInfoInspected ?? false;
@@ -935,6 +1100,41 @@ export class TutorialPanel extends LitElement implements Controller {
     this.highlight = target;
     this.eventBus.emit(new TutorialHighlightEvent(target));
   }
+  private syncModernHighlight(stepId: string | null): void {
+    const targets: Record<string, string> = {
+      modern_branches: "army",
+      modern_select: "selection",
+      modern_box_select: "selection",
+      modern_cursor: "selection",
+      modern_army_move: "selection",
+      modern_queue: "selection",
+      modern_stop: "stop",
+      modern_armybase: "armybase",
+      modern_army_train: "army",
+      modern_navybase: "navybase",
+      modern_navy_move: "navy",
+      modern_airbase: "airbase",
+      modern_air_produce: "fighter",
+      modern_air_launch: "air",
+      modern_population: "production",
+      modern_mobilization: "production",
+    };
+    const target = stepId ? targets[stepId] : undefined;
+    const panel = document.querySelector("modern-command-panel");
+    const element = target
+      ? (panel?.querySelector<HTMLElement>(
+          `[data-modern-highlight="${target}"]`,
+        ) ??
+        panel?.querySelector<HTMLElement>(
+          '[data-modern-highlight="production"]',
+        ) ??
+        null)
+      : null;
+    if (element === this.modernHighlightElement) return;
+    this.modernHighlightElement?.classList.remove("ring-2", "ring-yellow-300");
+    this.modernHighlightElement = element ?? null;
+    this.modernHighlightElement?.classList.add("ring-2", "ring-yellow-300");
+  }
 
   private setActive(active: boolean) {
     if (this.active === active) return;
@@ -943,6 +1143,7 @@ export class TutorialPanel extends LitElement implements Controller {
     // the flow when hidden so it doesn't add a gap there.
     this.classList.toggle("hidden", !active);
     if (!active) {
+      this.syncModernHighlight(null);
       this.setHighlight(null);
       this.syncMapMarkers(null);
       this.game.setOwnSpawnRing(false);
@@ -956,17 +1157,43 @@ export class TutorialPanel extends LitElement implements Controller {
 
   render() {
     if (!this.active) return nothing;
+    const modernGuide = this.ctx?.modern !== undefined;
     return html`
       <div
+        data-modern-guide=${modernGuide ? "true" : "false"}
         dir=${textDirection()}
-        class="pointer-events-auto w-full sm:rounded-lg bg-gray-800/92 backdrop-blur-sm shadow-lg text-white text-base p-2 sm:mb-1"
+        class="pointer-events-auto ${modernGuide
+          ? "fixed top-16 left-1/2 -translate-x-1/2 w-[min(500px,calc(100vw-1rem))] max-h-[35vh] overflow-y-auto"
+          : "w-full"} sm:rounded-lg bg-gray-800/92 backdrop-blur-sm shadow-lg text-white text-base p-2 sm:mb-1"
         @contextmenu=${(e: MouseEvent) => e.preventDefault()}
       >
         <div class="flex items-center justify-between gap-2 mb-1">
-          <span
-            class="font-bold text-cyber-yellow uppercase tracking-wide text-sm"
-            >${translateText("tutorial.title")}</span
-          >
+          <span class="flex items-center gap-2">
+            <span
+              class="font-bold text-cyber-yellow uppercase tracking-wide text-sm"
+              >${translateText("tutorial.title")}</span
+            >
+            ${modernGuide
+              ? html`
+                  <button
+                    class="text-xs underline font-normal"
+                    @click=${() => (this.showingOptions = !this.showingOptions)}
+                    aria-expanded=${this.showingOptions}
+                  >
+                    ${translateText("education.chapter")}
+                  </button>
+                  <button
+                    class="text-xs underline font-normal"
+                    @click=${() =>
+                      document
+                        .querySelector<HelpModal>("help-modal")
+                        ?.openControls()}
+                  >
+                    ${translateText("repair.open_controls")}
+                  </button>
+                `
+              : nothing}
+          </span>
           <span class="flex items-center gap-2 text-sm text-gray-300">
             ${this.confirmingClose ? nothing : this.renderHeaderActions()}
             ${this.ctx && !this.progress.finished()
@@ -985,74 +1212,77 @@ export class TutorialPanel extends LitElement implements Controller {
             </button>
           </span>
         </div>
-        <div class="flex flex-wrap items-center gap-2 mb-1 text-xs">
-          <label>
-            ${translateText("education.chapter")}
-            <select
-              class="bg-gray-900 border border-gray-500 rounded px-1 py-0.5"
-              .value=${this.chapter}
-              @change=${(event: Event) =>
-                this.chooseChapter(
-                  (event.target as HTMLSelectElement)
-                    .value as TutorialChapterID,
+        ${!modernGuide || this.showingOptions
+          ? html`<div class="flex flex-wrap items-center gap-2 mb-1 text-xs">
+              <label>
+                ${translateText("education.chapter")}
+                <select
+                  class="bg-gray-900 border border-gray-500 rounded px-1 py-0.5"
+                  .value=${this.chapter}
+                  @change=${(event: Event) =>
+                    this.chooseChapter(
+                      (event.target as HTMLSelectElement)
+                        .value as TutorialChapterID,
+                    )}
+                >
+                  ${TUTORIAL_CHAPTERS.map(
+                    (chapter) =>
+                      html`<option
+                        value=${chapter.id}
+                        ?selected=${chapter.id === this.chapter}
+                      >
+                        ${translateText(`education.chapters.${chapter.id}`)}
+                      </option>`,
+                  )}
+                </select>
+              </label>
+              <button
+                class="underline"
+                @click=${() => this.chooseChapter(this.chapter, true)}
+              >
+                ${translateText("education.repeat")}
+              </button>
+              <button
+                class="underline"
+                @click=${() => this.startChapter(this.chapter, true)}
+              >
+                ${translateText("education.resume")}
+              </button>
+              <button
+                class="underline"
+                @click=${() => (this.guidePaused = !this.guidePaused)}
+              >
+                ${translateText(
+                  this.guidePaused
+                    ? "education.resume_guide"
+                    : "education.pause_guide",
                 )}
-            >
-              ${TUTORIAL_CHAPTERS.map(
-                (chapter) =>
-                  html`<option
-                    value=${chapter.id}
-                    ?selected=${chapter.id === this.chapter}
-                  >
-                    ${translateText(`education.chapters.${chapter.id}`)}
-                  </option>`,
-              )}
-            </select>
-          </label>
-          <button
-            class="underline"
-            @click=${() => this.chooseChapter(this.chapter, true)}
-          >
-            ${translateText("education.repeat")}
-          </button>
-          <button
-            class="underline"
-            @click=${() => this.startChapter(this.chapter, true)}
-          >
-            ${translateText("education.resume")}
-          </button>
-          <button
-            class="underline"
-            @click=${() => (this.guidePaused = !this.guidePaused)}
-          >
-            ${translateText(
-              this.guidePaused
-                ? "education.resume_guide"
-                : "education.pause_guide",
-            )}
-          </button>
-          <button
-            class="underline"
-            @click=${() => (this.showingHint = !this.showingHint)}
-          >
-            ${translateText("education.hint")}
-          </button>
-          <button
-            class="underline"
-            @click=${() => {
-              const stepId = this.progress.current()?.id;
-              const feature = EDUCATION_FEATURES.find((feature) =>
-                feature.tutorialSteps.includes(stepId ?? ""),
-              );
-              const help = document.querySelector(
-                "help-modal",
-              ) as HelpModal | null;
-              if (feature && help) help.openFeature(feature.featureId);
-            }}
-          >
-            ${translateText("main.help")}
-          </button>
-        </div>
-        ${this.game.config().gameConfig().training
+              </button>
+              <button
+                class="underline"
+                @click=${() => (this.showingHint = !this.showingHint)}
+              >
+                ${translateText("education.hint")}
+              </button>
+              <button
+                class="underline"
+                @click=${() => {
+                  const stepId = this.progress.current()?.id;
+                  const feature = EDUCATION_FEATURES.find((feature) =>
+                    feature.tutorialSteps.includes(stepId ?? ""),
+                  );
+                  const help = document.querySelector(
+                    "help-modal",
+                  ) as HelpModal | null;
+                  if (feature && help) help.openFeature(feature.featureId);
+                }}
+              >
+                ${translateText("main.help")}
+              </button>
+            </div>`
+          : nothing}
+        ${this.game.config().gameConfig().training &&
+        (!modernGuide || this.showingOptions)
           ? html`<p class="text-xs text-blue-200 mb-1">
               <strong>${translateText("education.trainee")}:</strong>
               ${translateText("education.training_rules")}
@@ -1060,13 +1290,7 @@ export class TutorialPanel extends LitElement implements Controller {
           : nothing}
         ${this.confirmingClose ? this.renderCloseChoice() : this.renderStep()}
         ${this.showingHint
-          ? html`<p class="text-xs text-blue-200 mt-1">
-              ${translateText(
-                Platform.isTouch
-                  ? "education.touch_hint"
-                  : "education.practice_hint",
-              )}
-            </p>`
+          ? html`<p class="text-xs text-blue-200 mt-1">${this.hintText()}</p>`
           : nothing}
         ${this.guidePaused
           ? html`<p class="text-xs text-yellow-200">
@@ -1185,13 +1409,23 @@ export class TutorialPanel extends LitElement implements Controller {
 
   private stepText(step: TutorialStep, done: boolean): string {
     if (step.id.startsWith("modern_")) {
-      return translateText(`education.modern_steps.${step.id}`, {
+      const key =
+        Platform.isTouch && MODERN_TOUCH_TEXT_STEPS.has(step.id)
+          ? `education.modern_touch_steps.${step.id}`
+          : `education.modern_steps.${step.id}`;
+      return translateText(key, {
         population:
           this.game.config().gameConfig().modernMode?.initialPopulation ??
           MODERN_RULES.initialPopulation,
         armyKey: this.modernKey("modernArmy"),
         navyKey: this.modernKey("modernNavy"),
         airKey: this.modernKey("modernAir"),
+        stopKey: this.modernKey("modernStop"),
+        selectKey: this.modernKey("modernSelectVisible"),
+        cancelKey: this.modernKey("cancel"),
+        cameraKey: this.modernKey("centerCamera"),
+        zoomInKey: this.modernKey("zoomInEqual"),
+        zoomOutKey: this.modernKey("zoomOutMinus"),
         cost: MODERN_RULES.climateTrainingGold,
         seconds: MODERN_RULES.climateTrainingTicks / 10,
       });
@@ -1247,5 +1481,25 @@ export class TutorialPanel extends LitElement implements Controller {
   private modernKey(action: string): string {
     const key = modernKeybinds(this.userSettings, Platform.isMac)[action];
     return key ? formatKeyForDisplay(key) : translateText("education.unbound");
+  }
+
+  private hintText(): string {
+    const id = this.progress.current()?.id;
+    const modernHints = new Set([
+      "modern_camera",
+      "modern_box_select",
+      "modern_cursor",
+      "modern_queue",
+      "modern_armybase",
+      "modern_army_train",
+      "modern_navybase",
+      "modern_air_produce",
+    ]);
+    const general = translateText(
+      Platform.isTouch ? "education.touch_hint" : "education.practice_hint",
+    );
+    return id && modernHints.has(id)
+      ? `${translateText(`education.modern_hints.${id}`)} ${general}`
+      : general;
   }
 }

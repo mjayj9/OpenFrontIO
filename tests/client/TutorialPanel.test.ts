@@ -64,6 +64,7 @@ describe("Tutorial panel uses actual game state", () => {
       tutorialDismissed: () => false,
       setTutorialDismissed: () => {},
       keybinds: () => effectiveKeys,
+      effectiveKeybinds: () => effectiveKeys,
       parsedUserKeybinds: () => ({ buildCity: { key: "obsolete" } }),
     } as unknown as UserSettings;
     panel.uiState = {
@@ -93,6 +94,58 @@ describe("Tutorial panel uses actual game state", () => {
     expect(panel.educationSnapshot().progress.outcomes.buy_city).toBe(
       "practiced",
     );
+  });
+
+  it("keeps modern practice outside the lower HUD stacking context and restores Classic placement", () => {
+    const hud = document.createElement("div");
+    hud.style.position = "fixed";
+    hud.style.zIndex = "200";
+    const next = document.createElement("control-panel");
+    document.body.append(hud);
+    hud.append(panel, next);
+    const config = panel.game.config();
+    vi.spyOn(panel.game, "config").mockReturnValue({
+      ...config,
+      gameConfig: () => ({
+        modernMode: { version: 2, scenario: "modern-regions-v2" },
+      }),
+    } as ReturnType<GameView["config"]>);
+    panel.init();
+    expect(panel.parentNode).toBe(document.body);
+    expect(panel.classList.contains("z-[960]")).toBe(true);
+    panel.init();
+    expect(document.querySelectorAll("tutorial-panel")).toHaveLength(1);
+    vi.spyOn(panel.game, "config").mockReturnValue(config);
+    panel.init();
+    expect(panel.parentNode).toBe(hud);
+    expect(panel.nextSibling).toBe(next);
+    expect(panel.classList.contains("z-[960]")).toBe(false);
+    vi.spyOn(panel.game, "config").mockReturnValue({
+      ...config,
+      gameConfig: () => ({
+        modernMode: { version: 2, scenario: "modern-regions-v2" },
+      }),
+    } as ReturnType<GameView["config"]>);
+    panel.init();
+    panel.startChapter("modern_commands");
+    panel.dispose();
+    expect(panel.educationSnapshot().active).toBe(false);
+    expect(panel.classList.contains("hidden")).toBe(true);
+    expect(panel.parentNode).toBe(hud);
+    expect(panel.nextSibling).toBe(next);
+  });
+
+  it("offers the current command step's practical hint without completing practice", async () => {
+    panel.startChapter("modern_commands");
+    await panel.updateComplete;
+    const hint = [...panel.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("education.hint"),
+    );
+    expect(hint).toBeDefined();
+    hint!.click();
+    await panel.updateComplete;
+    expect(panel.textContent).toContain("education.modern_hints.modern_camera");
+    expect(panel.educationSnapshot().progress.outcomes).toEqual({});
   });
 
   it("latches actual conquest once per tick and clears old evidence when practice restarts", () => {
@@ -253,6 +306,9 @@ describe("Tutorial panel uses actual game state", () => {
     expect(panel.educationSnapshot().progress.outcomes.modern_regions).toBe(
       "practiced",
     );
+    const options = panel.querySelector<HTMLButtonElement>("[aria-expanded]");
+    options?.click();
+    await panel.updateComplete;
     expect(panel.querySelector<HTMLSelectElement>("select")?.value).toBe(
       "modern_regions",
     );
@@ -281,6 +337,7 @@ describe("Tutorial panel uses actual game state", () => {
         airReturns: number;
         airRearms: number;
         nuclearImpacts: number;
+        queuedOrders: number;
       };
     };
     evidence.buildModernEvidence(panel.game.myPlayer());
@@ -302,6 +359,25 @@ describe("Tutorial panel uses actual game state", () => {
     expect(evidence.buildModernEvidence(panel.game.myPlayer()).airReturns).toBe(
       2,
     );
+    expect(
+      evidence.buildModernEvidence(panel.game.myPlayer()).queuedOrders,
+    ).toBe(0);
+    force.queue = [{ kind: "move", target: 8, issuedTick: 12 }];
+    expect(
+      evidence.buildModernEvidence(panel.game.myPlayer()).queuedOrders,
+    ).toBe(1);
+    expect(
+      evidence.buildModernEvidence(panel.game.myPlayer()).queuedOrders,
+    ).toBe(1);
+    const acknowledged = panel.educationSnapshot();
+    expect(panel.restoreEducationSnapshot(acknowledged)).toBe(true);
+    expect(
+      evidence.buildModernEvidence(panel.game.myPlayer()).queuedOrders,
+    ).toBe(1);
+    force.queue = [];
+    expect(
+      evidence.buildModernEvidence(panel.game.myPlayer()).queuedOrders,
+    ).toBe(1);
     force.phase = "rearming";
     expect(evidence.buildModernEvidence(panel.game.myPlayer()).airReturns).toBe(
       2,

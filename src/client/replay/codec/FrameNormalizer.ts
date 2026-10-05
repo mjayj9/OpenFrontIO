@@ -83,6 +83,7 @@ export const UPDATE_TYPE_ROUTING: Record<
   DonateEvent: "misc",
   AIStatus: "misc",
   ModernSystems: "misc",
+  ModernForcesFrame: "misc",
 };
 
 /**
@@ -326,6 +327,11 @@ function miscUpdatesOf(gu: GameUpdateViewData): MiscUpdates | null {
     out[name] = arr.map((u) => {
       const payload: Record<string, unknown> = { ...(u as object) };
       delete payload.type;
+      if (
+        name === "ModernForcesFrame" &&
+        payload.positions instanceof Uint32Array
+      )
+        payload.positions = Array.from(payload.positions);
       return payload;
     });
   }

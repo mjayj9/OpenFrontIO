@@ -16,9 +16,32 @@ import {
   TutorialProgress,
 } from "../src/client/hud/Tutorial";
 import { UnitType } from "../src/core/game/Game";
+import { INPUT_ACTIONS } from "../src/core/game/KeybindingRegistry";
 import { GameConfigSchema, IntentSchema } from "../src/core/Schemas";
 
 describe("Public feature education coverage", () => {
+  it("keeps every registered control and modern practice step translated in both languages", () => {
+    for (const dictionary of [en, ko]) {
+      for (const action of INPUT_ACTIONS) {
+        const text =
+          dictionary.input_actions[
+            action.id as keyof typeof dictionary.input_actions
+          ];
+        expect(text?.label, action.id).toBeTruthy();
+        expect(text?.description, action.id).toBeTruthy();
+      }
+      for (const step of TUTORIAL_STEPS.filter((step) =>
+        step.id.startsWith("modern_"),
+      )) {
+        expect(
+          dictionary.education.modern_steps[
+            step.id as keyof typeof dictionary.education.modern_steps
+          ],
+          step.id,
+        ).toBeTruthy();
+      }
+    }
+  });
   it("covers every public intent and identifies internal protocol intents", () => {
     const covered = new Set(
       EDUCATION_FEATURES.flatMap((feature) => feature.intents),

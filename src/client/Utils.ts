@@ -378,20 +378,56 @@ export function formatPercentage(value: number): string {
  * formatKeyForDisplay("KeyA") // returns "A"
  * formatKeyForDisplay("Space") // returns "Space"
  * formatKeyForDisplay(" ") // returns "Space"
- * formatKeyForDisplay("ArrowUp") // returns "Arrowup"
+ * formatKeyForDisplay("ArrowUp") // returns "↑"
+ * formatKeyForDisplay("Ctrl+KeyA") // returns "Ctrl+A"
  * formatKeyForDisplay("") // returns ""
  */
 export function formatKeyForDisplay(value: string): string {
   // Handle empty string
   if (!value) return "";
 
-  // Handle Shift+ prefix: format as "Shift+X"
-  if (value.startsWith("Shift+")) {
-    return "Shift+" + formatKeyForDisplay(value.slice(6));
-  }
+  // All consumers display the same complete binding, including combinations
+  // captured by the key editor. Formatting never changes the stored key code.
+  if (value.includes("+"))
+    return value.split("+").map(formatKeyForDisplay).join("+");
 
   // Handle space character or "Space" key
   if (value === " " || value === "Space") return "Space";
+
+  const labels: Record<string, string> = {
+    Equal: "+",
+    Minus: "−",
+    Comma: ",",
+    Period: ".",
+    Slash: "/",
+    Backslash: "\\",
+    Semicolon: ";",
+    Quote: "'",
+    Backquote: "`",
+    BracketLeft: "[",
+    BracketRight: "]",
+    ArrowUp: "↑",
+    ArrowDown: "↓",
+    ArrowLeft: "←",
+    ArrowRight: "→",
+    Escape: "Esc",
+    NumpadAdd: "Num +",
+    NumpadSubtract: "Num −",
+    NumpadMultiply: "Num ×",
+    NumpadDivide: "Num /",
+    NumpadDecimal: "Num .",
+    NumpadEnter: "Num Enter",
+    ControlLeft: "Left Ctrl",
+    ControlRight: "Right Ctrl",
+    ShiftLeft: "Left Shift",
+    ShiftRight: "Right Shift",
+    AltLeft: "Left Alt",
+    AltRight: "Right Alt",
+    MetaLeft: "Left Meta",
+    MetaRight: "Right Meta",
+  };
+  if (labels[value]) return labels[value];
+  if (/^Numpad\d$/.test(value)) return value.replace("Numpad", "Num ");
 
   // Handle DigitN pattern (e.g., "Digit1" -> "1")
   if (/^Digit\d$/.test(value)) {

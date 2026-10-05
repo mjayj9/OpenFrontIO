@@ -364,6 +364,14 @@ describe("Modern lessons require actual simulation evidence", () => {
     ...patch,
   });
   it.each([
+    ["modern_camera", { cameraMoves: 1, zoomChanges: 1 }],
+    ["modern_box_select", { boxSelections: 1, additionalSelections: 1 }],
+    ["modern_cursor", { cursorPreviews: 1 }],
+    ["modern_queue", { queuedOrders: 1, armyMissions: 1 }],
+    ["modern_armybase", { armyBasesCompleted: 1 }],
+    ["modern_army_train", { armyTrained: 1 }],
+    ["modern_navybase", { navalBasesCompleted: 1 }],
+    ["modern_air_produce", { aircraftProduced: 1 }],
     ["modern_army_move", { armyMissions: 1 }],
     ["modern_navy_move", { navyMissions: 1 }],
     ["modern_stop", { completedStops: 1 }],
@@ -527,6 +535,25 @@ describe("TutorialProgress step counter", () => {
 });
 
 describe("TutorialProgress evidence and outcomes", () => {
+  it("reopens newly introduced exercises while preserving old recorded outcomes", () => {
+    const steps = chapterSteps("modern_commands");
+    const outcomes = Object.fromEntries(
+      [
+        "modern_branches",
+        "modern_select",
+        "modern_army_move",
+        "modern_stop",
+        "modern_navy_move",
+      ].map((id) => [id, "practiced" as const]),
+    );
+    const progress = new TutorialProgress(steps);
+    expect(progress.restore({ version: 3, stepId: null, outcomes })).toBe(true);
+    expect(progress.finished()).toBe(false);
+    expect(progress.current()?.id).toBe("modern_camera");
+    expect(progress.result().modern_army_move).toBe("practiced");
+    progress.acknowledge();
+    expect(progress.result().modern_camera).toBeUndefined();
+  });
   it("does not mark attack launch as successful land capture", () => {
     const step = TUTORIAL_STEPS.find((s) => s.id === "attack_wilderness")!;
     const progress = new TutorialProgress([step]);

@@ -74,6 +74,16 @@ export interface TutorialContext {
 }
 /** Derived only from acknowledged core state and actual military UI events. */
 export interface ModernTutorialEvidence {
+  cameraMoves?: number;
+  zoomChanges?: number;
+  cursorPreviews?: number;
+  boxSelections?: number;
+  additionalSelections?: number;
+  queuedOrders?: number;
+  armyBasesCompleted?: number;
+  armyTrained?: number;
+  navalBasesCompleted?: number;
+  aircraftProduced?: number;
   independent: boolean;
   equalPopulation: boolean;
   branchesUsed: string[];
@@ -144,6 +154,16 @@ function validModernEvidence(evidence: ModernTutorialEvidence): boolean {
       ["army", "navy", "air"].includes(branch),
     ) &&
     [
+      evidence.cameraMoves ?? 0,
+      evidence.zoomChanges ?? 0,
+      evidence.cursorPreviews ?? 0,
+      evidence.boxSelections ?? 0,
+      evidence.additionalSelections ?? 0,
+      evidence.queuedOrders ?? 0,
+      evidence.armyBasesCompleted ?? 0,
+      evidence.armyTrained ?? 0,
+      evidence.navalBasesCompleted ?? 0,
+      evidence.aircraftProduced ?? 0,
       evidence.climateAdaptedBattles ?? 0,
       evidence.climateHarshBattles ?? 0,
       evidence.blockadesSuffered ?? 0,
@@ -342,6 +362,59 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
       ),
   },
   {
+    id: "modern_camera",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.cameraMoves ?? 0) > (b.modern?.cameraMoves ?? 0) &&
+      (c.modern?.zoomChanges ?? 0) > (b.modern?.zoomChanges ?? 0),
+  },
+  {
+    id: "modern_box_select",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.boxSelections ?? 0) > (b.modern?.boxSelections ?? 0) &&
+      (c.modern?.additionalSelections ?? 0) >
+        (b.modern?.additionalSelections ?? 0),
+  },
+  {
+    id: "modern_cursor",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.cursorPreviews ?? 0) > (b.modern?.cursorPreviews ?? 0),
+  },
+  {
+    id: "modern_queue",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.queuedOrders ?? 0) > (b.modern?.queuedOrders ?? 0) &&
+      (c.modern?.armyMissions ?? 0) > (b.modern?.armyMissions ?? 0),
+  },
+  {
+    id: "modern_armybase",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.armyBasesCompleted ?? 0) > (b.modern?.armyBasesCompleted ?? 0),
+  },
+  {
+    id: "modern_army_train",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.armyTrained ?? 0) > (b.modern?.armyTrained ?? 0),
+  },
+  {
+    id: "modern_navybase",
+    applies: (c) => Boolean(c.modern) && !c.portDisabled,
+    isDone: (c, b) =>
+      (c.modern?.navalBasesCompleted ?? 0) >
+      (b.modern?.navalBasesCompleted ?? 0),
+  },
+  {
+    id: "modern_air_produce",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.aircraftProduced ?? 0) > (b.modern?.aircraftProduced ?? 0),
+  },
+  {
     id: "modern_select",
     applies: (c) => Boolean(c.modern),
     isDone: (c) => (c.modern?.selectionCount ?? 0) > 0,
@@ -456,7 +529,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
 /** Ticks a completed step stays on screen (with its checkmark) before advancing. */
 export const STEP_DONE_LINGER_TICKS = 15;
 
-export const EDUCATION_VERSION = 3;
+export const EDUCATION_VERSION = 4;
 export const TUTORIAL_CHAPTERS = [
   {
     id: "basic",
@@ -498,10 +571,17 @@ export const TUTORIAL_CHAPTERS = [
   {
     id: "modern_commands",
     stepIds: [
+      "modern_camera",
       "modern_branches",
       "modern_select",
+      "modern_box_select",
+      "modern_cursor",
       "modern_army_move",
+      "modern_queue",
       "modern_stop",
+      "modern_armybase",
+      "modern_army_train",
+      "modern_navybase",
       "modern_navy_move",
     ],
   },
@@ -509,6 +589,7 @@ export const TUTORIAL_CHAPTERS = [
     id: "modern_air",
     stepIds: [
       "modern_airbase",
+      "modern_air_produce",
       "modern_air_launch",
       "modern_air_return",
       "modern_air_intercept",
@@ -628,7 +709,7 @@ export class TutorialProgress {
   restore(snapshot: TutorialProgressSnapshot): boolean {
     if (
       !snapshot ||
-      (snapshot.version !== EDUCATION_VERSION && snapshot.version !== 2) ||
+      ![EDUCATION_VERSION, 3, 2].includes(snapshot.version) ||
       !snapshot.outcomes ||
       typeof snapshot.outcomes !== "object" ||
       Array.isArray(snapshot.outcomes)
@@ -648,11 +729,17 @@ export class TutorialProgress {
       !validModernEvidence(snapshot.baseline.modern)
     )
       return false;
-    const index =
+    let index =
       snapshot.stepId === null
         ? this.steps.length
         : this.steps.findIndex((s) => s.id === snapshot.stepId);
     if (index < 0) return false;
+    if (snapshot.version < EDUCATION_VERSION) {
+      const newStep = this.steps.findIndex(
+        (step) => snapshot.outcomes[step.id] === undefined,
+      );
+      if (newStep >= 0) index = Math.min(index, newStep);
+    }
     this.index = index;
     this.outcomes = Object.fromEntries(
       Object.entries(snapshot.outcomes).filter(
@@ -662,12 +749,15 @@ export class TutorialProgress {
       ),
     );
     this.doneTicks =
-      this.outcomes[snapshot.stepId ?? ""] === "practiced" ||
-      this.outcomes[snapshot.stepId ?? ""] === "read"
+      this.outcomes[this.current()?.id ?? ""] === "practiced" ||
+      this.outcomes[this.current()?.id ?? ""] === "read"
         ? 0
         : null;
     this.baseline = null;
-    this.restoredBaseline = snapshot.baseline ?? null;
+    this.restoredBaseline =
+      this.current()?.id === snapshot.stepId
+        ? (snapshot.baseline ?? null)
+        : null;
     return true;
   }
 

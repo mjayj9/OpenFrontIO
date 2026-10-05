@@ -135,8 +135,6 @@
     "command_sent": "Order sent; watch the unit's acknowledged state.",
     "commands": "Modern military commands",
     "common_start": "Common start: {population} people · {gold} gold · {army} army personnel. These are game values, independent of actual national population.",
-    "confirm": "Confirm military order",
-    "confirm_airbase": "Build airbase: {cost} gold, capacity {capacity} aircraft. Confirm to construct it.",
     "confirm_preview": "Review the route and risk, then confirm. A preview is not a guaranteed victory.",
     "country_info": "Country info / diplomacy",
     "develop_port": "Develop: {cost} · nominal +{increase}/s",
@@ -156,7 +154,6 @@
     "initial_population": "Common starting population N0 (every faction)",
     "input_hint": "Left select · right preview · Shift queue · Alt+drag pan",
     "invite": "Create an invitation room",
-    "key_priority": "Saved Classic keys keep priority. A conflicting new modern binding becomes unassigned; reassign or use branch buttons. Classic games retain their existing keys.",
     "keys": "Modern key settings",
     "kind": {
       "airbase": "Airbase",
@@ -202,7 +199,6 @@
       "rearming": "Rearming",
       "returning": "Returning"
     },
-    "place_airbase": "Click or tap owned land for the airbase. It cannot overlap an existing base.",
     "population": "Population",
     "port_choice": "Owned major port",
     "port_status": "Level {level} · income {income}/s · damage {damage}% · blockading fleets {blockades}",

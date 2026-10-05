@@ -1,15 +1,26 @@
 import { EventBus, GameEvent } from "../core/EventBus";
 import { PlayerBuildableUnitType, UnitType } from "../core/game/Game";
 import {
+  INPUT_ACTIONS,
+  inputActionRows,
+  setActiveInputContext,
+} from "../core/game/KeybindingRegistry";
+import {
   KEYBINDS_KEY,
   USER_SETTINGS_CHANGED_EVENT,
   UserSettings,
 } from "../core/game/UserSettings";
+import { OModal } from "./components/baseComponents/Modal";
+import type { HelpModal } from "./HelpModal";
 import {
   MODERN_KEYBINDS_CHANGED,
   ModernBranchEvent,
-  ModernClearSelectionEvent,
+  ModernCancelEvent,
+  ModernCenterSelectionEvent,
+  ModernPreviewEvent,
+  ModernSelectVisibleEvent,
   ModernSelectionEvent,
+  ModernStopEvent,
   ModernTargetEvent,
   modernKeybinds,
 } from "./ModernInput";
@@ -267,8 +278,36 @@ export class InputHandler {
   private activeKeys = new Set<string>();
   private keybinds: Record<string, string> = {};
   private keybindAndEvent: Array<[string, KeybindEntry]> = [];
+  private pressKeybindAndEvent: Array<[string, KeybindEntry, string]> = [];
   private coordinateGridEnabled = false;
   private modernSelecting = false;
+  private dispatchedPressKeys = new Set<string>();
+  private cursorPreviewFrame = 0;
+  private latestCursorPreview: ModernPreviewEvent | null = null;
+
+  private replayContext(): boolean {
+    return this.gameView.config?.().isReplay?.() === true;
+  }
+
+  private modalContext(): boolean {
+    return (
+      OModal.openCount > 0 ||
+      (
+        document.querySelector("settings-modal") as
+          | (HTMLElement & { open?: boolean })
+          | null
+      )?.open === true
+    );
+  }
+
+  private permitsAction(action: string): boolean {
+    return (
+      !this.replayContext() ||
+      INPUT_ACTIONS.find((entry) => entry.id === action)?.contexts.includes(
+        "replay",
+      ) === true
+    );
+  }
 
   private modernContext(): boolean {
     return (
@@ -291,6 +330,10 @@ export class InputHandler {
   ) {}
 
   initialize() {
+    setActiveInputContext(
+      this.modernContext() ? "modern" : "classic",
+      this.replayContext() ? "replay" : "map",
+    );
     this.buildKeybindTable();
     // Keybinds are editable mid-match now (the in-game settings modal has a
     // Keybinds tab), and this table is otherwise built once per game, so a
@@ -312,6 +355,10 @@ export class InputHandler {
     // game's events. off() first so a second initialize() cannot double it.
     this.eventBus.off(UnitSelectionEvent, this.onUnitSelection);
     this.eventBus.on(UnitSelectionEvent, this.onUnitSelection);
+    this.eventBus.off(DragEvent, this.onCameraPractice);
+    this.eventBus.on(DragEvent, this.onCameraPractice);
+    this.eventBus.off(ZoomEvent, this.onZoomPractice);
+    this.eventBus.on(ZoomEvent, this.onZoomPractice);
 
     this.initializePointerAndKeyboardEvents();
   }
@@ -336,7 +383,24 @@ export class InputHandler {
     }
   };
 
+  private readonly onCameraPractice = (event: DragEvent) => {
+    if (this.modernContext() && (event.deltaX || event.deltaY))
+      this.uiState.modernCameraMoves =
+        (this.uiState.modernCameraMoves ?? 0) + 1;
+  };
+  private readonly onZoomPractice = (event: ZoomEvent) => {
+    if (this.modernContext() && event.delta)
+      this.uiState.modernZoomChanges =
+        (this.uiState.modernZoomChanges ?? 0) + 1;
+  };
+
   private onKeybindsChanged = () => {
+    this.activeKeys.clear();
+    this.dispatchedPressKeys.clear();
+    if (this.alternateView) {
+      this.alternateView = false;
+      this.eventBus.emit(new AlternateViewEvent(false));
+    }
     this.buildKeybindTable();
   };
 
@@ -362,6 +426,8 @@ export class InputHandler {
     this.selectionBoxActive = false;
     this.multiSelectionActive = false;
     this.modernSelecting = false;
+    this.uiState.modernAdditiveSelection = false;
+    this.uiState.modernQueueCommand = false;
   }
 
   /** Re-read the player's keybinds and rebuild the key dispatch table. */
@@ -370,17 +436,35 @@ export class InputHandler {
       ? modernKeybinds(this.userSettings, Platform.isMac)
       : this.userSettings.keybinds(Platform.isMac);
     this.keybindAndEvent = [];
+    this.pressKeybindAndEvent = [];
     if (this.modernContext()) {
       for (const [action, branch] of [
         ["modernArmy", "army"],
         ["modernNavy", "navy"],
         ["modernAir", "air"],
+        ["modernArmyAlternate", "army"],
+        ["modernNavyAlternate", "navy"],
+        ["modernAirAlternate", "air"],
       ] as const) {
-        this.addKeybindAndEvent(this.keybinds[action], () => {
+        this.addPressKeybind(action, () => {
           this.eventBus.emit(new ModernBranchEvent(branch));
         });
       }
+      this.addPressKeybind("modernStop", () =>
+        this.eventBus.emit(new ModernStopEvent()),
+      );
+      this.addPressKeybind("modernSelectVisible", () =>
+        this.eventBus.emit(new ModernSelectVisibleEvent()),
+      );
     }
+    this.addPressKeybind("buildMenu", () =>
+      this.eventBus.emit(
+        new ShowBuildMenuEvent(this.lastPointerX, this.lastPointerY),
+      ),
+    );
+    this.addPressKeybind("help", () =>
+      document.querySelector<HelpModal>("help-modal")?.openControls(),
+    );
 
     this.addKeybindAndEvent(this.keybinds.boatAttack, () => {
       this.eventBus.emit(new DoBoatAttackEvent());
@@ -391,9 +475,13 @@ export class InputHandler {
     this.addKeybindAndEvent(this.keybinds.retaliateAttack, () => {
       this.eventBus.emit(new DoRetaliateAttackEvent());
     });
-    this.addKeybindAndEvent(this.keybinds.centerCamera, () => {
-      this.eventBus.emit(new CenterCameraEvent());
-    });
+    this.addPressKeybind("centerCamera", () =>
+      this.eventBus.emit(
+        this.modernContext()
+          ? new ModernCenterSelectionEvent()
+          : new CenterCameraEvent(),
+      ),
+    );
     this.addKeybindAndEvent(this.keybinds.selectAllWarships, () => {
       this.eventBus.emit(new SelectAllWarshipsEvent());
     });
@@ -443,40 +531,14 @@ export class InputHandler {
       this.alternateView = false;
       this.eventBus.emit(new AlternateViewEvent(false));
     });
-    const resetKey = this.keybinds.resetGfx;
-    this.addKeybindAndEvent(
-      resetKey,
-      () => {
-        this.eventBus.emit(new RefreshGraphicsEvent());
-      },
-      (e: KeyboardEvent) => {
-        if (
-          this.keybinds.altKey === "AltLeft" ||
-          this.keybinds.altKey === "AltRight"
-        ) {
-          return e.altKey && !e.ctrlKey;
-        }
-        if (
-          this.keybinds.altKey === "ControlLeft" ||
-          this.keybinds.altKey === "ControlRight"
-        ) {
-          return e.ctrlKey;
-        }
-        if (
-          this.keybinds.altKey === "ShiftLeft" ||
-          this.keybinds.altKey === "ShiftRight"
-        ) {
-          return e.shiftKey;
-        }
-        if (
-          this.keybinds.altKey === "MetaLeft" ||
-          this.keybinds.altKey === "MetaRight"
-        ) {
-          return e.metaKey;
-        }
-        return this.activeKeys.has(this.keybinds.altKey);
-      },
-    );
+    const resetKey =
+      inputActionRows(
+        this.modernContext() ? "modern" : "classic",
+        this.keybinds,
+      ).find((row) => row.id === "resetGfx")?.binding ?? "";
+    this.addKeybindAndEvent(resetKey, () => {
+      this.eventBus.emit(new RefreshGraphicsEvent());
+    });
 
     let buildKeybinds: string[] = [
       "buildCity",
@@ -555,6 +617,28 @@ export class InputHandler {
     this.resetPointerState();
     this.listenerAbort = new AbortController();
     const { signal } = this.listenerAbort;
+    window.addEventListener(
+      "focusin",
+      (event) => {
+        if (this.isTextInputTarget(event.target) || this.modalContext()) {
+          this.activeKeys.clear();
+          this.dispatchedPressKeys.clear();
+          if (this.alternateView) {
+            this.alternateView = false;
+            this.eventBus.emit(new AlternateViewEvent(false));
+          }
+        }
+      },
+      { signal },
+    );
+    window.addEventListener(
+      "compositionstart",
+      () => {
+        this.activeKeys.clear();
+        this.dispatchedPressKeys.clear();
+      },
+      { signal },
+    );
     this.canvas.addEventListener("pointerdown", (e) => this.onPointerDown(e), {
       signal,
     });
@@ -621,6 +705,11 @@ export class InputHandler {
       "blur",
       () => {
         this.activeKeys.clear();
+        this.dispatchedPressKeys.clear();
+        this.latestCursorPreview = null;
+        if (this.cursorPreviewFrame)
+          cancelAnimationFrame(this.cursorPreviewFrame);
+        this.cursorPreviewFrame = 0;
         if (this.alternateView) {
           this.alternateView = false;
           this.eventBus.emit(new AlternateViewEvent(false));
@@ -638,10 +727,7 @@ export class InputHandler {
     this.pointers.clear();
 
     this.moveInterval = setInterval(() => {
-      if (
-        this.modernContext() &&
-        this.isTextInputTarget(document.activeElement)
-      )
+      if (this.modalContext() || this.isTextInputTarget(document.activeElement))
         return;
       let deltaX = 0;
       let deltaY = 0;
@@ -700,8 +786,22 @@ export class InputHandler {
       "keydown",
       (e) => {
         if (e.defaultPrevented || e.isComposing || e.keyCode === 229) return;
+        // Modal widgets own their keys, including Escape. No map action leaks
+        // through a focused button or a modal with no text field.
+        if (this.modalContext()) return;
         const isTextInput = this.isTextInputTarget(e.target);
-        if (isTextInput && e.code !== "Escape") {
+        if (isTextInput && !this.keybindMatchesEvent(e, this.keybinds.cancel)) {
+          return;
+        }
+
+        for (const [key, entry, id] of this.pressKeybindAndEvent) {
+          if (!this.keybindMatchesEvent(e, key) || !this.permitsAction(id))
+            continue;
+          e.preventDefault();
+          if (!e.repeat && !this.dispatchedPressKeys.has(e.code)) {
+            this.dispatchedPressKeys.add(e.code);
+            entry.handler(e);
+          }
           return;
         }
 
@@ -724,13 +824,14 @@ export class InputHandler {
           );
         }
 
-        if (e.code === "Escape") {
+        if (this.keybindMatchesEvent(e, this.keybinds.cancel) && !e.repeat) {
           e.preventDefault();
           let closedUI = false;
 
           if (this.uiState.ghostStructure !== null) {
             this.setGhostStructure(null);
             closedUI = true;
+            if (this.modernContext()) return;
           }
 
           if (this.selectionBoxActive) {
@@ -743,7 +844,7 @@ export class InputHandler {
           if (this.modernContext()) {
             this.modernSelecting = false;
             this.uiState.modernTargeting = false;
-            this.eventBus.emit(new ModernClearSelectionEvent());
+            this.eventBus.emit(new ModernCancelEvent());
           }
 
           if (
@@ -755,7 +856,10 @@ export class InputHandler {
         }
 
         if (
-          (e.code === "Enter" || e.code === "NumpadEnter") &&
+          (this.keybindMatchesEvent(e, this.keybinds.confirmPlacement) ||
+            (this.keybinds.confirmPlacement === "Enter" &&
+              e.code === "NumpadEnter")) &&
+          !e.repeat &&
           this.uiState.ghostStructure !== null
         ) {
           e.preventDefault();
@@ -774,10 +878,20 @@ export class InputHandler {
             e.code === "NumpadSubtract");
 
         const isConfiguredKeybind =
-          Object.values(this.keybinds).some(
-            (key) => this.parseKeybind(key).code === e.code,
-          ) ||
-          this.keybindAndEvent.some(([k]) => this.keybindMatchesEvent(e, k));
+          Object.entries(this.keybinds).some(([id, key]) => {
+            const phase = INPUT_ACTIONS.find((entry) => entry.id === id)?.phase;
+            // A held physical modifier is allowed to share its own flag.
+            // Other shortcuts must match the complete combination, otherwise
+            // a default P/R/W would swallow browser Ctrl+P/R/W.
+            if (phase === "modifier")
+              return this.parseKeybind(key).code === e.code;
+            return phase === "hold" && this.keybindMatchesEvent(e, key);
+          }) ||
+          this.keybindAndEvent.some(
+            ([key, entry]) =>
+              this.keybindMatchesEvent(e, key) &&
+              entry.conditions.every((condition) => condition(e)),
+          );
 
         if (isConfiguredKeybind && !isBrowserZoomCombo) {
           e.preventDefault();
@@ -823,7 +937,7 @@ export class InputHandler {
         // warship box selection mode.
         // If a ghost structure is active, discard it first.
         if (e.code === this.keybinds.boxSelectWarships) {
-          if (this.uiState.ghostStructure !== null) {
+          if (!this.modernContext() && this.uiState.ghostStructure !== null) {
             this.setGhostStructure(null);
           }
           this.canvas.style.cursor = "crosshair";
@@ -834,12 +948,16 @@ export class InputHandler {
     window.addEventListener(
       "keyup",
       (e) => {
+        if (this.dispatchedPressKeys.delete(e.code)) {
+          this.activeKeys.delete(e.code);
+          return;
+        }
         if (e.defaultPrevented || e.isComposing || e.keyCode === 229) {
           this.activeKeys.delete(e.code);
           return;
         }
         const isTextInput = this.isTextInputTarget(e.target);
-        if (this.modernContext() && isTextInput) {
+        if (this.modalContext() || isTextInput) {
           this.activeKeys.delete(e.code);
           return;
         }
@@ -893,6 +1011,10 @@ export class InputHandler {
   }
 
   private onPointerDown(event: PointerEvent) {
+    if (this.modalContext()) return;
+    if (this.cursorPreviewFrame) cancelAnimationFrame(this.cursorPreviewFrame);
+    this.cursorPreviewFrame = 0;
+    this.latestCursorPreview = null;
     if (event.button === 1) {
       event.preventDefault();
       this.eventBus.emit(new AutoUpgradeEvent(event.clientX, event.clientY));
@@ -915,6 +1037,7 @@ export class InputHandler {
 
       if (
         this.modernContext() &&
+        !this.replayContext() &&
         this.uiState.ghostStructure === null &&
         !event.ctrlKey &&
         !event.altKey &&
@@ -986,24 +1109,52 @@ export class InputHandler {
       this.modernSelecting = false;
       if (event.type === "pointercancel" || modernPinch) return;
       if (this.uiState.modernTargeting) {
+        this.cancelCursorPreview();
         this.eventBus.emit(
-          new ModernTargetEvent(event.clientX, event.clientY, event.shiftKey),
+          new ModernTargetEvent(
+            event.clientX,
+            event.clientY,
+            event.shiftKey || Boolean(this.uiState.modernQueueCommand),
+          ),
         );
       } else {
+        const previousSelection =
+          this.uiState.modernSelectedForceIds?.length ?? 0;
+        const additive =
+          event.shiftKey || Boolean(this.uiState.modernAdditiveSelection);
         this.eventBus.emit(
           new ModernSelectionEvent(
             this.lastPointerDownX,
             this.lastPointerDownY,
             event.clientX,
             event.clientY,
-            event.shiftKey,
+            additive,
             true,
           ),
         );
+        const selected = this.uiState.modernSelectedForceIds?.length ?? 0;
+        const distance =
+          Math.abs(event.clientX - this.lastPointerDownX) +
+          Math.abs(event.clientY - this.lastPointerDownY);
+        if (selected && distance >= this.DRAG_THRESHOLD_PX)
+          this.uiState.modernBoxSelections =
+            (this.uiState.modernBoxSelections ?? 0) + 1;
+        if (additive && selected > previousSelection)
+          this.uiState.modernAdditionalSelections =
+            (this.uiState.modernAdditionalSelections ?? 0) + 1;
       }
       event.preventDefault();
       return;
     }
+
+    if (
+      this.modernContext() &&
+      event.altKey &&
+      Math.abs(event.clientX - this.lastPointerDownX) +
+        Math.abs(event.clientY - this.lastPointerDownY) >=
+        this.DRAG_THRESHOLD_PX
+    )
+      return;
 
     // Clean up long-press state
     if (this.longPressTimer !== null) {
@@ -1056,12 +1207,12 @@ export class InputHandler {
 
     // Modifier menus: on Win/Linux Ctrl is the default build-menu key, so a
     // ctrl+left must still reach ShowBuildMenuEvent (Mac already returned).
-    if (this.activeKeys.has(this.keybinds.buildMenuModifier)) {
+    if (this.modifierHeld(this.keybinds.buildMenuModifier)) {
       this.suppressNextTap = false;
       this.eventBus.emit(new ShowBuildMenuEvent(event.clientX, event.clientY));
       return;
     }
-    if (this.activeKeys.has(this.keybinds.emojiMenuModifier)) {
+    if (this.modifierHeld(this.keybinds.emojiMenuModifier)) {
       this.suppressNextTap = false;
       this.eventBus.emit(new ShowEmojiMenuEvent(event.clientX, event.clientY));
       return;
@@ -1167,7 +1318,17 @@ export class InputHandler {
     }
 
     if (!this.pointerDown) {
+      this.lastPointerX = event.clientX;
+      this.lastPointerY = event.clientY;
       this.eventBus.emit(new MouseOverEvent(event.clientX, event.clientY));
+      if (
+        this.modernContext() &&
+        !this.replayContext() &&
+        (event.target === this.canvas ||
+          event.composedPath().includes(this.canvas))
+      ) {
+        this.scheduleModernPreview(event);
+      }
       return;
     }
 
@@ -1180,13 +1341,19 @@ export class InputHandler {
       const deltaX = event.clientX - this.lastPointerX;
       const deltaY = event.clientY - this.lastPointerY;
       if (this.modernSelecting) {
+        // A touch command drag previews the real target path. Selecting a
+        // different unit here would lose the command's source before release.
+        if (this.uiState.modernTargeting) {
+          this.scheduleModernPreview(event);
+          return;
+        }
         this.eventBus.emit(
           new ModernSelectionEvent(
             this.lastPointerDownX,
             this.lastPointerDownY,
             event.clientX,
             event.clientY,
-            event.shiftKey,
+            event.shiftKey || Boolean(this.uiState.modernAdditiveSelection),
             false,
           ),
         );
@@ -1208,7 +1375,7 @@ export class InputHandler {
       // started, continue emitting selection box updates
       if (
         this.selectionBoxActive ||
-        this.activeKeys.has(this.keybinds.boxSelectWarships) ||
+        this.modifierHeld(this.keybinds.boxSelectWarships) ||
         this.longPressActive
       ) {
         this.selectionBoxActive = true;
@@ -1248,8 +1415,33 @@ export class InputHandler {
     }
   }
 
+  private scheduleModernPreview(event: PointerEvent) {
+    this.latestCursorPreview = new ModernPreviewEvent(
+      event.clientX,
+      event.clientY,
+      event.shiftKey || Boolean(this.uiState.modernQueueCommand),
+    );
+    if (!this.cursorPreviewFrame)
+      this.cursorPreviewFrame = requestAnimationFrame(() => {
+        this.cursorPreviewFrame = 0;
+        const preview = this.latestCursorPreview;
+        this.latestCursorPreview = null;
+        if (preview && !this.modalContext()) this.eventBus.emit(preview);
+      });
+  }
+
+  private cancelCursorPreview() {
+    if (this.cursorPreviewFrame) cancelAnimationFrame(this.cursorPreviewFrame);
+    this.cursorPreviewFrame = 0;
+    this.latestCursorPreview = null;
+  }
+
   private onContextMenu(event: MouseEvent) {
     event.preventDefault();
+    if (this.modalContext() || this.replayContext()) return;
+    if (this.cursorPreviewFrame) cancelAnimationFrame(this.cursorPreviewFrame);
+    this.cursorPreviewFrame = 0;
+    this.latestCursorPreview = null;
     if (this.gameView.inSpawnPhase()) {
       return;
     }
@@ -1259,7 +1451,11 @@ export class InputHandler {
     }
     if (this.modernContext() && !event.ctrlKey && !event.metaKey) {
       this.eventBus.emit(
-        new ModernTargetEvent(event.clientX, event.clientY, event.shiftKey),
+        new ModernTargetEvent(
+          event.clientX,
+          event.clientY,
+          event.shiftKey || Boolean(this.uiState.modernQueueCommand),
+        ),
       );
       return;
     }
@@ -1319,14 +1515,16 @@ export class InputHandler {
     keybindValue: string,
   ): boolean {
     const parsed = this.parseKeybind(keybindValue);
-    const graphicsReset = keybindValue === this.keybinds.resetGfx;
     return (
       e.code === parsed.code &&
-      e.shiftKey === parsed.shift &&
-      (graphicsReset ||
-        (!!e.ctrlKey === parsed.ctrl &&
-          !!e.altKey === parsed.alt &&
-          !!e.metaKey === parsed.meta))
+      (e.shiftKey === parsed.shift ||
+        (keybindValue === "Equal" &&
+          e.code === "Equal" &&
+          e.shiftKey &&
+          !Object.values(this.keybinds).includes("Shift+Equal"))) &&
+      !!e.ctrlKey === parsed.ctrl &&
+      !!e.altKey === parsed.alt &&
+      !!e.metaKey === parsed.meta
     );
   }
 
@@ -1334,9 +1532,11 @@ export class InputHandler {
     const key = this.parseKeybind(value);
     return (
       this.activeKeys.has(key.code) &&
-      key.shift ===
-        (this.activeKeys.has("ShiftLeft") ||
-          this.activeKeys.has("ShiftRight")) &&
+      ((value === "Equal" &&
+        !Object.values(this.keybinds).includes("Shift+Equal")) ||
+        key.shift ===
+          (this.activeKeys.has("ShiftLeft") ||
+            this.activeKeys.has("ShiftRight"))) &&
       key.ctrl ===
         (this.activeKeys.has("ControlLeft") ||
           this.activeKeys.has("ControlRight")) &&
@@ -1344,6 +1544,39 @@ export class InputHandler {
         (this.activeKeys.has("AltLeft") || this.activeKeys.has("AltRight")) &&
       key.meta ===
         (this.activeKeys.has("MetaLeft") || this.activeKeys.has("MetaRight"))
+    );
+  }
+
+  /** Modifier actions can be a physical modifier or an explicit combination.
+   * The modifier key itself must not count as an unexpected extra modifier. */
+  private modifierHeld(value: string): boolean {
+    if (!value) return false;
+    const parsed = this.parseKeybind(value);
+    const group = /^(Shift|Control|Alt|Meta)(Left|Right)$/.exec(
+      parsed.code,
+    )?.[1];
+    const down =
+      group === "Shift"
+        ? this.activeKeys.has(`${group}Left`) ||
+          this.activeKeys.has(`${group}Right`)
+        : this.activeKeys.has(parsed.code);
+    return (
+      down &&
+      (group === "Shift" ||
+        parsed.shift ===
+          (this.activeKeys.has("ShiftLeft") ||
+            this.activeKeys.has("ShiftRight"))) &&
+      (group === "Control" ||
+        parsed.ctrl ===
+          (this.activeKeys.has("ControlLeft") ||
+            this.activeKeys.has("ControlRight"))) &&
+      (group === "Alt" ||
+        parsed.alt ===
+          (this.activeKeys.has("AltLeft") ||
+            this.activeKeys.has("AltRight"))) &&
+      (group === "Meta" ||
+        parsed.meta ===
+          (this.activeKeys.has("MetaLeft") || this.activeKeys.has("MetaRight")))
     );
   }
 
@@ -1394,9 +1627,30 @@ export class InputHandler {
   ) {
     const entry: KeybindEntry = {
       handler: event,
-      conditions,
+      conditions: [
+        () => {
+          const id = Object.entries(this.keybinds).find(
+            ([, value]) => value === keybind,
+          )?.[0];
+          return !id || this.permitsAction(id);
+        },
+        ...conditions,
+      ],
     };
     if (keybind) this.keybindAndEvent.push([keybind, entry]);
+  }
+
+  private addPressKeybind(
+    action: string,
+    handler: (event: KeyboardEvent) => void,
+  ) {
+    const key = this.keybinds[action];
+    if (key)
+      this.pressKeybindAndEvent.push([
+        key,
+        { handler, conditions: [] },
+        action,
+      ]);
   }
 
   /**
@@ -1454,7 +1708,11 @@ export class InputHandler {
 
   private canUseBuildKeybinds(): boolean {
     const myPlayer = this.gameView.myPlayer?.();
-    return !this.gameView.inSpawnPhase() && myPlayer?.isAlive() === true;
+    return (
+      !this.replayContext() &&
+      !this.gameView.inSpawnPhase() &&
+      myPlayer?.isAlive() === true
+    );
   }
 
   private getPinchDistance(): number {
@@ -1492,10 +1750,6 @@ export class InputHandler {
       return true;
     }
     if (element.tagName === "INPUT") {
-      const input = element as HTMLInputElement;
-      if (input.type === "range") {
-        return false;
-      }
       return true;
     }
     return false;
@@ -1517,6 +1771,8 @@ export class InputHandler {
     this.listenerAbort?.abort();
     this.listenerAbort = null;
     this.eventBus.off(UnitSelectionEvent, this.onUnitSelection);
+    this.eventBus.off(DragEvent, this.onCameraPractice);
+    this.eventBus.off(ZoomEvent, this.onZoomPractice);
     // Includes the 800ms long-press timer a touch pointerdown arms: aborting
     // the listeners does not cancel it, so without this it can still fire
     // after teardown, emitting TouchLongPressStartEvent on the page-global
@@ -1524,6 +1780,12 @@ export class InputHandler {
     // renderer has already removed.
     this.resetPointerState();
     this.activeKeys.clear();
+    this.dispatchedPressKeys.clear();
+    if (this.cursorPreviewFrame) cancelAnimationFrame(this.cursorPreviewFrame);
+    this.cursorPreviewFrame = 0;
+    this.latestCursorPreview = null;
+    this.pressKeybindAndEvent = [];
+    setActiveInputContext("classic", "map");
     this.keybindAndEvent = [];
     this.keybinds = {};
   }

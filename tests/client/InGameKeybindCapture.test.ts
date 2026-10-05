@@ -3,7 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "../../src/client/components/baseComponents/setting/SettingKeybind";
 import {
   AlternateViewEvent,
+  AttackRatioEvent,
   InputHandler,
+  RefreshGraphicsEvent,
 } from "../../src/client/InputHandler";
 import type { GameView } from "../../src/client/view";
 import { EventBus } from "../../src/core/EventBus";
@@ -85,6 +87,60 @@ describe("keybind capture over a live game", () => {
     pressToggleView(other);
 
     expect(alternateViewEvents()).toHaveLength(1);
+  });
+
+  it("leaves focused range keys to the native control and resumes on the map", () => {
+    const field = document.createElement("input");
+    field.type = "range";
+    document.body.appendChild(field);
+    const event = new KeyboardEvent("keydown", {
+      code: "KeyT",
+      bubbles: true,
+      cancelable: true,
+    });
+    field.dispatchEvent(event);
+    field.dispatchEvent(
+      new KeyboardEvent("keyup", { code: "KeyT", bubbles: true }),
+    );
+    expect(event.defaultPrevented).toBe(false);
+    expect(emitted.some((e) => e instanceof AttackRatioEvent)).toBe(false);
+    press(document.body, "KeyT");
+    document.body.dispatchEvent(
+      new KeyboardEvent("keyup", { code: "KeyT", bubbles: true }),
+    );
+    expect(emitted.filter((e) => e instanceof AttackRatioEvent)).toHaveLength(
+      1,
+    );
+  });
+
+  it("uses the registered complete graphics gesture without extra modifiers", () => {
+    const release = (altKey: boolean, shiftKey = false) => {
+      document.body.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          code: "KeyR",
+          altKey,
+          shiftKey,
+          bubbles: true,
+        }),
+      );
+      document.body.dispatchEvent(
+        new KeyboardEvent("keyup", {
+          code: "KeyR",
+          altKey,
+          shiftKey,
+          bubbles: true,
+        }),
+      );
+    };
+    release(false);
+    release(true, true);
+    expect(
+      emitted.filter((e) => e instanceof RefreshGraphicsEvent),
+    ).toHaveLength(0);
+    release(true);
+    expect(
+      emitted.filter((e) => e instanceof RefreshGraphicsEvent),
+    ).toHaveLength(1);
   });
 
   it("picks up a keybind rebound mid-match", () => {

@@ -1,6 +1,7 @@
 import { Cell } from "../core/game/Game";
 import { modernFactions } from "../core/game/ModernRegions";
 import { modernWorld } from "../core/game/ModernWorld";
+import { modernMapImage } from "./ModernMapDisplay";
 import { TransformHandler } from "./TransformHandler";
 import { GameView } from "./view";
 
@@ -43,7 +44,7 @@ export function mountModernCapitalOverlay(
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     context.clearRect(0, 0, width, height);
     if (enabled && !game.inSpawnPhase()) {
-      context.font = "bold 13px sans-serif";
+      context.font = "11px sans-serif";
       context.textAlign = "center";
       context.textBaseline = "middle";
       context.lineWidth = 3;
@@ -61,14 +62,16 @@ export function mountModernCapitalOverlay(
         const owner = game.owner(
           game.ref(country.capital[0], country.capital[1]),
         );
-        context.fillStyle = owner === game.myPlayer() ? "#fff799" : "#ffffff";
-        context.strokeText("★", point.x, point.y);
-        context.fillText("★", point.x, point.y);
-        if (transform.scale >= 6) {
+        if (owner !== game.myPlayer() && transform.scale < 4) continue;
+        const icon = modernMapImage("capital");
+        if (icon.complete && icon.naturalWidth)
+          context.drawImage(icon, point.x - 8, point.y - 20, 16, 14);
+        context.fillStyle = "#ffffff";
+        if (transform.scale >= 8) {
           context.font = "11px sans-serif";
           context.strokeText(country.capitalName, point.x, point.y + 14);
           context.fillText(country.capitalName, point.x, point.y + 14);
-          context.font = "bold 13px sans-serif";
+          context.font = "11px sans-serif";
         }
       }
     }

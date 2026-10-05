@@ -8,7 +8,12 @@ import {
   PlayerBuildableUnitType,
   UnitType,
 } from "../../../core/game/Game";
-import { UserSettings } from "../../../core/game/UserSettings";
+import {
+  INPUT_PROFILE_CHANGED_EVENT,
+  KEYBINDS_KEY,
+  USER_SETTINGS_CHANGED_EVENT,
+  UserSettings,
+} from "../../../core/game/UserSettings";
 import { Controller } from "../../Controller";
 import { ToggleStructureEvent } from "../../InputHandler";
 import { Platform } from "../../Platform";
@@ -60,11 +65,50 @@ export class UnitDisplay extends LitElement implements Controller {
     return this;
   }
 
+  private keyMode(): "modern" | "classic" {
+    return this.game?.config().gameConfig().modernMode?.scenario ===
+      "modern-regions-v2"
+      ? "modern"
+      : "classic";
+  }
+  private readonly onInputBindingsChanged = () => {
+    this.keybinds = new UserSettings().effectiveKeybinds(
+      this.keyMode(),
+      Platform.isMac,
+    );
+    this.requestUpdate();
+  };
+  connectedCallback() {
+    super.connectedCallback();
+    globalThis.addEventListener(
+      INPUT_PROFILE_CHANGED_EVENT,
+      this.onInputBindingsChanged,
+    );
+    globalThis.addEventListener(
+      `${USER_SETTINGS_CHANGED_EVENT}:${KEYBINDS_KEY}`,
+      this.onInputBindingsChanged,
+    );
+  }
+  disconnectedCallback() {
+    globalThis.removeEventListener(
+      INPUT_PROFILE_CHANGED_EVENT,
+      this.onInputBindingsChanged,
+    );
+    globalThis.removeEventListener(
+      `${USER_SETTINGS_CHANGED_EVENT}:${KEYBINDS_KEY}`,
+      this.onInputBindingsChanged,
+    );
+    super.disconnectedCallback();
+  }
+
   init() {
     const config = this.game.config();
     const userSettings = new UserSettings();
 
-    this.keybinds = userSettings.keybinds(Platform.isMac);
+    this.keybinds = userSettings.effectiveKeybinds(
+      this.keyMode(),
+      Platform.isMac,
+    );
 
     this.allDisabled = BuildMenus.types.every((u) => config.isUnitDisabled(u));
 
@@ -122,7 +166,10 @@ export class UnitDisplay extends LitElement implements Controller {
   tick() {
     const player = this.game?.myPlayer();
     if (!player) return;
-    this.keybinds = new UserSettings().keybinds(Platform.isMac);
+    this.keybinds = new UserSettings().effectiveKeybinds(
+      this.keyMode(),
+      Platform.isMac,
+    );
     player.buildables(undefined, BuildMenus.types).then((buildables) => {
       this.playerBuildables = buildables;
     });

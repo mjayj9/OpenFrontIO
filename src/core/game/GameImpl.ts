@@ -8,6 +8,7 @@ import {
 } from "../execution/nation/SharedWaterCache";
 import { transferModernArea } from "../modern/ModernArea";
 import {
+  migrateLegacyModernState,
   ModernState,
   modernStateHash,
   ModernStateSchema,
@@ -1711,8 +1712,14 @@ export class GameImpl implements Game {
 
 export const GameSnapshot = snapshotType({
   name: "Game",
-  version: 2,
-  migrations: { 1: (data) => ({ ...data, modernSystems: null }) },
+  version: 3,
+  migrations: {
+    1: (data) => ({ ...data, modernSystems: null }),
+    2: (data) => ({
+      ...data,
+      modernSystems: migrateLegacyModernState(data.modernSystems),
+    }),
+  },
   schema: z.object({
     modernSystems: ModernStateSchema.nullable(),
     ticks: zInt(),

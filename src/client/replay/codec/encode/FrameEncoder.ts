@@ -28,7 +28,9 @@
  *               updates carry the terrain byte in bits 16-23.
  */
 
+import type { ModernState } from "../../../../core/modern/ModernState";
 import type { NameEntry, PlayerState, UnitState } from "../../../render/types";
+import { applyModernForcesFrame } from "../../../view/ModernForcesFrame";
 import { BinaryWriter } from "../BinaryWriter";
 import {
   PLAYER_FIELDS,
@@ -54,9 +56,28 @@ export const SEC_TERRAIN = 1 << 6;
 
 export class FrameEncoder {
   private modernSystems: Record<string, unknown> | null = null;
+  private modernForcesTick = -1;
   private applyModernSystems(misc: MiscUpdates | null): void {
-    for (const raw of misc?.ModernSystems ?? [])
-      this.modernSystems = raw as Record<string, unknown>;
+    for (const raw of misc?.ModernSystems ?? []) {
+      const baseline = raw as { state: ModernState };
+      if (baseline.state.tick < this.modernForcesTick) continue;
+      this.modernSystems = baseline;
+      this.modernForcesTick = baseline.state.tick;
+    }
+    for (const raw of misc?.ModernForcesFrame ?? []) {
+      const motion = raw as { tick: number; positions: number[] };
+      if (!this.modernSystems || motion.tick <= this.modernForcesTick) continue;
+      const state = applyModernForcesFrame(
+        this.modernSystems.state as ModernState,
+        motion,
+        this.modernForcesTick,
+        this.tileState.length,
+      );
+      this.modernForcesTick = motion.tick;
+      // Carry motion into each seekable keyframe; its economy baseline tick is
+      // unchanged, so preserve the separate ordering clock as codec metadata.
+      this.modernSystems = { state, forceTick: this.modernForcesTick };
+    }
   }
   private aiStrategies = new Map<string, Record<string, unknown>>();
   private applyAIStrategies(misc: MiscUpdates | null): void {

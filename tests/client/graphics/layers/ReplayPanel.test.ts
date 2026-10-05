@@ -18,6 +18,7 @@ vi.mock("lit/decorators.js", () => ({
   customElement: () => (clazz: unknown) => clazz,
   state: () => () => {},
   property: () => () => {},
+  query: () => () => {},
 }));
 
 vi.mock("../../../../src/client/Utils", () => ({

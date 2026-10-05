@@ -14,22 +14,37 @@ import {
 } from "../core/modern/ModernForceTypes";
 import { MODERN_RULES } from "../core/modern/ModernRules";
 import { nuclearEffects } from "../core/modern/ModernState";
-import "./components/baseComponents/setting/SettingKeybind";
 import { HelpModal } from "./HelpModal";
-import { ContextMenuEvent } from "./InputHandler";
+import {
+  CenterCameraEvent,
+  ContextMenuEvent,
+  ShowBuildMenuEvent,
+} from "./InputHandler";
 import {
   MODERN_KEYBINDS_CHANGED,
-  MODERN_KEY_DEFAULTS,
   ModernBranchEvent,
+  ModernBuildBaseEvent,
+  ModernCancelEvent,
+  ModernCenterSelectionEvent,
   ModernClearSelectionEvent,
+  ModernPreviewEvent,
+  ModernSelectVisibleEvent,
   ModernSelectionEvent,
+  ModernStopEvent,
   ModernTargetEvent,
   modernKeybinds,
-  saveModernKeybind,
 } from "./ModernInput";
+import {
+  MODERN_ICONS,
+  curvedPath,
+  drawCommandArrow,
+  modernMapImage,
+  type ArrowSegment,
+} from "./ModernMapDisplay";
 import { modernNuclearNotice } from "./ModernNuclearNotice";
+import { queryPreviewBatches, stableChunks } from "./ModernSelectionCommands";
 import { Platform } from "./Platform";
-import { TransformHandler } from "./TransformHandler";
+import { GoToPositionEvent, TransformHandler } from "./TransformHandler";
 import { SendModernIntentEvent } from "./Transport";
 import { UIState } from "./UIState";
 import { formatKeyForDisplay, renderNumber, translateText } from "./Utils";
@@ -55,15 +70,23 @@ export class ModernCommandPanel extends LitElement {
   @state() private status = "";
   @state() private expanded = false;
   @state() private minimized = false;
-  @state() private keysOpen = false;
   @state() private preview: ModernCommandPreview | null = null;
+  private previews = new Map<
+    string,
+    { preview: ModernCommandPreview; command: ModernCommandKind }
+  >();
   @state() private target: TileRef | null = null;
   @state() private portId = "";
   @state() private climate = "temperate";
   @state() private climateOverlay = false;
   @state() private inspectTarget = false;
   @state() private selectedBaseId = "";
-  private productionPlacement: "airbase" | null = null;
+  @state() private productionManpowerSource:
+    | "auto"
+    | "army_reserve"
+    | "available" = "auto";
+  private productionPlacement: "armybase" | "navybase" | "airbase" | null =
+    null;
   private pendingProductionTile: TileRef | null = null;
   private climateCanvas: HTMLCanvasElement | null = null;
   private pendingCommand: {
@@ -72,48 +95,143 @@ export class ModernCommandPanel extends LitElement {
   } | null = null;
   private revision = 0;
   private interval: ReturnType<typeof setInterval> | null = null;
+  private nativeCosts = new Map<UnitType, number>();
+  private nativeCostsTick = -Infinity;
+  private nativeCostsRequest: number | null = null;
+  private nativeCostsGeneration = 0;
   private canvas: HTMLCanvasElement | null = null;
   private frame = 0;
   private selectionBox: ModernSelectionEvent | null = null;
   private stopped = true;
   private pendingStops = new Set<string>();
   private userSettings = new UserSettings();
+  private pendingHover: ModernPreviewEvent | null = null;
+  private hoverInFlight = false;
+  private committing = false;
+  private hoverTimer: ReturnType<typeof setTimeout> | null = null;
+  private cursor = { x: 0, y: 0 };
+  private lastPreviewEvidenceTarget: TileRef | null = null;
+  private arrowCache = new Map<
+    string,
+    { path: TileRef[]; segments: ArrowSegment[] }
+  >();
+  private previewCache = new Map<string, ModernCommandPreview>();
 
   createRenderRoot() {
     return this;
   }
   private readonly onBranch = (event: ModernBranchEvent) => {
     this.branch = event.branch;
+    this.uiState.modernAdditiveSelection = false;
+    this.uiState.modernQueueCommand = false;
     this.uiState.modernBranchesUsed = [
       ...new Set([...(this.uiState.modernBranchesUsed ?? []), event.branch]),
     ];
     this.selectedIds = [];
     this.operation = "auto";
     this.clearPreview();
-    this.status = translateText("modern_v2.select_units");
+    this.status = this.ownedForces().length
+      ? translateText("modern_v2.select_units")
+      : translateText("repair.no_branch_units");
   };
   private readonly onClear = () => {
     this.selectedIds = [];
+    this.uiState.modernAdditiveSelection = false;
+    this.uiState.modernQueueCommand = false;
     this.selectionBox = null;
     this.uiState.modernTargeting = false;
     this.clearPreview();
   };
   private readonly onKeys = () => this.requestUpdate();
-  private updatePlacement(): void {
-    const width = Math.min(window.innerWidth * 0.96, 460);
-    const sidebar = document
-      .querySelector("game-left-sidebar > aside")
-      ?.getBoundingClientRect();
-    let top = window.innerWidth < 640 ? 56 : 112;
+  private readonly onStop = () => this.control("stop");
+  private readonly onBuildBase = (event: ModernBuildBaseEvent) =>
+    this.produce(event.kind);
+  private readonly onCancel = () => {
     if (
-      sidebar &&
-      sidebar.right > window.innerWidth - width - 8 &&
-      sidebar.bottom > top
+      this.preview ||
+      this.productionPlacement ||
+      this.uiState.modernTargeting
+    ) {
+      this.uiState.modernTargeting = false;
+      this.clearPreview();
+    } else this.onClear();
+  };
+  private readonly onVisible = () => {
+    this.selectedIds = this.ownedForces()
+      .filter((force) => {
+        const point = this.transform.worldToScreenCoordinates(
+          new Cell(
+            this.game.x(this.forceTile(force)) + 0.5,
+            this.game.y(this.forceTile(force)) + 0.5,
+          ),
+        );
+        return (
+          point.x >= 0 &&
+          point.y >= 0 &&
+          point.x <= innerWidth &&
+          point.y <= innerHeight
+        );
+      })
+      .map((force) => force.id);
+    this.uiState.modernSelectedForceIds = [...this.selectedIds];
+    this.clearPreview();
+  };
+  private readonly onCenter = () => {
+    const forces = this.ownedForces().filter((force) =>
+      this.selectedIds.includes(force.id),
+    );
+    if (!forces.length) this.eventBus.emit(new CenterCameraEvent());
+    else
+      this.eventBus.emit(
+        new GoToPositionEvent(
+          forces.reduce(
+            (sum, force) => sum + this.game.x(this.forceTile(force)),
+            0,
+          ) / forces.length,
+          forces.reduce(
+            (sum, force) => sum + this.game.y(this.forceTile(force)),
+            0,
+          ) / forces.length,
+        ),
+      );
+  };
+  private readonly onPreview = (event: ModernPreviewEvent) => {
+    this.cursor = { x: event.x, y: event.y };
+    if (
+      !this.selectedIds.length ||
+      this.productionPlacement ||
+      this.inspectTarget
     )
-      top = Math.min(window.innerHeight - 180, sidebar.bottom + 8);
-    this.style.top = `${Math.max(8, top)}px`;
-    this.style.left = "auto";
-    this.style.right = "8px";
+      return;
+    this.pendingHover = event;
+    // Invalidate a previous response immediately, before waiting for it. Only
+    // one cursor query batch can be in flight, regardless of pointer frequency.
+    if (this.committing) return;
+    this.revision++;
+    if (!this.hoverInFlight && this.hoverTimer === null)
+      this.hoverTimer = setTimeout(() => {
+        this.hoverTimer = null;
+        void this.flushHover();
+      }, 60);
+  };
+  private async flushHover(): Promise<void> {
+    const event = this.pendingHover;
+    this.pendingHover = null;
+    if (!event || this.stopped) return;
+    const cell = this.transform.screenToWorldCoordinates(event.x, event.y);
+    if (!this.game.isValidCoord(cell.x, cell.y)) return;
+    const target = this.game.ref(cell.x, cell.y);
+    if (target === this.target && this.pendingCommand?.queue === event.queue)
+      return;
+    this.hoverInFlight = true;
+    await this.prepare(target, event.queue, true);
+    this.hoverInFlight = false;
+    if (this.pendingHover && !this.stopped) void this.flushHover();
+  }
+  private updatePlacement(): void {
+    // The panel is a normal child of the existing bottom resource HUD. No
+    // independent floating panel covers the battlefield or leaderboards.
+    this.style.width = "100%";
   }
   private readonly onSelect = (event: ModernSelectionEvent) => {
     this.selectionBox = event.complete ? null : event;
@@ -128,7 +246,10 @@ export class ModernCommandPanel extends LitElement {
     const maxY = Math.max(event.startY, event.endY) + (tiny ? 16 : 0);
     const matches = this.ownedForces().filter((force) => {
       const point = this.transform.worldToScreenCoordinates(
-        new Cell(this.game.x(force.tile), this.game.y(force.tile)),
+        new Cell(
+          this.game.x(this.forceTile(force)) + 0.5,
+          this.game.y(this.forceTile(force)) + 0.5,
+        ),
       );
       return (
         point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY
@@ -136,10 +257,16 @@ export class ModernCommandPanel extends LitElement {
     });
     const nearest = tiny
       ? matches
+          .filter(
+            (force) => !event.additive || !this.selectedIds.includes(force.id),
+          )
           .sort((a, b) => {
             const distance = (force: ModernForceState) => {
               const point = this.transform.worldToScreenCoordinates(
-                new Cell(this.game.x(force.tile), this.game.y(force.tile)),
+                new Cell(
+                  this.game.x(this.forceTile(force)) + 0.5,
+                  this.game.y(this.forceTile(force)) + 0.5,
+                ),
               );
               return (point.x - event.endX) ** 2 + (point.y - event.endY) ** 2;
             };
@@ -147,18 +274,45 @@ export class ModernCommandPanel extends LitElement {
           })
           .slice(0, 1)
       : matches;
+    if (tiny && !nearest.length) {
+      const base = (this.systems()?.bases ?? [])
+        .filter(
+          (entry) =>
+            entry.playerId === this.game.myPlayer()?.id() &&
+            (entry.branch ?? "air") === this.branch,
+        )
+        .find((entry) => {
+          const point = this.transform.worldToScreenCoordinates(
+            new Cell(
+              this.game.x(entry.tile) + 0.5,
+              this.game.y(entry.tile) + 0.5,
+            ),
+          );
+          return (
+            Math.abs(point.x - event.endX) <= 18 &&
+            Math.abs(point.y - event.endY) <= 18
+          );
+        });
+      if (base) {
+        this.selectedBaseId = base.id;
+        this.expanded = true;
+      }
+    }
     this.selectedIds = [
       ...new Set([
         ...(event.additive ? this.selectedIds : []),
         ...nearest.map((force) => force.id),
       ]),
-    ].slice(0, 32);
+    ];
+    this.uiState.modernSelectedForceIds = [...this.selectedIds];
     this.clearPreview();
     this.status = this.selectedIds.length
       ? ""
       : translateText("modern_v2.no_units");
   };
   private readonly onTarget = (event: ModernTargetEvent) => {
+    this.pendingHover = null;
+    this.cursor = { x: event.x, y: event.y };
     if (this.inspectTarget) {
       this.inspectTarget = false;
       this.uiState.modernTargeting = false;
@@ -175,24 +329,38 @@ export class ModernCommandPanel extends LitElement {
       this.status = translateText("modern_v2.reason.out_of_map");
       return;
     }
-    if (this.productionPlacement === "airbase") {
+    if (this.productionPlacement) {
       const tile = this.game.ref(cell.x, cell.y);
+      if (this.productionPlacement === "navybase") {
+        void this.prepareNavalBase(tile);
+        return;
+      }
       const me = this.game.myPlayer();
       const bases = this.systems()?.bases ?? [];
+      const branch = this.productionPlacement === "armybase" ? "army" : "air";
       const valid = Boolean(
         me &&
         this.game.isLand(tile) &&
         !this.game.isImpassable(tile) &&
         this.game.ownerID(tile) === me.smallID() &&
-        me.gold() >= BigInt(DEFAULT_MODERN_FORCE_RULES.airbaseCost) &&
-        !bases.some((base) => base.tile === tile) &&
-        bases.filter((base) => base.playerId === me.id()).length <
-          DEFAULT_MODERN_FORCE_RULES.maxBasesPerFaction,
+        me.gold() >= BigInt(this.productionCost(this.productionPlacement)) &&
+        !bases.some(
+          (base) => base.tile === tile && (base.branch ?? "air") === branch,
+        ) &&
+        bases.filter(
+          (base) =>
+            base.playerId === me.id() && (base.branch ?? "air") === branch,
+        ).length < DEFAULT_MODERN_FORCE_RULES.maxBasesPerFaction,
       );
       this.pendingProductionTile = tile;
       this.preview = {
         valid,
-        reason: valid ? null : "airbase_requires_owned_land_and_gold",
+        reason: valid
+          ? null
+          : me &&
+              me.gold() < BigInt(this.productionCost(this.productionPlacement))
+            ? "insufficient_gold"
+            : "base_requires_owned_land",
         path: [tile],
         etaTicks: 0,
         rangeTiles: 0,
@@ -200,14 +368,25 @@ export class ModernCommandPanel extends LitElement {
         climateEfficiencyPermille: 1000,
       };
       this.status = valid
-        ? translateText("modern_v2.confirm_airbase", {
-            cost: DEFAULT_MODERN_FORCE_RULES.airbaseCost,
-            capacity: DEFAULT_MODERN_FORCE_RULES.airbaseCapacity,
+        ? translateText("repair.production_detail", {
+            gold: this.productionCost(this.productionPlacement),
+            seconds: this.productionTicks(this.productionPlacement) / 10,
+            personnel: 0,
           })
         : this.reason(this.preview.reason);
       return;
     }
-    void this.prepare(this.game.ref(cell.x, cell.y), event.queue);
+    // A right click confirms this exact cursor destination. A stale hover
+    // response can neither change it nor issue an unintended second command.
+    const target = this.game.ref(cell.x, cell.y);
+    const targetMode = Boolean(this.uiState.modernTargeting);
+    this.committing = true;
+    void this.prepare(target, event.queue, targetMode).then((valid) => {
+      if (valid && this.target === target && !targetMode) this.confirm();
+      this.committing = false;
+      if (this.pendingHover && !this.stopped && !this.hoverInFlight)
+        void this.flushHover();
+    });
   };
 
   public start(): void {
@@ -217,6 +396,12 @@ export class ModernCommandPanel extends LitElement {
     this.eventBus.on(ModernClearSelectionEvent, this.onClear);
     this.eventBus.on(ModernSelectionEvent, this.onSelect);
     this.eventBus.on(ModernTargetEvent, this.onTarget);
+    this.eventBus.on(ModernPreviewEvent, this.onPreview);
+    this.eventBus.on(ModernStopEvent, this.onStop);
+    this.eventBus.on(ModernSelectVisibleEvent, this.onVisible);
+    this.eventBus.on(ModernCancelEvent, this.onCancel);
+    this.eventBus.on(ModernCenterSelectionEvent, this.onCenter);
+    this.eventBus.on(ModernBuildBaseEvent, this.onBuildBase);
     globalThis.addEventListener(MODERN_KEYBINDS_CHANGED, this.onKeys);
     this.interval = setInterval(() => {
       this.selectedIds = this.selectedIds.filter((id) =>
@@ -235,6 +420,7 @@ export class ModernCommandPanel extends LitElement {
             (this.uiState.modernCompletedStops ?? 0) + 1;
         }
       }
+      this.refreshNativeCosts();
       this.updatePlacement();
       this.requestUpdate();
     }, 250);
@@ -253,10 +439,38 @@ export class ModernCommandPanel extends LitElement {
       this.eventBus.off(ModernClearSelectionEvent, this.onClear);
       this.eventBus.off(ModernSelectionEvent, this.onSelect);
       this.eventBus.off(ModernTargetEvent, this.onTarget);
+      this.eventBus.off(ModernPreviewEvent, this.onPreview);
+      this.eventBus.off(ModernStopEvent, this.onStop);
+      this.eventBus.off(ModernSelectVisibleEvent, this.onVisible);
+      this.eventBus.off(ModernCancelEvent, this.onCancel);
+      this.eventBus.off(ModernCenterSelectionEvent, this.onCenter);
+      this.eventBus.off(ModernBuildBaseEvent, this.onBuildBase);
     }
     globalThis.removeEventListener(MODERN_KEYBINDS_CHANGED, this.onKeys);
     if (this.interval !== null) clearInterval(this.interval);
     this.interval = null;
+    if (this.hoverTimer !== null) clearTimeout(this.hoverTimer);
+    this.hoverTimer = null;
+    this.pendingHover = null;
+    this.nativeCostsGeneration++;
+    this.nativeCostsRequest = null;
+    this.nativeCostsTick = -Infinity;
+    this.nativeCosts.clear();
+    this.clearPreview();
+    this.selectedIds = [];
+    this.selectedBaseId = "";
+    this.pendingStops.clear();
+    this.committing = false;
+    this.hoverInFlight = false;
+    this.status = "";
+    if (this.uiState) {
+      this.uiState.modernTargeting = false;
+      this.uiState.modernSelectedForceIds = [];
+      this.uiState.modernAdditiveSelection = false;
+      this.uiState.modernQueueCommand = false;
+    }
+    this.arrowCache.clear();
+    this.previewCache.clear();
     cancelAnimationFrame(this.frame);
     this.canvas?.remove();
     this.canvas = null;
@@ -265,8 +479,64 @@ export class ModernCommandPanel extends LitElement {
     this.stop();
     super.disconnectedCallback();
   }
+  private previewSummary(): string {
+    const preview = this.preview;
+    if (!preview) return "";
+    if (!preview.valid) return this.reason(preview.reason);
+    if (this.productionPlacement)
+      return translateText("repair.production_detail", {
+        gold: this.productionCost(this.productionPlacement),
+        seconds: this.productionTicks(this.productionPlacement) / 10,
+        personnel: 0,
+      });
+    const summary = translateText("modern_v2.preview", {
+      seconds: Math.ceil(preview.etaTicks / 10),
+      range: preview.rangeTiles,
+      risk: translateText(`modern_v2.risk.${preview.risk}`),
+      efficiency: Math.round(preview.climateEfficiencyPermille / 10),
+    });
+    const combat = preview.armyCombat;
+    const details = combat
+      ? translateText("modern_v2.ground_preview", {
+          attacker: renderNumber(
+            combat.attackerLossRaw / MODERN_RULES.rawTroopsPerPerson,
+          ),
+          defender: renderNumber(
+            combat.defenderLossRaw / MODERN_RULES.rawTroopsPerPerson,
+          ),
+          defenderClimate: Math.round(combat.defenderClimatePermille / 10),
+          ratio: Math.round(combat.climateRatioPermille / 10),
+        })
+      : "";
+    return [
+      summary,
+      details,
+      preview.usesTransport ? translateText("modern_v2.transport_preview") : "",
+      this.pendingCommand?.queue
+        ? translateText("modern_v2.queue_preview")
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
   private systems() {
     return this.game.modernSystems();
+  }
+  private selectFromRoster(id: string, shift = false): void {
+    if (!this.ownedForces().some((force) => force.id === id)) return;
+    const previousCount = this.selectedIds.length;
+    this.selectedIds =
+      shift || this.uiState.modernAdditiveSelection
+        ? [...new Set([...this.selectedIds, id])]
+        : [id];
+    this.uiState.modernSelectedForceIds = [...this.selectedIds];
+    if (
+      (shift || this.uiState.modernAdditiveSelection) &&
+      this.selectedIds.length > previousCount
+    )
+      this.uiState.modernAdditionalSelections =
+        (this.uiState.modernAdditionalSelections ?? 0) + 1;
+    this.clearPreview();
   }
   private ownedForces(): ModernForceState[] {
     const id = this.game.myPlayer()?.id();
@@ -280,18 +550,23 @@ export class ModernCommandPanel extends LitElement {
   private clearPreview(): void {
     this.revision++;
     this.preview = null;
+    this.previews.clear();
     this.target = null;
     this.pendingCommand = null;
     this.productionPlacement = null;
     this.pendingProductionTile = null;
   }
-  private async prepare(target: TileRef, queue: boolean): Promise<void> {
+  private async prepare(
+    target: TileRef,
+    queue: boolean,
+    hover = false,
+  ): Promise<boolean> {
     const forces = this.ownedForces().filter((force) =>
       this.selectedIds.includes(force.id),
     );
     if (!forces.length) {
       this.status = translateText("modern_v2.no_units");
-      return;
+      return false;
     }
     const enemy =
       (this.game.ownerID(target) !== 0 &&
@@ -306,12 +581,12 @@ export class ModernCommandPanel extends LitElement {
               force.phase !== "destroyed",
           ),
         ));
-    const command =
+    const commandFor = (force: ModernForceState): ModernCommandKind =>
       this.operation !== "auto"
         ? this.operation
         : this.branch === "air"
           ? enemy
-            ? forces[0].kind === "strike"
+            ? force.kind === "strike"
               ? "strike"
               : "air_superiority"
             : "patrol"
@@ -321,13 +596,40 @@ export class ModernCommandPanel extends LitElement {
     const revision = ++this.revision;
     this.status = translateText("modern_v2.checking_path");
     try {
-      const previews = await Promise.all(
-        forces.map((force) =>
-          this.queryPreview(force.id, target, command, queue),
-        ),
+      const previews = await queryPreviewBatches(
+        forces,
+        async (force) => {
+          const command = commandFor(force);
+          const key = `${this.game.modernForcesTick?.() ?? this.game.ticks()}:${force.id}:${force.tile}:${target}:${command}:${queue}`;
+          const cached = this.previewCache.get(key);
+          if (cached) {
+            this.previewCache.delete(key);
+            this.previewCache.set(key, cached);
+            return cached;
+          }
+          const result = await this.queryPreview(
+            force.id,
+            target,
+            command,
+            queue,
+          );
+          if (!this.stopped && revision === this.revision) {
+            this.previewCache.set(key, result);
+            if (this.previewCache.size > 512)
+              this.previewCache.delete(this.previewCache.keys().next().value!);
+          }
+          return result;
+        },
+        () => !this.stopped && revision === this.revision,
       );
-      if (this.stopped || revision !== this.revision) return;
-      this.preview = previews.find((result) => !result.valid) ?? previews[0];
+      if (!previews || this.stopped || revision !== this.revision) return false;
+      this.previews = new Map(
+        forces.map((force, index) => [
+          force.id,
+          { preview: previews[index], command: commandFor(force) },
+        ]),
+      );
+      this.preview = previews.find((result) => result.valid) ?? previews[0];
       if (this.branch === "army" && this.preview.valid) {
         if (this.preview.climateEfficiencyPermille > 1000)
           this.uiState.modernClimatePreviewAdapted = true;
@@ -335,13 +637,24 @@ export class ModernCommandPanel extends LitElement {
           this.uiState.modernClimatePreviewHarsh = true;
       }
       this.target = target;
-      this.pendingCommand = { command, queue };
+      if (
+        hover &&
+        this.preview.valid &&
+        this.lastPreviewEvidenceTarget !== target
+      ) {
+        this.lastPreviewEvidenceTarget = target;
+        this.uiState.modernCursorPreviewCount =
+          (this.uiState.modernCursorPreviewCount ?? 0) + 1;
+      }
+      this.pendingCommand = { command: commandFor(forces[0]), queue };
       this.status = this.preview.valid
         ? translateText("modern_v2.confirm_preview")
         : this.reason(this.preview.reason);
+      return this.preview.valid;
     } catch {
       if (!this.stopped && revision === this.revision)
         this.status = translateText("modern_v2.preview_unavailable");
+      return false;
     }
   }
   private reason(reason: string | null): string {
@@ -352,41 +665,151 @@ export class ModernCommandPanel extends LitElement {
     this.status = translateText("modern_v2.paused_commands");
     return false;
   }
+  private async prepareNavalBase(tile: TileRef): Promise<boolean> {
+    const game = this.game,
+      me = game.myPlayer(),
+      revision = ++this.revision;
+    this.preview = null;
+    this.pendingProductionTile = null;
+    this.status = translateText("modern_v2.checking_path");
+    const current = () =>
+      !this.stopped &&
+      this.game === game &&
+      this.productionPlacement === "navybase" &&
+      this.revision === revision;
+    const show = (reason: string | null, spawn: TileRef = tile) => {
+      if (!current()) return false;
+      this.preview = {
+        valid: reason === null,
+        reason,
+        path: [spawn],
+        etaTicks: this.productionTicks("navybase"),
+        rangeTiles: 0,
+        risk: "uncertain",
+        climateEfficiencyPermille: 1000,
+      };
+      this.pendingProductionTile = reason === null ? spawn : null;
+      this.status = reason ? this.reason(reason) : this.previewSummary();
+      return reason === null;
+    };
+    if (
+      !me ||
+      !game.isLand(tile) ||
+      game.isImpassable(tile) ||
+      game.ownerID(tile) !== me.smallID()
+    )
+      return show("base_requires_owned_land");
+    if (game.config().isUnitDisabled(UnitType.Port))
+      return show("navybase_disabled");
+    try {
+      // Reuse the original Worker/core Port search. A coastal click alone is
+      // insufficient: nearby structures can reject or relocate its spawn.
+      const buildable = (await me.buildables(tile, [UnitType.Port])).find(
+        (item) => item.type === UnitType.Port,
+      );
+      if (!current()) return false;
+      if (!buildable) return show("cost_unavailable");
+      // Discard an older price-only query, which must not overwrite this
+      // placement's freshly validated native price.
+      this.nativeCostsRequest = null;
+      this.nativeCosts.set(UnitType.Port, Number(buildable.cost));
+      this.nativeCostsTick = game.ticks();
+      if (me.gold() < buildable.cost) return show("insufficient_gold");
+      const spawn = buildable.canBuild;
+      if (
+        typeof spawn !== "number" ||
+        !game.isValidCoord(game.x(spawn), game.y(spawn)) ||
+        !game.isLand(spawn) ||
+        game.isImpassable(spawn) ||
+        game.ownerID(spawn) !== me.smallID()
+      )
+        return show("navybase_no_valid_site");
+      if (
+        this.systems()?.bases.some(
+          (base) => base.tile === spawn && base.branch === "navy",
+        )
+      )
+        return show("base_already_exists", spawn);
+      return show(null, spawn);
+    } catch {
+      return show("cost_unavailable");
+    }
+  }
+  private async confirmNavalBase(): Promise<void> {
+    if (this.committing || this.pendingProductionTile === null) return;
+    const tile = this.pendingProductionTile,
+      price = this.productionCost("navybase");
+    this.committing = true;
+    try {
+      const valid = await this.prepareNavalBase(tile);
+      // A changed price/site needs a refreshed, explicit confirmation. A
+      // paused game, cancelled preview or old response cannot submit a build.
+      if (
+        valid &&
+        this.pendingProductionTile === tile &&
+        this.productionCost("navybase") === price &&
+        this.canDispatch()
+      )
+        this.dispatchBaseProduction();
+    } finally {
+      this.committing = false;
+    }
+  }
+  private dispatchBaseProduction(): void {
+    if (!this.productionPlacement || this.pendingProductionTile === null)
+      return;
+    this.eventBus.emit(
+      new SendModernIntentEvent({
+        type: "modern_produce",
+        branch:
+          this.productionPlacement === "armybase"
+            ? "army"
+            : this.productionPlacement === "navybase"
+              ? "navy"
+              : "air",
+        kind: this.productionPlacement,
+        tile: this.pendingProductionTile,
+        count: 1,
+      }),
+    );
+    this.uiState.modernTargeting = false;
+    this.clearPreview();
+    this.status = translateText("modern_v2.production_sent");
+  }
   private sendModern(event: SendModernIntentEvent): void {
     if (this.canDispatch()) this.eventBus.emit(event);
   }
   private confirm(): void {
     if (!this.canDispatch()) return;
     if (
-      this.productionPlacement === "airbase" &&
+      this.productionPlacement &&
       this.preview?.valid &&
       this.pendingProductionTile !== null
     ) {
-      this.eventBus.emit(
-        new SendModernIntentEvent({
-          type: "modern_produce",
-          branch: "air",
-          kind: "airbase",
-          tile: this.pendingProductionTile,
-          count: 1,
-        }),
-      );
-      this.uiState.modernTargeting = false;
-      this.clearPreview();
-      this.status = translateText("modern_v2.production_sent");
+      if (this.productionPlacement === "navybase") void this.confirmNavalBase();
+      else this.dispatchBaseProduction();
       return;
     }
     if (!this.preview?.valid || this.target === null || !this.pendingCommand)
       return;
-    this.eventBus.emit(
-      new SendModernIntentEvent({
-        type: "modern_command",
-        forceIds: [...this.selectedIds],
-        command: this.pendingCommand.command,
-        target: this.target,
-        queue: this.pendingCommand.queue,
-      }),
-    );
+    const grouped = new Map<ModernCommandKind, string[]>();
+    for (const [id, result] of this.previews) {
+      if (!result.preview.valid || !this.selectedIds.includes(id)) continue;
+      const ids = grouped.get(result.command) ?? [];
+      ids.push(id);
+      grouped.set(result.command, ids);
+    }
+    for (const [command, forceIds] of grouped)
+      for (const chunk of stableChunks(forceIds))
+        this.eventBus.emit(
+          new SendModernIntentEvent({
+            type: "modern_command",
+            forceIds: chunk,
+            command,
+            target: this.target,
+            queue: this.pendingCommand.queue,
+          }),
+        );
     this.uiState.modernTargeting = false;
     this.clearPreview();
     this.status = translateText("modern_v2.command_sent");
@@ -407,41 +830,63 @@ export class ModernCommandPanel extends LitElement {
           this.pendingStops.add(force.id);
       }
     }
-    this.eventBus.emit(
-      new SendModernIntentEvent({
-        type: "modern_command",
-        forceIds: [...this.selectedIds],
-        command,
-        target: first.tile,
-      }),
-    );
+    for (const forceIds of stableChunks(this.selectedIds))
+      this.eventBus.emit(
+        new SendModernIntentEvent({
+          type: "modern_command",
+          forceIds,
+          command,
+          target: first.tile,
+        }),
+      );
     this.clearPreview();
   }
   private produce(
-    kind: "army" | "warship" | "fighter" | "strike" | "airbase",
+    kind:
+      | "army"
+      | "warship"
+      | "fighter"
+      | "strike"
+      | "airbase"
+      | "armybase"
+      | "navybase"
+      | "repair_base",
   ): void {
     const me = this.game.myPlayer();
     if (!me) return;
-    if (kind === "airbase") {
+    if (kind.endsWith("base") && kind !== "repair_base") {
+      if (kind === "navybase" && !this.nativeCosts.has(UnitType.Port)) {
+        this.status = this.reason("cost_unavailable");
+        this.refreshNativeCosts();
+        return;
+      }
       this.clearPreview();
-      this.productionPlacement = "airbase";
+      this.expanded = false;
+      this.productionPlacement = kind as "armybase" | "navybase" | "airbase";
       this.uiState.modernTargeting = true;
-      this.status = translateText("modern_v2.place_airbase");
+      this.status = translateText("repair.place_base", {
+        base: translateText(`modern_v2.kind.${kind}`),
+      });
       return;
     }
     if (!this.canDispatch()) return;
     const systems = this.systems();
     const bases =
       systems?.bases.filter(
-        (item) => item.playerId === me.id() && item.health > 0,
+        (item) =>
+          item.playerId === me.id() &&
+          item.health > 0 &&
+          (item.branch ?? "air") === this.branch,
       ) ?? [];
     const base =
       bases.find((item) => item.id === this.selectedBaseId) ?? bases[0];
     const center = me.nameLocation();
-    let tile = center
-      ? this.game.ref(Math.round(center.x), Math.round(center.y))
-      : base?.tile;
-    if (kind === "warship")
+    let tile =
+      base?.tile ??
+      (center
+        ? this.game.ref(Math.round(center.x), Math.round(center.y))
+        : undefined);
+    if (kind === "warship" && !base)
       tile =
         me
           .units(UnitType.Port)
@@ -450,14 +895,311 @@ export class ModernCommandPanel extends LitElement {
     this.eventBus.emit(
       new SendModernIntentEvent({
         type: "modern_produce",
-        branch: kind === "army" ? "army" : kind === "warship" ? "navy" : "air",
+        branch:
+          kind === "army"
+            ? "army"
+            : kind === "warship"
+              ? "navy"
+              : kind === "repair_base"
+                ? this.branch
+                : "air",
         kind,
         baseId: base?.id,
         tile,
         count: 1,
+        ...(["army", "warship", "fighter", "strike"].includes(kind) &&
+        this.productionManpowerSource !== "auto"
+          ? { source: this.productionManpowerSource }
+          : {}),
       }),
     );
     this.status = translateText("modern_v2.production_sent");
+  }
+  private refreshNativeCosts(): void {
+    const game = this.game,
+      me = game.myPlayer();
+    if (
+      this.stopped ||
+      !me?.buildables ||
+      this.nativeCostsRequest !== null ||
+      game.ticks() < this.nativeCostsTick + 10
+    )
+      return;
+    const request = ++this.nativeCostsGeneration;
+    this.nativeCostsRequest = request;
+    this.nativeCostsTick = game.ticks();
+    const release = () => {
+      if (this.nativeCostsRequest === request) this.nativeCostsRequest = null;
+    };
+    void me
+      .buildables(undefined, [UnitType.Port, UnitType.Warship])
+      .then((buildables) => {
+        if (
+          !this.stopped &&
+          this.game === game &&
+          this.nativeCostsRequest === request
+        ) {
+          this.nativeCosts = new Map(
+            buildables.map((item) => [item.type, Number(item.cost)]),
+          );
+          this.requestUpdate();
+        }
+        release();
+      }, release);
+  }
+  private productionCost(kind: string): number {
+    // Costs need core's construction counters, absent from PlayerView. Query
+    // the existing bounded Worker buildables API instead of casting the view.
+    if (kind === "navybase") return this.nativeCosts.get(UnitType.Port) ?? 0;
+    if (kind === "warship") return this.nativeCosts.get(UnitType.Warship) ?? 0;
+    if (kind === "army") return DEFAULT_MODERN_FORCE_RULES.armyTrainingCost;
+    if (kind === "repair_base")
+      return DEFAULT_MODERN_FORCE_RULES.baseRepairCost;
+    return DEFAULT_MODERN_FORCE_RULES[`${kind}Cost` as "fighterCost"] ?? 0;
+  }
+  private productionTicks(kind: string): number {
+    if (kind === "army") return DEFAULT_MODERN_FORCE_RULES.armyTrainingTicks;
+    if (kind === "warship")
+      return DEFAULT_MODERN_FORCE_RULES.warshipProductionTicks;
+    if (kind === "repair_base")
+      return DEFAULT_MODERN_FORCE_RULES.baseRepairTicks;
+    if (kind.endsWith("base"))
+      return DEFAULT_MODERN_FORCE_RULES[
+        `${kind}BuildTicks` as "airbaseBuildTicks"
+      ];
+    return (
+      DEFAULT_MODERN_FORCE_RULES.aircraftProductionTicks +
+      DEFAULT_MODERN_FORCE_RULES.aircraftProductionTicksPerAircraft
+    );
+  }
+  private branchBase() {
+    const bases =
+      this.systems()?.bases.filter(
+        (base) =>
+          base.playerId === this.game.myPlayer()?.id() &&
+          (base.branch ?? "air") === this.branch,
+      ) ?? [];
+    return bases.find((base) => base.id === this.selectedBaseId) ?? bases[0];
+  }
+  private baseCapacityUsed(baseId: string): number {
+    const state = this.systems();
+    const units = (state?.forces ?? [])
+      .filter((force) => force.baseId === baseId && force.phase !== "destroyed")
+      .reduce(
+        (sum, force) =>
+          sum +
+          (this.branch === "army"
+            ? force.personnel +
+              Math.floor(force.attackTroops / MODERN_RULES.rawTroopsPerPerson)
+            : this.branch === "air"
+              ? force.aircraft
+              : 1),
+        0,
+      );
+    return (
+      units +
+      (state?.production ?? [])
+        .filter((job) => job.baseId === baseId)
+        .reduce(
+          (sum, job) =>
+            sum + (this.branch === "army" ? job.personnel : job.count),
+          0,
+        )
+    );
+  }
+  private productionReason(kind: string): string | null {
+    const me = this.game.myPlayer();
+    if (!me) return "not_owner";
+    if (
+      (kind === "navybase" && !this.nativeCosts.has(UnitType.Port)) ||
+      (kind === "warship" && !this.nativeCosts.has(UnitType.Warship))
+    )
+      return "cost_unavailable";
+    if (me.gold() < BigInt(this.productionCost(kind)))
+      return "insufficient_gold";
+    if (kind.endsWith("base") && kind !== "repair_base") return null;
+    const base = this.branchBase();
+    if (!base)
+      return this.branch === "air"
+        ? "airbase_unavailable"
+        : this.branch === "army"
+          ? "armybase_unavailable"
+          : "warship_requires_port";
+    if (kind === "repair_base")
+      return base.health >= base.maxHealth ? "base_damaged_or_repairing" : null;
+    if ((base.completesTick ?? 0) > this.game.ticks())
+      return "base_under_construction";
+    if (base.health <= 0 || (base.repairUntilTick ?? 0) > this.game.ticks())
+      return "base_damaged_or_repairing";
+    const personnel =
+      this.branch === "army"
+        ? DEFAULT_MODERN_FORCE_RULES.armyPersonnelPerGroup
+        : this.branch === "navy"
+          ? DEFAULT_MODERN_FORCE_RULES.navyPersonnelPerWarship
+          : DEFAULT_MODERN_FORCE_RULES.personnelPerAircraft;
+    const faction = this.systems()?.factions.find(
+      (item) => item.playerId === me.id(),
+    );
+    const reserveRequired =
+      this.effectiveProductionSource(personnel) === "army_reserve";
+    if (reserveRequired) {
+      if (me.troops() < personnel * MODERN_RULES.rawTroopsPerPerson)
+        return "insufficient_army_reserve";
+    } else if (faction) {
+      if (faction.population.available < personnel)
+        return "insufficient_manpower";
+      if (
+        this.systems()?.version === 3 &&
+        faction.population.army +
+          faction.population.navy +
+          faction.population.air +
+          personnel >
+          Math.floor(
+            (faction.population.total * MODERN_RULES.mobilizationPermille) /
+              1000,
+          )
+      )
+        return "mobilization_limit";
+    }
+    if (
+      this.baseCapacityUsed(base.id) +
+        (this.branch === "army" ? personnel : 1) >
+      base.capacity
+    )
+      return "base_capacity";
+    if (
+      this.branch === "navy" &&
+      this.game.config().isUnitDisabled(UnitType.Warship)
+    )
+      return "warship_disabled_or_count";
+    return null;
+  }
+  private effectiveProductionSource(
+    personnel: number,
+  ): "army_reserve" | "available" {
+    if (this.systems()?.version !== 3)
+      return this.branch === "army" ? "army_reserve" : "available";
+    if (this.productionManpowerSource !== "auto")
+      return this.productionManpowerSource;
+    const me = this.game.myPlayer();
+    if (this.branch === "army")
+      return (me?.troops() ?? 0) >= personnel * MODERN_RULES.rawTroopsPerPerson
+        ? "army_reserve"
+        : "available";
+    const population = this.systems()?.factions.find(
+      (item) => item.playerId === me?.id(),
+    )?.population;
+    const cannotMobilize =
+      population &&
+      (population.available < personnel ||
+        population.army + population.navy + population.air + personnel >
+          Math.floor(
+            (population.total * MODERN_RULES.mobilizationPermille) / 1000,
+          ));
+    return cannotMobilize ? "army_reserve" : "available";
+  }
+  private manpowerSummary(): string {
+    const me = this.game.myPlayer();
+    const personnel =
+      this.branch === "army"
+        ? DEFAULT_MODERN_FORCE_RULES.armyPersonnelPerGroup
+        : this.branch === "navy"
+          ? DEFAULT_MODERN_FORCE_RULES.navyPersonnelPerWarship
+          : DEFAULT_MODERN_FORCE_RULES.personnelPerAircraft;
+    return translateText("repair.manpower_source_effective", {
+      pool: translateText(
+        this.effectiveProductionSource(personnel) === "army_reserve"
+          ? "repair.manpower_source_reserve"
+          : "repair.manpower_source_available",
+      ),
+      people: personnel,
+      available:
+        this.systems()?.factions.find((item) => item.playerId === me?.id())
+          ?.population.available ?? 0,
+      reserve: Math.floor(
+        (me?.troops() ?? 0) / MODERN_RULES.rawTroopsPerPerson,
+      ),
+    });
+  }
+  private baseDetails() {
+    const base = this.branchBase();
+    if (!base)
+      return html`<p class="text-xs">
+        ${translateText("repair.no_branch_units")}
+      </p>`;
+    return html`<p class="text-xs">
+        ${translateText("repair.base_status", {
+          base: translateText(`modern_v2.kind.${this.branch}base`),
+          used: this.baseCapacityUsed(base.id),
+          capacity: base.capacity,
+          health: base.health,
+          maxHealth: base.maxHealth,
+          seconds: Math.max(
+            0,
+            Math.ceil(
+              (Math.max(base.completesTick ?? 0, base.repairUntilTick ?? 0) -
+                this.game.ticks()) /
+                10,
+            ),
+          ),
+        })}
+      </p>
+      ${base.health < base.maxHealth
+        ? html`<button
+            class="text-xs border border-slate-500 rounded-md p-1"
+            @click=${() => this.produce("repair_base")}
+          >
+            ${translateText("modern_v2.kind.repair_base")} ·
+            ${renderNumber(DEFAULT_MODERN_FORCE_RULES.baseRepairCost)}
+          </button>`
+        : nothing}`;
+  }
+  private forceTile(force: ModernForceState): TileRef {
+    const unit =
+      force.unitId === null || force.unitId === undefined
+        ? undefined
+        : this.game.unit?.(force.unitId);
+    return unit?.isActive() ? unit.tile() : force.tile;
+  }
+  private commandSegments(
+    key: string,
+    path: TileRef[],
+    branch: ModernBranch,
+    start?: TileRef,
+    index = 0,
+  ): ArrowSegment[] {
+    const cached = this.arrowCache.get(key);
+    if (cached?.path === path) {
+      this.arrowCache.delete(key);
+      this.arrowCache.set(key, cached);
+      return cached.segments;
+    }
+    if (start !== undefined) {
+      const liveIndex = path.indexOf(start, index);
+      if (liveIndex >= 0) index = liveIndex;
+    }
+    const tiles =
+      start === undefined ? path : [start, ...path.slice(index + 1)];
+    const segments = curvedPath(
+      tiles.map((tile) => ({
+        x: this.game.x(tile) + 0.5,
+        y: this.game.y(tile) + 0.5,
+      })),
+      (point) => {
+        if (branch === "air") return true;
+        const x = Math.floor(point.x),
+          y = Math.floor(point.y);
+        if (!this.game.isValidCoord(x, y)) return false;
+        const tile = this.game.ref(x, y);
+        return branch === "navy"
+          ? this.game.isWater(tile) || this.game.isShoreline(tile)
+          : this.game.isLand(tile) && !this.game.isImpassable(tile);
+      },
+    );
+    this.arrowCache.set(key, { path, segments });
+    if (this.arrowCache.size > 1024)
+      this.arrowCache.delete(this.arrowCache.keys().next().value!);
+    return segments;
   }
   private readonly draw = () => {
     if (this.stopped || !this.canvas) return;
@@ -520,137 +1262,225 @@ export class ModernCommandPanel extends LitElement {
       ctx.lineWidth = 2;
       ctx.font = "bold 12px sans-serif";
       ctx.textAlign = "center";
-      for (const port of this.systems()?.ports ?? []) {
+      const systems = this.systems();
+      const me = this.game.myPlayer()?.id();
+      const screen = (point: { x: number; y: number }) =>
+        this.transform.worldToScreenCoordinates(new Cell(point.x, point.y));
+      const visible = (point: { x: number; y: number }) =>
+        point.x >= -20 &&
+        point.y >= -20 &&
+        point.x <= innerWidth + 20 &&
+        point.y <= innerHeight + 20;
+      for (const base of systems?.bases ?? []) {
+        // Naval bases are the original Port facility, already rendered by GL.
         if (
-          this.transform.scale < 2 &&
-          port.ownerId !== this.game.myPlayer()?.id()
+          base.branch === "navy" ||
+          base.health <= 0 ||
+          (this.transform.scale < 2 && base.playerId !== me)
         )
           continue;
-        const point = this.transform.worldToScreenCoordinates(
-          new Cell(this.game.x(port.tile), this.game.y(port.tile)),
+        const point = screen({
+          x: this.game.x(base.tile) + 0.5,
+          y: this.game.y(base.tile) + 0.5,
+        });
+        if (!visible(point)) continue;
+        const icon = modernMapImage(
+          (base.branch ?? "air") === "army" ? "armybase" : "airbase",
         );
-        if (
-          point.x < 0 ||
-          point.y < 0 ||
-          point.x > innerWidth ||
-          point.y > innerHeight
-        )
-          continue;
-        ctx.fillStyle = port.level > 0 ? "#ffeb86" : "#b3b9bd";
-        ctx.strokeStyle = "#101820";
-        ctx.lineWidth = 3;
-        ctx.strokeText("⚓", point.x, point.y);
-        ctx.fillText("⚓", point.x, point.y);
-        if (this.transform.scale >= 6) {
-          ctx.font = "11px sans-serif";
-          ctx.strokeText(port.name, point.x, point.y + 12);
-          ctx.fillText(port.name, point.x, point.y + 12);
-          ctx.font = "bold 12px sans-serif";
+        ctx.globalAlpha =
+          (base.completesTick ?? 0) > this.game.ticks() ? 0.55 : 1;
+        if (icon.complete && icon.naturalWidth)
+          ctx.drawImage(icon, point.x - 13, point.y - 13, 26, 26);
+        ctx.globalAlpha = 1;
+        if (base.playerId === me && this.transform.scale >= 4) {
+          ctx.fillStyle = "white";
+          ctx.strokeStyle = "#101820";
+          const name = translateText(
+            `modern_v2.kind.${base.branch === "army" ? "armybase" : "airbase"}`,
+          );
+          ctx.strokeText(name, point.x, point.y + 24);
+          ctx.fillText(name, point.x, point.y + 24);
         }
-        ctx.lineWidth = 2;
       }
-      for (const base of this.systems()?.bases ?? []) {
-        if (
-          this.transform.scale < 2 &&
-          base.playerId !== this.game.myPlayer()?.id()
-        )
-          continue;
-        const point = this.transform.worldToScreenCoordinates(
-          new Cell(this.game.x(base.tile), this.game.y(base.tile)),
-        );
-        if (
-          point.x < 0 ||
-          point.y < 0 ||
-          point.x > innerWidth ||
-          point.y > innerHeight ||
-          base.health <= 0
-        )
-          continue;
-        ctx.fillStyle = "#b9bcff";
-        ctx.strokeStyle = "#101820";
-        ctx.beginPath();
-        ctx.rect(point.x - 11, point.y - 11, 22, 22);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = "#101820";
-        ctx.fillText("H", point.x, point.y + 4);
-      }
-      for (const force of this.systems()?.forces ?? []) {
-        if (force.phase === "destroyed") continue;
-        if (
-          this.transform.scale < 2 &&
-          force.playerId !== this.game.myPlayer()?.id() &&
-          force.phase === "idle"
-        )
-          continue;
-        const point = this.transform.worldToScreenCoordinates(
-          new Cell(this.game.x(force.tile), this.game.y(force.tile)),
-        );
-        if (
-          point.x < 0 ||
-          point.y < 0 ||
-          point.x > innerWidth ||
-          point.y > innerHeight
-        )
-          continue;
-        const own = force.playerId === this.game.myPlayer()?.id();
-        const selected = this.selectedIds.includes(force.id);
-        ctx.fillStyle = own ? "#a2fff0" : "#ffba9e";
-        ctx.strokeStyle = "#101820";
-        ctx.beginPath();
-        if (force.branch === "air") {
-          ctx.moveTo(point.x, point.y - 9);
-          ctx.lineTo(point.x + 9, point.y + 7);
-          ctx.lineTo(point.x, point.y + 3);
-          ctx.lineTo(point.x - 9, point.y + 7);
-        } else if (force.branch === "navy") {
-          ctx.moveTo(point.x - 8, point.y - 5);
-          ctx.lineTo(point.x + 8, point.y - 5);
-          ctx.lineTo(point.x + 4, point.y + 6);
-          ctx.lineTo(point.x - 4, point.y + 6);
-        } else {
-          ctx.rect(point.x - 6, point.y - 6, 12, 12);
+      if (
+        this.productionPlacement === "navybase" &&
+        this.preview?.valid &&
+        this.pendingProductionTile !== null
+      ) {
+        const tile = this.pendingProductionTile,
+          point = screen({
+            x: this.game.x(tile) + 0.5,
+            y: this.game.y(tile) + 0.5,
+          }),
+          icon = modernMapImage("navybase");
+        if (visible(point) && icon.complete && icon.naturalWidth) {
+          ctx.save();
+          ctx.globalAlpha = 0.6;
+          ctx.drawImage(icon, point.x - 13, point.y - 13, 26, 26);
+          ctx.globalAlpha = 1;
+          ctx.strokeStyle = "#fff799";
+          ctx.strokeRect(point.x - 15, point.y - 15, 30, 30);
+          ctx.restore();
         }
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+      }
+      for (const force of systems?.forces ?? []) {
+        if (
+          force.phase === "destroyed" ||
+          (this.transform.scale < 2 &&
+            force.playerId !== me &&
+            force.phase === "idle")
+        )
+          continue;
+        const point = screen({
+          x: this.game.x(this.forceTile(force)) + 0.5,
+          y: this.game.y(this.forceTile(force)) + 0.5,
+        });
+        const own = force.playerId === me,
+          selected = own && this.selectedIds.includes(force.id);
+        if (selected) {
+          if (force.command && force.path.length) {
+            const liveTile = this.forceTile(force);
+            const key = `active:${force.id}:${liveTile}:${force.pathIndex}`;
+            drawCommandArrow(
+              ctx,
+              this.commandSegments(
+                key,
+                force.path,
+                force.branch,
+                liveTile,
+                force.pathIndex,
+              ),
+              screen,
+              force.branch,
+              "active",
+              ["attack", "strike", "blockade"].includes(force.command.kind),
+            );
+          }
+          const result = this.previews.get(force.id);
+          if (result?.preview.valid) {
+            drawCommandArrow(
+              ctx,
+              this.commandSegments(
+                `preview:${force.id}`,
+                result.preview.path,
+                force.branch,
+              ),
+              screen,
+              force.branch,
+              "preview",
+              ["attack", "strike", "blockade"].includes(result.command),
+            );
+            if (result.preview.transportPath?.length)
+              drawCommandArrow(
+                ctx,
+                this.commandSegments(
+                  `transport:${force.id}`,
+                  result.preview.transportPath,
+                  "navy",
+                ),
+                screen,
+                "navy",
+                "preview",
+              );
+          }
+          // The core records only validated queued routes, and checks them
+          // again on activation. Older saves keep destination markers only.
+          for (let index = 0; index < force.queue.length; index++) {
+            const order = force.queue[index];
+            if (order.previewPath?.length)
+              drawCommandArrow(
+                ctx,
+                this.commandSegments(
+                  `queued:${force.id}:${index}`,
+                  order.previewPath,
+                  force.branch,
+                ),
+                screen,
+                force.branch,
+                "queued",
+                ["strike", "attack", "blockade"].includes(order.kind),
+              );
+            const destination = screen({
+              x: this.game.x(order.target),
+              y: this.game.y(order.target),
+            });
+            ctx.strokeStyle = "#fff799";
+            ctx.setLineDash([2, 4]);
+            ctx.strokeRect(destination.x - 7, destination.y - 7, 14, 14);
+            ctx.setLineDash([]);
+            ctx.fillStyle = "#fff799";
+            ctx.fillText(`${index + 1}`, destination.x, destination.y - 10);
+          }
+          if (force.branch === "air") {
+            const base = systems?.bases.find(
+              (entry) => entry.id === force.baseId,
+            );
+            if (base) {
+              const center = screen({
+                x: this.game.x(base.tile) + 0.5,
+                y: this.game.y(base.tile) + 0.5,
+              });
+              ctx.strokeStyle = "#89d8ff66";
+              ctx.setLineDash([4, 8]);
+              ctx.beginPath();
+              ctx.arc(
+                center.x,
+                center.y,
+                DEFAULT_MODERN_FORCE_RULES.airRangeTiles * this.transform.scale,
+                0,
+                Math.PI * 2,
+              );
+              ctx.stroke();
+              ctx.setLineDash([]);
+            }
+          }
+        }
+        if (!visible(point)) continue;
+        // Native warships/transports retain their original sprite, one unit.
+        if (
+          force.branch !== "navy" &&
+          !(
+            force.branch === "army" &&
+            force.unitId !== null &&
+            force.command?.viaTransport
+          )
+        ) {
+          const icon = modernMapImage(force.branch);
+          ctx.save();
+          if (force.branch === "army")
+            ctx.filter =
+              "brightness(0) invert(1) drop-shadow(0 1px 1px #101820)";
+          if (icon.complete && icon.naturalWidth)
+            ctx.drawImage(icon, point.x - 12, point.y - 12, 24, 24);
+          ctx.restore();
+        }
         if (selected) {
           ctx.strokeStyle = "#fff799";
-          ctx.beginPath();
-          ctx.arc(point.x, point.y, 13, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-        if (selected && force.branch === "air") {
-          const base = this.systems()?.bases.find(
-            (entry) => entry.id === force.baseId,
-          );
-          if (base) {
-            const center = this.transform.worldToScreenCoordinates(
-              new Cell(this.game.x(base.tile), this.game.y(base.tile)),
-            );
-            ctx.strokeStyle = "#89d8ff99";
-            ctx.setLineDash([4, 8]);
-            ctx.beginPath();
-            ctx.arc(
-              center.x,
-              center.y,
-              DEFAULT_MODERN_FORCE_RULES.airRangeTiles * this.transform.scale,
-              0,
-              Math.PI * 2,
-            );
-            ctx.stroke();
-            ctx.setLineDash([]);
-          }
+          ctx.lineWidth = 2;
+          ctx.strokeRect(point.x - 15, point.y - 15, 30, 30);
         }
         if (own && this.transform.scale >= 4) {
           ctx.strokeStyle = "#101820";
           ctx.lineWidth = 3;
-          const label = `${translateText(`modern_v2.kind.${force.kind}`)} ${force.branch === "air" ? force.aircraft : renderNumber(force.personnel)}`;
-          ctx.strokeText(label, point.x, point.y + 23);
+          const label = `${translateText(`modern_v2.kind.${force.kind}`)} ${force.branch === "air" ? force.aircraft : renderNumber(force.personnel + Math.floor(force.attackTroops / MODERN_RULES.rawTroopsPerPerson))}`;
+          ctx.strokeText(label, point.x, point.y + 30);
           ctx.fillStyle = "white";
-          ctx.fillText(label, point.x, point.y + 23);
+          ctx.fillText(label, point.x, point.y + 30);
           ctx.lineWidth = 2;
         }
+      }
+      if (this.preview && !this.preview.valid && this.selectedIds.length) {
+        const text = this.reason(this.preview.reason);
+        ctx.font = "12px sans-serif";
+        const width = Math.min(320, ctx.measureText(text).width + 16);
+        const x = Math.min(innerWidth - width - 8, this.cursor.x + 14),
+          y = Math.max(20, this.cursor.y - 16);
+        ctx.fillStyle = "#1e1e1eee";
+        ctx.fillRect(x, y - 16, width, 24);
+        ctx.fillStyle = "#fca5a5";
+        ctx.textAlign = "left";
+        ctx.fillText(text, x + 8, y, width - 16);
+        ctx.textAlign = "center";
       }
       if (this.selectionBox) {
         const box = this.selectionBox;
@@ -668,34 +1498,6 @@ export class ModernCommandPanel extends LitElement {
           box.endX - box.startX,
           box.endY - box.startY,
         );
-      }
-      if (this.preview?.valid && this.preview.path.length) {
-        ctx.strokeStyle = "#fff799";
-        ctx.setLineDash([6, 4]);
-        ctx.beginPath();
-        this.preview.path.forEach((tile, index) => {
-          const point = this.transform.worldToScreenCoordinates(
-            new Cell(this.game.x(tile), this.game.y(tile)),
-          );
-          if (!index) ctx.moveTo(point.x, point.y);
-          else ctx.lineTo(point.x, point.y);
-        });
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-      if (this.preview?.valid && this.preview.transportPath?.length) {
-        ctx.strokeStyle = "#89d8ff";
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        this.preview.transportPath.forEach((tile, index) => {
-          const point = this.transform.worldToScreenCoordinates(
-            new Cell(this.game.x(tile), this.game.y(tile)),
-          );
-          if (!index) ctx.moveTo(point.x, point.y);
-          else ctx.lineTo(point.x, point.y);
-        });
-        ctx.stroke();
-        ctx.setLineDash([]);
       }
     }
     this.frame = requestAnimationFrame(this.draw);
@@ -716,19 +1518,31 @@ export class ModernCommandPanel extends LitElement {
     const nuclear = nuclearEffects(faction, this.game.ticks());
     return html`<section
       aria-label=${translateText("modern_v2.commands")}
-      class="pointer-events-auto text-white rounded-lg bg-gray-900/95 p-2 shadow-lg"
-      style="max-width:min(96vw,460px);max-height:47dvh;overflow:auto"
+      class="pointer-events-auto text-white px-2 py-1 border-t border-gray-600"
+      style="max-height:47dvh;overflow:auto"
     >
       <div class="flex gap-1 justify-between">
         ${(["army", "navy", "air"] as const).map(
           (branch) =>
             html`<button
-              class="p-2 rounded ${this.branch === branch
-                ? "bg-blue-700"
-                : "bg-gray-700"}"
+              class="flex flex-1 items-center justify-center gap-1 py-1 px-2 rounded-md border hover:bg-gray-600 ${this
+                .branch === branch
+                ? "border-yellow-400 bg-gray-600"
+                : "border-slate-500 bg-gray-700/50"}"
+              data-modern-branch=${branch}
+              data-modern-highlight=${branch}
               aria-pressed=${this.branch === branch}
               @click=${() => this.eventBus.emit(new ModernBranchEvent(branch))}
             >
+              <img
+                src=${MODERN_ICONS[branch]}
+                width="18"
+                height="18"
+                alt=""
+                style=${branch === "army"
+                  ? "filter:brightness(0) invert(1)"
+                  : ""}
+              />
               ${translateText(`modern_v2.branch.${branch}`)}
               <small
                 >${formatKeyForDisplay(
@@ -736,22 +1550,46 @@ export class ModernCommandPanel extends LitElement {
                     "",
                 ) || translateText("education.unbound")}</small
               >
+              <span class="text-[10px] tabular-nums"
+                >${(systems?.forces ?? []).filter(
+                  (force) =>
+                    force.playerId === me?.id() &&
+                    force.branch === branch &&
+                    force.phase !== "destroyed",
+                ).length}</span
+              >
             </button>`,
         )}
         <button
           @click=${() => (this.minimized = !this.minimized)}
           aria-expanded=${!this.minimized}
           aria-label=${translateText("modern_v2.minimize")}
-          class="p-2"
+          class="px-1 py-1 border border-slate-500 rounded-md bg-gray-700/50 hover:bg-gray-600"
         >
           ${this.minimized ? "+" : "−"}
         </button>
         <button
           @click=${() => (this.expanded = !this.expanded)}
           aria-expanded=${this.expanded}
-          class="p-2"
+          class="px-2 py-1 border border-slate-500 rounded-md bg-gray-700/50 hover:bg-gray-600"
+          data-modern-highlight="production"
+          title=${translateText("repair.production_title")}
         >
-          ${this.expanded ? "▴" : "▾"}
+          <img
+            src=${MODERN_ICONS[
+              this.branch === "army"
+                ? "armybase"
+                : this.branch === "navy"
+                  ? "navybase"
+                  : "airbase"
+            ]}
+            width="18"
+            height="18"
+            alt=""
+          />
+          <span class="text-[10px]"
+            >${translateText("repair.production_title")}</span
+          >
         </button>
       </div>
       <div ?hidden=${this.minimized}>
@@ -763,16 +1601,63 @@ export class ModernCommandPanel extends LitElement {
         </p>
         <div class="flex flex-wrap gap-1 text-xs">
           <button
-            class="bg-gray-700 p-1 rounded"
+            data-modern-highlight="selection"
+            class="bg-gray-700/50 border border-slate-500 hover:bg-gray-600 p-1 rounded-md"
             @click=${() => {
-              this.selectedIds = forces.map((force) => force.id).slice(0, 32);
-              this.clearPreview();
+              this.onVisible();
             }}
           >
             ${translateText("modern_v2.select_all")}
           </button>
           <button
-            class="bg-gray-700 p-1 rounded"
+            data-modern-highlight="additional"
+            class="bg-gray-700/50 border border-slate-500 hover:bg-gray-600 p-1 rounded-md"
+            aria-pressed=${Boolean(this.uiState.modernAdditiveSelection)}
+            @click=${() => {
+              this.uiState.modernAdditiveSelection =
+                !this.uiState.modernAdditiveSelection;
+              this.requestUpdate();
+            }}
+          >
+            ${translateText("repair.additional_selection")}
+          </button>
+          <button
+            class="bg-gray-700/50 border border-slate-500 hover:bg-gray-600 p-1 rounded-md"
+            aria-pressed=${Boolean(this.uiState.modernQueueCommand)}
+            @click=${() => {
+              this.uiState.modernQueueCommand =
+                !this.uiState.modernQueueCommand;
+              this.requestUpdate();
+            }}
+          >
+            ${translateText("repair.queue_command")}
+          </button>
+          <button
+            class="bg-gray-700/50 border border-slate-500 rounded-md p-1"
+            @click=${() => {
+              const force = forces.find((item) =>
+                this.selectedIds.includes(item.id),
+              );
+              const center = me?.nameLocation();
+              const point = force
+                ? this.transform.worldToScreenCoordinates(
+                    new Cell(
+                      this.game.x(this.forceTile(force)) + 0.5,
+                      this.game.y(this.forceTile(force)) + 0.5,
+                    ),
+                  )
+                : center
+                  ? this.transform.worldToScreenCoordinates(
+                      new Cell(center.x, center.y),
+                    )
+                  : this.cursor;
+              this.eventBus.emit(new ShowBuildMenuEvent(point.x, point.y));
+            }}
+          >
+            ${translateText("repair.build_menu")}
+          </button>
+          <button
+            class="bg-gray-700/50 border border-slate-500 hover:bg-gray-600 p-1 rounded-md"
             aria-pressed=${Boolean(this.uiState.modernTargeting)}
             @click=${() => {
               this.inspectTarget = false;
@@ -783,7 +1668,7 @@ export class ModernCommandPanel extends LitElement {
             ${translateText("modern_v2.touch_target")}
           </button>
           <button
-            class="bg-gray-700 p-1 rounded"
+            class="bg-gray-700/50 border border-slate-500 hover:bg-gray-600 p-1 rounded-md"
             aria-pressed=${this.inspectTarget}
             @click=${() => {
               this.inspectTarget = !this.inspectTarget;
@@ -795,7 +1680,8 @@ export class ModernCommandPanel extends LitElement {
           ${(["stop", "cancel", "wait"] as const).map(
             (command) =>
               html`<button
-                class="bg-gray-700 p-1 rounded"
+                data-modern-highlight=${command}
+                class="bg-gray-700/50 border border-slate-500 hover:bg-gray-600 p-1 rounded-md"
                 @click=${() => this.control(command)}
               >
                 ${translateText(`modern_v2.operation.${command}`)}
@@ -827,63 +1713,30 @@ export class ModernCommandPanel extends LitElement {
             )}
           </select>
         </div>
-        ${this.preview
-          ? html`<p class="text-xs mt-1">
-                ${translateText("modern_v2.preview", {
-                  seconds: Math.ceil(this.preview.etaTicks / 10),
-                  range: this.preview.rangeTiles,
-                  risk: translateText(`modern_v2.risk.${this.preview.risk}`),
-                  efficiency: Math.round(
-                    this.preview.climateEfficiencyPermille / 10,
-                  ),
-                })}
-              </p>
-              ${this.preview.armyCombat
-                ? html`<p class="text-xs">
-                    ${translateText("modern_v2.ground_preview", {
-                      attacker: renderNumber(
-                        this.preview.armyCombat.attackerLossRaw / 10,
-                      ),
-                      defender: renderNumber(
-                        this.preview.armyCombat.defenderLossRaw / 10,
-                      ),
-                      defenderClimate: Math.round(
-                        this.preview.armyCombat.defenderClimatePermille / 10,
-                      ),
-                      ratio: Math.round(
-                        this.preview.armyCombat.climateRatioPermille / 10,
-                      ),
-                    })}
-                  </p>`
-                : nothing}
-              ${this.preview.usesTransport
-                ? html`<p class="text-xs">
-                    ${translateText("modern_v2.transport_preview")}
-                  </p>`
-                : nothing}
-              ${this.pendingCommand?.queue
-                ? html`<p class="text-xs">
-                    ${translateText("modern_v2.queue_preview")}
-                  </p>`
-                : nothing}
-              <button
-                class="bg-blue-700 p-2 mt-1 rounded disabled:opacity-50"
-                ?disabled=${!this.preview.valid}
-                @click=${this.confirm}
-              >
-                ${translateText("modern_v2.confirm")}
-              </button>
-              <button
-                class="p-2"
-                @click=${() => {
-                  this.clearPreview();
-                  this.status = "";
-                }}
-              >
-                ${translateText("common.cancel")}
-              </button>`
+        <p class="text-xs h-4 truncate" title=${this.previewSummary()}>
+          ${this.previewSummary()}
+        </p>
+        ${(this.productionPlacement || this.uiState.modernTargeting) &&
+        this.preview
+          ? html` <button
+              class="bg-gray-700/50 border border-slate-500 p-1 mt-1 rounded-md disabled:opacity-50"
+              ?disabled=${!this.preview.valid}
+              @click=${this.confirm}
+            >
+              ${translateText(
+                this.productionPlacement
+                  ? "repair.confirm_base"
+                  : "modern_v2.confirm",
+              )}
+            </button>`
           : nothing}
-        <p role="status" class="text-xs text-yellow-200 my-1">${this.status}</p>
+        <p
+          role="status"
+          class="text-xs h-4 truncate text-yellow-200 my-1"
+          title=${this.status}
+        >
+          ${this.status}
+        </p>
         ${modernNuclearNotice(this.game, this.uiState.ghostStructure)
           ? html`<p class="text-xs text-orange-200">
               ${modernNuclearNotice(this.game, this.uiState.ghostStructure)}
@@ -898,14 +1751,16 @@ export class ModernCommandPanel extends LitElement {
                       <button
                         class="underline"
                         aria-pressed=${this.selectedIds.includes(force.id)}
-                        @click=${() => {
-                          this.selectedIds = [force.id];
-                          this.clearPreview();
-                        }}
+                        @click=${(event: MouseEvent) =>
+                          this.selectFromRoster(force.id, event.shiftKey)}
                       >
                         ${translateText(`modern_v2.kind.${force.kind}`)}
-                        ${force.id} · ${force.personnel} ·
-                        ${translateText(`modern_v2.phase.${force.phase}`)}
+                        ${force.id} ·
+                        ${force.personnel +
+                        Math.floor(
+                          force.attackTroops / MODERN_RULES.rawTroopsPerPerson,
+                        )}
+                        · ${translateText(`modern_v2.phase.${force.phase}`)}
                       </button>
                       ${force.lastReason ? this.reason(force.lastReason) : ""}
                       ${force.cooldownUntil > this.game.ticks()
@@ -921,63 +1776,145 @@ export class ModernCommandPanel extends LitElement {
               <p class="text-xs mt-2">
                 ${translateText("modern_v2.production_hint")}
               </p>
-              ${this.branch === "air"
+              <p class="text-xs mt-1">${translateText("repair.base_rules")}</p>
+              <select
+                class="bg-gray-800 text-xs mb-1 w-full"
+                aria-label=${translateText("modern_v2.base_choice")}
+                .value=${this.selectedBaseId}
+                @change=${(event: Event) =>
+                  (this.selectedBaseId = (
+                    event.target as HTMLSelectElement
+                  ).value)}
+              >
+                ${(systems?.bases ?? [])
+                  .filter(
+                    (base) =>
+                      base.playerId === me?.id() &&
+                      (base.branch ?? "air") === this.branch,
+                  )
+                  .map(
+                    (base) =>
+                      html`<option
+                        value=${base.id}
+                        ?selected=${base.id === this.selectedBaseId}
+                      >
+                        ${translateText(`modern_v2.kind.${this.branch}base`)}
+                        ${base.id} · ${base.capacity} ·
+                        ${base.health}/${base.maxHealth} ·
+                        ${Math.max(
+                          0,
+                          Math.ceil(
+                            ((base.completesTick ?? 0) - this.game.ticks()) /
+                              10,
+                          ),
+                        )}s
+                      </option>`,
+                  )}
+              </select>
+              ${this.branch === "army" || systems?.version === 3
                 ? html`<select
-                    class="bg-gray-800 text-xs mb-1"
-                    aria-label=${translateText("modern_v2.base_choice")}
-                    .value=${this.selectedBaseId}
+                    class="bg-gray-800 text-xs mb-1 w-full"
+                    aria-label=${translateText("repair.manpower_source_auto")}
+                    .value=${this.productionManpowerSource}
                     @change=${(event: Event) =>
-                      (this.selectedBaseId = (
+                      (this.productionManpowerSource = (
                         event.target as HTMLSelectElement
-                      ).value)}
+                      ).value as "auto" | "army_reserve" | "available")}
                   >
-                    ${(systems?.bases ?? [])
-                      .filter(
-                        (base) => base.playerId === me?.id() && base.health > 0,
-                      )
-                      .map(
-                        (base) =>
-                          html`<option
-                            value=${base.id}
-                            ?selected=${base.id === this.selectedBaseId}
-                          >
-                            ${base.id} · ${base.capacity} ·
-                            ${base.health}/${base.maxHealth}
-                          </option>`,
-                      )}
+                    <option value="auto">
+                      ${translateText("repair.manpower_source_auto")}
+                    </option>
+                    <option value="army_reserve">
+                      ${translateText("repair.manpower_source_reserve")}
+                    </option>
+                    ${systems?.version === 3
+                      ? html`<option value="available">
+                          ${translateText("repair.manpower_source_available")}
+                        </option>`
+                      : nothing}
                   </select>`
                 : nothing}
+              <p class="text-xs mb-1">${this.manpowerSummary()}</p>
+              ${this.baseDetails()}
               <div class="flex gap-1 flex-wrap text-xs">
                 ${(this.branch === "army"
-                  ? ["army"]
+                  ? ["armybase", "army"]
                   : this.branch === "navy"
-                    ? ["warship"]
-                    : ["fighter", "strike", "airbase"]
-                ).map(
-                  (kind) =>
-                    html`<button
-                      class="bg-gray-700 rounded p-1"
-                      @click=${() =>
-                        this.produce(
-                          kind as
-                            | "army"
-                            | "warship"
-                            | "fighter"
-                            | "strike"
-                            | "airbase",
-                        )}
-                    >
-                      ${translateText(`modern_v2.kind.${kind}`)} ·
-                      ${renderNumber(
-                        kind === "army"
-                          ? 0
-                          : (DEFAULT_MODERN_FORCE_RULES[
-                              `${kind}Cost` as "fighterCost"
-                            ] ?? 0),
+                    ? ["navybase", "warship"]
+                    : ["airbase", "fighter", "strike"]
+                ).map((kind) => {
+                  const cost = this.productionCost(kind),
+                    reason = this.productionReason(kind);
+                  return html`<button
+                    class="bg-gray-700/50 border border-slate-500 hover:bg-gray-600 rounded-md p-2 disabled:opacity-50"
+                    data-modern-highlight=${kind}
+                    title=${reason
+                      ? this.reason(reason)
+                      : translateText("repair.production_detail", {
+                          gold: cost,
+                          seconds: this.productionTicks(kind) / 10,
+                          personnel:
+                            kind === "army"
+                              ? DEFAULT_MODERN_FORCE_RULES.armyPersonnelPerGroup
+                              : kind === "warship"
+                                ? DEFAULT_MODERN_FORCE_RULES.navyPersonnelPerWarship
+                                : ["fighter", "strike"].includes(kind)
+                                  ? DEFAULT_MODERN_FORCE_RULES.personnelPerAircraft
+                                  : 0,
+                        })}
+                    ?disabled=${Boolean(reason)}
+                    @click=${() =>
+                      this.produce(
+                        kind as
+                          | "army"
+                          | "warship"
+                          | "fighter"
+                          | "strike"
+                          | "armybase"
+                          | "navybase"
+                          | "airbase",
                       )}
-                    </button>`,
-                )}
+                  >
+                    <img
+                      src=${MODERN_ICONS[
+                        kind.endsWith("base")
+                          ? (kind as "armybase" | "navybase" | "airbase")
+                          : this.branch
+                      ]}
+                      width="20"
+                      height="20"
+                      alt=""
+                      style=${kind === "army"
+                        ? "filter:brightness(0) invert(1)"
+                        : ""}
+                    />
+                    ${translateText(`modern_v2.kind.${kind}`)} ·
+                    ${renderNumber(cost)}
+                    <span class="block"
+                      >${this.productionTicks(kind) / 10}s</span
+                    >
+                  </button>`;
+                })}
               </div>
+              ${(systems?.production ?? [])
+                .filter(
+                  (job) =>
+                    job.playerId === me?.id() && job.branch === this.branch,
+                )
+                .map(
+                  (job) =>
+                    html`<p class="text-xs mt-1">
+                      ${translateText("repair.production_queue", {
+                        kind: translateText(`modern_v2.kind.${job.kind}`),
+                        seconds: Math.max(
+                          0,
+                          Math.ceil(
+                            (job.completesTick - this.game.ticks()) / 10,
+                          ),
+                        ),
+                      })}
+                    </p>`,
+                )}
               ${faction
                 ? html`<details class="text-xs mt-2">
                     <summary>
@@ -1179,7 +2116,9 @@ export class ModernCommandPanel extends LitElement {
               <button
                 class="text-xs underline mt-2"
                 @click=${() => {
-                  this.keysOpen = !this.keysOpen;
+                  document
+                    .querySelector<HelpModal>("help-modal")
+                    ?.openControls();
                 }}
               >
                 ${translateText("modern_v2.keys")}
@@ -1208,38 +2147,6 @@ export class ModernCommandPanel extends LitElement {
               >
                 ${translateText("main.help")}
               </button>
-              ${this.keysOpen
-                ? html`<p class="text-xs">
-                      ${translateText("modern_v2.key_priority")}
-                    </p>
-                    ${Object.entries(MODERN_KEY_DEFAULTS).map(
-                      ([action, defaultKey]) =>
-                        html`<setting-keybind
-                          .action=${action}
-                          .label=${translateText(
-                            `modern_v2.branch.${action.replace("modern", "").toLowerCase()}`,
-                          )}
-                          .defaultKey=${defaultKey}
-                          .value=${keys[action] ?? ""}
-                          @change=${(
-                            event: CustomEvent<{
-                              action: keyof typeof MODERN_KEY_DEFAULTS;
-                              value: string;
-                            }>,
-                          ) => {
-                            if (
-                              !saveModernKeybind(
-                                event.detail.action,
-                                event.detail.value,
-                              )
-                            )
-                              this.status = translateText(
-                                "education.storage_error",
-                              );
-                          }}
-                        ></setting-keybind>`,
-                    )}`
-                : nothing}
             `
           : nothing}
       </div>
@@ -1258,9 +2165,9 @@ export function mountModernCommandPanel(
     "modern-command-panel",
   ) as ModernCommandPanel;
   Object.assign(panel, { game, transform, uiState, eventBus, queryPreview });
-  panel.style.cssText =
-    "position:fixed;right:8px;top:112px;z-index:31;pointer-events:none";
-  document.body.append(panel);
+  panel.style.cssText = "display:block;width:100%;pointer-events:auto";
+  const hud = document.querySelector(".hud-controls-surface");
+  (hud ?? document.body).append(panel);
   panel.start();
   return () => {
     panel.stop();

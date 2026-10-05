@@ -66,9 +66,10 @@ export class SavePanel extends LitElement {
 
   render() {
     if (!this.options) return nothing;
+    // Menus stay above the guide (960) and hover information (1001).
     return html`<div
         dir=${textDirection()}
-        class="fixed top-14 right-2 z-[950] pointer-events-auto max-w-[min(24rem,calc(100vw-1rem))] rounded-lg bg-gray-900/90 text-white p-2 shadow-lg"
+        class="fixed top-14 right-2 z-[1002] pointer-events-auto max-w-[min(24rem,calc(100vw-1rem))] rounded-lg bg-gray-900/90 text-white p-2 shadow-lg"
         @contextmenu=${(event: MouseEvent) => event.preventDefault()}
       >
         <button

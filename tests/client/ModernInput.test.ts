@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { OModal } from "../../src/client/components/baseComponents/Modal";
 import {
   ContextMenuEvent,
   DragEvent,
@@ -9,14 +10,22 @@ import {
 import {
   MODERN_KEYBINDS_KEY,
   ModernBranchEvent,
+  ModernCancelEvent,
+  ModernPreviewEvent,
+  ModernSelectVisibleEvent,
   ModernSelectionEvent,
+  ModernStopEvent,
   ModernTargetEvent,
   modernKeybinds,
   saveModernKeybind,
 } from "../../src/client/ModernInput";
 import { GameView } from "../../src/client/view";
 import { EventBus } from "../../src/core/EventBus";
-import { KEYBINDS_KEY, UserSettings } from "../../src/core/game/UserSettings";
+import {
+  INPUT_PROFILE_KEY,
+  KEYBINDS_KEY,
+  UserSettings,
+} from "../../src/core/game/UserSettings";
 
 describe("modern military input context", () => {
   let input: InputHandler;
@@ -27,6 +36,7 @@ describe("modern military input context", () => {
     localStorage.clear();
     new UserSettings().removeCached(KEYBINDS_KEY, false);
     canvas = document.createElement("canvas");
+    document.body.append(canvas);
     bus = new EventBus();
     input = new InputHandler(
       {
@@ -49,6 +59,8 @@ describe("modern military input context", () => {
   });
   afterEach(() => {
     input.destroy();
+    canvas.remove();
+    OModal.openCount = 0;
     vi.useRealTimers();
   });
 
@@ -76,11 +88,13 @@ describe("modern military input context", () => {
     expect(attacks).not.toHaveBeenCalled();
   });
 
-  it("preserves a saved camera W and leaves the new navy default unassigned", () => {
+  it("migrates old camera W to arrows while keeping W available for navy", () => {
     new UserSettings().setKeybinds({ moveUp: "KeyW" });
+    localStorage.removeItem(INPUT_PROFILE_KEY);
     const keys = modernKeybinds(new UserSettings(), false);
-    expect(keys.moveUp).toBe("KeyW");
-    expect(keys.modernNavy).toBeUndefined();
+    expect(keys.moveUp).toBeUndefined();
+    expect(keys.moveUpArrow).toBe("ArrowUp");
+    expect(keys.modernNavy).toBe("KeyW");
     expect(new UserSettings().parsedUserKeybinds()).toEqual({ moveUp: "KeyW" });
   });
 
@@ -178,7 +192,7 @@ describe("modern military input context", () => {
     expect(menu).toHaveBeenCalledOnce();
     expect(target).not.toHaveBeenCalled();
   });
-  it("does not switch branches when a map key is released after entering an editor", () => {
+  it("does not dispatch a second action when a pressed map key is released after entering an editor", () => {
     const branches = vi.fn();
     bus.on(ModernBranchEvent, branches);
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
@@ -188,8 +202,84 @@ describe("modern military input context", () => {
     editor.dispatchEvent(
       new KeyboardEvent("keyup", { code: "KeyW", bubbles: true }),
     );
-    expect(branches).not.toHaveBeenCalled();
+    expect(branches).toHaveBeenCalledOnce();
     editor.remove();
+  });
+  it("coalesces cursor moves into the newest preview and drops a pending preview on confirmation", () => {
+    const previews = vi.fn(),
+      targets = vi.fn();
+    bus.on(ModernPreviewEvent, previews);
+    bus.on(ModernTargetEvent, targets);
+    for (const x of [10, 30, 70])
+      canvas.dispatchEvent(
+        new MouseEvent("pointermove", {
+          clientX: x,
+          clientY: 25,
+          bubbles: true,
+        }),
+      );
+    vi.advanceTimersByTime(20);
+    expect(previews).toHaveBeenCalledOnce();
+    expect(previews).toHaveBeenLastCalledWith(
+      expect.objectContaining({ x: 70, y: 25 }),
+    );
+    canvas.dispatchEvent(
+      new MouseEvent("pointermove", { clientX: 80, bubbles: true }),
+    );
+    canvas.dispatchEvent(
+      new MouseEvent("contextmenu", { clientX: 100, clientY: 50 }),
+    );
+    vi.advanceTimersByTime(20);
+    expect(previews).toHaveBeenCalledOnce();
+    expect(targets).toHaveBeenCalledWith(
+      expect.objectContaining({ x: 100, y: 50 }),
+    );
+  });
+  it("X, F and Esc have distinct stop, visible selection and cancellation events", () => {
+    const stop = vi.fn(),
+      visible = vi.fn(),
+      cancel = vi.fn();
+    bus.on(ModernStopEvent, stop);
+    bus.on(ModernSelectVisibleEvent, visible);
+    bus.on(ModernCancelEvent, cancel);
+    for (const code of ["KeyX", "KeyF", "Escape"]) {
+      window.dispatchEvent(new KeyboardEvent("keydown", { code }));
+      window.dispatchEvent(new KeyboardEvent("keyup", { code }));
+    }
+    expect(stop).toHaveBeenCalledOnce();
+    expect(visible).toHaveBeenCalledOnce();
+    expect(cancel).toHaveBeenCalledOnce();
+    input.uiState.ghostStructure =
+      "City" as typeof input.uiState.ghostStructure;
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "Escape" }));
+    expect(input.uiState.ghostStructure).toBeNull();
+    expect(cancel).toHaveBeenCalledOnce();
+  });
+  it("modal buttons, repeat and blur do not duplicate or leak a military key", () => {
+    const branches = vi.fn();
+    bus.on(ModernBranchEvent, branches);
+    OModal.openCount = 1;
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyQ" }));
+    OModal.openCount = 0;
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyQ" }));
+    window.dispatchEvent(
+      new KeyboardEvent("keydown", { code: "KeyQ", repeat: true }),
+    );
+    window.dispatchEvent(new Event("blur"));
+    window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyQ" }));
+    expect(branches).toHaveBeenCalledTimes(2);
+  });
+  it("does not swallow browser or OS combinations of default game keys", () => {
+    for (const code of ["KeyP", "KeyR", "KeyW", "Space"]) {
+      const event = new KeyboardEvent("keydown", {
+        code,
+        ctrlKey: true,
+        cancelable: true,
+      });
+      window.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+      window.dispatchEvent(new KeyboardEvent("keyup", { code, ctrlKey: true }));
+    }
   });
   it("pinch release never selects a unit or attacks", () => {
     const selection = vi.fn(),
@@ -207,6 +297,105 @@ describe("modern military input context", () => {
     window.dispatchEvent(pointer("pointerup", 1, 10));
     expect(selection).not.toHaveBeenCalled();
     expect(attack).not.toHaveBeenCalled();
+  });
+  it("adds touch selections only when the screen toggle is enabled and counts successful selection growth", () => {
+    input.uiState.modernSelectedForceIds = ["first"];
+    input.uiState.modernAdditiveSelection = true;
+    const events: ModernSelectionEvent[] = [];
+    bus.on(ModernSelectionEvent, (event) => {
+      events.push(event);
+      if (event.complete && event.endX === 45)
+        input.uiState.modernSelectedForceIds = ["first", "second"];
+    });
+    const pointer = (type: string, x: number) =>
+      Object.assign(
+        new MouseEvent(type, { clientX: x, clientY: 30, button: 0 }),
+        { pointerId: 1, pointerType: "touch" },
+      );
+    canvas.dispatchEvent(pointer("pointerdown", 10));
+    window.dispatchEvent(pointer("pointermove", 45));
+    window.dispatchEvent(pointer("pointerup", 45));
+    expect(events.every((event) => event.additive)).toBe(true);
+    expect(input.uiState.modernAdditionalSelections).toBe(1);
+    expect(input.uiState.modernBoxSelections).toBe(1);
+    // Tapping an already-selected unit must not pretend a second addition.
+    canvas.dispatchEvent(pointer("pointerdown", 45));
+    window.dispatchEvent(pointer("pointerup", 45));
+    expect(input.uiState.modernAdditionalSelections).toBe(1);
+    input.uiState.modernAdditiveSelection = false;
+    canvas.dispatchEvent(pointer("pointerdown", 50));
+    window.dispatchEvent(pointer("pointerup", 50));
+    expect(events[events.length - 1]?.additive).toBe(false);
+    window.dispatchEvent(new Event("blur"));
+    expect(input.uiState.modernAdditiveSelection).toBe(false);
+  });
+  it("uses the same queue flag for touch targets, pointer previews and right-click confirmation", () => {
+    const targets = vi.fn(),
+      previews = vi.fn();
+    bus.on(ModernTargetEvent, targets);
+    bus.on(ModernPreviewEvent, previews);
+    input.uiState.modernTargeting = true;
+    input.uiState.modernQueueCommand = true;
+    const pointer = (type: string, pointerType = "touch") =>
+      Object.assign(
+        new MouseEvent(type, {
+          clientX: 50,
+          clientY: 30,
+          button: 0,
+          bubbles: true,
+        }),
+        { pointerId: 1, pointerType },
+      );
+    canvas.dispatchEvent(pointer("pointerdown"));
+    window.dispatchEvent(pointer("pointerup"));
+    expect(targets.mock.calls[0][0].queue).toBe(true);
+    canvas.dispatchEvent(pointer("pointermove", "mouse"));
+    vi.advanceTimersByTime(20);
+    expect(previews.mock.calls[previews.mock.calls.length - 1]?.[0].queue).toBe(
+      true,
+    );
+    canvas.dispatchEvent(
+      new MouseEvent("contextmenu", { clientX: 60, clientY: 35, button: 2 }),
+    );
+    expect(targets.mock.calls[targets.mock.calls.length - 1]?.[0].queue).toBe(
+      true,
+    );
+    window.dispatchEvent(new Event("blur"));
+    expect(input.uiState.modernQueueCommand).toBe(false);
+  });
+  it("previews a touch destination while held without reselecting and confirms once on release", () => {
+    const selection = vi.fn(),
+      targets = vi.fn(),
+      previews = vi.fn();
+    bus.on(ModernSelectionEvent, selection);
+    bus.on(ModernTargetEvent, targets);
+    bus.on(ModernPreviewEvent, previews);
+    input.uiState.modernTargeting = true;
+    const pointer = (type: string, x: number) =>
+      Object.assign(
+        new MouseEvent(type, {
+          clientX: x,
+          clientY: 50,
+          button: 0,
+          bubbles: true,
+        }),
+        { pointerId: 1, pointerType: "touch" },
+      );
+    canvas.dispatchEvent(pointer("pointerdown", 10));
+    canvas.dispatchEvent(pointer("pointermove", 30));
+    canvas.dispatchEvent(pointer("pointermove", 70));
+    vi.advanceTimersByTime(20);
+    expect(previews).toHaveBeenCalledOnce();
+    expect(previews.mock.calls[0][0].x).toBe(70);
+    expect(selection).not.toHaveBeenCalled();
+    expect(targets).not.toHaveBeenCalled();
+    canvas.dispatchEvent(pointer("pointermove", 80));
+    window.dispatchEvent(pointer("pointerup", 80));
+    vi.advanceTimersByTime(20);
+    expect(previews).toHaveBeenCalledOnce();
+    expect(targets).toHaveBeenCalledOnce();
+    expect(targets.mock.calls[0][0].x).toBe(80);
+    expect(selection).not.toHaveBeenCalled();
   });
   it("pans with two touch points while preserving selection-only one-finger drags", () => {
     const pan = vi.fn(),

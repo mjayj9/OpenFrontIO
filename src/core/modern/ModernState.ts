@@ -42,6 +42,11 @@ const FactionSchema = z.object({
   populationTransferredTo: z.string().nullable().default(null),
   nuclearStrikes: z.array(z.object({ launchId: uint, expiresTick: uint })),
   workerIncomePerTick: uint.optional(),
+  growthModel: z.enum(["legacy-fixed", "stockpile-v1"]).optional(),
+  growthCarryPermille: uint.max(999).optional(),
+  growthPeoplePerTick: uint.optional(),
+  civilianTrainedPerTick: uint.optional(),
+  growthReason: z.string().nullable().optional(),
 });
 export type ModernFactionState = z.infer<typeof FactionSchema>;
 const PortSchema = z.object({
@@ -80,6 +85,7 @@ const CommandSchema = z.object({
   issuedTick: uint,
   viaTransport: z.boolean().optional(),
   escortUnitId: uint.optional(),
+  previewPath: z.array(uint).max(8192).optional(),
 });
 const ForceSchema = z.object({
   id: z.string(),
@@ -121,9 +127,15 @@ const BaseSchema = z.object({
   capacity: uint,
   health: uint,
   maxHealth: uint,
+  branch: z.enum(["army", "navy", "air"]).optional(),
+  completesTick: uint.optional(),
+  repairUntilTick: uint.nullable().optional(),
+  unitId: uint.nullable().optional(),
+  constructionCounted: z.boolean().optional(),
 });
 export const ModernStateSchema = z.object({
-  version: z.literal(2),
+  // v2 fields remain valid: absent branch=air, production=[], fixed growth.
+  version: z.union([z.literal(2), z.literal(3)]),
   tick: uint,
   seed: uint,
   factions: z.array(FactionSchema),
@@ -131,6 +143,41 @@ export const ModernStateSchema = z.object({
   forces: z.array(ForceSchema),
   bases: z.array(BaseSchema),
   nextForceId: uint,
+  completedProduction: z
+    .array(
+      z.object({
+        playerId: z.string(),
+        kind: z.enum([
+          "army",
+          "warship",
+          "fighter",
+          "strike",
+          "armybase",
+          "navybase",
+          "airbase",
+        ]),
+        count: uint,
+      }),
+    )
+    .optional(),
+  production: z
+    .array(
+      z.object({
+        id: z.string(),
+        playerId: z.string(),
+        branch: z.enum(["army", "navy", "air"]),
+        kind: z.enum(["army", "warship", "fighter", "strike"]),
+        baseId: z.string(),
+        tile: uint,
+        count: uint.max(8),
+        personnel: uint,
+        costGold: z.string().regex(/^\d+$/),
+        completesTick: uint,
+        source: z.enum(["army_reserve", "available"]),
+        unitId: uint.nullable().optional(),
+      }),
+    )
+    .optional(),
   samAircraftReloads: z
     .array(z.object({ unitId: uint, nextTick: uint }))
     .optional(),
@@ -147,7 +194,7 @@ export const ModernStateSchema = z.object({
     .default([]),
 });
 export interface ModernState extends ModernForcesState {
-  version: 2;
+  version: 2 | 3;
   tick: number;
   factions: ModernFactionState[];
   ports: ModernPortState[];
@@ -158,6 +205,35 @@ export interface ModernState extends ModernForcesState {
     target: number | null;
     operations: number;
   }[];
+}
+/** Game-record v2 stored the old fixed-replenishment rules and air-only bases.
+ * Add explicit defaults without reinitializing borders, budgets or controllers. */
+export function migrateLegacyModernState(
+  state: ModernState | null,
+): ModernState | null {
+  if (!state || state.version !== 2) return state;
+  return {
+    ...state,
+    production: state.production ?? [],
+    completedProduction: state.completedProduction ?? [],
+    samAircraftReloads: state.samAircraftReloads ?? [],
+    factions: state.factions.map((f) => ({
+      ...f,
+      growthModel: f.growthModel ?? "legacy-fixed",
+      growthCarryPermille: f.growthCarryPermille ?? 0,
+      growthPeoplePerTick: f.growthPeoplePerTick ?? 0,
+      civilianTrainedPerTick: f.civilianTrainedPerTick ?? 0,
+      growthReason: f.growthReason ?? null,
+    })),
+    bases: state.bases.map((b) => ({
+      ...b,
+      branch: b.branch ?? "air",
+      completesTick: b.completesTick ?? 0,
+      repairUntilTick: b.repairUntilTick ?? null,
+      unitId: b.unitId ?? null,
+      constructionCounted: b.constructionCounted ?? true,
+    })),
+  };
 }
 const factionCache = new WeakMap<
   ModernState,

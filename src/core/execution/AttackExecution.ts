@@ -374,6 +374,10 @@ export class AttackExecution implements Execution {
         targetPlayer.removeTroops(defenderTroopLoss);
       }
       this._owner.conquer(tileToConquer);
+      modernSystemsFor(this.mg)?.forces.armyAttackProgress(
+        this.attack.id(),
+        tileToConquer,
+      );
       this.handleDeadDefender();
     }
     modernSystemsFor(this.mg)?.forces.armyAttackRemaining(

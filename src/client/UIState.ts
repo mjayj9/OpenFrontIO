@@ -10,6 +10,14 @@ export interface UIState {
   modernBranchesUsed?: string[];
   modernSelectedForceIds?: string[];
   modernCompletedStops?: number;
+  modernCursorPreviewCount?: number;
+  modernCameraMoves?: number;
+  modernZoomChanges?: number;
+  modernBoxSelections?: number;
+  modernAdditionalSelections?: number;
+  modernAdditiveSelection?: boolean;
+  modernQueueCommand?: boolean;
+  modernQueuedOrders?: number;
   modernClimatePreviewAdapted?: boolean;
   modernClimatePreviewHarsh?: boolean;
   modernAIInfoInspected?: boolean;

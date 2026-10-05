@@ -2,12 +2,23 @@ import { html } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import {
   DESKTOP_TUTORIAL_VIDEO_URL,
+  formatKeyForDisplay,
   textDirection,
   translateText,
   TUTORIAL_VIDEO_URL,
 } from "../client/Utils";
 import { assetUrl } from "../core/AssetUrls";
-import { getDefaultKeybinds, UserSettings } from "../core/game/UserSettings";
+import {
+  ACTIVE_INPUT_CONTEXT_CHANGED,
+  activeInputContext,
+  inputActionRows,
+  InputContext,
+  InputMode,
+} from "../core/game/KeybindingRegistry";
+import {
+  INPUT_PROFILE_CHANGED_EVENT,
+  UserSettings,
+} from "../core/game/UserSettings";
 import { BaseModal } from "./components/BaseModal";
 import "./components/Difficulties";
 import { modalHeader } from "./components/ui/ModalHeader";
@@ -22,16 +33,169 @@ import { TroubleshootingModal } from "./TroubleshootingModal";
 
 @customElement("help-modal")
 export class HelpModal extends BaseModal {
-  protected routerName = "help";
+  protected routerName: string | undefined = "help";
+  private gameOverlay = false;
+
+  public open(args?: Record<string, unknown>): void {
+    // The menu's inline page is inside the hidden menu during a match. Reuse
+    // the original modal shell in the game instead of navigating that page.
+    if (
+      this.inline &&
+      (document.body.classList.contains("in-game") ||
+        activeInputContext().context === "replay")
+    ) {
+      let overlay = document.querySelector<HelpModal>("#game-help-modal");
+      if (!overlay) {
+        overlay = document.createElement("help-modal") as HelpModal;
+        overlay.id = "game-help-modal";
+        overlay.gameOverlay = true;
+        overlay.routerName = undefined;
+        document.body.appendChild(overlay);
+      }
+      overlay.featureQuery = this.featureQuery;
+      overlay.featureChapter = this.featureChapter;
+      const target = overlay;
+      void target.updateComplete.then(() => {
+        if (target.isConnected) target.open(args);
+      });
+      return;
+    }
+    super.open(args);
+  }
 
   @state() private keybinds: Record<string, string> = this.getKeybinds();
   @state() private featureQuery = "";
   @state() private featureChapter = "all";
+  @state() private shortcutMode: InputMode = activeInputContext().mode;
+  @state() private inputContext: InputContext = activeInputContext().context;
   @query("#tutorial-video-iframe") private videoIframe?: HTMLIFrameElement;
   @query("#tutorial-video-player") private videoPlayer?: HTMLVideoElement;
 
   private getKeybinds(): Record<string, string> {
-    return new UserSettings().keybinds(Platform.isMac);
+    return new UserSettings().effectiveKeybinds(
+      this.shortcutMode ?? activeInputContext().mode,
+      Platform.isMac,
+    );
+  }
+  private readonly refreshInputs = () => {
+    this.keybinds = this.getKeybinds();
+    this.requestUpdate();
+  };
+  private readonly refreshContext = () => {
+    this.shortcutMode = activeInputContext().mode;
+    this.inputContext = activeInputContext().context;
+    this.refreshInputs();
+  };
+  connectedCallback(): void {
+    super.connectedCallback();
+    globalThis.addEventListener(
+      INPUT_PROFILE_CHANGED_EVENT,
+      this.refreshInputs,
+    );
+    globalThis.addEventListener(
+      ACTIVE_INPUT_CONTEXT_CHANGED,
+      this.refreshContext,
+    );
+  }
+  disconnectedCallback(): void {
+    globalThis.removeEventListener(
+      INPUT_PROFILE_CHANGED_EVENT,
+      this.refreshInputs,
+    );
+    globalThis.removeEventListener(
+      ACTIVE_INPUT_CONTEXT_CHANGED,
+      this.refreshContext,
+    );
+    super.disconnectedCallback();
+  }
+  public openControls(): void {
+    this.openFeature("keybindings");
+  }
+  private renderInputTable() {
+    const rows = inputActionRows(
+      this.shortcutMode,
+      this.keybinds,
+      this.inputContext,
+    );
+    return html`<section
+      class="my-3 rounded-xl border border-white/10 bg-white/5 p-3"
+      aria-label=${translateText("input_controls.shortcut_table")}
+    >
+      <h3>${translateText("input_controls.shortcut_table")}</h3>
+      <label
+        >${translateText("input_controls.profile")}<select
+          class="ms-2 bg-gray-800 rounded p-1"
+          .value=${this.shortcutMode}
+          @change=${(e: Event) => {
+            this.shortcutMode = (e.target as HTMLSelectElement)
+              .value as InputMode;
+            this.refreshInputs();
+          }}
+        >
+          <option value="classic">
+            ${translateText("input_controls.classic")}
+          </option>
+          <option value="modern">
+            ${translateText("input_controls.modern")}
+          </option>
+        </select></label
+      >
+      <label class="ms-3"
+        >${translateText("input_controls.context")}<select
+          class="ms-2 bg-gray-800 rounded p-1"
+          .value=${this.inputContext}
+          @change=${(e: Event) => {
+            this.inputContext = (e.target as HTMLSelectElement)
+              .value as InputContext;
+            this.requestUpdate();
+          }}
+        >
+          ${["map", "replay", "modal", "text", "keybind"].map(
+            (context) =>
+              html`<option value=${context}>
+                ${translateText(`input_controls.context_${context}`)}
+              </option>`,
+          )}
+        </select></label
+      >
+      <p class="text-xs my-2">
+        ${translateText("input_controls.context_help")}
+      </p>
+      <table class="w-full text-xs">
+        <thead>
+          <tr>
+            <th>${translateText("help_modal.table_key")}</th>
+            <th>${translateText("help_modal.table_action")}</th>
+            <th>${translateText("education.description")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(
+            (row) =>
+              html`<tr class="border-t border-white/10">
+                <td class="py-1" dir="ltr">
+                  ${row.binding
+                    ? this.renderKey(row.binding)
+                    : translateText("input_controls.unassigned")}
+                </td>
+                <td>${translateText(row.labelKey)}</td>
+                <td>
+                  ${translateText(row.descriptionKey, {
+                    amount: new UserSettings().attackRatioIncrement(),
+                  })}
+                </td>
+              </tr>`,
+          )}
+          ${rows.length === 0
+            ? html`<tr>
+                <td colspan="3">
+                  ${translateText("input_controls.no_game_keys")}
+                </td>
+              </tr>`
+            : ""}
+        </tbody>
+      </table>
+    </section>`;
   }
 
   private getKeyLabel(code: string): string {
@@ -58,34 +222,23 @@ export class HelpModal extends BaseModal {
       ArrowDown: "↓",
       ArrowLeft: "←",
       ArrowRight: "→",
-      Period: ">",
-      Comma: "<",
+      MouseLeft: translateText("input_controls.mouse_left"),
+      MouseRight: translateText("input_controls.mouse_right"),
+      MouseMiddle: translateText("input_controls.mouse_middle"),
+      MouseDrag: translateText("input_controls.mouse_drag"),
+      Tap: translateText("input_controls.touch_tap"),
+      Pinch: translateText("input_controls.touch_pinch"),
+      TwoFingerDrag: translateText("input_controls.two_finger"),
+      LongPress: translateText("input_controls.long_press"),
+      TargetTap: translateText("input_controls.target_tap"),
+      Wheel: translateText("input_controls.wheel"),
+      TouchTap: translateText("input_controls.touch_tap"),
+      TouchDrag: translateText("input_controls.touch_drag"),
+      TouchPinch: translateText("input_controls.touch_pinch"),
     };
 
     if (specialLabels[code]) return specialLabels[code];
-    if (code.startsWith("Key") && code.length === 4) return code.slice(3);
-    if (code.startsWith("Digit")) return code.slice(5);
-    if (code.startsWith("Numpad")) return `Num ${code.slice(6)}`;
-
-    return code;
-  }
-
-  private keybindLabel(action: string): string {
-    const aliases: Record<string, string> = {
-      moveUpArrow: "moveUp",
-      moveDownArrow: "moveDown",
-      moveLeftArrow: "moveLeft",
-      moveRightArrow: "moveRight",
-      zoomOutMinus: "zoomOut",
-      zoomOutNumpad: "zoomOut",
-      zoomInEqual: "zoomIn",
-      zoomInNumpad: "zoomIn",
-      performanceOverlay: "performanceOverlayLabel",
-    };
-    const key = (aliases[action] ?? action)
-      .replace(/([a-z])([A-Z])/g, "$1_$2")
-      .toLowerCase();
-    return translateText(`user_setting.${key}`);
+    return formatKeyForDisplay(code);
   }
 
   private renderKey(code: string) {
@@ -108,8 +261,6 @@ export class HelpModal extends BaseModal {
   }
 
   protected renderBody() {
-    const keybinds = this.keybinds;
-
     return html`
       <div
         dir=${textDirection()}
@@ -283,265 +434,7 @@ export class HelpModal extends BaseModal {
               class="flex-1 h-px bg-gradient-to-r from-blue-500/50 to-transparent"
             ></div>
           </div>
-          <section
-            class="bg-white/5 rounded-xl border border-white/10 overflow-hidden"
-          >
-            <div class="pt-2 pb-4 px-4 overflow-x-auto">
-              <table class="w-full text-sm border-separate border-spacing-y-1">
-                <thead>
-                  <tr
-                    class="text-white/40 text-xs uppercase tracking-wider text-start"
-                  >
-                    <th class="pb-2 ps-4">
-                      ${translateText("help_modal.table_key")}
-                    </th>
-                    <th class="pb-2">
-                      ${translateText("help_modal.table_action")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="text-white/80">
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      ${this.renderKey("Escape")}
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_esc")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      ${this.renderKey("Enter")}
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_enter")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      ${this.renderKey(keybinds.toggleView)}
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("user_setting.toggle_view_desc")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      ${this.renderKey(keybinds.coordinateGrid)}
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_coordinate_grid")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      ${this.renderKey(keybinds.swapDirection)}
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.bomb_direction")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="inline-flex items-center gap-2">
-                        ${this.renderKey(keybinds.shiftKey)}
-                        <span class="text-white/40 font-bold">+</span>
-                        <div
-                          class="w-5 h-8 border border-white/40 rounded-full relative"
-                        >
-                          <div
-                            class="absolute top-0 left-0 w-1/2 h-1/2 bg-red-500/80 rounded-tl-full"
-                          ></div>
-                          <div
-                            class="w-0.5 h-1.5 bg-white/40 rounded-full absolute top-1.5 left-1/2 -translate-x-1/2"
-                          ></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_attack_altclick")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="inline-flex items-center gap-2">
-                        ${this.renderKey(keybinds.buildMenuModifier)}
-                        <span class="text-white/40 font-bold">+</span>
-                        <div
-                          class="w-5 h-8 border border-white/40 rounded-full relative"
-                        >
-                          <div
-                            class="absolute top-0 left-0 w-1/2 h-1/2 bg-red-500/80 rounded-tl-full"
-                          ></div>
-                          <div
-                            class="w-0.5 h-1.5 bg-white/40 rounded-full absolute top-1.5 left-1/2 -translate-x-1/2"
-                          ></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_build")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="inline-flex items-center gap-2">
-                        ${this.renderKey(keybinds.emojiMenuModifier)}
-                        <span class="text-white/40 font-bold">+</span>
-                        <div
-                          class="w-5 h-8 border border-white/40 rounded-full relative"
-                        >
-                          <div
-                            class="absolute top-0 left-0 w-1/2 h-1/2 bg-red-500/80 rounded-tl-full"
-                          ></div>
-                          <div
-                            class="w-0.5 h-1.5 bg-white/40 rounded-full absolute top-1.5 left-1/2 -translate-x-1/2"
-                          ></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_emote")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      ${this.renderKey(keybinds.centerCamera)}
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("user_setting.center_camera_desc")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      ${this.renderKey(keybinds.pauseGame)}
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_pause_game")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="flex flex-wrap gap-2">
-                        ${this.renderKey(keybinds.gameSpeedDown)}
-                        ${this.renderKey(keybinds.gameSpeedUp)}
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_game_speed")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="flex flex-wrap gap-2">
-                        ${this.renderKey(keybinds.zoomOut)}
-                        ${this.renderKey(keybinds.zoomIn)}
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_zoom")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="flex flex-wrap gap-1 max-w-[200px]">
-                        ${this.renderKey(keybinds.moveUp)}
-                        ${this.renderKey(keybinds.moveLeft)}
-                        ${this.renderKey(keybinds.moveDown)}
-                        ${this.renderKey(keybinds.moveRight)}
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_move_camera")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="flex flex-wrap gap-2">
-                        ${this.renderKey(keybinds.attackRatioDown)}
-                        ${this.renderKey(keybinds.attackRatioUp)}
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_ratio_change")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="inline-flex items-center gap-2">
-                        ${this.renderKey(keybinds.shiftKey)}
-                        <span class="text-white/40 font-bold">+</span>
-                        <div class="flex items-center gap-1">
-                          <div
-                            class="w-5 h-8 border border-white/40 rounded-full relative"
-                          >
-                            <div
-                              class="w-0.5 h-2 bg-red-400 rounded-full absolute top-1.5 left-1/2 -translate-x-1/2"
-                            ></div>
-                          </div>
-                          <div class="flex flex-col text-[10px] text-white/50">
-                            <span>↑</span>
-                            <span>↓</span>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_ratio_change")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="inline-flex items-center gap-2">
-                        ${this.renderKey(keybinds.altKey)}
-                        <span class="text-white/40 font-bold">+</span>
-                        ${this.renderKey(keybinds.resetGfx)}
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_reset_gfx")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div
-                        class="w-5 h-8 border border-white/40 rounded-full relative"
-                      >
-                        <div
-                          class="w-0.5 h-2 bg-red-400 rounded-full absolute top-1.5 left-1/2 -translate-x-1/2"
-                        ></div>
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_auto_upgrade")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      <div class="inline-flex items-center gap-2">
-                        ${this.renderKey(keybinds.boxSelectWarships)}
-                        <span class="text-white/40 font-bold">+</span>
-                        <span class="text-white/50 text-xs"
-                          >${translateText("help_modal.drag")}</span
-                        >
-                      </div>
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_warship_multiselect")}
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="py-3 ps-4 border-b border-white/5">
-                      ${this.renderKey(keybinds.selectAllWarships)}
-                    </td>
-                    <td class="py-3 border-b border-white/5 text-white/70">
-                      ${translateText("help_modal.action_warship_selectall")}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
+          ${this.renderInputTable()}
 
           <!-- UI Interface Section -->
           <section class="mb-8 mt-8">
@@ -1321,6 +1214,7 @@ export class HelpModal extends BaseModal {
   }
 
   private startChapter(chapter: TutorialChapterID): void {
+    if (this.isOpen()) this.close();
     requestChapter(chapter);
     document.dispatchEvent(
       new CustomEvent("start-tutorial", { detail: { chapter } }),
@@ -1443,24 +1337,7 @@ export class HelpModal extends BaseModal {
                   </dd>
                 </dl>
                 ${feature.featureId === "keybindings"
-                  ? html`<div class="mt-2 grid grid-cols-2 gap-1 text-xs">
-                      ${Object.keys(getDefaultKeybinds(Platform.isMac))
-                        .filter(
-                          (action) =>
-                            action !== "shiftKey" && action !== "altKey",
-                        )
-                        .map(
-                          (action) =>
-                            html`<span>${this.keybindLabel(action)}</span
-                              ><span dir="ltr"
-                                >${this.getKeyLabel(
-                                  new UserSettings().keybinds(Platform.isMac)[
-                                    action
-                                  ] ?? "",
-                                ) || translateText("education.unbound")}</span
-                              >`,
-                        )}
-                    </div>`
+                  ? this.renderInputTable()
                   : ""}
                 ${feature.kind === "practice"
                   ? html`<button
@@ -1491,6 +1368,8 @@ export class HelpModal extends BaseModal {
   }
 
   protected onOpen(): void {
+    this.shortcutMode = activeInputContext().mode;
+    this.inputContext = activeInputContext().context;
     this.keybinds = this.getKeybinds();
     // Restore the video src when modal opens
     if (this.videoIframe) {
@@ -1506,5 +1385,6 @@ export class HelpModal extends BaseModal {
     // The desktop <video> keeps its src -- the file is local, so unlike the
     // YouTube iframe there is nothing to unload; pausing is enough.
     this.videoPlayer?.pause();
+    if (this.gameOverlay) queueMicrotask(() => this.remove());
   }
 }

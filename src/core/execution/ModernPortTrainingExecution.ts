@@ -11,10 +11,15 @@ import { ExecRecord, SnapshotReader } from "../snapshot/SnapshotContext";
  * It never manufactures personnel, teleports ships, or changes normal games. */
 export class ModernPortTrainingExecution implements Execution {
   private game: Game;
-  private stage: "waiting" | "approaching" | "blockaded" | "complete" =
-    "waiting";
+  private stage:
+    | "waiting"
+    | "building"
+    | "approaching"
+    | "blockaded"
+    | "complete" = "waiting";
   private portId: string | null = null;
   private forceId: string | null = null;
+  private productionUnitId: number | null = null;
   private nextThinkTick = 0;
   init(game: Game): void {
     this.game = game;
@@ -89,7 +94,22 @@ export class ModernPortTrainingExecution implements Execution {
           1,
         );
         if (reason) continue;
-        const force = systems.state.forces[systems.state.forces.length - 1];
+        const job = systems.state.production?.find(
+          (p) => p.playerId === enemy.id() && p.kind === "warship",
+        );
+        if (job) {
+          this.productionUnitId = job.unitId ?? null;
+          this.portId = port.portId;
+          this.stage = "building";
+          return;
+        }
+        const force = systems.state.forces.find(
+          (f) =>
+            f.playerId === enemy.id() &&
+            f.branch === "navy" &&
+            f.phase !== "destroyed",
+        );
+        if (!force) continue;
         const command = systems.forces.command(
           enemy.id(),
           [force.id],
@@ -111,6 +131,32 @@ export class ModernPortTrainingExecution implements Execution {
       return;
     }
     const port = systems.state.ports.find((p) => p.portId === this.portId);
+    if (this.stage === "building") {
+      const ship =
+        this.productionUnitId === null
+          ? undefined
+          : this.game.unit(this.productionUnitId);
+      if (!ship?.isActive() || !port || port.ownerId !== human.id()) {
+        this.stage = "complete";
+        return;
+      }
+      const built = systems.state.forces.find(
+        (f) =>
+          f.unitId === this.productionUnitId &&
+          f.branch === "navy" &&
+          f.phase !== "destroyed",
+      );
+      if (!built) return;
+      this.forceId = built.id;
+      const command = systems.forces.command(
+        built.playerId,
+        [built.id],
+        "blockade",
+        port.tile,
+      )[0];
+      this.stage = command.reason ? "complete" : "approaching";
+      return;
+    }
     const force = systems.state.forces.find((f) => f.id === this.forceId);
     if (
       !port ||
@@ -130,6 +176,7 @@ export class ModernPortTrainingExecution implements Execution {
       stage: this.stage,
       portId: this.portId,
       forceId: this.forceId,
+      productionUnitId: this.productionUnitId,
       nextThinkTick: this.nextThinkTick,
     });
   }
@@ -140,21 +187,30 @@ export class ModernPortTrainingExecution implements Execution {
     this.stage = state.stage;
     this.portId = state.portId;
     this.forceId = state.forceId;
+    this.productionUnitId = state.productionUnitId;
     this.nextThinkTick = state.nextThinkTick;
     if (state.initialized) this.game = reader.game;
   }
 }
 const ModernPortTrainingSchema = z.object({
   initialized: z.boolean(),
-  stage: z.enum(["waiting", "approaching", "blockaded", "complete"]),
+  stage: z.enum([
+    "waiting",
+    "building",
+    "approaching",
+    "blockaded",
+    "complete",
+  ]),
   portId: z.string().nullable(),
   forceId: z.string().nullable(),
+  productionUnitId: z.number().int().nonnegative().nullable(),
   nextThinkTick: z.number().int().nonnegative(),
 });
 type ModernPortTrainingState = z.infer<typeof ModernPortTrainingSchema>;
 export const ModernPortTrainingExecutionSnapshot = execSnapshotType({
   name: "ModernPortTraining",
-  version: 1,
+  version: 2,
+  migrations: { 1: (data) => ({ ...data, productionUnitId: null }) },
   schema: ModernPortTrainingSchema,
   cls: () => ModernPortTrainingExecution,
 });

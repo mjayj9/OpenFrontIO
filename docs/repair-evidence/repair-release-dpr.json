@@ -1,0 +1,93 @@
+{
+  "before": {
+    "rect": {
+      "x": 616,
+      "y": 66.66667175292969,
+      "width": 124.8333740234375,
+      "height": 20
+    },
+    "hit": "BUTTON",
+    "hitText": "저장과 승리 목표 ▴",
+    "expanded": "true",
+    "dpr": 2.0000000596046448
+  },
+  "data": {
+    "tick": 142,
+    "paused": true,
+    "world": {
+      "x": 1712.5,
+      "y": 291.5
+    },
+    "screen": {
+      "x": 499.8550913777317,
+      "y": 292.25398393586283
+    },
+    "back": {
+      "x": 1712,
+      "y": 291,
+      "strRepr": "Cell[1712,291]"
+    },
+    "selected": ["force-1466", "force-1467"],
+    "canvas": [
+      {
+        "width": 2000,
+        "height": 1520,
+        "css": {
+          "width": 1000,
+          "height": 760
+        }
+      },
+      {
+        "width": 2000,
+        "height": 1520,
+        "css": {
+          "width": 1000,
+          "height": 760
+        }
+      },
+      {
+        "width": 2000,
+        "height": 1520,
+        "css": {
+          "width": 1000,
+          "height": 760
+        }
+      }
+    ],
+    "expanded": "false"
+  },
+  "after": {
+    "selected": ["force-1466", "force-1467"],
+    "previews": [
+      {
+        "id": "force-1466",
+        "valid": true,
+        "reason": null,
+        "path": [
+          583712, 583713, 583714, 583715, 583716, 583717, 585717, 585718, 587718
+        ],
+        "etaTicks": 32,
+        "rangeTiles": 0,
+        "risk": "low",
+        "climateEfficiencyPermille": 1100,
+        "command": "move"
+      },
+      {
+        "id": "force-1467",
+        "valid": true,
+        "reason": null,
+        "path": [
+          583711, 583712, 583713, 583714, 583715, 583716, 583717, 585717,
+          587717, 587718
+        ],
+        "etaTicks": 36,
+        "rangeTiles": 0,
+        "risk": "low",
+        "climateEfficiencyPermille": 1100,
+        "command": "move"
+      }
+    ],
+    "menuExpanded": "false",
+    "commandPanelCount": 1
+  }
+}

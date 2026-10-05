@@ -1,11 +1,18 @@
 import { html, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { formatKeyForDisplay, translateText } from "../client/Utils";
+import {
+  ACTIVE_INPUT_CONTEXT_CHANGED,
+  activeInputContext,
+  inputActionRows,
+  inputDefaults,
+  InputMode,
+} from "../core/game/KeybindingRegistry";
 import type { MapLayer } from "../core/game/TerrainMapLoader";
 import {
   AudioCategory,
-  getDefaultKeybinds,
   GRAPHICS_KEY,
+  INPUT_PROFILE_CHANGED_EVENT,
   USER_SETTINGS_CHANGED_EVENT,
   UserSettings,
 } from "../core/game/UserSettings";
@@ -114,7 +121,10 @@ export class UserSettingModal extends BaseModal {
     null;
 
   private userSettings: UserSettings = new UserSettings();
-  private readonly defaultKeybinds = getDefaultKeybinds(Platform.isMac);
+  @state() private keyMode: InputMode = activeInputContext().mode;
+  private get defaultKeybinds() {
+    return inputDefaults(this.keyMode, Platform.isMac);
+  }
 
   // Optional "return to where you came from" callback, supplied by the caller
   // of open() and invoked once on close. The in-game menu uses it to reappear.
@@ -163,6 +173,14 @@ export class UserSettingModal extends BaseModal {
     }
     this.loadKeybindsFromStorage();
     globalThis.addEventListener(
+      INPUT_PROFILE_CHANGED_EVENT,
+      this.onInputProfileChanged,
+    );
+    globalThis.addEventListener(
+      ACTIVE_INPUT_CONTEXT_CHANGED,
+      this.onInputContextChanged,
+    );
+    globalThis.addEventListener(
       `${USER_SETTINGS_CHANGED_EVENT}:${GRAPHICS_KEY}`,
       this.onGraphicsChanged,
     );
@@ -172,6 +190,14 @@ export class UserSettingModal extends BaseModal {
     globalThis.removeEventListener(
       `${USER_SETTINGS_CHANGED_EVENT}:${GRAPHICS_KEY}`,
       this.onGraphicsChanged,
+    );
+    globalThis.removeEventListener(
+      INPUT_PROFILE_CHANGED_EVENT,
+      this.onInputProfileChanged,
+    );
+    globalThis.removeEventListener(
+      ACTIVE_INPUT_CONTEXT_CHANGED,
+      this.onInputContextChanged,
     );
     window.removeEventListener("keydown", this.handleEasterEggKey);
     // An element torn down without close() being called (the in-game instance
@@ -199,40 +225,24 @@ export class UserSettingModal extends BaseModal {
   };
 
   private loadKeybindsFromStorage() {
-    const parsed = this.userSettings.parsedUserKeybinds();
-    if (Object.keys(parsed).length === 0) {
-      this.userKeybinds = {};
-      return;
-    }
-
-    const validated: Record<string, { value: string; key: string }> = {};
-
-    for (const [action, entry] of Object.entries(parsed)) {
-      if (typeof entry === "string") {
-        validated[action] = { value: entry, key: entry };
-      } else if (
-        typeof entry === "object" &&
-        entry !== null &&
-        !Array.isArray(entry)
-      ) {
-        const rawValue = (entry as any).value ?? "Null";
-        const value = Array.isArray(rawValue)
-          ? rawValue.find((v) => typeof v === "string")
-          : rawValue;
-
-        const rawKey = (entry as any).key ?? value;
-        const key = Array.isArray(rawKey)
-          ? rawKey.find((v) => typeof v === "string")
-          : rawKey;
-
-        if (typeof value === "string" && typeof key === "string") {
-          validated[action] = { value, key };
-        }
-      }
-    }
-
-    this.userKeybinds = validated;
+    this.userKeybinds = Object.fromEntries(
+      Object.entries(
+        this.userSettings.effectiveKeybinds(this.keyMode, Platform.isMac),
+      ).map(([action, value]) => [
+        action,
+        { value, key: formatKeyForDisplay(value) },
+      ]),
+    );
   }
+
+  private readonly onInputProfileChanged = () => {
+    this.loadKeybindsFromStorage();
+    this.requestUpdate();
+  };
+  private readonly onInputContextChanged = () => {
+    this.keyMode = activeInputContext().mode;
+    this.onInputProfileChanged();
+  };
 
   private handleKeybindChange(
     e: CustomEvent<{
@@ -244,7 +254,10 @@ export class UserSettingModal extends BaseModal {
   ) {
     const { action, value, key, prevValue } = e.detail;
 
-    const activeKeybinds = this.userSettings.keybinds(Platform.isMac);
+    const activeKeybinds = this.userSettings.effectiveKeybinds(
+      this.keyMode,
+      Platform.isMac,
+    );
 
     const values = Object.entries(activeKeybinds)
       .filter(([k]) => k !== action)
@@ -267,9 +280,15 @@ export class UserSettingModal extends BaseModal {
     );
 
     if (
-      values.includes(value) &&
-      value !== "Null" &&
-      !isAllowedSharedModifier
+      (values.includes(value) &&
+        value !== "Null" &&
+        !isAllowedSharedModifier) ||
+      !this.userSettings.setInputBinding(
+        this.keyMode,
+        action,
+        value,
+        Platform.isMac,
+      )
     ) {
       const displayKey = formatKeyForDisplay(key || value);
       window.dispatchEvent(
@@ -321,26 +340,36 @@ export class UserSettingModal extends BaseModal {
       return;
     }
 
-    this.userKeybinds = {
-      ...this.userKeybinds,
-      [action]: { value: value, key: key },
-    };
-    this.userSettings.setKeybinds(this.userKeybinds);
+    this.onInputProfileChanged();
   }
 
   private getKeyValue(action: string): string | undefined {
     const entry = this.userKeybinds[action];
-    if (!entry) return this.userSettings.keybinds(Platform.isMac)[action] ?? "";
+    if (!entry)
+      return (
+        this.userSettings.effectiveKeybinds(this.keyMode, Platform.isMac)[
+          action
+        ] ?? ""
+      );
     const normalizedValue = entry.value;
     if (normalizedValue === "Null") return "";
     return normalizedValue || undefined;
   }
 
   private getKeyChar(action: string): string {
+    if (action === "resetGfx")
+      return formatKeyForDisplay(
+        inputActionRows(
+          this.keyMode,
+          this.userSettings.effectiveKeybinds(this.keyMode, Platform.isMac),
+        ).find((entry) => entry.id === action)?.binding ?? "",
+      );
     const entry = this.userKeybinds[action];
     if (!entry)
       return formatKeyForDisplay(
-        this.userSettings.keybinds(Platform.isMac)[action] || "",
+        this.userSettings.effectiveKeybinds(this.keyMode, Platform.isMac)[
+          action
+        ] || "",
       );
     return entry.key || formatKeyForDisplay(entry.value || "");
   }
@@ -1183,466 +1212,126 @@ export class UserSettingModal extends BaseModal {
   }
 
   private renderKeybindSettings() {
+    const bindings = this.userSettings.effectiveKeybinds(
+      this.keyMode,
+      Platform.isMac,
+    );
+    const rows = [
+      ...new Map(
+        [
+          ...inputActionRows(this.keyMode, bindings),
+          ...inputActionRows(this.keyMode, bindings, "replay"),
+        ].map((entry) => [entry.id, entry]),
+      ).values(),
+    ];
+    const notices =
+      this.keyMode === "modern"
+        ? this.userSettings.inputMigrationNotices(Platform.isMac)
+        : [];
     return html`
-      <div
-        class="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300/70 text-xs"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-3.5 w-3.5 shrink-0 opacity-70"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <label
+          >${translateText("input_controls.profile")}
+          <select
+            class="bg-black/40 text-white border border-white/20 rounded p-2"
+            .value=${this.keyMode}
+            @change=${(event: Event) => {
+              this.keyMode = (event.target as HTMLSelectElement)
+                .value as InputMode;
+              this.onInputProfileChanged();
+            }}
+          >
+            <option value="classic">
+              ${translateText("input_controls.classic")}
+            </option>
+            <option value="modern">
+              ${translateText("input_controls.modern")}
+            </option>
+          </select>
+        </label>
+        <button
+          class="bg-white/5 hover:bg-white/20 border border-white/10 px-3 py-2 rounded"
+          @click=${() => {
+            this.userSettings.resetInputBindings(this.keyMode, Platform.isMac);
+            this.onInputProfileChanged();
+          }}
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        ${translateText("user_setting.keybinds_hint")}
+          ${translateText("input_controls.reset")}
+        </button>
       </div>
-
-      <h2
-        class="text-blue-200 text-xl font-bold mt-4 mb-3 border-b border-white/10 pb-2"
-      >
-        ${translateText("user_setting.view_options")}
-      </h2>
-
-      <setting-keybind
-        action="toggleView"
-        label=${translateText("user_setting.toggle_view")}
-        description=${translateText("user_setting.toggle_view_desc")}
-        defaultKey=${this.defaultKeybinds.toggleView}
-        .value=${this.getKeyValue("toggleView")}
-        .display=${this.getKeyChar("toggleView")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="coordinateGrid"
-        label=${translateText("user_setting.coordinate_grid_label")}
-        description=${translateText("user_setting.coordinate_grid_desc")}
-        defaultKey=${this.defaultKeybinds.coordinateGrid}
-        .value=${this.getKeyValue("coordinateGrid")}
-        .display=${this.getKeyChar("coordinateGrid")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="altKey"
-        label=${translateText("user_setting.graphics_refresh_modifier")}
-        description=${translateText(
-          "user_setting.graphics_refresh_modifier_desc",
-          { key: this.getKeyChar("resetGfx").toUpperCase() },
+      <p class="text-white/60 text-sm mb-3">
+        ${translateText("user_setting.keybinds_hint")}
+      </p>
+      ${notices.length
+        ? html`<details class="border border-white/10 rounded p-3 mb-3">
+            <summary>
+              ${translateText("input_controls.migration")} (${notices.length})
+            </summary>
+            <ul>
+              ${notices.map(
+                (notice) =>
+                  html`<li>
+                    ${translateText(`input_actions.${notice.action}.label`)}:
+                    ${formatKeyForDisplay(notice.previous)} →
+                    ${notice.replacement
+                      ? formatKeyForDisplay(notice.replacement)
+                      : translateText("input_controls.unassigned")}
+                    (${translateText(
+                      `input_controls.${notice.reason === "legacy-default" ? "legacy_default" : "conflict"}`,
+                    )})
+                  </li>`,
+              )}
+            </ul>
+          </details>`
+        : nothing}
+      ${rows
+        .filter(
+          (entry) => entry.phase !== "pointer" && entry.phase !== "button",
+        )
+        .map(
+          (entry) => html`
+            <setting-keybind
+              .action=${entry.id}
+              .label=${translateText(entry.labelKey)}
+              .description=${translateText(entry.descriptionKey, {
+                amount: String(this.userSettings.attackRatioIncrement()),
+              })}
+              .defaultKey=${entry.defaults[this.keyMode]}
+              .value=${this.getKeyValue(entry.id)}
+              .display=${this.getKeyChar(entry.id)}
+              @change=${this.handleKeybindChange}
+            ></setting-keybind>
+          `,
         )}
-        .defaultKey=${this.defaultKeybinds.altKey}
-        .value=${this.getKeyValue("altKey")}
-        .display=${this.getKeyChar("altKey")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="resetGfx"
-        label=${translateText("help_modal.action_reset_gfx")}
-        description=${translateText("user_setting.reset_gfx_desc")}
-        .defaultKey=${this.defaultKeybinds.resetGfx}
-        .value=${this.getKeyValue("resetGfx")}
-        .display=${this.getKeyChar("resetGfx")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
       <h2
-        class="text-blue-200 text-xl font-bold mt-8 mb-3 border-b border-white/10 pb-2"
+        class="text-blue-200 text-xl font-bold mt-6 mb-3 border-b border-white/10 pb-2"
       >
-        ${translateText("user_setting.build_controls")}
+        ${translateText("input_controls.mouse_controls")}
       </h2>
-
-      <setting-keybind
-        action="buildCity"
-        label=${translateText("user_setting.build_city")}
-        description=${translateText("user_setting.build_city_desc")}
-        defaultKey=${this.defaultKeybinds.buildCity}
-        .value=${this.getKeyValue("buildCity")}
-        .display=${this.getKeyChar("buildCity")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildFactory"
-        label=${translateText("user_setting.build_factory")}
-        description=${translateText("user_setting.build_factory_desc")}
-        defaultKey=${this.defaultKeybinds.buildFactory}
-        .value=${this.getKeyValue("buildFactory")}
-        .display=${this.getKeyChar("buildFactory")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildPort"
-        label=${translateText("user_setting.build_port")}
-        description=${translateText("user_setting.build_port_desc")}
-        defaultKey=${this.defaultKeybinds.buildPort}
-        .value=${this.getKeyValue("buildPort")}
-        .display=${this.getKeyChar("buildPort")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildDefensePost"
-        label=${translateText("user_setting.build_defense_post")}
-        description=${translateText("user_setting.build_defense_post_desc")}
-        defaultKey=${this.defaultKeybinds.buildDefensePost}
-        .value=${this.getKeyValue("buildDefensePost")}
-        .display=${this.getKeyChar("buildDefensePost")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildMissileSilo"
-        label=${translateText("user_setting.build_missile_silo")}
-        description=${translateText("user_setting.build_missile_silo_desc")}
-        defaultKey=${this.defaultKeybinds.buildMissileSilo}
-        .value=${this.getKeyValue("buildMissileSilo")}
-        .display=${this.getKeyChar("buildMissileSilo")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildSamLauncher"
-        label=${translateText("user_setting.build_sam_launcher")}
-        description=${translateText("user_setting.build_sam_launcher_desc")}
-        defaultKey=${this.defaultKeybinds.buildSamLauncher}
-        .value=${this.getKeyValue("buildSamLauncher")}
-        .display=${this.getKeyChar("buildSamLauncher")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildWarship"
-        label=${translateText("user_setting.build_warship")}
-        description=${translateText("user_setting.build_warship_desc")}
-        defaultKey=${this.defaultKeybinds.buildWarship}
-        .value=${this.getKeyValue("buildWarship")}
-        .display=${this.getKeyChar("buildWarship")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildAtomBomb"
-        label=${translateText("user_setting.build_atom_bomb")}
-        description=${translateText("user_setting.build_atom_bomb_desc")}
-        defaultKey=${this.defaultKeybinds.buildAtomBomb}
-        .value=${this.getKeyValue("buildAtomBomb")}
-        .display=${this.getKeyChar("buildAtomBomb")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildHydrogenBomb"
-        label=${translateText("user_setting.build_hydrogen_bomb")}
-        description=${translateText("user_setting.build_hydrogen_bomb_desc")}
-        defaultKey=${this.defaultKeybinds.buildHydrogenBomb}
-        .value=${this.getKeyValue("buildHydrogenBomb")}
-        .display=${this.getKeyChar("buildHydrogenBomb")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="buildMIRV"
-        label=${translateText("user_setting.build_mirv")}
-        description=${translateText("user_setting.build_mirv_desc")}
-        defaultKey=${this.defaultKeybinds.buildMIRV}
-        .value=${this.getKeyValue("buildMIRV")}
-        .display=${this.getKeyChar("buildMIRV")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <h2
-        class="text-blue-200 text-xl font-bold mt-8 mb-3 border-b border-white/10 pb-2"
-      >
-        ${translateText("user_setting.menu_shortcuts")}
-      </h2>
-
-      <setting-keybind
-        action="buildMenuModifier"
-        label=${translateText("user_setting.build_menu_modifier")}
-        description=${translateText("user_setting.build_menu_modifier_desc")}
-        .defaultKey=${this.defaultKeybinds.buildMenuModifier}
-        .value=${this.getKeyValue("buildMenuModifier")}
-        .display=${this.getKeyChar("buildMenuModifier")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="emojiMenuModifier"
-        label=${translateText("user_setting.emoji_menu_modifier")}
-        description=${translateText("user_setting.emoji_menu_modifier_desc")}
-        .defaultKey=${this.defaultKeybinds.emojiMenuModifier}
-        .value=${this.getKeyValue("emojiMenuModifier")}
-        .display=${this.getKeyChar("emojiMenuModifier")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="boxSelectWarships"
-        label=${translateText("user_setting.box_select_warships")}
-        description=${translateText("user_setting.box_select_warships_desc")}
-        .defaultKey=${this.defaultKeybinds.boxSelectWarships}
-        .value=${this.getKeyValue("boxSelectWarships")}
-        .display=${this.getKeyChar("boxSelectWarships")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="selectAllWarships"
-        label=${translateText("user_setting.select_all_warships")}
-        description=${translateText("user_setting.select_all_warships_desc")}
-        .defaultKey=${this.defaultKeybinds.selectAllWarships}
-        .value=${this.getKeyValue("selectAllWarships")}
-        .display=${this.getKeyChar("selectAllWarships")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="pauseGame"
-        label=${translateText("user_setting.pause_game")}
-        description=${translateText("user_setting.pause_game_desc")}
-        .defaultKey=${this.defaultKeybinds.pauseGame}
-        .value=${this.getKeyValue("pauseGame")}
-        .display=${this.getKeyChar("pauseGame")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="gameSpeedUp"
-        label=${translateText("user_setting.game_speed_up")}
-        description=${translateText("user_setting.game_speed_up_desc")}
-        .defaultKey=${this.defaultKeybinds.gameSpeedUp}
-        .value=${this.getKeyValue("gameSpeedUp")}
-        .display=${this.getKeyChar("gameSpeedUp")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="gameSpeedDown"
-        label=${translateText("user_setting.game_speed_down")}
-        description=${translateText("user_setting.game_speed_down_desc")}
-        .defaultKey=${this.defaultKeybinds.gameSpeedDown}
-        .value=${this.getKeyValue("gameSpeedDown")}
-        .display=${this.getKeyChar("gameSpeedDown")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <h2
-        class="text-blue-200 text-xl font-bold mt-8 mb-3 border-b border-white/10 pb-2"
-      >
-        ${translateText("user_setting.attack_ratio_controls")}
-      </h2>
-
-      <setting-keybind
-        action="attackRatioDown"
-        label=${translateText("user_setting.attack_ratio_down")}
-        description=${translateText("user_setting.attack_ratio_down_desc", {
-          amount: this.userSettings.attackRatioIncrement(),
-        })}
-        defaultKey=${this.defaultKeybinds.attackRatioDown}
-        .value=${this.getKeyValue("attackRatioDown")}
-        .display=${this.getKeyChar("attackRatioDown")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="attackRatioUp"
-        label=${translateText("user_setting.attack_ratio_up")}
-        description=${translateText("user_setting.attack_ratio_up_desc", {
-          amount: this.userSettings.attackRatioIncrement(),
-        })}
-        defaultKey=${this.defaultKeybinds.attackRatioUp}
-        .value=${this.getKeyValue("attackRatioUp")}
-        .display=${this.getKeyChar("attackRatioUp")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <h2
-        class="text-blue-200 text-xl font-bold mt-8 mb-3 border-b border-white/10 pb-2"
-      >
-        ${translateText("user_setting.attack_keybinds")}
-      </h2>
-
-      <setting-keybind
-        action="boatAttack"
-        label=${translateText("user_setting.boat_attack")}
-        description=${translateText("user_setting.boat_attack_desc")}
-        defaultKey=${this.defaultKeybinds.boatAttack}
-        .value=${this.getKeyValue("boatAttack")}
-        .display=${this.getKeyChar("boatAttack")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="groundAttack"
-        label=${translateText("user_setting.ground_attack")}
-        description=${translateText("user_setting.ground_attack_desc")}
-        defaultKey=${this.defaultKeybinds.groundAttack}
-        .value=${this.getKeyValue("groundAttack")}
-        .display=${this.getKeyChar("groundAttack")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="retaliateAttack"
-        label=${translateText("user_setting.retaliate_attack")}
-        description=${translateText("user_setting.retaliate_attack_desc")}
-        defaultKey=${this.defaultKeybinds.retaliateAttack}
-        .value=${this.getKeyValue("retaliateAttack")}
-        .display=${this.getKeyChar("retaliateAttack")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="swapDirection"
-        label=${translateText("user_setting.swap_direction")}
-        description=${translateText("user_setting.swap_direction_desc")}
-        .defaultKey=${this.defaultKeybinds.swapDirection}
-        .value=${this.getKeyValue("swapDirection")}
-        .display=${this.getKeyChar("swapDirection")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <h2
-        class="text-blue-200 text-xl font-bold mt-8 mb-3 border-b border-white/10 pb-2"
-      >
-        ${translateText("user_setting.ally_keybinds")}
-      </h2>
-
-      <setting-keybind
-        action="requestAlliance"
-        label=${translateText("user_setting.request_alliance")}
-        description=${translateText("user_setting.request_alliance_desc")}
-        defaultKey=${this.defaultKeybinds.requestAlliance}
-        .value=${this.getKeyValue("requestAlliance")}
-        .display=${this.getKeyChar("requestAlliance")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="breakAlliance"
-        label=${translateText("user_setting.break_alliance")}
-        description=${translateText("user_setting.break_alliance_desc")}
-        defaultKey=${this.defaultKeybinds.breakAlliance}
-        .value=${this.getKeyValue("breakAlliance")}
-        .display=${this.getKeyChar("breakAlliance")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <h2
-        class="text-blue-200 text-xl font-bold mt-8 mb-3 border-b border-white/10 pb-2"
-      >
-        ${translateText("user_setting.zoom_controls")}
-      </h2>
-
-      <setting-keybind
-        action="zoomOut"
-        label=${translateText("user_setting.zoom_out")}
-        description=${translateText("user_setting.zoom_out_desc")}
-        defaultKey=${this.defaultKeybinds.zoomOut}
-        .value=${this.getKeyValue("zoomOut")}
-        .display=${this.getKeyChar("zoomOut")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="zoomIn"
-        label=${translateText("user_setting.zoom_in")}
-        description=${translateText("user_setting.zoom_in_desc")}
-        defaultKey=${this.defaultKeybinds.zoomIn}
-        .value=${this.getKeyValue("zoomIn")}
-        .display=${this.getKeyChar("zoomIn")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <h2
-        class="text-blue-200 text-xl font-bold mt-8 mb-3 border-b border-white/10 pb-2"
-      >
-        ${translateText("user_setting.camera_movement")}
-      </h2>
-
-      <setting-keybind
-        action="centerCamera"
-        label=${translateText("user_setting.center_camera")}
-        description=${translateText("user_setting.center_camera_desc")}
-        defaultKey=${this.defaultKeybinds.centerCamera}
-        .value=${this.getKeyValue("centerCamera")}
-        .display=${this.getKeyChar("centerCamera")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="moveUp"
-        label=${translateText("user_setting.move_up")}
-        description=${translateText("user_setting.move_up_desc")}
-        defaultKey=${this.defaultKeybinds.moveUp}
-        .value=${this.getKeyValue("moveUp")}
-        .display=${this.getKeyChar("moveUp")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="moveLeft"
-        label=${translateText("user_setting.move_left")}
-        description=${translateText("user_setting.move_left_desc")}
-        defaultKey=${this.defaultKeybinds.moveLeft}
-        .value=${this.getKeyValue("moveLeft")}
-        .display=${this.getKeyChar("moveLeft")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="moveDown"
-        label=${translateText("user_setting.move_down")}
-        description=${translateText("user_setting.move_down_desc")}
-        defaultKey=${this.defaultKeybinds.moveDown}
-        .value=${this.getKeyValue("moveDown")}
-        .display=${this.getKeyChar("moveDown")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-
-      <setting-keybind
-        action="moveRight"
-        label=${translateText("user_setting.move_right")}
-        description=${translateText("user_setting.move_right_desc")}
-        defaultKey=${this.defaultKeybinds.moveRight}
-        .value=${this.getKeyValue("moveRight")}
-        .display=${this.getKeyChar("moveRight")}
-        @change=${this.handleKeybindChange}
-      ></setting-keybind>
-      ${[
-        ["moveUpArrow", "move_up"],
-        ["moveDownArrow", "move_down"],
-        ["moveLeftArrow", "move_left"],
-        ["moveRightArrow", "move_right"],
-        ["zoomOutMinus", "zoom_out"],
-        ["zoomOutNumpad", "zoom_out"],
-        ["zoomInEqual", "zoom_in"],
-        ["zoomInNumpad", "zoom_in"],
-        ["performanceOverlay", "performance_overlay_label"],
-      ].map(
-        ([action, key]) =>
-          html`<setting-keybind
-            .action=${action}
-            .label=${translateText("user_setting." + key)}
-            .description=${translateText("controls.alternate_key")}
-            .defaultKey=${this.defaultKeybinds[action]}
-            .value=${this.getKeyValue(action)}
-            .display=${this.getKeyChar(action)}
-            @change=${this.handleKeybindChange}
-          ></setting-keybind>`,
-      )}
+      <table class="w-full text-left text-sm">
+        <tbody>
+          ${rows
+            .filter(
+              (entry) => entry.phase === "pointer" || entry.phase === "button",
+            )
+            .map(
+              (entry) =>
+                html`<tr class="border-b border-white/10">
+                  <td class="py-2">${translateText(entry.labelKey)}</td>
+                  <td class="py-2 font-mono">
+                    ${entry.binding
+                      ? formatKeyForDisplay(entry.binding)
+                      : translateText("input_controls.unassigned")}
+                  </td>
+                  <td class="py-2 text-white/60">
+                    ${translateText(entry.descriptionKey)}
+                  </td>
+                </tr>`,
+            )}
+        </tbody>
+      </table>
     `;
   }
-
   /**
    * Purely visual switches — how the map and HUD are drawn. Anything that
    * changes how the game is played, or what the game tells you, belongs in

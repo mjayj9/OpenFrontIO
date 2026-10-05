@@ -1,80 +1,39 @@
 import { GameEvent } from "../core/EventBus";
+import { inputDefaults } from "../core/game/KeybindingRegistry";
 import {
-  getDefaultKeybinds,
-  mergeKeybinds,
+  INPUT_PROFILE_CHANGED_EVENT,
+  INPUT_PROFILE_KEY,
   UserSettings,
 } from "../core/game/UserSettings";
+import { Platform } from "./Platform";
 
 export type ModernBranch = "army" | "navy" | "air";
-export const MODERN_KEYBINDS_KEY = "settings.modernKeybinds.v1";
-export const MODERN_KEYBINDS_CHANGED = "modern-keybinds-changed";
+/** Compatibility aliases point at the one versioned input profile. */
+export const MODERN_KEYBINDS_KEY = INPUT_PROFILE_KEY;
+export const MODERN_KEYBINDS_CHANGED = INPUT_PROFILE_CHANGED_EVENT;
+const defaults = inputDefaults("modern", false);
 export const MODERN_KEY_DEFAULTS = {
-  modernArmy: "KeyQ",
-  modernNavy: "KeyW",
-  modernAir: "KeyE",
+  modernArmy: defaults.modernArmy,
+  modernNavy: defaults.modernNavy,
+  modernAir: defaults.modernAir,
 };
-
-/** Read through old bindings without modifying the Classic settings. Saved
- * Classic choices have priority over newly introduced modern defaults. */
 export function modernKeybinds(
   settings: UserSettings,
   isMac: boolean,
-  storage: Pick<Storage, "getItem"> = localStorage,
 ): Record<string, string> {
-  const classicSaved = Object.fromEntries(
-    Object.entries(settings.parsedUserKeybinds()).flatMap(([action, entry]) => {
-      let value = entry;
-      if (value && typeof value === "object" && "value" in value)
-        value = value.value;
-      if (Array.isArray(value)) value = value[0];
-      return typeof value === "string" ? [[action, value]] : [];
-    }),
-  );
-  let modernSaved: Record<string, string> = {};
-  try {
-    const parsed: unknown = JSON.parse(
-      storage.getItem(MODERN_KEYBINDS_KEY) ?? "{}",
-    );
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-      modernSaved = Object.fromEntries(
-        Object.entries(parsed).filter(
-          ([action, value]) =>
-            action in MODERN_KEY_DEFAULTS && typeof value === "string",
-        ),
-      );
-    }
-  } catch {
-    // An invalid optional modern settings entry never damages Classic input.
-  }
-  return mergeKeybinds(
-    { ...MODERN_KEY_DEFAULTS, ...getDefaultKeybinds(isMac) },
-    { ...classicSaved, ...modernSaved },
-  );
+  return settings.effectiveKeybinds("modern", isMac);
 }
-
 export function saveModernKeybind(
   action: keyof typeof MODERN_KEY_DEFAULTS,
   value: string,
 ): boolean {
-  try {
-    const previous: unknown = JSON.parse(
-      localStorage.getItem(MODERN_KEYBINDS_KEY) ?? "{}",
-    );
-    const saved =
-      previous && typeof previous === "object" && !Array.isArray(previous)
-        ? previous
-        : {};
-    localStorage.setItem(
-      MODERN_KEYBINDS_KEY,
-      JSON.stringify({ ...saved, [action]: value }),
-    );
-    globalThis.dispatchEvent(new Event(MODERN_KEYBINDS_CHANGED));
-    return true;
-  } catch {
-    return false;
-  }
+  return new UserSettings().setInputBinding(
+    "modern",
+    action,
+    value,
+    Platform.isMac,
+  );
 }
-
 export class ModernBranchEvent implements GameEvent {
   constructor(public readonly branch: ModernBranch) {}
 }
@@ -88,6 +47,15 @@ export class ModernSelectionEvent implements GameEvent {
     public readonly complete: boolean,
   ) {}
 }
+/** Cursor preview only; never submits an Intent. Coordinates are CSS pixels. */
+export class ModernPreviewEvent implements GameEvent {
+  constructor(
+    public readonly x: number,
+    public readonly y: number,
+    public readonly queue: boolean,
+  ) {}
+}
+/** Explicit click/touch confirmation, including Shift queue semantics. */
 export class ModernTargetEvent implements GameEvent {
   constructor(
     public readonly x: number,
@@ -96,3 +64,10 @@ export class ModernTargetEvent implements GameEvent {
   ) {}
 }
 export class ModernClearSelectionEvent implements GameEvent {}
+export class ModernCancelEvent implements GameEvent {}
+export class ModernStopEvent implements GameEvent {}
+export class ModernSelectVisibleEvent implements GameEvent {}
+export class ModernCenterSelectionEvent implements GameEvent {}
+export class ModernBuildBaseEvent implements GameEvent {
+  constructor(public readonly kind: "armybase" | "airbase") {}
+}

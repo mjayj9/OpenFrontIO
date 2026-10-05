@@ -1,5 +1,7 @@
 import { AttackExecution } from "../execution/AttackExecution";
 import { MoveWarshipExecution } from "../execution/MoveWarshipExecution";
+import { PortExecution } from "../execution/PortExecution";
+import { RetreatExecution } from "../execution/RetreatExecution";
 import { TransportShipExecution } from "../execution/TransportShipExecution";
 import { WarshipExecution } from "../execution/WarshipExecution";
 import { FlatBinaryHeap } from "../execution/utils/FlatBinaryHeap";
@@ -18,6 +20,7 @@ import {
   ModernForceRules,
   ModernForcesState,
   ModernForceState,
+  ModernProductionState,
 } from "./ModernForceTypes";
 import { MODERN_RULES } from "./ModernRules";
 
@@ -164,6 +167,15 @@ export function forcePreview(
     return { ...result, valid: true, risk: "low" };
   const owner = game.player(force.playerId),
     destination = game.owner(target);
+  const queuedTarget = queue
+    ? (force.queue[force.queue.length - 1]?.target ?? force.command?.target)
+    : undefined;
+  const from =
+    queuedTarget !== undefined &&
+    game.owner(queuedTarget) === owner &&
+    force.branch === "army"
+      ? queuedTarget
+      : force.tile;
   if (force.branch === "army") {
     if (!game.isLand(target) || game.isImpassable(target))
       return fail("army_requires_land_transport");
@@ -234,7 +246,7 @@ export function forcePreview(
     const path = landPath(
       game,
       force.playerId,
-      force.tile,
+      from,
       target,
       rules.landPathBudget,
     );
@@ -251,7 +263,7 @@ export function forcePreview(
       const ground = landPath(
         game,
         force.playerId,
-        force.tile,
+        from,
         shore,
         rules.landPathBudget,
       );
@@ -299,7 +311,18 @@ export function forcePreview(
       !game.hasWaterComponent(unit.tile(), game.getWaterComponent(target)!)
     )
       return fail("water_component_disconnected");
-    const path = PathFinding.Water(game).findPath(unit.tile(), target);
+    const previousQueued = force.queue[force.queue.length - 1]?.previewPath;
+    const priorEndpoint = queue
+      ? (previousQueued?.[previousQueued.length - 1] ??
+        force.path[force.path.length - 1])
+      : undefined;
+    const queuedFrom =
+      priorEndpoint !== undefined && game.isWater(priorEndpoint)
+        ? priorEndpoint
+        : queuedTarget !== undefined && game.isWater(queuedTarget)
+          ? queuedTarget
+          : unit.tile();
+    const path = PathFinding.Water(game).findPath(queuedFrom, target);
     if (!path) return fail("no_water_path");
     // The shared shore transformer restores a land endpoint for transports.
     // A warship stops at the preceding navigable node instead of sailing ashore.
@@ -325,8 +348,11 @@ export function forcePreview(
   const base = state.bases.find(
     (b) =>
       b.id === force.baseId &&
+      (b.branch ?? "air") === "air" &&
       b.playerId === force.playerId &&
       b.health > 0 &&
+      (b.completesTick ?? 0) <= game.ticks() &&
+      (b.repairUntilTick ?? 0) <= game.ticks() &&
       game.owner(b.tile) === owner,
   );
   if (!base) return fail("airbase_unavailable");
@@ -376,6 +402,9 @@ export class ModernForces {
   private armyByAttackId = new Map<string, ModernForceState>();
   private armiesByPlayer = new Map<PlayerID, ModernForceState[]>();
   private forceIndexRevision = "";
+  private get timedProduction(): boolean {
+    return this.state.version === 3;
+  }
   constructor(
     private game: Game,
     readonly state: ModernForcesState,
@@ -383,6 +412,15 @@ export class ModernForces {
     readonly rules: ModernForceRules = DEFAULT_MODERN_FORCE_RULES,
   ) {
     state.samAircraftReloads ??= [];
+    state.production ??= [];
+    state.completedProduction ??= [];
+    for (const base of state.bases) {
+      base.branch ??= "air";
+      base.completesTick ??= 0;
+      base.repairUntilTick ??= null;
+      base.unitId ??= null;
+      base.constructionCounted ??= true;
+    }
   }
 
   private indexForces(): void {
@@ -450,6 +488,31 @@ export class ModernForces {
       this.armyByAttackId.delete(attackId);
     }
   }
+  /** Called only after native AttackExecution actually conquers this tile. */
+  armyAttackProgress(attackId: string, tile: TileRef): void {
+    this.indexForces();
+    const force = this.armyByAttackId.get(attackId);
+    if (force?.phase !== "attacking" || force.attackId !== attackId) return;
+    force.tile = tile;
+    const attack = this.game
+      .player(force.playerId)
+      .outgoingAttacks()
+      .find((a) => a.id() === attackId);
+    // Native combat expands a front after the clicked tile is taken. Show its
+    // real adjacent frontier rather than drawing backwards to old waypoints.
+    const next = attack
+      ? this.game
+          .neighbors(tile)
+          .find(
+            (t) =>
+              this.game.isLand(t) &&
+              !this.game.isImpassable(t) &&
+              this.game.owner(t) === attack.target(),
+          )
+      : undefined;
+    force.path = next === undefined ? [tile] : [tile, next];
+    force.pathIndex = 0;
+  }
 
   transportStarted(
     playerId: PlayerID,
@@ -503,8 +566,6 @@ export class ModernForces {
       Math.min(force.attackTroops, owner.troops()) / 10,
     );
     owner.removeTroops(force.personnel * 10);
-    if (force.command && this.game.owner(force.command.target) === owner)
-      force.tile = force.command.target;
     if (force.unitId !== null) this.armyByUnitId.delete(force.unitId);
     if (force.attackId !== null) this.armyByAttackId.delete(force.attackId);
     force.unitId = null;
@@ -516,12 +577,74 @@ export class ModernForces {
 
   initializeFaction(playerId: PlayerID, capital: TileRef): void {
     this.createBase(playerId, capital, true);
-    this.produce(playerId, "army", "army", undefined, capital, 1, true);
-    const base = this.state.bases.find((b) => b.playerId === playerId);
+    if (!this.timedProduction) {
+      this.produce(playerId, "army", "army", undefined, capital, 1, true);
+      const base = this.state.bases.find(
+        (b) => b.playerId === playerId && (b.branch ?? "air") === "air",
+      );
+      if (base) {
+        this.produce(playerId, "air", "fighter", base.id, undefined, 4, true);
+        this.produce(playerId, "air", "strike", base.id, undefined, 4, true);
+      }
+      return;
+    }
+    const owner = this.game.player(playerId),
+      candidates = [capital],
+      seen = new Set(candidates);
+    let armyTile = capital;
+    for (let i = 0; i < candidates.length && i < 64; i++) {
+      const tile = candidates[i],
+        distance = this.game.manhattanDist(tile, capital);
+      if (distance >= 3 && distance <= 5) {
+        armyTile = tile;
+        break;
+      }
+      if (distance > 5) continue;
+      for (const next of this.game.neighbors(tile))
+        if (
+          !seen.has(next) &&
+          this.game.owner(next) === owner &&
+          this.game.isLand(next) &&
+          !this.game.isImpassable(next)
+        ) {
+          seen.add(next);
+          candidates.push(next);
+          if (armyTile === capital) armyTile = next;
+        }
+    }
+    const armyBase = this.createBase(playerId, armyTile, true, "army");
+    this.produce(playerId, "army", "army", armyBase?.id, armyTile, 1, true);
+    const initialArmy = this.state.forces.find(
+      (f) => f.playerId === playerId && f.branch === "army",
+    );
+    if (initialArmy && initialArmy.personnel >= 2) {
+      const personnel = Math.floor(initialArmy.personnel / 2);
+      initialArmy.personnel -= personnel;
+      const rally =
+        this.game
+          .neighbors(armyTile)
+          .find(
+            (t) =>
+              this.game.owner(t) === owner &&
+              this.game.isLand(t) &&
+              !this.game.isImpassable(t),
+          ) ?? armyTile;
+      this.state.forces.push({
+        ...structuredClone(initialArmy),
+        id: this.nextId("force"),
+        tile: rally,
+        personnel,
+      });
+    }
+    const base = this.state.bases.find(
+      (b) => b.playerId === playerId && (b.branch ?? "air") === "air",
+    );
     if (base) {
       this.produce(playerId, "air", "fighter", base.id, undefined, 4, true);
       this.produce(playerId, "air", "strike", base.id, undefined, 4, true);
     }
+    for (const port of this.game.player(playerId).units(UnitType.Port))
+      if (port.isActive()) this.navalBase(playerId, port.tile());
   }
 
   private nextId(prefix: string): string {
@@ -531,6 +654,7 @@ export class ModernForces {
     playerId: PlayerID,
     tile: TileRef,
     free = false,
+    branch: ModernBranch = "air",
   ): ModernBaseState | null {
     const owner = this.game.player(playerId);
     if (
@@ -541,33 +665,147 @@ export class ModernForces {
     )
       return null;
     if (
-      this.state.bases.filter((b) => b.playerId === playerId).length >=
-        this.rules.maxBasesPerFaction ||
-      this.state.bases.some((b) => b.tile === tile)
+      this.state.bases.filter(
+        (b) => b.playerId === playerId && (b.branch ?? "air") === branch,
+      ).length >= this.rules.maxBasesPerFaction ||
+      this.state.bases.some(
+        (b) => b.tile === tile && (b.branch ?? "air") === branch,
+      )
     )
       return null;
-    if (!free && owner.gold() < BigInt(this.rules.airbaseCost)) return null;
-    if (!free) owner.removeGold(BigInt(this.rules.airbaseCost));
+    const cost =
+      branch === "army" ? this.rules.armybaseCost : this.rules.airbaseCost;
+    if (!free && owner.gold() < BigInt(cost)) return null;
+    if (!free) owner.removeGold(BigInt(cost));
     const base = {
       id: this.nextId("base"),
       playerId,
       tile,
-      capacity: this.rules.airbaseCapacity,
+      branch,
+      completesTick:
+        free || !this.timedProduction || this.game.config().instantBuild()
+          ? 0
+          : this.game.ticks() +
+            (branch === "army"
+              ? this.rules.armybaseBuildTicks
+              : this.rules.airbaseBuildTicks),
+      repairUntilTick: null,
+      unitId: null,
+      constructionCounted: free,
+      capacity:
+        branch === "army"
+          ? this.rules.armybaseCapacity
+          : this.rules.airbaseCapacity,
       health: this.rules.airbaseHealth,
       maxHealth: this.rules.airbaseHealth,
     };
     this.state.bases.push(base);
+    if (!free && this.game.config().instantBuild()) {
+      this.recordProduction(
+        playerId,
+        branch === "army" ? "armybase" : "airbase",
+        1,
+      );
+      base.constructionCounted = true;
+    }
     return base;
+  }
+
+  /** Military docks are the existing Port: one unit, one economic owner. */
+  private navalBase(
+    playerId: PlayerID,
+    tile: TileRef,
+    build = false,
+  ): ModernBaseState | null {
+    const owner = this.game.player(playerId);
+    let port = owner
+      .units(UnitType.Port)
+      .find((u) => u.isActive() && u.tile() === tile);
+    let createdPort = false;
+    if (!port && build) {
+      if (this.game.config().isUnitDisabled(UnitType.Port)) return null;
+      const spawn = owner.canBuild(UnitType.Port, tile);
+      if (spawn === false) return null;
+      port = owner.buildUnit(UnitType.Port, spawn, {});
+      createdPort = true;
+      if (this.game.config().instantBuild())
+        this.game.addExecution(new PortExecution(port));
+      else port.setUnderConstruction(true);
+    }
+    if (!port) return null;
+    const existing = this.state.bases.find(
+      (b) => b.unitId === port!.id() && b.branch === "navy",
+    );
+    if (existing) return existing;
+    const base: ModernBaseState = {
+      id: this.nextId("base"),
+      playerId,
+      branch: "navy",
+      tile: port.tile(),
+      unitId: port.id(),
+      capacity: this.rules.navybaseCapacity,
+      health: this.rules.airbaseHealth,
+      maxHealth: this.rules.airbaseHealth,
+      completesTick:
+        port.isUnderConstruction() &&
+        createdPort &&
+        !this.game.config().instantBuild()
+          ? this.game.ticks() + this.rules.navybaseBuildTicks
+          : 0,
+      repairUntilTick: null,
+      constructionCounted: !createdPort,
+    };
+    this.state.bases.push(base);
+    if (createdPort && this.game.config().instantBuild()) {
+      this.recordProduction(playerId, "navybase", 1);
+      base.constructionCounted = true;
+    }
+    return base;
+  }
+
+  private operationalBase(
+    base: ModernBaseState | undefined,
+    playerId: PlayerID,
+  ): boolean {
+    if (
+      !base ||
+      base.playerId !== playerId ||
+      base.health <= 0 ||
+      (base.completesTick ?? 0) > this.game.ticks() ||
+      (base.repairUntilTick ?? 0) > this.game.ticks() ||
+      this.game.owner(base.tile).id() !== playerId
+    )
+      return false;
+    if (base.branch === "navy") {
+      const unit =
+        typeof base.unitId !== "number"
+          ? undefined
+          : this.game.unit(base.unitId);
+      if (
+        !unit?.isActive() ||
+        unit.isUnderConstruction() ||
+        unit.owner().id() !== playerId
+      )
+        return false;
+      if (
+        this.game
+          .modernSystems()
+          ?.ports.some((p) => p.unitId === unit.id() && p.damage >= 1000)
+      )
+        return false;
+    }
+    return true;
   }
 
   produce(
     playerId: PlayerID,
     branch: ModernBranch,
-    kind: ModernForceKind | "airbase",
+    kind: ModernForceKind | "airbase" | "armybase" | "navybase" | "repair_base",
     baseId: string | undefined,
     tile: TileRef | undefined,
     count: number,
     free = false,
+    requestedSource?: "army_reserve" | "available",
   ): string | null {
     if (
       !Number.isInteger(count) ||
@@ -578,36 +816,202 @@ export class ModernForces {
       return "invalid_count";
     const owner = this.game.player(playerId);
     if (!owner.isAlive()) return "faction_defeated";
-    if (kind === "airbase")
-      return branch !== "air" ||
+    if (kind === "repair_base") {
+      const base = this.state.bases.find((b) => b.id === baseId);
+      if (
+        !base ||
+        base.playerId !== playerId ||
+        this.game.owner(base.tile) !== owner
+      )
+        return "not_base_owner";
+      if ((base.completesTick ?? 0) > this.game.ticks())
+        return "base_under_construction";
+      if (base.health >= base.maxHealth || base.repairUntilTick)
+        return "base_repair_unavailable";
+      if (owner.gold() < BigInt(this.rules.baseRepairCost))
+        return "insufficient_gold";
+      owner.removeGold(BigInt(this.rules.baseRepairCost));
+      base.repairUntilTick = this.game.ticks() + this.rules.baseRepairTicks;
+      return null;
+    }
+    if (kind === "airbase" || kind === "armybase" || kind === "navybase") {
+      const requestedBranch =
+        kind === "airbase" ? "air" : kind === "armybase" ? "army" : "navy";
+      if (
+        branch !== requestedBranch ||
         count !== 1 ||
         tile === undefined ||
-        !this.createBase(playerId, tile, free)
-        ? "airbase_requires_owned_land_and_gold"
-        : null;
+        !this.game.isValidRef(tile)
+      )
+        return "invalid_target";
+      if (
+        this.game.owner(tile) !== owner ||
+        !this.game.isLand(tile) ||
+        this.game.isImpassable(tile)
+      )
+        return "base_requires_owned_land";
+      if (kind === "navybase") {
+        if (this.game.config().isUnitDisabled(UnitType.Port))
+          return "navybase_disabled";
+        const existingPort = owner
+          .units(UnitType.Port)
+          .some((u) => u.isActive() && u.tile() === tile);
+        if (
+          !existingPort &&
+          owner.gold() <
+            this.game.unitInfo(UnitType.Port).cost(this.game, owner)
+        )
+          return "insufficient_gold";
+        // navalBase resolves the native Port search once, including structure
+        // spacing and the adjusted coast. Never charge for a rejected site.
+        return this.navalBase(playerId, tile, true)
+          ? null
+          : "navybase_no_valid_site";
+      }
+      if (
+        this.state.bases.some(
+          (b) => b.tile === tile && (b.branch ?? "air") === requestedBranch,
+        )
+      )
+        return "base_already_exists";
+      if (
+        this.state.bases.filter(
+          (b) =>
+            b.playerId === playerId && (b.branch ?? "air") === requestedBranch,
+        ).length >= this.rules.maxBasesPerFaction
+      )
+        return "base_limit";
+      const cost =
+        kind === "armybase" ? this.rules.armybaseCost : this.rules.airbaseCost;
+      if (!free && owner.gold() < BigInt(cost)) return "insufficient_gold";
+      return this.createBase(playerId, tile, free, requestedBranch)
+        ? null
+        : "base_requires_owned_land";
+    }
     if (
       (branch === "army" && kind !== "army") ||
       (branch === "navy" && kind !== "warship") ||
       (branch === "air" && kind !== "fighter" && kind !== "strike")
     )
       return "wrong_branch_mission";
+    const pending = this.state.production!;
     if (
       this.state.forces.filter(
         (f) => f.playerId === playerId && f.phase !== "destroyed",
-      ).length >= this.rules.maxForcesPerFaction
+      ).length +
+        pending.filter((p) => p.playerId === playerId).length >=
+      this.rules.maxForcesPerFaction
     )
       return "force_limit";
-    let base: ModernBaseState | undefined,
-      unitId: number | null = null;
+    let base = this.state.bases.find(
+      (b) => b.id === baseId && (b.branch ?? "air") === branch,
+    );
+    if (
+      !this.timedProduction &&
+      branch === "army" &&
+      tile !== undefined &&
+      this.game.isValidRef(tile) &&
+      this.game.owner(tile) === owner &&
+      this.game.isLand(tile) &&
+      !this.game.isImpassable(tile)
+    )
+      base = {
+        id: "",
+        playerId,
+        tile,
+        capacity: Number.MAX_SAFE_INTEGER,
+        health: this.rules.airbaseHealth,
+        maxHealth: this.rules.airbaseHealth,
+        branch: "army",
+      };
+    if (
+      !base &&
+      branch === "navy" &&
+      tile !== undefined &&
+      this.game.isValidRef(tile)
+    ) {
+      const port = owner
+        .units(UnitType.Port)
+        .filter(
+          (u) => u.isActive() && this.game.manhattanDist(u.tile(), tile!) <= 24,
+        )
+        .sort(
+          (a, b) =>
+            this.game.manhattanDist(a.tile(), tile!) -
+              this.game.manhattanDist(b.tile(), tile!) || a.id() - b.id(),
+        )[0];
+      if (port) base = this.navalBase(playerId, port.tile()) ?? undefined;
+    }
+    if (!base && branch === "army" && free && tile !== undefined)
+      base = this.createBase(playerId, tile, true, "army") ?? undefined;
+    if (!base && branch === "army")
+      base = this.state.bases.find(
+        (b) =>
+          b.playerId === playerId &&
+          b.branch === "army" &&
+          (tile === undefined || b.tile === tile),
+      );
+    if (
+      !base ||
+      base.playerId !== playerId ||
+      this.game.owner(base.tile) !== owner
+    )
+      return branch === "air"
+        ? "airbase_unavailable"
+        : branch === "army"
+          ? "armybase_unavailable"
+          : "warship_requires_port";
+    if ((base.completesTick ?? 0) > this.game.ticks())
+      return "base_under_construction";
+    if (
+      base.branch === "navy" &&
+      typeof base.unitId === "number" &&
+      this.game.unit(base.unitId)?.isUnderConstruction()
+    )
+      return "base_under_construction";
+    if (!this.operationalBase(base, playerId))
+      return "base_damaged_or_repairing";
     const personnel =
-      branch === "army"
-        ? count * this.rules.armyPersonnelPerGroup
+      count *
+      (branch === "army"
+        ? this.rules.armyPersonnelPerGroup
         : branch === "navy"
-          ? count * this.rules.navyPersonnelPerWarship
-          : count * this.rules.personnelPerAircraft;
+          ? this.rules.navyPersonnelPerWarship
+          : this.rules.personnelPerAircraft);
+    const capacityUse = branch === "army" ? personnel : count;
+    const assigned = this.state.forces
+      .filter((f) => f.baseId === base!.id && f.phase !== "destroyed")
+      .reduce(
+        (n, f) =>
+          n +
+          (branch === "army"
+            ? f.personnel + Math.floor(f.attackTroops / 10)
+            : branch === "air"
+              ? f.aircraft
+              : 1),
+        0,
+      );
+    const queued = pending
+      .filter((p) => p.baseId === base!.id)
+      .reduce((n, p) => n + (branch === "army" ? p.personnel : p.count), 0);
+    if (assigned + queued + capacityUse > base.capacity) return "base_capacity";
+    let spawn = base.tile;
+    if (branch === "navy") {
+      if (count !== 1 || this.game.config().isUnitDisabled(UnitType.Warship))
+        return "warship_disabled_or_count";
+      const water = this.game
+        .neighbors(base.tile)
+        .find((t) => this.game.isWater(t));
+      if (water === undefined) return "warship_requires_port";
+      const valid = owner.canBuild(UnitType.Warship, water);
+      if (valid === false) return "warship_requires_port";
+      spawn = valid;
+    }
     const cost =
       branch === "army"
-        ? 0n
+        ? this.timedProduction
+          ? BigInt(count * this.rules.armyTrainingCost)
+          : 0n
         : branch === "navy"
           ? this.game.unitInfo(UnitType.Warship).cost(this.game, owner)
           : BigInt(
@@ -617,71 +1021,121 @@ export class ModernForces {
                   : this.rules.strikeCost),
             );
     if (!free && owner.gold() < cost) return "insufficient_gold";
-    if (branch === "air") {
-      base = this.state.bases.find(
-        (b) =>
-          b.id === baseId &&
-          b.playerId === playerId &&
-          b.health > 0 &&
-          this.game.owner(b.tile) === owner,
-      );
-      if (!base) return "airbase_unavailable";
-      const stationed = this.state.forces
-        .filter((f) => f.baseId === base!.id && f.phase !== "destroyed")
-        .reduce((sum, f) => sum + f.aircraft, 0);
-      if (stationed + count > base.capacity) return "airbase_capacity";
-      tile = base.tile;
-    } else if (tile === undefined || !this.game.isValidRef(tile))
-      return "invalid_target";
+    let source: ModernProductionState["source"] = "available";
     if (
       branch === "army" &&
-      (this.game.owner(tile!) !== owner ||
-        !this.game.isLand(tile!) ||
-        this.game.isImpassable(tile!))
-    )
-      return "army_requires_owned_land";
-    if (branch === "navy") {
-      if (count !== 1 || this.game.config().isUnitDisabled(UnitType.Warship))
-        return "warship_disabled_or_count";
-      if (!this.game.isWater(tile!))
-        tile = this.game.neighbors(tile!).find((t) => this.game.isWater(t));
-      if (tile === undefined) return "warship_requires_port";
-      const spawn = owner.canBuild(UnitType.Warship, tile);
-      if (spawn === false) return "warship_requires_port";
-      tile = spawn;
-    }
-    if (!this.hooks.reserve(playerId, branch, personnel))
-      return "insufficient_manpower";
-    if (branch === "army") {
-      if (owner.troops() < personnel * 10) {
-        this.hooks.release(playerId, branch, personnel);
+      (free ||
+        !this.timedProduction ||
+        !this.hooks.mobilize ||
+        requestedSource === "army_reserve" ||
+        (requestedSource === undefined && owner.troops() >= personnel * 10))
+    ) {
+      source = "army_reserve";
+      if (
+        owner.troops() < personnel * 10 ||
+        !this.hooks.reserve(playerId, branch, personnel)
+      )
         return "insufficient_army_reserve";
-      }
       owner.removeTroops(personnel * 10);
-    } else if (branch === "navy") {
-      const unit = owner.buildUnit(UnitType.Warship, tile!, {
-        patrolTile: tile!,
+    } else if (branch === "army") {
+      if (!this.hooks.mobilize!(playerId, personnel))
+        return "insufficient_manpower";
+    } else {
+      const people = owner.modernFaction?.()?.population;
+      const cannotMobilize =
+        people &&
+        (people.available < personnel ||
+          people.army + people.navy + people.air + personnel >
+            Math.floor(
+              (people.total * MODERN_RULES.mobilizationPermille) / 1000,
+            ));
+      const retrain =
+        requestedSource === "army_reserve" ||
+        (requestedSource === undefined &&
+          this.timedProduction &&
+          cannotMobilize &&
+          this.hooks.reassignArmy);
+      if (retrain) {
+        if (!this.hooks.reassignArmy?.(playerId, branch, personnel))
+          return "insufficient_army_reserve";
+        source = "army_reserve";
+      } else if (!this.hooks.reserve(playerId, branch, personnel))
+        return "insufficient_manpower";
+    }
+    let unitId: number | null = null;
+    if (branch === "navy") {
+      const unit = owner.buildUnit(UnitType.Warship, spawn, {
+        patrolTile: spawn,
       });
       unitId = unit.id();
-      this.game.addExecution(new WarshipExecution(unit));
+      if (!free && this.timedProduction && !this.game.config().instantBuild())
+        unit.setUnderConstruction(true);
     } else if (!free) owner.removeGold(cost);
-    this.state.forces.push({
-      id: this.nextId("force"),
+    const job: ModernProductionState = {
+      id: this.nextId("production"),
       playerId,
       branch,
       kind,
-      tile: tile!,
-      baseId: base?.id ?? null,
+      baseId: base.id,
+      tile: spawn,
+      count,
       personnel,
-      aircraft: branch === "air" ? count : 0,
+      costGold: cost.toString(),
+      source,
       unitId,
-      phase: branch === "air" && !free ? "rearming" : "idle",
+      completesTick:
+        this.game.ticks() +
+        (branch === "army"
+          ? this.rules.armyTrainingTicks * count
+          : branch === "navy"
+            ? this.rules.warshipProductionTicks
+            : this.rules.aircraftProductionTicks +
+              this.rules.aircraftProductionTicksPerAircraft * count),
+    };
+    if (free || !this.timedProduction || this.game.config().instantBuild())
+      this.finishProduction(job, !free);
+    else pending.push(job);
+    return null;
+  }
+
+  private recordProduction(
+    playerId: PlayerID,
+    kind: ModernForceKind | "armybase" | "navybase" | "airbase",
+    count: number,
+  ): void {
+    const existing = this.state.completedProduction!.find(
+      (p) => p.playerId === playerId && p.kind === kind,
+    );
+    if (existing) existing.count += count;
+    else this.state.completedProduction!.push({ playerId, kind, count });
+  }
+  private finishProduction(job: ModernProductionState, record = true): void {
+    if (typeof job.unitId === "number") {
+      const unit = this.game.unit(job.unitId);
+      if (!unit?.isActive() || unit.owner().id() !== job.playerId) return;
+      unit.setUnderConstruction(false);
+      this.game.addExecution(new WarshipExecution(unit));
+    }
+    this.state.forces.push({
+      id: this.nextId("force"),
+      playerId: job.playerId,
+      branch: job.branch,
+      kind: job.kind,
+      tile: job.tile,
+      baseId: job.baseId || null,
+      personnel: job.personnel,
+      aircraft: job.branch === "air" ? job.count : 0,
+      unitId: job.unitId ?? null,
+      phase:
+        !this.timedProduction && job.branch === "air" && record
+          ? "rearming"
+          : "idle",
       command: null,
       queue: [],
       path: [],
       pathIndex: 0,
       cooldownUntil:
-        branch === "air" && !free
+        !this.timedProduction && job.branch === "air" && record
           ? this.game.ticks() + this.rules.airRearmTicks
           : 0,
       attackId: null,
@@ -692,7 +1146,85 @@ export class ModernForces {
       casualties: 0,
       movementProgress: 0,
     });
-    return null;
+    if (record) this.recordProduction(job.playerId, job.kind, job.count);
+  }
+
+  private tickProduction(tick: number): void {
+    for (const base of this.state.bases) {
+      const owner = this.game.owner(base.tile);
+      if (owner.isPlayer() && owner.id() !== base.playerId)
+        base.playerId = owner.id();
+      if (
+        !base.constructionCounted &&
+        (base.completesTick ?? 0) > 0 &&
+        tick >= base.completesTick!
+      ) {
+        this.recordProduction(
+          base.playerId,
+          base.branch === "army"
+            ? "armybase"
+            : base.branch === "navy"
+              ? "navybase"
+              : "airbase",
+          1,
+        );
+        base.constructionCounted = true;
+      }
+      if (base.repairUntilTick && tick >= base.repairUntilTick) {
+        base.health = base.maxHealth;
+        base.repairUntilTick = null;
+      }
+      if (
+        base.branch === "navy" &&
+        (base.completesTick ?? 0) > 0 &&
+        tick >= base.completesTick!
+      ) {
+        const unit =
+          typeof base.unitId !== "number"
+            ? undefined
+            : this.game.unit(base.unitId);
+        if (unit?.isActive()) {
+          unit.setUnderConstruction(false);
+          this.game.addExecution(new PortExecution(unit));
+        }
+        base.completesTick = 0;
+      }
+    }
+    const remaining: ModernProductionState[] = [];
+    for (const job of this.state.production!) {
+      const base = this.state.bases.find((b) => b.id === job.baseId);
+      const owner = this.game.player(job.playerId);
+      const unit =
+        typeof job.unitId !== "number" ? undefined : this.game.unit(job.unitId);
+      if (
+        !owner.isAlive() ||
+        !base ||
+        base.playerId !== job.playerId ||
+        this.game.owner(base.tile) !== owner ||
+        (typeof job.unitId === "number" &&
+          (!unit?.isActive() || unit.owner() !== owner))
+      ) {
+        if (unit?.isActive()) unit.delete();
+        if (job.branch === "army") {
+          if (job.source === "army_reserve")
+            owner.addTroops(job.personnel * 10);
+          else this.hooks.demobilize?.(job.playerId, job.personnel);
+        } else if (job.source === "army_reserve") {
+          this.hooks.restoreArmy?.(job.playerId, job.branch, job.personnel);
+        } else this.hooks.release(job.playerId, job.branch, job.personnel);
+        continue;
+      }
+      if (!this.operationalBase(base, job.playerId)) job.completesTick++;
+      if (
+        tick < job.completesTick ||
+        !this.operationalBase(base, job.playerId)
+      ) {
+        remaining.push(job);
+        continue;
+      }
+      this.finishProduction(job);
+    }
+    this.state.production = remaining;
   }
 
   command(
@@ -743,6 +1275,15 @@ export class ModernForces {
         continue;
       }
       const command = { kind, target, issuedTick: this.game.ticks() };
+      if (queue) {
+        const route = preview.usesTransport
+          ? preview.path.concat(preview.transportPath?.slice(1) ?? [])
+          : preview.path;
+        // No client-provided route reaches the simulation; this is only the
+        // bounded result of its own validation for queued-arrow display.
+        if (route.length <= 8192)
+          Object.assign(command, { previewPath: route });
+      }
       if (preview.usesTransport) Object.assign(command, { viaTransport: true });
       if (force.branch === "navy" && kind === "escort") {
         const owner = this.game.player(playerId);
@@ -795,8 +1336,13 @@ export class ModernForces {
       if (transport?.type() === UnitType.TransportShip && transport.isActive())
         transport.updateTransportShipState({ isRetreating: true });
     }
-    if (force.attackId)
-      this.game.player(force.playerId).orderRetreat(force.attackId);
+    if (force.attackId) {
+      const attack = this.game
+        .player(force.playerId)
+        .outgoingAttacks()
+        .find((a) => a.id() === force.attackId);
+      if (attack) this.requestArmyRetreat(attack);
+    }
     if (force.phase === "attacking") {
       force.lastReason = "retreat_requested";
       return;
@@ -823,15 +1369,30 @@ export class ModernForces {
     force.lastReason = wait ? "waiting" : null;
   }
 
+  private requestArmyRetreat(attack: Attack): void {
+    if (attack.retreating() || attack.retreated()) return;
+    // The original retreat is a two-step execution: freeze now, return
+    // survivors after its 20-tick cancellation delay. A flag alone never ends it.
+    attack.attacker().orderRetreat(attack.id());
+    this.game.addExecution(
+      new RetreatExecution(attack.attacker(), attack.id()),
+    );
+  }
+
   committedArmyRaw(playerId: PlayerID): number {
-    return this.state.forces
-      .filter(
-        (f) =>
-          f.playerId === playerId &&
-          f.branch === "army" &&
-          f.phase !== "destroyed",
-      )
-      .reduce((sum, f) => sum + f.personnel * 10, 0);
+    return (
+      this.state.forces
+        .filter(
+          (f) =>
+            f.playerId === playerId &&
+            f.branch === "army" &&
+            f.phase !== "destroyed",
+        )
+        .reduce((sum, f) => sum + f.personnel * 10, 0) +
+      (this.state.production ?? [])
+        .filter((p) => p.playerId === playerId && p.branch === "army")
+        .reduce((sum, p) => sum + p.personnel * 10, 0)
+    );
   }
 
   /** The original build menu stays usable, but cannot bypass crew accounting. */
@@ -888,6 +1449,21 @@ export class ModernForces {
   }
 
   tick(tick = this.game.ticks()): void {
+    this.tickProduction(tick);
+    if (tick % 10 === 0) {
+      const registered = new Set(
+        this.state.bases
+          .filter((b) => b.branch === "navy")
+          .map((b) => b.unitId),
+      );
+      for (const port of this.game.units(UnitType.Port))
+        if (
+          port.isActive() &&
+          !port.isUnderConstruction() &&
+          !registered.has(port.id())
+        )
+          this.navalBase(port.owner().id(), port.tile());
+    }
     this.adoptExistingWarships();
     if (tick % 5 === 0) {
       this.airGrid.clear();
@@ -902,11 +1478,6 @@ export class ModernForces {
           bucket.push(force);
           this.airGrid.set(key, bucket);
         }
-    }
-    for (const base of this.state.bases) {
-      const owner = this.game.owner(base.tile);
-      if (owner.isPlayer() && owner.id() !== base.playerId)
-        base.playerId = owner.id();
     }
     for (const force of this.state.forces) {
       if (force.phase === "destroyed") continue;
@@ -1019,7 +1590,7 @@ export class ModernForces {
         force.attackId = attack.id();
         this.observeArmyTroops(force, attack.troops());
         if (force.lastReason === "retreat_requested")
-          owner.orderRetreat(attack.id());
+          this.requestArmyRetreat(attack);
       } else if (tick > force.lastMissionTick + 1) {
         // AttackExecution returns surviving troops to the owner's pool. Move
         // at most the last observed survivors back into this formation; this
@@ -1120,6 +1691,12 @@ export class ModernForces {
       return;
     }
     force.tile = unit.tile();
+    while (
+      force.pathIndex + 1 < force.path.length &&
+      this.game.manhattanDist(force.tile, force.path[force.pathIndex + 1]) <=
+        this.game.manhattanDist(force.tile, force.path[force.pathIndex])
+    )
+      force.pathIndex++;
     if (!force.command && unit.warshipState().state === "patrolling")
       unit.setTargetTile(unit.tile()); // Stop/wait holds position while native combat remains active.
     if (
@@ -1186,6 +1763,8 @@ export class ModernForces {
     const base = this.state.bases.find((b) => b.id === force.baseId);
     if (
       (!base ||
+        (base.branch ?? "air") !== "air" ||
+        (base.completesTick ?? 0) > tick ||
         base.health <= 0 ||
         base.playerId !== owner.id() ||
         this.game.owner(base.tile) !== owner) &&
@@ -1360,7 +1939,10 @@ export class ModernForces {
       .filter(
         (b) =>
           b.playerId === force.playerId &&
+          (b.branch ?? "air") === "air" &&
           b.health > 0 &&
+          (b.completesTick ?? 0) <= this.game.ticks() &&
+          (b.repairUntilTick ?? 0) <= this.game.ticks() &&
           this.game.owner(b.tile).id() === force.playerId &&
           this.state.forces
             .filter(

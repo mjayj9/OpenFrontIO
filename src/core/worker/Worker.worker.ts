@@ -1,6 +1,10 @@
 import { assetUrl } from "../AssetUrls";
 import { FetchGameMapLoader } from "../game/FetchGameMapLoader";
-import { ErrorUpdate, GameUpdateViewData } from "../game/GameUpdates";
+import {
+  ErrorUpdate,
+  GameUpdateType,
+  GameUpdateViewData,
+} from "../game/GameUpdates";
 import {
   createGameRunner,
   createGameRunnerFromSnapshot,
@@ -134,6 +138,8 @@ function sendGameUpdateBatch(gameUpdates: GameUpdateViewData[]): void {
     if (gu.packedNukeImpacts) {
       transfers.push(gu.packedNukeImpacts.buffer);
     }
+    for (const update of gu.updates[GameUpdateType.ModernForcesFrame] ?? [])
+      transfers.push(update.positions.buffer);
   }
 
   ctx.postMessage(

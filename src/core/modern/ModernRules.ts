@@ -1,3 +1,4 @@
+import { pow } from "../DetMath";
 import { GameConfig } from "../Schemas";
 import { DEFAULT_MODERN_FORCE_RULES } from "./ModernForceTypes";
 
@@ -19,6 +20,8 @@ export const MODERN_RULES = {
   industryIncomeCapPerTick: 200,
   civilianTrainingCapPerTick: 8,
   trainingGoldPerPerson: 2,
+  /** Stockpiling uses the Classic curve; this trains its demand instead of capping at four people. */
+  civilianTrainingBufferPerTick: 8,
   climateAdaptedPermille: 1100,
   climateHarshPermille: 900,
   climateMovementPermille: 950,
@@ -41,6 +44,17 @@ export const MODERN_RULES = {
   portBlockadeRange: 24,
   forces: DEFAULT_MODERN_FORCE_RULES,
 } as const;
+
+/** The original human/Hard curve, with a population-normalized modern capacity. */
+export function modernStockpileGrowth(
+  rawTroops: number,
+  rawCapacity: number,
+): number {
+  if (rawCapacity <= rawTroops || rawCapacity <= 0) return 0;
+  const growth =
+    (10 + pow(rawTroops, 0.73) / 4) * (1 - rawTroops / rawCapacity);
+  return Math.max(0, Math.min(growth, rawCapacity - rawTroops));
+}
 
 export function isModernV2(config: GameConfig): boolean {
   return config.modernMode?.scenario === "modern-regions-v2";

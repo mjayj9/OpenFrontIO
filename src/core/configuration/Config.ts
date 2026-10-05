@@ -20,7 +20,11 @@ import {
   UnitType,
 } from "../game/Game";
 import { UserSettings } from "../game/UserSettings";
-import { isModernV2, MODERN_RULES } from "../modern/ModernRules";
+import {
+  isModernV2,
+  MODERN_RULES,
+  modernStockpileGrowth,
+} from "../modern/ModernRules";
 import { GameConfig, TeamCountConfig } from "../Schemas";
 import { NukeType } from "../StatsSchemas";
 import { assertNever, sigmoid, toInt, within } from "../Util";
@@ -1162,11 +1166,23 @@ export class Config {
   }
 
   troopIncreaseRate(player: Player | PlayerView): number {
-    if (isModernV2(this._gameConfig))
-      return Math.min(
-        MODERN_RULES.replenishmentPerTick * MODERN_RULES.rawTroopsPerPerson,
-        Math.max(0, this.maxTroops(player) - player.troops()),
+    if (isModernV2(this._gameConfig)) {
+      const f = player.modernFaction?.();
+      // Old saved games retain their declared fixed replenishment model.
+      if (f?.growthModel !== "stockpile-v1")
+        return Math.min(
+          MODERN_RULES.replenishmentPerTick * MODERN_RULES.rawTroopsPerPerson,
+          Math.max(0, this.maxTroops(player) - player.troops()),
+        );
+      const committed = Math.max(
+        0,
+        f.population.army * MODERN_RULES.rawTroopsPerPerson - player.troops(),
       );
+      return modernStockpileGrowth(
+        player.troops(),
+        Math.max(0, this.maxTroops(player) - committed),
+      );
+    }
     const max = this.maxTroops(player);
 
     let toAdd = 10 + pow(player.troops(), 0.73) / 4;

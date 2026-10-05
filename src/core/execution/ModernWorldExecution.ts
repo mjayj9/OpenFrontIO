@@ -140,7 +140,7 @@ export class ModernWorldExecution implements Execution {
         ? Math.max(0, (mode.participantSlots ?? humanCount) - humanCount)
         : 0;
     const state: SystemsState = {
-      version: 2,
+      version: 3,
       tick: game.ticks(),
       seed,
       factions: [],
@@ -179,6 +179,8 @@ export class ModernWorldExecution implements Execution {
         ] as SystemsState["factions"][number]["climateAdaptation"],
         completedTraining: 0,
         populationTransferredTo: null,
+        growthModel: "stockpile-v1",
+        growthCarryPermille: 0,
         population: {
           total: population,
           civilian: population - army - available,

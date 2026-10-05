@@ -22,7 +22,9 @@ import { GameStartInfo, RENDERABLE_NAME_CHARS } from "../core/Schemas";
 import { generateID } from "../core/Util";
 import { BaseModal } from "./components/BaseModal";
 import { modalHeader } from "./components/ui/ModalHeader";
+import { requestChapter } from "./education/EducationProgressStore";
 import { HostLobbyModal } from "./HostLobbyModal";
+import { TutorialChapterID } from "./hud/Tutorial";
 import type { LangSelector } from "./LangSelector";
 import { JoinLobbyEvent } from "./Main";
 import { modernAreaException } from "./ModernRegionDetails";
@@ -90,6 +92,7 @@ export class ModernWorldModal extends BaseModal {
   @state() private eliminateCapital = false;
   @state() private aiPercent = 25;
   @state() private seed = 1;
+  @state() private showCommandGuide = true;
   protected modalConfig() {
     return { maxWidth: "1200px" };
   }
@@ -114,6 +117,7 @@ export class ModernWorldModal extends BaseModal {
   public startModernPractice(
     lesson: NonNullable<ModernWorldModal["trainingLesson"]>,
   ): void {
+    requestChapter(`modern_${lesson}` as TutorialChapterID);
     this.rulesVersion = 2;
     // Pakistan has adjacent arid (adapted) and continental (unadapted)
     // ground borders close to its start. Egypt would require a distant
@@ -509,6 +513,31 @@ export class ModernWorldModal extends BaseModal {
           this.rulesVersion === 2 ? "modern_v2.fair" : "modern.fair",
         )}
       </p>
+      <p class="text-sm text-white/70">
+        ${translateText(
+          this.rulesVersion === 2
+            ? "repair.entry_guide"
+            : "repair.legacy_scope",
+        )}
+      </p>
+      ${this.rulesVersion === 2
+        ? html`<label class="flex items-center gap-2 text-sm"
+              ><input
+                type="checkbox"
+                .checked=${this.showCommandGuide}
+                @change=${(e: Event) =>
+                  (this.showCommandGuide = (
+                    e.target as HTMLInputElement
+                  ).checked)}
+              />${translateText("repair.show_guide")}</label
+            >
+            <button
+              class="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 p-2"
+              @click=${() => this.startModernPractice("commands")}
+            >
+              ${translateText("repair.practice")}
+            </button>`
+        : nothing}
       <button
         class="w-full p-3 rounded bg-blue-600 disabled:opacity-50"
         ?disabled=${this.rulesVersion === 2 &&
@@ -675,6 +704,12 @@ export class ModernWorldModal extends BaseModal {
         },
       },
     };
+    if (
+      this.rulesVersion === 2 &&
+      !this.trainingLesson &&
+      this.showCommandGuide
+    )
+      requestChapter("modern_commands");
     this.dispatchEvent(
       new CustomEvent("join-lobby", {
         detail: {

@@ -48,6 +48,15 @@ export class ModernSystems {
     private game: Game,
     readonly state: ModernState,
   ) {
+    // A restored v2 save explicitly retains its original stockpiling policy.
+    for (const faction of state.factions) {
+      faction.growthModel ??=
+        state.version === 3 ? "stockpile-v1" : "legacy-fixed";
+      faction.growthCarryPermille ??= 0;
+      faction.growthPeoplePerTick ??= 0;
+      faction.civilianTrainedPerTick ??= 0;
+      faction.growthReason ??= null;
+    }
     this.forces = new ModernForces(
       game,
       state,
@@ -55,6 +64,11 @@ export class ModernSystems {
         reserve: (id, branch, count) => this.reserve(id, branch, count),
         release: (id, branch, count) => this.release(id, branch, count),
         casualties: (id, branch, count) => this.casualties(id, branch, count),
+        mobilize: (id, count) => this.mobilize(id, count),
+        demobilize: (id, count) => this.demobilize(id, count),
+        reassignArmy: (id, branch, count) =>
+          this.reassignArmy(id, branch, count),
+        restoreArmy: (id, branch, count) => this.restoreArmy(id, branch, count),
         climateEfficiency: (id, tile) =>
           climateCombatEfficiency(modernFactionState(state, id), tile),
         climateMovementEfficiency: (id, tile) =>
@@ -79,6 +93,12 @@ export class ModernSystems {
     const f = modernFactionState(this.state, id);
     if (!f || count < 0 || !Number.isInteger(count)) return false;
     if (branch === "army") return f.population.army >= count;
+    if (
+      this.state.version === 3 &&
+      f.population.army + f.population.navy + f.population.air + count >
+        Math.floor((f.population.total * R.mobilizationPermille) / 1000)
+    )
+      return false;
     if (f.population.available < count) return false;
     f.population.available -= count;
     f.population[branch] += count;
@@ -98,6 +118,52 @@ export class ModernSystems {
     f.population[branch] -= lost;
     f.population.total -= lost;
     f.population.dead += lost;
+  }
+  mobilize(id: string, count: number): boolean {
+    const f = modernFactionState(this.state, id);
+    if (!f || count < 0 || !Number.isInteger(count)) return false;
+    const p = f.population;
+    if (
+      p.available < count ||
+      p.army + p.navy + p.air + count >
+        Math.floor((p.total * R.mobilizationPermille) / 1000)
+    )
+      return false;
+    p.available -= count;
+    p.army += count;
+    return true;
+  }
+  demobilize(id: string, count: number): void {
+    const f = modernFactionState(this.state, id);
+    if (!f) return;
+    const people = Math.min(count, f.population.army);
+    f.population.army -= people;
+    f.population.available += people;
+  }
+  /** Retraining transfers only uncommitted reserve soldiers, never creates crew. */
+  reassignArmy(id: string, branch: "navy" | "air", count: number): boolean {
+    const f = modernFactionState(this.state, id),
+      owner = this.game.player(id);
+    if (
+      !f ||
+      count < 0 ||
+      !Number.isInteger(count) ||
+      f.population.army < count ||
+      owner.troops() < count * R.rawTroopsPerPerson
+    )
+      return false;
+    owner.removeTroops(count * R.rawTroopsPerPerson);
+    f.population.army -= count;
+    f.population[branch] += count;
+    return true;
+  }
+  restoreArmy(id: string, branch: "navy" | "air", count: number): void {
+    const f = modernFactionState(this.state, id);
+    if (!f) return;
+    const people = Math.min(count, f.population[branch]);
+    f.population[branch] -= people;
+    f.population.army += people;
+    this.game.player(id).addTroops(people * R.rawTroopsPerPerson);
   }
   /** Army people stay counted while on an attack, in transport, or in a selected group. */
   reconcileArmy(player: Player): void {
@@ -133,39 +199,46 @@ export class ModernSystems {
         .reduce((n, u) => n + u.level(), 0);
     const cities = Math.max(0, levels(UnitType.City) - 1),
       factories = Math.max(0, levels(UnitType.Factory) - 1);
-    const train = Math.min(
-      R.civilianTrainingCapPerTick,
-      R.civilianTrainingPerTick + cities,
-      p.civilian,
-      Math.max(
-        0,
-        Math.floor((p.total * R.availableCapPermille) / 1000) - p.available,
-      ),
-      Math.floor(Number(player.gold()) / R.trainingGoldPerPerson),
-    );
-    p.civilian -= train;
-    p.available += train;
-    player.removeGold(BigInt(train * R.trainingGoldPerPerson));
-    const loss = nuclearEffects(f, this.game.ticks()).replenishmentLossPermille;
-    // Integer budget over 100 ticks preserves the exact rate, without floating point drift.
-    const replenish =
-      this.game.ticks() % 100 < 100 - Math.floor(loss / 10)
-        ? R.replenishmentPerTick
-        : 0;
-    const people = Math.min(
-      replenish,
-      p.available,
-      Math.max(
-        0,
-        Math.floor((p.total * R.mobilizationPermille) / 1000) -
-          p.army -
-          p.navy -
-          p.air,
-      ),
-    );
-    p.available -= people;
-    p.army += people;
-    player.addTroops(people * R.rawTroopsPerPerson);
+    if (f.growthModel === "stockpile-v1") {
+      this.stockpile(player, f, cities);
+    } else {
+      const train = Math.min(
+        R.civilianTrainingCapPerTick,
+        R.civilianTrainingPerTick + cities,
+        p.civilian,
+        Math.max(
+          0,
+          Math.floor((p.total * R.availableCapPermille) / 1000) - p.available,
+        ),
+        Math.floor(Number(player.gold()) / R.trainingGoldPerPerson),
+      );
+      p.civilian -= train;
+      p.available += train;
+      player.removeGold(BigInt(train * R.trainingGoldPerPerson));
+      const loss = nuclearEffects(
+        f,
+        this.game.ticks(),
+      ).replenishmentLossPermille;
+      // Integer budget over 100 ticks preserves the exact rate, without floating point drift.
+      const replenish =
+        this.game.ticks() % 100 < 100 - Math.floor(loss / 10)
+          ? R.replenishmentPerTick
+          : 0;
+      const people = Math.min(
+        replenish,
+        p.available,
+        Math.max(
+          0,
+          Math.floor((p.total * R.mobilizationPermille) / 1000) -
+            p.army -
+            p.navy -
+            p.air,
+        ),
+      );
+      p.available -= people;
+      p.army += people;
+      player.addTroops(people * R.rawTroopsPerPerson);
+    }
     const industry = Math.min(
       R.industryIncomeCapPerTick,
       cities * R.cityIncomePerExtraLevel +
@@ -179,6 +252,68 @@ export class ModernSystems {
     f.workerIncomePerTick = Number(gold);
     player.addGold(gold);
     this.game.stats().goldWork(player, gold);
+  }
+  private stockpile(
+    player: Player,
+    f: NonNullable<ReturnType<typeof modernFactionState>>,
+    cities: number,
+  ): void {
+    const p = f.population;
+    const loss = nuclearEffects(f, this.game.ticks()).replenishmentLossPermille;
+    const rawGrowth = this.game.config().troopIncreaseRate(player);
+    // Quantize explicitly once, then accumulate thousandths of a person in saved state.
+    const requestedPermille = Math.floor(
+      (rawGrowth * 100 * (1000 - loss)) / 1000,
+    );
+    const remaining = Math.max(
+      0,
+      Math.floor((p.total * R.mobilizationPermille) / 1000) -
+        p.army -
+        p.navy -
+        p.air,
+    );
+    const demand = Math.min(remaining, Math.ceil(requestedPermille / 1000));
+    const bufferTarget = Math.floor(
+      (p.total * R.initialAvailablePermille) / 1000,
+    );
+    const trainingBudget =
+      demand +
+      (p.available < bufferTarget
+        ? R.civilianTrainingBufferPerTick + cities
+        : 0);
+    const trained = Math.max(
+      0,
+      Math.min(
+        trainingBudget,
+        p.civilian,
+        Math.floor((p.total * R.availableCapPermille) / 1000) - p.available,
+        Math.floor(Number(player.gold()) / R.trainingGoldPerPerson),
+      ),
+    );
+    p.civilian -= trained;
+    p.available += trained;
+    player.removeGold(BigInt(trained * R.trainingGoldPerPerson));
+    const budget = (f.growthCarryPermille ?? 0) + requestedPermille;
+    const wanted = Math.floor(budget / 1000);
+    const people = Math.min(wanted, p.available, remaining);
+    f.growthCarryPermille = budget % 1000;
+    f.growthPeoplePerTick = people;
+    f.civilianTrainedPerTick = trained;
+    f.growthReason =
+      remaining === 0
+        ? "mobilization_cap"
+        : people < wanted
+          ? "insufficient_manpower"
+          : loss > 0
+            ? "nuclear_replenishment_penalty"
+            : trained < trainingBudget &&
+                p.civilian > 0 &&
+                player.gold() < BigInt(R.trainingGoldPerPerson)
+              ? "training_gold_shortage"
+              : null;
+    p.available -= people;
+    p.army += people;
+    player.addTroops(people * R.rawTroopsPerPerson);
   }
   /** Population moves only once on complete annexation; partial tile captures grant no new N0. */
   annex(conqueror: Player, conquered: Player): void {

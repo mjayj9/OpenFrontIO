@@ -135,8 +135,6 @@
     "command_sent": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요.",
     "commands": "현대 군사 명령",
     "common_start": "공통 시작: 인구 {population}명 · 자금 {gold} · 육군 인력 {army}명. 실제 국가 인구와 무관한 게임용 수치입니다.",
-    "confirm": "군사 명령 확정",
-    "confirm_airbase": "비행장 배치: 금 {cost}, 수용 항공기 {capacity}. 확인하면 실제로 건설합니다.",
     "confirm_preview": "경로와 위험을 확인한 뒤 확정하세요. 미리보기는 승리를 보장하지 않습니다.",
     "country_info": "국가 정보·외교",
     "develop_port": "개발: {cost} · 기본 수입 +{increase}/초",
@@ -156,7 +154,6 @@
     "initial_population": "공통 시작 인구 N0 (모든 세력)",
     "input_hint": "좌클릭 선택 · 우클릭 미리보기 · Shift 대기열 · Alt+드래그 이동",
     "invite": "인간 초대 방 만들기",
-    "key_priority": "저장한 기존 단축키를 우선합니다. 충돌하는 새 현대 단축키는 미지정되므로 다시 지정하거나 군종 버튼을 사용하세요. Classic 단축키는 유지됩니다.",
     "keys": "현대 단축키 설정",
     "kind": {
       "airbase": "비행장",
@@ -202,7 +199,6 @@
       "rearming": "재출격 준비",
       "returning": "귀환 중"
     },
-    "place_airbase": "비행장을 배치할 자기 땅을 클릭하거나 터치하세요. 기존 비행장과 겹칠 수 없습니다.",
     "population": "전체 인구",
     "port_choice": "자국 주요 항구",
     "port_status": "개발 {level}단계 · 수입 {income}/초 · 피해 {damage}% · 봉쇄 함대 {blockades}",

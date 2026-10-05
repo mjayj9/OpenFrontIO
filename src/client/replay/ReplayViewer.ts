@@ -13,6 +13,11 @@ import { customElement, property, state } from "lit/decorators.js";
 import { Config } from "../../core/configuration/Config";
 import { EventBus } from "../../core/EventBus";
 import { Cell, PlayerType } from "../../core/game/Game";
+import {
+  actionPhase,
+  InputMode,
+  setActiveInputContext,
+} from "../../core/game/KeybindingRegistry";
 import { loadTerrainMap } from "../../core/game/TerrainMapLoader";
 import {
   GRAPHICS_KEY,
@@ -20,8 +25,10 @@ import {
   UserSettings,
 } from "../../core/game/UserSettings";
 import type { GameStartInfo } from "../../core/Schemas";
+import { OModal } from "../components/baseComponents/Modal";
 import { MapLayerController } from "../controllers/MapLayerController";
 import { ViewModeController } from "../controllers/ViewModeController";
+import type { HelpModal } from "../HelpModal";
 import "../hud/layers/EventsDisplay";
 import type { EventsDisplay } from "../hud/layers/EventsDisplay";
 import "../hud/layers/PlayerInfoOverlay";
@@ -33,7 +40,13 @@ import {
   ShowSettingsModalEvent,
   type SettingsModal,
 } from "../hud/layers/SettingsModal";
-import { MouseMoveEvent } from "../InputHandler";
+import {
+  AlternateViewEvent,
+  CloseViewEvent,
+  MouseMoveEvent,
+  ToggleCoordinateGridEvent,
+} from "../InputHandler";
+import { Platform } from "../Platform";
 import { buildTerrainRowSpans } from "../render/frame/derive/TerrainRowSpans";
 import { uploadFrameData } from "../render/frame/Upload";
 import {
@@ -69,9 +82,14 @@ import { processInBrowser, type Processing } from "./LocalProcessing";
 import { drawModernReplayOverlay } from "./ModernReplayOverlay";
 import { ReplayAppearance } from "./ReplayAppearance";
 import { CameraGestures, ReplayCamera } from "./ReplayCamera";
-import { formatGameTime, timelineFrames } from "./ReplayControls";
+import {
+  formatGameTime,
+  REPLAY_SPEEDS,
+  timelineFrames,
+} from "./ReplayControls";
 import { classicReplayHref, versionedViewerUrl } from "./ReplayEntry";
 import { ReplayGameView } from "./ReplayGameAdapter";
+import { replayKeyboardAction } from "./ReplayInput";
 import { ReplayNukedLayers } from "./ReplayNukedLayers";
 import type { ReplayPalette } from "./ReplayPalette";
 import { ReplayPlayback, TICKS_PER_SECOND } from "./ReplayPlayback";
@@ -166,6 +184,9 @@ export class ReplayViewer extends LitElement {
   private gestures: CameraGestures | null = null;
   private rafId: number | null = null;
   private readonly abort = new AbortController();
+  private replayInputMode: InputMode = "classic";
+  private heldReplayActions = new Map<string, string>();
+  private replayGrid = false;
 
   createRenderRoot() {
     return this;
@@ -176,6 +197,41 @@ export class ReplayViewer extends LitElement {
     window.addEventListener("keydown", (e) => this.onKey(e), {
       signal: this.abort.signal,
     });
+    window.addEventListener("keyup", (e) => this.onKey(e), {
+      signal: this.abort.signal,
+    });
+    window.addEventListener(
+      "blur",
+      () => {
+        this.heldReplayActions.clear();
+        this.hudBus.emit(new AlternateViewEvent(false));
+      },
+      { signal: this.abort.signal },
+    );
+    window.addEventListener(
+      "compositionstart",
+      () => {
+        this.heldReplayActions.clear();
+        this.hudBus.emit(new AlternateViewEvent(false));
+      },
+      { signal: this.abort.signal },
+    );
+    window.addEventListener(
+      "focusin",
+      (event) => {
+        const target = event.target;
+        if (
+          target instanceof HTMLElement &&
+          (target.isContentEditable ||
+            ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName) ||
+            target.closest("setting-keybind"))
+        ) {
+          this.heldReplayActions.clear();
+          this.hudBus.emit(new AlternateViewEvent(false));
+        }
+      },
+      { signal: this.abort.signal },
+    );
     void this.open();
   }
 
@@ -186,6 +242,8 @@ export class ReplayViewer extends LitElement {
     if (this.rafId !== null) cancelAnimationFrame(this.rafId);
     if (this.hudTimer !== null) clearInterval(this.hudTimer);
     this.playback?.pause();
+    this.heldReplayActions.clear();
+    setActiveInputContext("classic", "map");
     this.view?.dispose();
   }
 
@@ -382,6 +440,11 @@ export class ReplayViewer extends LitElement {
     if (this.abort.signal.aborted) return;
     const header = playback.header;
     const gsi = header.gameStartInfo as GameStartInfo;
+    this.replayInputMode =
+      gsi.config.modernMode?.scenario === "modern-regions-v2"
+        ? "modern"
+        : "classic";
+    setActiveInputContext(this.replayInputMode, "replay");
     const [terrain] = await Promise.all([
       loadTerrainMap(
         gsi.config.gameMap,
@@ -689,23 +752,91 @@ export class ReplayViewer extends LitElement {
   private onKey(e: KeyboardEvent): void {
     const p = this.playback;
     if (p === null || this.status !== "ready") return;
-    // The settings menu paused playback, so keys wait until it closes.
-    if (this.querySelector<SettingsModal>("settings-modal")?.open) return;
-    // The timeline keeps focus after a click, so it doesn't count as typing.
-    // Its own arrow-key steps are prevented below so a key seeks once.
-    if (e.target instanceof HTMLInputElement && e.target.type !== "range") {
+    const released = this.heldReplayActions.get(e.code);
+    if (e.type === "keyup") this.heldReplayActions.delete(e.code);
+    const action = replayKeyboardAction(
+      e,
+      this.replayInputMode,
+      new UserSettings().effectiveKeybinds(
+        this.replayInputMode,
+        Platform.isMac,
+      ),
+      OModal.openCount > 0 ||
+        this.querySelector<SettingsModal>("settings-modal")?.open === true,
+    );
+    if (!action) {
+      if (e.type === "keyup" && released === "toggleView")
+        this.hudBus.emit(new AlternateViewEvent(false));
       return;
     }
-    if (e.code === "Space") {
-      e.preventDefault();
-      this.togglePlay();
-    } else if (e.code === "ArrowRight") {
-      e.preventDefault();
-      void p.seek(p.frame + (e.shiftKey ? 100 : 1));
-    } else if (e.code === "ArrowLeft") {
-      e.preventDefault();
-      void p.seek(p.frame - (e.shiftKey ? 100 : 1));
+    e.preventDefault();
+    const phase = actionPhase(action);
+    if (e.type === "keydown") {
+      if (e.repeat && phase !== "hold") return;
+      this.heldReplayActions.set(e.code, action);
+      if (phase === "release") return;
+    } else {
+      if (action === "toggleView")
+        this.hudBus.emit(new AlternateViewEvent(false));
+      if (phase !== "release" || released !== action) return;
     }
+    if (action === "pauseGame") this.togglePlay();
+    else if (action === "gameSpeedUp" || action === "gameSpeedDown") {
+      const index = REPLAY_SPEEDS.indexOf(p.speed);
+      const next = Math.max(
+        0,
+        Math.min(
+          REPLAY_SPEEDS.length - 1,
+          (index < 0 ? 1 : index) + (action === "gameSpeedUp" ? 1 : -1),
+        ),
+      );
+      p.setSpeed(REPLAY_SPEEDS[next]);
+    } else if (
+      action.startsWith("replayStep") ||
+      action.startsWith("replayJump")
+    ) {
+      void p.seek(
+        p.frame +
+          (action.endsWith("Back") ? -1 : 1) *
+            (action.startsWith("replayJump") ? 100 : 1),
+      );
+    } else if (action.startsWith("move")) {
+      const horizontal = action.includes("Left")
+        ? 40
+        : action.includes("Right")
+          ? -40
+          : 0;
+      const vertical = action.includes("Up")
+        ? 40
+        : action.includes("Down")
+          ? -40
+          : 0;
+      this.camera?.panBy(horizontal, vertical);
+    } else if (action.startsWith("zoom")) {
+      const canvas = this.querySelector<HTMLCanvasElement>("canvas");
+      if (canvas)
+        this.camera?.zoomAt(
+          canvas.clientWidth / 2,
+          canvas.clientHeight / 2,
+          action.startsWith("zoomIn") ? 1.1 : 1 / 1.1,
+          canvas.clientWidth,
+          canvas.clientHeight,
+        );
+    } else if (action === "centerCamera") {
+      const focus = this.adapter?.focus;
+      const at = focus?.nameLocation();
+      if (at) this.camera?.goTo(at.x, at.y);
+      else if (this.camera)
+        this.camera.goTo(p.header.mapWidth / 2, p.header.mapHeight / 2);
+    } else if (action === "help")
+      document.querySelector<HelpModal>("help-modal")?.openControls();
+    else if (action === "toggleView")
+      this.hudBus.emit(new AlternateViewEvent(true));
+    else if (action === "coordinateGrid") {
+      this.replayGrid = !this.replayGrid;
+      this.hudBus.emit(new ToggleCoordinateGridEvent(this.replayGrid));
+    } else if (action === "resetGfx") this.view?.rebuildTerrain();
+    else if (action === "cancel") this.hudBus.emit(new CloseViewEvent());
   }
 
   private onPointerDown(e: PointerEvent): void {

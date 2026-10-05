@@ -1,0 +1,201 @@
+{
+  "before": {
+    "tick": 142,
+    "selected": ["force-1466", "force-1467"],
+    "previews": 2,
+    "forces": [
+      {
+        "id": "force-1466",
+        "tile": 583712,
+        "phase": "moving",
+        "command": {
+          "kind": "move",
+          "target": 583711,
+          "issuedTick": 108
+        },
+        "queue": []
+      },
+      {
+        "id": "force-1467",
+        "tile": 583711,
+        "phase": "idle",
+        "command": null,
+        "queue": []
+      },
+      {
+        "id": "force-1469",
+        "tile": 583705,
+        "phase": "idle",
+        "command": null,
+        "queue": []
+      },
+      {
+        "id": "force-1471",
+        "tile": 583705,
+        "phase": "idle",
+        "command": null,
+        "queue": []
+      }
+    ]
+  },
+  "after": {
+    "tick": 22,
+    "paused": true,
+    "panels": 1,
+    "saves": 1,
+    "tutorials": 1,
+    "selected": [],
+    "previewCount": 0,
+    "population": {
+      "total": 1000000,
+      "civilian": 967144,
+      "available": 11362,
+      "army": 20694,
+      "navy": 0,
+      "air": 800,
+      "dead": 0
+    },
+    "forces": [
+      {
+        "id": "force-1466",
+        "playerId": "region0149",
+        "branch": "army",
+        "kind": "army",
+        "tile": 577705,
+        "baseId": "base-1464",
+        "personnel": 500,
+        "aircraft": 0,
+        "unitId": null,
+        "phase": "idle",
+        "command": null,
+        "queue": [],
+        "path": [],
+        "pathIndex": 0,
+        "cooldownUntil": 0,
+        "attackId": null,
+        "attackTroops": 0,
+        "lastReason": null,
+        "completedMissions": 0,
+        "lastMissionTick": 0,
+        "casualties": 0,
+        "movementProgress": 0
+      },
+      {
+        "id": "force-1467",
+        "playerId": "region0149",
+        "branch": "army",
+        "kind": "army",
+        "tile": 579705,
+        "baseId": "base-1464",
+        "personnel": 500,
+        "aircraft": 0,
+        "unitId": null,
+        "phase": "idle",
+        "command": null,
+        "queue": [],
+        "path": [],
+        "pathIndex": 0,
+        "cooldownUntil": 0,
+        "attackId": null,
+        "attackTroops": 0,
+        "lastReason": null,
+        "completedMissions": 0,
+        "lastMissionTick": 0,
+        "casualties": 0,
+        "movementProgress": 0
+      },
+      {
+        "id": "force-1469",
+        "playerId": "region0149",
+        "branch": "air",
+        "kind": "fighter",
+        "tile": 583705,
+        "baseId": "base-1463",
+        "personnel": 400,
+        "aircraft": 4,
+        "unitId": null,
+        "phase": "idle",
+        "command": null,
+        "queue": [],
+        "path": [],
+        "pathIndex": 0,
+        "cooldownUntil": 0,
+        "attackId": null,
+        "attackTroops": 0,
+        "lastReason": null,
+        "completedMissions": 0,
+        "lastMissionTick": 0,
+        "casualties": 0,
+        "movementProgress": 0
+      },
+      {
+        "id": "force-1471",
+        "playerId": "region0149",
+        "branch": "air",
+        "kind": "strike",
+        "tile": 583705,
+        "baseId": "base-1463",
+        "personnel": 400,
+        "aircraft": 4,
+        "unitId": null,
+        "phase": "idle",
+        "command": null,
+        "queue": [],
+        "path": [],
+        "pathIndex": 0,
+        "cooldownUntil": 0,
+        "attackId": null,
+        "attackTroops": 0,
+        "lastReason": null,
+        "completedMissions": 0,
+        "lastMissionTick": 0,
+        "casualties": 0,
+        "movementProgress": 0
+      }
+    ],
+    "jobs": [],
+    "education": {
+      "panelVersion": 1,
+      "active": false,
+      "guidePaused": false,
+      "chapter": "basic",
+      "progress": {
+        "version": 4,
+        "stepId": "spawn",
+        "outcomes": {},
+        "doneTicks": null
+      },
+      "evidence": {
+        "conqueredPlayers": 0,
+        "atomLaunchSeen": false,
+        "boatSeen": false,
+        "modern": {
+          "phases": [],
+          "outbounds": 0,
+          "returns": 0,
+          "rearms": 0,
+          "blockades": [],
+          "branches": [],
+          "completedStops": 0,
+          "cameraMoves": 0,
+          "zoomChanges": 0,
+          "boxSelections": 0,
+          "additionalSelections": 0,
+          "cursorPreviews": 0,
+          "queuedOrders": 0,
+          "queuedOrderIds": [],
+          "climatePreviewAdapted": false,
+          "climatePreviewHarsh": false,
+          "aiInfoInspected": false,
+          "armyLosses": [],
+          "adaptedBattles": 0,
+          "harshBattles": 0,
+          "sufferedBlockades": [],
+          "portRecoveries": [],
+          "nuclearTargets": [],
+          "nuclearImpacts": []
+        }
+      }
+    }
+  }
+}

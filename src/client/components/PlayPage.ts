@@ -12,6 +12,7 @@ import "./NavUtilityIcons";
 import "./NewsBox";
 import "./SteamWishlist";
 import "./StreamingNow";
+import { actionButton } from "./ui/ActionButton";
 
 @customElement("play-page")
 export class PlayPage extends LitElement {
@@ -25,13 +26,6 @@ export class PlayPage extends LitElement {
         id="page-play"
         class="flex flex-col gap-2 w-full px-0 lg:px-4 min-h-0"
       >
-        <button
-          class="p-3 rounded-xl bg-surface text-white"
-          @click=${() =>
-            (this.querySelector("save-manager") as SaveManager)?.open()}
-        >
-          ${translateText("saves.title")}</button
-        ><save-manager></save-manager>
         <token-login class="absolute"></token-login>
         <rewards-modal class="absolute"></rewards-modal>
 
@@ -130,14 +124,24 @@ export class PlayPage extends LitElement {
         </div>
 
         <game-mode-selector></game-mode-selector>
-        <button
-          class="p-4 rounded-xl bg-blue-800 text-white"
-          @click=${() =>
-            this.querySelector<ModernWorldModal>("modern-world-modal")?.open()}
-        >
-          ${translateText("modern.title")}
-        </button>
+        ${actionButton({
+          icon: assetUrl("images/ClaimIcon.svg"),
+          iconAlt: translateText("modern.title"),
+          title: translateText("modern.title"),
+          label: translateText("modern.title"),
+          onClick: () =>
+            this.querySelector<ModernWorldModal>("modern-world-modal")?.open(),
+        })}
         <modern-world-modal></modern-world-modal>
+        ${actionButton({
+          icon: assetUrl("images/ReplayRegularIconWhite.svg"),
+          iconAlt: translateText("saves.title"),
+          title: translateText("saves.title"),
+          label: translateText("saves.title"),
+          onClick: () =>
+            this.querySelector<SaveManager>("save-manager")?.open(),
+        })}
+        <save-manager></save-manager>
 
         <!-- Desktop gets the compact footer button instead. -->
         <steam-wishlist

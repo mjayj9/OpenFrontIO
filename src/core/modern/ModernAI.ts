@@ -297,14 +297,36 @@ export class ModernAI {
         owner.troops() > reserve + 10000 &&
         own.filter((f) => f.branch === "army").length < level.operations + 1
       ) {
-        const tile = this.operatingTile(owner);
-        if (tile !== undefined)
+        let base = this.state.bases.find(
+          (b) =>
+            b.playerId === owner.id() &&
+            b.branch === "army" &&
+            this.game.owner(b.tile) === owner,
+        );
+        const tile = base?.tile ?? this.operatingTile(owner);
+        if (this.state.version === 3 && !base && tile !== undefined) {
+          this.forces.produce(
+            owner.id(),
+            "army",
+            "armybase",
+            undefined,
+            tile,
+            1,
+          );
+          base = this.state.bases.find(
+            (b) =>
+              b.playerId === owner.id() &&
+              b.branch === "army" &&
+              b.tile === tile,
+          );
+        }
+        if (base || (this.state.version !== 3 && tile !== undefined))
           this.forces.produce(
             owner.id(),
             "army",
             "army",
-            undefined,
-            tile,
+            base?.id,
+            base?.tile ?? tile,
             faction.aiLevel === "high" ? 3 : 2,
           );
       }
@@ -385,8 +407,11 @@ export class ModernAI {
   private ownedBase(owner: Player) {
     return this.state.bases.find(
       (b) =>
+        (b.branch ?? "air") === "air" &&
         b.playerId === owner.id() &&
         b.health > 0 &&
+        (b.completesTick ?? 0) <= this.game.ticks() &&
+        (b.repairUntilTick ?? 0) <= this.game.ticks() &&
         this.game.owner(b.tile) === owner,
     );
   }

@@ -1,4 +1,5 @@
 import { AllPlayersStats, ClientID, Winner } from "../Schemas";
+import type { ModernForceCommand } from "../modern/ModernForceTypes";
 import type { ModernState } from "../modern/ModernState";
 import {
   EmojiMessage,
@@ -109,6 +110,7 @@ export enum GameUpdateType {
   DonateEvent,
   AIStatus,
   ModernSystems,
+  ModernForcesFrame,
 }
 
 export type GameUpdate =
@@ -136,11 +138,31 @@ export type GameUpdate =
   | GamePausedUpdate
   | DonateEventUpdate
   | AIStatusUpdate
-  | ModernSystemsUpdate;
+  | ModernSystemsUpdate
+  | ModernForcesFrameUpdate;
 
 export interface ModernSystemsUpdate {
   type: GameUpdateType.ModernSystems;
   state: ModernState;
+}
+
+/** Actual force motion at the core tick cadence. Append-only force indices,
+ * stride 9: index, tile, phase, pathIndex, personnel, aircraft, attackRaw,
+ * frontier tile (0xffffffff absent), last mission tick. */
+export interface ModernForcesFrameUpdate {
+  type: GameUpdateType.ModernForcesFrame;
+  tick: number;
+  positions: Uint32Array;
+  /** Only changed orders/routes; do not clone every force each tick. */
+  routes?: ModernForceRouteUpdate[];
+}
+export interface ModernForceRouteUpdate {
+  index: number;
+  command: ModernForceCommand | null;
+  queue: ModernForceCommand[];
+  path: TileRef[];
+  cooldownUntil: number;
+  lastReason: string | null;
 }
 
 /** Worker-local, read-only AI inspection. No server/network response is used

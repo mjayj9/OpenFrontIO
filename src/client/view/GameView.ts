@@ -47,6 +47,7 @@ import {
   applyPackedPlayerStats,
   embargoSmallIDs,
 } from "./EntityState";
+import { applyModernForcesFrame } from "./ModernForcesFrame";
 import {
   MotionPlanResolver,
   type GridMotionPlan,
@@ -61,6 +62,10 @@ function readCosmeticVisibility(): CosmeticVisibility {
 
 export class GameView implements GameMap {
   private _modernSystems: ModernState | null = null;
+  private _modernForcesTick = -1;
+  public modernForcesTick(): number {
+    return this._modernForcesTick;
+  }
   public modernSystems(): ModernState | null {
     return this._modernSystems;
   }
@@ -245,8 +250,21 @@ export class GameView implements GameMap {
     this.toDelete.clear();
 
     this.lastUpdate = gu;
-    for (const update of gu.updates[GameUpdateType.ModernSystems] ?? [])
+    for (const update of gu.updates[GameUpdateType.ModernSystems] ?? []) {
+      if (update.state.tick < this._modernForcesTick) continue;
       this._modernSystems = update.state;
+      this._modernForcesTick = update.state.tick;
+    }
+    for (const update of gu.updates[GameUpdateType.ModernForcesFrame] ?? []) {
+      if (update.tick <= this._modernForcesTick) continue;
+      this._modernSystems = applyModernForcesFrame(
+        this._modernSystems,
+        update,
+        this._modernForcesTick,
+        this.width() * this.height(),
+      );
+      if (this._modernSystems) this._modernForcesTick = update.tick;
+    }
 
     this.updatedTiles = [];
     this.updatedTerrainTiles = [];

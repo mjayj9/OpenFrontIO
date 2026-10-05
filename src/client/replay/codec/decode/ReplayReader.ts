@@ -22,8 +22,10 @@ import {
   GameUpdateType,
   type AIStatusUpdate,
 } from "../../../../core/game/GameUpdates";
+import type { ModernState } from "../../../../core/modern/ModernState";
 import { FALLOUT_BIT } from "../../../render/gl/utils/TileCodec";
 import type { NameEntry, PlayerState, UnitState } from "../../../render/types";
+import { applyModernForcesFrame } from "../../../view/ModernForcesFrame";
 import { BinaryReader } from "../BinaryReader";
 import {
   FRAME_DELTA,
@@ -65,16 +67,27 @@ interface Chunk {
 }
 
 export class ReplayReader {
-  private modernSystems:
-    | import("../../../../core/modern/ModernState").ModernState
-    | null = null;
+  private modernSystems: ModernState | null = null;
+  private modernForcesTick = -1;
   private applyModernSystems(misc: MiscUpdates | null): void {
-    for (const raw of misc?.ModernSystems ?? [])
-      this.modernSystems = (
-        raw as {
-          state: import("../../../../core/modern/ModernState").ModernState;
-        }
-      ).state;
+    for (const raw of misc?.ModernSystems ?? []) {
+      const baseline = raw as { state: ModernState; forceTick?: number };
+      const tick = baseline.forceTick ?? baseline.state.tick;
+      if (tick < this.modernForcesTick) continue;
+      this.modernSystems = baseline.state;
+      this.modernForcesTick = tick;
+    }
+    for (const raw of misc?.ModernForcesFrame ?? []) {
+      const motion = raw as { tick: number; positions: number[] };
+      if (!this.modernSystems || motion.tick <= this.modernForcesTick) continue;
+      this.modernSystems = applyModernForcesFrame(
+        this.modernSystems,
+        motion,
+        this.modernForcesTick,
+        this.tileState.length,
+      );
+      this.modernForcesTick = motion.tick;
+    }
   }
   private aiStrategies = new Map<string, AIStatusUpdate>();
   private applyAIStrategies(misc: MiscUpdates | null): void {
@@ -318,6 +331,7 @@ export class ReplayReader {
     this.aiStrategies = new Map();
     this.applyAIStrategies(misc);
     this.modernSystems = null;
+    this.modernForcesTick = -1;
     this.applyModernSystems(misc);
     this.terrain = new Map();
     this.readTerrain(r);

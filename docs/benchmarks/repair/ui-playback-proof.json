@@ -1,0 +1,3266 @@
+{
+  "verifiedBuild": {
+    "coreFingerprint": "64a4a035a0e4",
+    "clientBundle": "index-1gRSTbfm.js",
+    "assets": 2151,
+    "url": "http://127.0.0.1:19004",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "stateVersion": 3,
+    "entry": "Normal main menu > modern country mode > modern controls practice > actual air operations",
+    "countryId": "KOR",
+    "trainingBudgetEveryFaction": 4000000,
+    "ordinaryStartBudget": 400000,
+    "initialPopulationEveryFaction": 1000000,
+    "noStateInjection": true
+  },
+  "evidencePolicy": "Public GameView/worker reads and actual mouse/keyboard only. Screenshots capture existing paused state; motion comes from different game ticks. Counter updates, descriptions and test state injection are not completion evidence.",
+  "production": {
+    "build": "64a4a035a0e4",
+    "before": {
+      "tick": 2211,
+      "gold": "2999796",
+      "reserveRaw": 982000,
+      "population": {
+        "total": 1000000,
+        "civilian": 886648,
+        "available": 13352,
+        "army": 99200,
+        "navy": 0,
+        "air": 800,
+        "dead": 0
+      },
+      "jobs": [],
+      "completed": [
+        {
+          "playerId": "region0149",
+          "kind": "armybase",
+          "count": 1
+        },
+        {
+          "playerId": "region0149",
+          "kind": "airbase",
+          "count": 1
+        },
+        {
+          "playerId": "region0149",
+          "kind": "navybase",
+          "count": 1
+        }
+      ],
+      "forces": [
+        {
+          "id": "force-1466",
+          "branch": "army",
+          "kind": "army",
+          "tile": 577705,
+          "baseId": "base-1464",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 500,
+          "aircraft": 0
+        },
+        {
+          "id": "force-1467",
+          "branch": "army",
+          "kind": "army",
+          "tile": 579705,
+          "baseId": "base-1464",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 500,
+          "aircraft": 0
+        },
+        {
+          "id": "force-1469",
+          "branch": "air",
+          "kind": "fighter",
+          "tile": 583705,
+          "baseId": "base-1463",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 400,
+          "aircraft": 4
+        },
+        {
+          "id": "force-1471",
+          "branch": "air",
+          "kind": "strike",
+          "tile": 583705,
+          "baseId": "base-1463",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 400,
+          "aircraft": 4
+        }
+      ]
+    },
+    "navyStart": {
+      "tick": 2217,
+      "gold": "2988396",
+      "reserveRaw": 981000,
+      "population": {
+        "total": 1000000,
+        "civilian": 886648,
+        "available": 13352,
+        "army": 99100,
+        "navy": 100,
+        "air": 800,
+        "dead": 0
+      },
+      "jobs": [
+        {
+          "id": "production-2871",
+          "playerId": "region0149",
+          "branch": "navy",
+          "kind": "warship",
+          "baseId": "base-1472",
+          "tile": 601703,
+          "count": 1,
+          "personnel": 100,
+          "costGold": "12000",
+          "source": "army_reserve",
+          "unitId": 3744,
+          "completesTick": 2464
+        }
+      ],
+      "completed": [
+        {
+          "playerId": "region0149",
+          "kind": "armybase",
+          "count": 1
+        },
+        {
+          "playerId": "region0149",
+          "kind": "airbase",
+          "count": 1
+        },
+        {
+          "playerId": "region0149",
+          "kind": "navybase",
+          "count": 1
+        }
+      ],
+      "forces": [
+        {
+          "id": "force-1466",
+          "branch": "army",
+          "kind": "army",
+          "tile": 577705,
+          "baseId": "base-1464",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 500,
+          "aircraft": 0
+        },
+        {
+          "id": "force-1467",
+          "branch": "army",
+          "kind": "army",
+          "tile": 579705,
+          "baseId": "base-1464",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 500,
+          "aircraft": 0
+        },
+        {
+          "id": "force-1469",
+          "branch": "air",
+          "kind": "fighter",
+          "tile": 583705,
+          "baseId": "base-1463",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 400,
+          "aircraft": 4
+        },
+        {
+          "id": "force-1471",
+          "branch": "air",
+          "kind": "strike",
+          "tile": 583705,
+          "baseId": "base-1463",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 400,
+          "aircraft": 4
+        }
+      ]
+    },
+    "airStart": {
+      "tick": 2223,
+      "gold": "2983996",
+      "reserveRaw": 980000,
+      "population": {
+        "total": 1000000,
+        "civilian": 886648,
+        "available": 13352,
+        "army": 99000,
+        "navy": 100,
+        "air": 900,
+        "dead": 0
+      },
+      "jobs": [
+        {
+          "id": "production-2871",
+          "playerId": "region0149",
+          "branch": "navy",
+          "kind": "warship",
+          "baseId": "base-1472",
+          "tile": 601703,
+          "count": 1,
+          "personnel": 100,
+          "costGold": "12000",
+          "source": "army_reserve",
+          "unitId": 3744,
+          "completesTick": 2464
+        },
+        {
+          "id": "production-2872",
+          "playerId": "region0149",
+          "branch": "air",
+          "kind": "fighter",
+          "baseId": "base-2868",
+          "tile": 581709,
+          "count": 1,
+          "personnel": 100,
+          "costGold": "5000",
+          "source": "army_reserve",
+          "unitId": null,
+          "completesTick": 2370
+        }
+      ],
+      "completed": [
+        {
+          "playerId": "region0149",
+          "kind": "armybase",
+          "count": 1
+        },
+        {
+          "playerId": "region0149",
+          "kind": "airbase",
+          "count": 1
+        },
+        {
+          "playerId": "region0149",
+          "kind": "navybase",
+          "count": 1
+        }
+      ],
+      "forces": [
+        {
+          "id": "force-1466",
+          "branch": "army",
+          "kind": "army",
+          "tile": 577705,
+          "baseId": "base-1464",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 500,
+          "aircraft": 0
+        },
+        {
+          "id": "force-1467",
+          "branch": "army",
+          "kind": "army",
+          "tile": 579705,
+          "baseId": "base-1464",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 500,
+          "aircraft": 0
+        },
+        {
+          "id": "force-1469",
+          "branch": "air",
+          "kind": "fighter",
+          "tile": 583705,
+          "baseId": "base-1463",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 400,
+          "aircraft": 4
+        },
+        {
+          "id": "force-1471",
+          "branch": "air",
+          "kind": "strike",
+          "tile": 583705,
+          "baseId": "base-1463",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 400,
+          "aircraft": 4
+        }
+      ]
+    },
+    "armyStart": {
+      "tick": 2229,
+      "gold": "2982096",
+      "reserveRaw": 970000,
+      "population": {
+        "total": 1000000,
+        "civilian": 886648,
+        "available": 13352,
+        "army": 99000,
+        "navy": 100,
+        "air": 900,
+        "dead": 0
+      },
+      "jobs": [
+        {
+          "id": "production-2871",
+          "playerId": "region0149",
+          "branch": "navy",
+          "kind": "warship",
+          "baseId": "base-1472",
+          "tile": 601703,
+          "count": 1,
+          "personnel": 100,
+          "costGold": "12000",
+          "source": "army_reserve",
+          "unitId": 3744,
+          "completesTick": 2464
+        },
+        {
+          "id": "production-2872",
+          "playerId": "region0149",
+          "branch": "air",
+          "kind": "fighter",
+          "baseId": "base-2868",
+          "tile": 581709,
+          "count": 1,
+          "personnel": 100,
+          "costGold": "5000",
+          "source": "army_reserve",
+          "unitId": null,
+          "completesTick": 2370
+        },
+        {
+          "id": "production-2873",
+          "playerId": "region0149",
+          "branch": "army",
+          "kind": "army",
+          "baseId": "base-1464",
+          "tile": 577705,
+          "count": 1,
+          "personnel": 1000,
+          "costGold": "2500",
+          "source": "army_reserve",
+          "unitId": null,
+          "completesTick": 2326
+        }
+      ],
+      "completed": [
+        {
+          "playerId": "region0149",
+          "kind": "armybase",
+          "count": 1
+        },
+        {
+          "playerId": "region0149",
+          "kind": "airbase",
+          "count": 1
+        },
+        {
+          "playerId": "region0149",
+          "kind": "navybase",
+          "count": 1
+        }
+      ],
+      "forces": [
+        {
+          "id": "force-1466",
+          "branch": "army",
+          "kind": "army",
+          "tile": 577705,
+          "baseId": "base-1464",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 500,
+          "aircraft": 0
+        },
+        {
+          "id": "force-1467",
+          "branch": "army",
+          "kind": "army",
+          "tile": 579705,
+          "baseId": "base-1464",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 500,
+          "aircraft": 0
+        },
+        {
+          "id": "force-1469",
+          "branch": "air",
+          "kind": "fighter",
+          "tile": 583705,
+          "baseId": "base-1463",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 400,
+          "aircraft": 4
+        },
+        {
+          "id": "force-1471",
+          "branch": "air",
+          "kind": "strike",
+          "tile": 583705,
+          "baseId": "base-1463",
+          "phase": "idle",
+          "unitId": null,
+          "personnel": 400,
+          "aircraft": 4
+        }
+      ]
+    }
+  },
+  "navy": {
+    "acceptedActiveAndQueued": {
+      "build": "64a4a035a0e4",
+      "preview": {
+        "selected": ["force-2876"],
+        "previews": [
+          {
+            "id": "force-2876",
+            "preview": {
+              "valid": true,
+              "reason": null,
+              "path": [
+                601703, 601702, 601701, 601700, 601699, 601698, 601697, 601696,
+                601695, 601694, 601693, 601692, 601691, 601690, 601689, 601688,
+                601687, 601686, 601685, 601684, 601683, 601682, 601681, 601680,
+                601679, 601678, 601677, 601676, 601675, 601674, 601673, 601672,
+                601671, 601670
+              ],
+              "etaTicks": 34,
+              "rangeTiles": 0,
+              "risk": "uncertain",
+              "climateEfficiencyPermille": 1000
+            },
+            "command": "move"
+          }
+        ]
+      },
+      "activeCapture": {
+        "tick": 6377,
+        "paused": true,
+        "selection": ["force-2876"],
+        "queuedMetric": 1,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601702,
+            "x": 1702,
+            "y": 300,
+            "phase": "moving",
+            "path": [
+              601703, 601702, 601701, 601700, 601699, 601698, 601697, 601696,
+              601695, 601694, 601693, 601692, 601691, 601690, 601689, 601688,
+              601687, 601686, 601685, 601684, 601683, 601682, 601681, 601680,
+              601679, 601678, 601677, 601676, 601675, 601674, 601673, 601672,
+              601671, 601670
+            ],
+            "pathIndex": 1,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ],
+            "nativeTile": 601701,
+            "nativeX": 1701,
+            "nativeY": 300,
+            "unitId": 3744
+          }
+        ]
+      },
+      "samples": [
+        {
+          "tick": 6375,
+          "paused": false,
+          "selection": ["force-2876"],
+          "queuedMetric": 0,
+          "forces": [
+            {
+              "id": "force-2876",
+              "tile": 601703,
+              "x": 1703,
+              "y": 300,
+              "phase": "moving",
+              "path": [
+                601703, 601702, 601701, 601700, 601699, 601698, 601697, 601696,
+                601695, 601694, 601693, 601692, 601691, 601690, 601689, 601688,
+                601687, 601686, 601685, 601684, 601683, 601682, 601681, 601680,
+                601679, 601678, 601677, 601676, 601675, 601674, 601673, 601672,
+                601671, 601670
+              ],
+              "pathIndex": 0,
+              "command": {
+                "kind": "move",
+                "target": 601670,
+                "issuedTick": 6374
+              },
+              "queue": [],
+              "nativeTile": 601703,
+              "nativeX": 1703,
+              "nativeY": 300,
+              "unitId": 3744
+            }
+          ]
+        },
+        {
+          "tick": 6376,
+          "paused": false,
+          "selection": ["force-2876"],
+          "queuedMetric": 1,
+          "forces": [
+            {
+              "id": "force-2876",
+              "tile": 601703,
+              "x": 1703,
+              "y": 300,
+              "phase": "moving",
+              "path": [
+                601703, 601702, 601701, 601700, 601699, 601698, 601697, 601696,
+                601695, 601694, 601693, 601692, 601691, 601690, 601689, 601688,
+                601687, 601686, 601685, 601684, 601683, 601682, 601681, 601680,
+                601679, 601678, 601677, 601676, 601675, 601674, 601673, 601672,
+                601671, 601670
+              ],
+              "pathIndex": 0,
+              "command": {
+                "kind": "move",
+                "target": 601670,
+                "issuedTick": 6374
+              },
+              "queue": [
+                {
+                  "kind": "move",
+                  "target": 601690,
+                  "issuedTick": 6375,
+                  "previewPath": [
+                    601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                    601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                    601684, 601685, 601686, 601687, 601688, 601689, 601690
+                  ]
+                }
+              ],
+              "nativeTile": 601702,
+              "nativeX": 1702,
+              "nativeY": 300,
+              "unitId": 3744
+            }
+          ]
+        }
+      ]
+    },
+    "movementAndStop": [
+      {
+        "tick": 6379,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601700,
+            "x": 1700,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601699,
+            "nativeX": 1699,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6380,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601699,
+            "x": 1699,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601698,
+            "nativeX": 1698,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6381,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601698,
+            "x": 1698,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601697,
+            "nativeX": 1697,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6382,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601697,
+            "x": 1697,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601696,
+            "nativeX": 1696,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6383,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601696,
+            "x": 1696,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601695,
+            "nativeX": 1695,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6384,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601695,
+            "x": 1695,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601694,
+            "nativeX": 1694,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6385,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601694,
+            "x": 1694,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601693,
+            "nativeX": 1693,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6386,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601693,
+            "x": 1693,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601692,
+            "nativeX": 1692,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6387,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601692,
+            "x": 1692,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601691,
+            "nativeX": 1691,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "stopAfterIntent": [
+      {
+        "tick": 6389,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601690,
+            "x": 1690,
+            "y": 300,
+            "phase": "moving",
+            "nativeTile": 601689,
+            "nativeX": 1689,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601670,
+              "issuedTick": 6374
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601690,
+                "issuedTick": 6375,
+                "previewPath": [
+                  601670, 601671, 601672, 601673, 601674, 601675, 601676,
+                  601677, 601678, 601679, 601680, 601681, 601682, 601683,
+                  601684, 601685, 601686, 601687, 601688, 601689, 601690
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6390,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601689,
+            "x": 1689,
+            "y": 300,
+            "phase": "idle",
+            "nativeTile": 601688,
+            "nativeX": 1688,
+            "nativeY": 300,
+            "command": null,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 6392,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601688,
+            "x": 1688,
+            "y": 300,
+            "phase": "idle",
+            "nativeTile": 601688,
+            "nativeX": 1688,
+            "nativeY": 300,
+            "command": null,
+            "queue": []
+          }
+        ]
+      }
+    ],
+    "invalidTarget": {
+      "preview": {
+        "valid": false,
+        "reason": "navy_requires_navigable_water",
+        "path": [],
+        "etaTicks": 0,
+        "rangeTiles": 0,
+        "risk": "uncertain",
+        "climateEfficiencyPermille": 1000
+      },
+      "status": "해군은 연결된 항해 가능한 바다·해안이 필요합니다.",
+      "previews": [
+        {
+          "id": "force-2876",
+          "preview": {
+            "valid": false,
+            "reason": "navy_requires_navigable_water",
+            "path": [],
+            "etaTicks": 0,
+            "rangeTiles": 0,
+            "risk": "uncertain",
+            "climateEfficiencyPermille": 1000
+          },
+          "command": "move"
+        }
+      ]
+    },
+    "afterInvalid": {
+      "tick": 6407,
+      "paused": false,
+      "forces": [
+        {
+          "id": "force-2876",
+          "tile": 601688,
+          "x": 1688,
+          "y": 300,
+          "phase": "idle",
+          "pathIndex": 0,
+          "command": null,
+          "queue": [],
+          "nativeTile": 601688,
+          "nativeX": 1688,
+          "nativeY": 300,
+          "unitId": 3744
+        }
+      ]
+    },
+    "queuedOrdersActuallyComplete": [
+      {
+        "tick": 6997,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601688,
+            "phase": "idle",
+            "nativeTile": 601688,
+            "nativeX": 1688,
+            "nativeY": 300,
+            "command": null,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 6998,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601688,
+            "phase": "moving",
+            "nativeTile": 601688,
+            "nativeX": 1688,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 6999,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601688,
+            "phase": "moving",
+            "nativeTile": 601687,
+            "nativeX": 1687,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 7000,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601687,
+            "phase": "moving",
+            "nativeTile": 601686,
+            "nativeX": 1686,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 7001,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601686,
+            "phase": "moving",
+            "nativeTile": 601685,
+            "nativeX": 1685,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 7002,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601685,
+            "phase": "moving",
+            "nativeTile": 601684,
+            "nativeX": 1684,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 7003,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601684,
+            "phase": "moving",
+            "nativeTile": 601683,
+            "nativeX": 1683,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 7004,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601683,
+            "phase": "moving",
+            "nativeTile": 601682,
+            "nativeX": 1682,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 7005,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601682,
+            "phase": "moving",
+            "nativeTile": 601681,
+            "nativeX": 1681,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 7006,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601681,
+            "phase": "moving",
+            "nativeTile": 601680,
+            "nativeX": 1680,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601680,
+              "issuedTick": 6997
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 601695,
+                "issuedTick": 6997,
+                "previewPath": [
+                  601680, 601681, 601682, 601683, 601684, 601685, 601686,
+                  601687, 601688, 601689, 601690, 601691, 601692, 601693,
+                  601694, 601695
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tick": 7007,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601680,
+            "phase": "moving",
+            "nativeTile": 601680,
+            "nativeX": 1680,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7008,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601680,
+            "phase": "moving",
+            "nativeTile": 601681,
+            "nativeX": 1681,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7009,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601681,
+            "phase": "moving",
+            "nativeTile": 601682,
+            "nativeX": 1682,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7010,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601682,
+            "phase": "moving",
+            "nativeTile": 601683,
+            "nativeX": 1683,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7012,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601684,
+            "phase": "moving",
+            "nativeTile": 601685,
+            "nativeX": 1685,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7013,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601685,
+            "phase": "moving",
+            "nativeTile": 601686,
+            "nativeX": 1686,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7014,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601686,
+            "phase": "moving",
+            "nativeTile": 601687,
+            "nativeX": 1687,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7015,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601687,
+            "phase": "moving",
+            "nativeTile": 601688,
+            "nativeX": 1688,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7016,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601688,
+            "phase": "moving",
+            "nativeTile": 601689,
+            "nativeX": 1689,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7017,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601689,
+            "phase": "moving",
+            "nativeTile": 601690,
+            "nativeX": 1690,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7018,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601690,
+            "phase": "moving",
+            "nativeTile": 601691,
+            "nativeX": 1691,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7019,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601691,
+            "phase": "moving",
+            "nativeTile": 601692,
+            "nativeX": 1692,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7020,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601692,
+            "phase": "moving",
+            "nativeTile": 601693,
+            "nativeX": 1693,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7021,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601693,
+            "phase": "moving",
+            "nativeTile": 601694,
+            "nativeX": 1694,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7022,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601694,
+            "phase": "moving",
+            "nativeTile": 601695,
+            "nativeX": 1695,
+            "nativeY": 300,
+            "command": {
+              "kind": "move",
+              "target": 601695,
+              "issuedTick": 7006
+            },
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 7023,
+        "forces": [
+          {
+            "id": "force-2876",
+            "tile": 601695,
+            "phase": "idle",
+            "nativeTile": 601695,
+            "nativeX": 1695,
+            "nativeY": 300,
+            "command": null,
+            "queue": []
+          }
+        ]
+      }
+    ]
+  },
+  "air": {
+    "perForcePreview": {
+      "selected": ["force-1469", "force-1471", "force-2875"],
+      "previews": [
+        {
+          "id": "force-1469",
+          "preview": {
+            "valid": true,
+            "reason": null,
+            "path": [
+              583705, 581711, 579716, 577722, 575728, 573733, 571739, 569744,
+              567750
+            ],
+            "etaTicks": 8,
+            "rangeTiles": 180,
+            "risk": "uncertain",
+            "climateEfficiencyPermille": 1000
+          },
+          "command": "patrol"
+        },
+        {
+          "id": "force-1471",
+          "preview": {
+            "valid": true,
+            "reason": null,
+            "path": [
+              583705, 581711, 579716, 577722, 575728, 573733, 571739, 569744,
+              567750
+            ],
+            "etaTicks": 8,
+            "rangeTiles": 180,
+            "risk": "uncertain",
+            "climateEfficiencyPermille": 1000
+          },
+          "command": "patrol"
+        },
+        {
+          "id": "force-2875",
+          "preview": {
+            "valid": true,
+            "reason": null,
+            "path": [
+              581709, 579715, 577721, 575727, 573732, 571738, 569744, 567750
+            ],
+            "etaTicks": 7,
+            "rangeTiles": 180,
+            "risk": "uncertain",
+            "climateEfficiencyPermille": 1000
+          },
+          "command": "patrol"
+        }
+      ]
+    },
+    "firstMissionChanges": [
+      {
+        "tick": 3956,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 583705,
+            "x": 1705,
+            "y": 291,
+            "phase": "idle",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 583705,
+            "x": 1705,
+            "y": 291,
+            "phase": "idle",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "idle",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3958,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 583705,
+            "x": 1705,
+            "y": 291,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 583705,
+            "x": 1705,
+            "y": 291,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "outbound",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3959,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 581711,
+            "x": 1711,
+            "y": 290,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 581711,
+            "x": 1711,
+            "y": 290,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 579715,
+            "x": 1715,
+            "y": 289,
+            "phase": "outbound",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3960,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 579716,
+            "x": 1716,
+            "y": 289,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 579716,
+            "x": 1716,
+            "y": 289,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 577721,
+            "x": 1721,
+            "y": 288,
+            "phase": "outbound",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3961,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 577722,
+            "x": 1722,
+            "y": 288,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 577722,
+            "x": 1722,
+            "y": 288,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 575727,
+            "x": 1727,
+            "y": 287,
+            "phase": "outbound",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3962,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 575728,
+            "x": 1728,
+            "y": 287,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 575728,
+            "x": 1728,
+            "y": 287,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 573732,
+            "x": 1732,
+            "y": 286,
+            "phase": "outbound",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3963,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 573733,
+            "x": 1733,
+            "y": 286,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 573733,
+            "x": 1733,
+            "y": 286,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 571738,
+            "x": 1738,
+            "y": 285,
+            "phase": "outbound",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3964,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 571739,
+            "x": 1739,
+            "y": 285,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 571739,
+            "x": 1739,
+            "y": 285,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 569744,
+            "x": 1744,
+            "y": 284,
+            "phase": "outbound",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3965,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 569744,
+            "x": 1744,
+            "y": 284,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 569744,
+            "x": 1744,
+            "y": 284,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3966,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3986,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3991,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 3996,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "returning",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 4000,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 575727,
+            "x": 1727,
+            "y": 287,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 575727,
+            "x": 1727,
+            "y": 287,
+            "phase": "returning",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 0,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 4001,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 577721,
+            "x": 1721,
+            "y": 288,
+            "phase": "returning",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 577721,
+            "x": 1721,
+            "y": 288,
+            "phase": "returning",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 4002,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 579715,
+            "x": 1715,
+            "y": 289,
+            "phase": "returning",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 579715,
+            "x": 1715,
+            "y": 289,
+            "phase": "returning",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      },
+      {
+        "tick": 4003,
+        "forces": [
+          {
+            "id": "force-1469",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "rearming",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "rearming",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1,
+            "queue": []
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0,
+            "queue": []
+          }
+        ]
+      }
+    ],
+    "returningPausedScreenshotState": {
+      "tick": 3997,
+      "paused": true,
+      "population": {
+        "total": 999900,
+        "civilian": 886643,
+        "available": 13355,
+        "army": 99002,
+        "navy": 100,
+        "air": 800,
+        "dead": 100
+      },
+      "forces": [
+        {
+          "id": "force-1469",
+          "tile": 569744,
+          "x": 1744,
+          "y": 284,
+          "phase": "returning",
+          "queue": [],
+          "pathIndex": 1,
+          "personnel": 300,
+          "aircraft": 3,
+          "casualties": 0,
+          "completedMissions": 0,
+          "lastMissionTick": 3965,
+          "cooldownUntil": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 569744,
+          "x": 1744,
+          "y": 284,
+          "phase": "returning",
+          "queue": [],
+          "pathIndex": 1,
+          "personnel": 400,
+          "aircraft": 4,
+          "casualties": 0,
+          "completedMissions": 0,
+          "lastMissionTick": 3965,
+          "cooldownUntil": 0
+        },
+        {
+          "id": "force-2875",
+          "tile": 567750,
+          "x": 1750,
+          "y": 283,
+          "phase": "destroyed",
+          "queue": [],
+          "pathIndex": 7,
+          "personnel": 0,
+          "aircraft": 0,
+          "casualties": 100,
+          "completedMissions": 0,
+          "lastMissionTick": 3964,
+          "cooldownUntil": 0
+        }
+      ]
+    },
+    "secondMissionChanges": [
+      {
+        "tick": 7686,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "idle",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "idle",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7687,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "outbound",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7688,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 579715,
+            "x": 1715,
+            "y": 289,
+            "phase": "outbound",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 579715,
+            "x": 1715,
+            "y": 289,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7689,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 577721,
+            "x": 1721,
+            "y": 288,
+            "phase": "outbound",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 577721,
+            "x": 1721,
+            "y": 288,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7690,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 575727,
+            "x": 1727,
+            "y": 287,
+            "phase": "outbound",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 575727,
+            "x": 1727,
+            "y": 287,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7691,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 573732,
+            "x": 1732,
+            "y": 286,
+            "phase": "outbound",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 573732,
+            "x": 1732,
+            "y": 286,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7692,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 571738,
+            "x": 1738,
+            "y": 285,
+            "phase": "outbound",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 571738,
+            "x": 1738,
+            "y": 285,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7693,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 569744,
+            "x": 1744,
+            "y": 284,
+            "phase": "outbound",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 569744,
+            "x": 1744,
+            "y": 284,
+            "phase": "outbound",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7694,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 2,
+            "personnel": 200,
+            "casualties": 200,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7711,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 1,
+            "personnel": 100,
+            "casualties": 300,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7716,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 300,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 4,
+            "personnel": 400,
+            "casualties": 0,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7721,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "engaging",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7724,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7725,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 569744,
+            "x": 1744,
+            "y": 284,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7726,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 571738,
+            "x": 1738,
+            "y": 285,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7727,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 573732,
+            "x": 1732,
+            "y": 286,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7728,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 575727,
+            "x": 1727,
+            "y": 287,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7729,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 577721,
+            "x": 1721,
+            "y": 288,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7730,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 579715,
+            "x": 1715,
+            "y": 289,
+            "phase": "returning",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      },
+      {
+        "tick": 7731,
+        "air": [
+          {
+            "id": "force-1469",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 400,
+            "completedMissions": 1
+          },
+          {
+            "id": "force-1471",
+            "tile": 581709,
+            "x": 1709,
+            "y": 290,
+            "phase": "rearming",
+            "aircraft": 3,
+            "personnel": 300,
+            "casualties": 100,
+            "completedMissions": 2
+          },
+          {
+            "id": "force-2875",
+            "tile": 567750,
+            "x": 1750,
+            "y": 283,
+            "phase": "destroyed",
+            "aircraft": 0,
+            "personnel": 0,
+            "casualties": 100,
+            "completedMissions": 0
+          }
+        ]
+      }
+    ],
+    "actualChapterFinal": {
+      "tick": 7790,
+      "paused": true,
+      "population": {
+        "total": 999400,
+        "civilian": 885400,
+        "available": 14243,
+        "army": 99357,
+        "navy": 100,
+        "air": 300,
+        "dead": 600
+      },
+      "air": [
+        {
+          "id": "force-1469",
+          "tile": 567750,
+          "x": 1750,
+          "y": 283,
+          "phase": "destroyed",
+          "personnel": 0,
+          "aircraft": 0,
+          "casualties": 400,
+          "completedMissions": 1
+        },
+        {
+          "id": "force-1471",
+          "tile": 581709,
+          "x": 1709,
+          "y": 290,
+          "phase": "rearming",
+          "personnel": 300,
+          "aircraft": 3,
+          "casualties": 100,
+          "completedMissions": 2
+        },
+        {
+          "id": "force-2875",
+          "tile": 567750,
+          "x": 1750,
+          "y": 283,
+          "phase": "destroyed",
+          "personnel": 0,
+          "aircraft": 0,
+          "casualties": 100,
+          "completedMissions": 0
+        }
+      ],
+      "guide": "튜토리얼\n챕터\n전체 조작표 열기\n✕\n\n챕터 종료: 실습 성공 5개, 설명 확인 0개, 건너뜀 0개. 건너뛴 실습은 다시 도전할 수 있습니다."
+    }
+  },
+  "finalScreenshotState": {
+    "build": "64a4a035a0e4",
+    "tick": 7790,
+    "paused": true,
+    "guide": "튜토리얼\n챕터\n전체 조작표 열기\n✕\n\n챕터 종료: 실습 성공 5개, 설명 확인 0개, 건너뜀 0개. 건너뛴 실습은 다시 도전할 수 있습니다.",
+    "population": {
+      "total": 999400,
+      "civilian": 885400,
+      "available": 14243,
+      "army": 99357,
+      "navy": 100,
+      "air": 300,
+      "dead": 600
+    },
+    "completed": [
+      {
+        "playerId": "region0149",
+        "kind": "armybase",
+        "count": 1
+      },
+      {
+        "playerId": "region0149",
+        "kind": "airbase",
+        "count": 1
+      },
+      {
+        "playerId": "region0149",
+        "kind": "navybase",
+        "count": 1
+      },
+      {
+        "playerId": "region0149",
+        "kind": "army",
+        "count": 1
+      },
+      {
+        "playerId": "region0149",
+        "kind": "fighter",
+        "count": 1
+      },
+      {
+        "playerId": "region0149",
+        "kind": "warship",
+        "count": 1
+      }
+    ],
+    "assetErrors": []
+  },
+  "screenshots": [
+    "output/playwright/repair-64-air-preview-valid.png",
+    "output/playwright/repair-64-air-returning.png",
+    "output/playwright/repair-64-navy-active-queue.png",
+    "output/playwright/repair-64-air-course-complete.png"
+  ],
+  "rawLogs": [
+    "output/playwright/repair-64-production-start.txt",
+    "output/playwright/repair-64-navy-active-state.txt",
+    "output/playwright/repair-64-navy-stop-invalid.txt",
+    "output/playwright/repair-64-navy-queue-complete.txt",
+    "output/playwright/repair-64-air-motion-success.txt",
+    "output/playwright/repair-64-air-course-complete.txt",
+    "output/playwright/repair-64-air-complete-screenshot-state.txt"
+  ],
+  "excludedFailures": {
+    "repair-64-air-motion.txt": "F used before C when air forces outside viewport; selection 0, no command and no movement. Repeated with C then F before success.",
+    "repair-64-bases.txt": "First two base commands completed; third target outside viewport after ArrowDown, locator timeout. Not used as complete three-base proof.",
+    "repair-64-navy-queue-stop.txt": "Foreground screenshot timed out before command; contains no motion result."
+  },
+  "notVerifiedByThisRecord": [
+    "Multiplayer other-client/reconnect",
+    "All climate/maps/AI mixtures",
+    "All weapon missions/SAM aircraft intercept",
+    "Mobile touch alternatives, separately verified by input agent",
+    "Performance targets, separately measured in serial core benchmark",
+    "Save/replay/end/restart, separately verified by root"
+  ]
+}

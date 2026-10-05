@@ -10,6 +10,8 @@ process.env.GIT_COMMIT ??= "DEV";
 process.env.DOMAIN ??= "localhost";
 process.env.TURNSTILE_SITE_KEY ??= "1x00000000000000000000AA";
 const { renderHtmlContent } = await import("../src/server/RenderHtml");
+const { clearRuntimeAssetManifestCache } =
+  await import("../src/server/RuntimeAssetManifest");
 const root = path.resolve("static"),
   port = Number(process.env.FORK_PREVIEW_PORT ?? 9002);
 http
@@ -25,6 +27,7 @@ http
       if (pathname === "/" || !path.extname(pathname)) {
         // A new build replaces hashed bundle names. Refresh its HTML together
         // with those assets instead of retaining references to removed files.
+        clearRuntimeAssetManifestCache();
         const html = await renderHtmlContent(path.join(root, "index.html"), {
           perServer: false,
         });

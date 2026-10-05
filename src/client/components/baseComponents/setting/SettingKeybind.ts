@@ -1,6 +1,7 @@
 import { LitElement, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { formatKeyForDisplay, translateText } from "../../../../client/Utils";
+import { actionPhase } from "../../../../core/game/KeybindingRegistry";
 
 @customElement("setting-keybind")
 export class SettingKeybind extends LitElement {
@@ -107,27 +108,32 @@ export class SettingKeybind extends LitElement {
 
     // Don't capture lone modifier keys — wait for the actual key
     if (
-      e.code === "ShiftLeft" ||
-      e.code === "ShiftRight" ||
-      e.code === "ControlLeft" ||
-      e.code === "ControlRight" ||
-      e.code === "AltLeft" ||
-      e.code === "AltRight" ||
-      e.code === "MetaLeft" ||
-      e.code === "MetaRight"
+      actionPhase(this.action) !== "modifier" &&
+      (e.code === "ShiftLeft" ||
+        e.code === "ShiftRight" ||
+        e.code === "ControlLeft" ||
+        e.code === "ControlRight" ||
+        e.code === "AltLeft" ||
+        e.code === "AltRight" ||
+        e.code === "MetaLeft" ||
+        e.code === "MetaRight")
     ) {
       return;
     }
 
     // Prevent default only for keys we're actually capturing
     e.preventDefault();
+    e.stopPropagation();
 
-    const modifiers = [
-      ...(e.ctrlKey ? ["Ctrl"] : []),
-      ...(e.altKey ? ["Alt"] : []),
-      ...(e.shiftKey ? ["Shift"] : []),
-      ...(e.metaKey ? ["Meta"] : []),
-    ];
+    const loneModifier = /^(Shift|Control|Alt|Meta)(Left|Right)$/.test(e.code);
+    const modifiers = loneModifier
+      ? []
+      : [
+          ...(e.ctrlKey ? ["Ctrl"] : []),
+          ...(e.altKey ? ["Alt"] : []),
+          ...(e.shiftKey ? ["Shift"] : []),
+          ...(e.metaKey ? ["Meta"] : []),
+        ];
     const code = [...modifiers, e.code].join("+");
     const displayKey = [...modifiers, e.key.toUpperCase()].join("+");
     const prevValue = this.value;

@@ -1,0 +1,509 @@
+{
+  "samples": [
+    {
+      "tick": 65,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579710,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 583709,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    },
+    {
+      "tick": 74,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 583712,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    },
+    {
+      "tick": 84,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583713,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 583714,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    },
+    {
+      "tick": 93,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 585714,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 585715,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    },
+    {
+      "tick": 102,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 585717,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 587717,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 37
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 48,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ],
+          "missions": 0
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    },
+    {
+      "tick": 111,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 587718,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 109
+          },
+          "queue": [],
+          "missions": 1
+        },
+        {
+          "id": "force-1467",
+          "tile": 585718,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 105
+          },
+          "queue": [],
+          "missions": 1
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 585717,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 109
+          },
+          "queue": [],
+          "missions": 1
+        },
+        {
+          "id": "force-1467",
+          "tile": 585716,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 105
+          },
+          "queue": [],
+          "missions": 1
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    },
+    {
+      "tick": 130,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 585714,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 109
+          },
+          "queue": [],
+          "missions": 1
+        },
+        {
+          "id": "force-1467",
+          "tile": 585713,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 105
+          },
+          "queue": [],
+          "missions": 1
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    },
+    {
+      "tick": 139,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583713,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 109
+          },
+          "queue": [],
+          "missions": 1
+        },
+        {
+          "id": "force-1467",
+          "tile": 583712,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 105
+          },
+          "queue": [],
+          "missions": 1
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": [],
+          "missions": 0
+        }
+      ]
+    }
+  ]
+}

@@ -777,7 +777,19 @@ test("real world: every independent controller has equal N0, exact raster, bases
     state.factions.filter((f) => f.aiRole === "invited-slot"),
   ).toHaveLength(0);
   expect(state.ports).toHaveLength(modernRegions.ports.length);
-  expect(state.forces).toHaveLength(modernFactions.length * 3);
+  expect(state.version).toBe(3);
+  expect(state.forces).toHaveLength(modernFactions.length * 4);
+  for (const faction of state.factions) {
+    const army = state.forces.filter(
+      (f) => f.playerId === faction.playerId && f.branch === "army",
+    );
+    expect(army.map((f) => f.personnel)).toEqual([500, 500]);
+    expect(
+      game.player(faction.playerId).troops() +
+        army.reduce((n, f) => n + f.personnel * 10, 0),
+    ).toBe(180000);
+    expect(faction.growthModel).toBe("stockpile-v1");
+  }
   balanced(state);
   const restored = await createGameRunnerFromSnapshot(
     start,

@@ -409,17 +409,20 @@ test("playback keys do nothing while the settings menu is open", () => {
   v.playback = playback;
   const menu = document.createElement("settings-modal") as SettingsModal;
   element.appendChild(menu);
-  const key = (code: string) => new KeyboardEvent("keydown", { code });
+  const key = (code: string, type = "keydown") =>
+    new KeyboardEvent(type, { code });
 
   menu.openModal();
-  v.onKey(key("Space"));
-  v.onKey(key("ArrowRight"));
+  v.onKey(key("KeyP"));
+  v.onKey(key("KeyP", "keyup"));
+  v.onKey(key("BracketRight"));
   expect(playback.play).not.toHaveBeenCalled();
   expect(playback.seek).not.toHaveBeenCalled();
 
   menu.closeModal({ keepPause: true });
-  v.onKey(key("Space"));
-  v.onKey(key("ArrowRight"));
+  v.onKey(key("KeyP"));
+  v.onKey(key("KeyP", "keyup"));
+  v.onKey(key("BracketRight"));
   expect(playback.play).toHaveBeenCalledOnce();
   expect(playback.seek).toHaveBeenCalledWith(11);
 });
