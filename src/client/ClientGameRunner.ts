@@ -27,6 +27,7 @@ import {
   GameUpdateViewData,
   HashUpdate,
 } from "../core/game/GameUpdates";
+import { modernFactions } from "../core/game/ModernRegions";
 import { modernWorld } from "../core/game/ModernWorld";
 import { loadTerrainMap, TerrainMapData } from "../core/game/TerrainMapLoader";
 import {
@@ -52,10 +53,16 @@ import {
   ToggleRenderDebugGuiEvent,
 } from "./InputHandler";
 import { mountModernCapitalOverlay } from "./ModernCapitalOverlay";
+import { mountModernCommandPanel } from "./ModernCommandPanel";
 import { pagePin } from "./PagePin";
 import { groupTokenOf, loggableStartMessage } from "./PresenceGroup";
 import { versionedPathForMismatchedGame } from "./ServerList";
-import { reviewGame, saveBuild, writeSave } from "./SingleplayerSaves";
+import {
+  automaticSaveId,
+  reviewGame,
+  saveBuild,
+  writeSave,
+} from "./SingleplayerSaves";
 import { reportGameError } from "./Telemetry";
 import { terrainMapFileLoader } from "./TerrainMapFileLoader";
 import { GoToPlayerEvent } from "./TransformHandler";
@@ -931,6 +938,24 @@ async function createClientGame(
       ? mountModernCapitalOverlay(gameView, gameRenderer.transformHandler)
       : () => {};
     rendererDisposers.push(disposeCapitalMarkers);
+    if (config.gameConfig().modernMode?.scenario === "modern-regions-v2") {
+      rendererDisposers.push(
+        mountModernCommandPanel(
+          gameView,
+          gameRenderer.transformHandler,
+          gameRenderer.uiState,
+          eventBus,
+          (forceId, target, command, queue) =>
+            worker.modernForcePreview(
+              gameView.myPlayer()!.id(),
+              forceId,
+              target,
+              command,
+              queue,
+            ),
+        ),
+      );
+    }
     const { builder: webglBuilder, stopFrameLoop } = mountWebGLFrameLoop(
       gameMap,
       view,
@@ -994,6 +1019,7 @@ export class ClientGameRunner {
   private currentTickDelay: number | undefined = undefined;
   private savePanel: SavePanel | null = null;
   private autosaveTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly saveRunId: string;
   private lifecycleAbort = new AbortController();
   private subscriptions: Array<() => void> = [];
   private connectionCheckDelay: ReturnType<typeof setTimeout> | null = null;
@@ -1017,6 +1043,9 @@ export class ClientGameRunner {
   ) {
     this.lastMessageTime = Date.now();
     this.turnsSeen = lobby.savedGame?.tick ?? 0;
+    // This UUID identifies a local save slot only; it never enters simulation
+    // decisions or changes the seeded game ID. Old saves receive a new slot.
+    this.saveRunId = lobby.savedGame?.runId ?? crypto.randomUUID();
   }
 
   /**
@@ -1187,9 +1216,16 @@ export class ClientGameRunner {
       gu.updates[GameUpdateType.Hash].forEach((hu: HashUpdate) => {
         this.eventBus.emit(new SendHashEvent(hu.tick, hu.hash));
       });
+      const wasPaused = this.gameView.isPaused();
+      const hadModernState = this.gameView.modernSystems() !== null;
       this.gameView.update(gu);
       this.webglBuilder?.update(this.gameView);
-      this.renderer.tick();
+      // The final paused update must refresh throttled HUD counters too. At
+      // modern bootstrap, replace the initial tile-based rows immediately.
+      this.renderer.tick(
+        wasPaused !== this.gameView.isPaused() ||
+          (!hadModernState && this.gameView.modernSystems() !== null),
+      );
       this.savePanel?.tick();
       if (gu.tickExecutionDuration !== undefined) {
         this.metrics?.recordTickExecution(gu.tickExecutionDuration);
@@ -1418,7 +1454,10 @@ export class ClientGameRunner {
       ) as TutorialPanel | null;
       await writeSave({
         format: 1,
-        id: automatic ? `${this.lobby.gameID}-auto` : crypto.randomUUID(),
+        runId: this.saveRunId,
+        id: automatic
+          ? automaticSaveId(saveBuild, this.saveRunId)
+          : crypto.randomUUID(),
         name:
           name ?? translateText(automatic ? "saves.autosave" : "saves.manual"),
         createdAt: Date.now(),
@@ -1438,19 +1477,34 @@ export class ClientGameRunner {
     const mode = this.lobby.gameStartInfo?.config.modernMode,
       player = this.gameView.myPlayer();
     if (!mode || !player) return "";
-    const capitals = modernWorld.countries.filter(
+    const countries =
+      mode.scenario === "modern-regions-v2"
+        ? modernFactions
+        : modernWorld.countries;
+    const capitals = countries.filter(
       (country) =>
         this.gameView
           .owner(this.gameView.ref(country.capital[0], country.capital[1]))
           .id() === player.id(),
     ).length;
+    const systems = this.gameView.modernSystems();
+    const totalArea =
+      systems?.factions.reduce(
+        (sum, faction) => sum + faction.ownedAreaUnits,
+        0,
+      ) ?? 0;
+    const ownedArea =
+      systems?.factions.find((faction) => faction.playerId === player.id())
+        ?.ownedAreaUnits ?? 0;
     return translateText("modern.progress", {
       territory:
         Math.round(
-          (player.numTilesOwned() * 1000) / this.gameView.numLandTiles(),
+          mode.scenario === "modern-regions-v2" && totalArea > 0
+            ? (ownedArea * 1000) / totalArea
+            : (player.numTilesOwned() * 1000) / this.gameView.numLandTiles(),
         ) / 10,
       capitals,
-      total: modernWorld.countries.length,
+      total: countries.length,
       requirement: ["territory", "capitals"].includes(mode.victory)
         ? translateText("modern.threshold", { target: mode.targetPercent })
         : "",

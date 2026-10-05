@@ -23,6 +23,7 @@ import { TerrainMapData } from "../../core/game/TerrainMapLoader";
 import { TerraNulliusImpl } from "../../core/game/TerraNulliusImpl";
 import { UnitGrid, UnitPredicate } from "../../core/game/UnitGrid";
 import { UserSettings } from "../../core/game/UserSettings";
+import type { ModernState } from "../../core/modern/ModernState";
 import { ClientID, GameID, Player, PlayerCosmetics } from "../../core/Schemas";
 import { formatPlayerDisplayName } from "../../core/Util";
 import { WorkerClient } from "../../core/worker/WorkerClient";
@@ -59,6 +60,10 @@ function readCosmeticVisibility(): CosmeticVisibility {
 }
 
 export class GameView implements GameMap {
+  private _modernSystems: ModernState | null = null;
+  public modernSystems(): ModernState | null {
+    return this._modernSystems;
+  }
   private lastUpdate: GameUpdateViewData | null;
   private startTick: Tick | null = null;
   private smallIDToID = new Map<number, PlayerID>();
@@ -240,6 +245,8 @@ export class GameView implements GameMap {
     this.toDelete.clear();
 
     this.lastUpdate = gu;
+    for (const update of gu.updates[GameUpdateType.ModernSystems] ?? [])
+      this._modernSystems = update.state;
 
     this.updatedTiles = [];
     this.updatedTerrainTiles = [];

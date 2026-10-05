@@ -5,6 +5,14 @@ import {
   USER_SETTINGS_CHANGED_EVENT,
   UserSettings,
 } from "../core/game/UserSettings";
+import {
+  MODERN_KEYBINDS_CHANGED,
+  ModernBranchEvent,
+  ModernClearSelectionEvent,
+  ModernSelectionEvent,
+  ModernTargetEvent,
+  modernKeybinds,
+} from "./ModernInput";
 import { Platform } from "./Platform";
 import { UIState } from "./UIState";
 import { ReplaySpeedMultiplier } from "./utilities/ReplaySpeedMultiplier";
@@ -229,6 +237,7 @@ export class InputHandler {
   private pointers: Map<number, PointerEvent> = new Map();
 
   private lastPinchDistance: number = 0;
+  private lastModernPinchCenter: { x: number; y: number } | null = null;
 
   // Scale of the in-progress Safari pinch, or null when no gesture is active.
   private lastGestureScale: number | null = null;
@@ -259,6 +268,14 @@ export class InputHandler {
   private keybinds: Record<string, string> = {};
   private keybindAndEvent: Array<[string, KeybindEntry]> = [];
   private coordinateGridEnabled = false;
+  private modernSelecting = false;
+
+  private modernContext(): boolean {
+    return (
+      this.gameView.config?.().gameConfig().modernMode?.scenario ===
+      "modern-regions-v2"
+    );
+  }
 
   private readonly PAN_SPEED = 5;
   private readonly ZOOM_SPEED = 10;
@@ -280,6 +297,10 @@ export class InputHandler {
     // rebind would not take effect until the next one.
     globalThis.addEventListener(
       `${USER_SETTINGS_CHANGED_EVENT}:${KEYBINDS_KEY}`,
+      this.onKeybindsChanged,
+    );
+    globalThis.addEventListener(
+      MODERN_KEYBINDS_CHANGED,
       this.onKeybindsChanged,
     );
 
@@ -331,6 +352,7 @@ export class InputHandler {
     this.pointerDown = false;
     this.pointers.clear();
     this.lastGestureScale = null;
+    this.lastModernPinchCenter = null;
     if (this.longPressTimer !== null) {
       clearTimeout(this.longPressTimer);
       this.longPressTimer = null;
@@ -339,12 +361,26 @@ export class InputHandler {
     this.suppressNextTap = false;
     this.selectionBoxActive = false;
     this.multiSelectionActive = false;
+    this.modernSelecting = false;
   }
 
   /** Re-read the player's keybinds and rebuild the key dispatch table. */
   private buildKeybindTable() {
-    this.keybinds = this.userSettings.keybinds(Platform.isMac);
+    this.keybinds = this.modernContext()
+      ? modernKeybinds(this.userSettings, Platform.isMac)
+      : this.userSettings.keybinds(Platform.isMac);
     this.keybindAndEvent = [];
+    if (this.modernContext()) {
+      for (const [action, branch] of [
+        ["modernArmy", "army"],
+        ["modernNavy", "navy"],
+        ["modernAir", "air"],
+      ] as const) {
+        this.addKeybindAndEvent(this.keybinds[action], () => {
+          this.eventBus.emit(new ModernBranchEvent(branch));
+        });
+      }
+    }
 
     this.addKeybindAndEvent(this.keybinds.boatAttack, () => {
       this.eventBus.emit(new DoBoatAttackEvent());
@@ -602,6 +638,11 @@ export class InputHandler {
     this.pointers.clear();
 
     this.moveInterval = setInterval(() => {
+      if (
+        this.modernContext() &&
+        this.isTextInputTarget(document.activeElement)
+      )
+        return;
       let deltaX = 0;
       let deltaY = 0;
 
@@ -658,6 +699,7 @@ export class InputHandler {
     window.addEventListener(
       "keydown",
       (e) => {
+        if (e.defaultPrevented || e.isComposing || e.keyCode === 229) return;
         const isTextInput = this.isTextInputTarget(e.target);
         if (isTextInput && e.code !== "Escape") {
           return;
@@ -698,6 +740,11 @@ export class InputHandler {
           }
 
           this.eventBus.emit(new CloseViewEvent());
+          if (this.modernContext()) {
+            this.modernSelecting = false;
+            this.uiState.modernTargeting = false;
+            this.eventBus.emit(new ModernClearSelectionEvent());
+          }
 
           if (
             !closedUI &&
@@ -787,7 +834,15 @@ export class InputHandler {
     window.addEventListener(
       "keyup",
       (e) => {
+        if (e.defaultPrevented || e.isComposing || e.keyCode === 229) {
+          this.activeKeys.delete(e.code);
+          return;
+        }
         const isTextInput = this.isTextInputTarget(e.target);
+        if (this.modernContext() && isTextInput) {
+          this.activeKeys.delete(e.code);
+          return;
+        }
         if (isTextInput && !this.activeKeys.has(e.code)) {
           return;
         }
@@ -858,6 +913,18 @@ export class InputHandler {
       this.lastPointerDownX = event.clientX;
       this.lastPointerDownY = event.clientY;
 
+      if (
+        this.modernContext() &&
+        this.uiState.ghostStructure === null &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.metaKey
+      ) {
+        this.modernSelecting = true;
+        // Selecting never emits the Classic attack MouseDown/MouseUp path.
+        return;
+      }
+
       this.eventBus.emit(new MouseDownEvent(event.clientX, event.clientY));
 
       // Start long-press timer for touch devices
@@ -891,6 +958,9 @@ export class InputHandler {
         this.canvas.style.cursor = "";
       }
       this.lastPinchDistance = this.getPinchDistance();
+      this.lastModernPinchCenter = this.modernContext()
+        ? this.getPinchCenter()
+        : null;
     }
   }
 
@@ -908,8 +978,32 @@ export class InputHandler {
     if (!this.pointerDown || !this.pointers.has(event.pointerId)) {
       return;
     }
+    const modernPinch = this.modernSelecting && this.pointers.size > 1;
     this.pointerDown = false;
     this.pointers.clear();
+
+    if (this.modernSelecting) {
+      this.modernSelecting = false;
+      if (event.type === "pointercancel" || modernPinch) return;
+      if (this.uiState.modernTargeting) {
+        this.eventBus.emit(
+          new ModernTargetEvent(event.clientX, event.clientY, event.shiftKey),
+        );
+      } else {
+        this.eventBus.emit(
+          new ModernSelectionEvent(
+            this.lastPointerDownX,
+            this.lastPointerDownY,
+            event.clientX,
+            event.clientY,
+            event.shiftKey,
+            true,
+          ),
+        );
+      }
+      event.preventDefault();
+      return;
+    }
 
     // Clean up long-press state
     if (this.longPressTimer !== null) {
@@ -1085,6 +1179,19 @@ export class InputHandler {
     if (this.pointers.size === 1) {
       const deltaX = event.clientX - this.lastPointerX;
       const deltaY = event.clientY - this.lastPointerY;
+      if (this.modernSelecting) {
+        this.eventBus.emit(
+          new ModernSelectionEvent(
+            this.lastPointerDownX,
+            this.lastPointerDownY,
+            event.clientX,
+            event.clientY,
+            event.shiftKey,
+            false,
+          ),
+        );
+        return;
+      }
 
       // Cancel long-press if finger moved significantly before timer fires
       if (this.longPressTimer !== null) {
@@ -1122,9 +1229,17 @@ export class InputHandler {
     } else if (this.pointers.size === 2) {
       const currentPinchDistance = this.getPinchDistance();
       const pinchDelta = currentPinchDistance - this.lastPinchDistance;
+      const zoomCenter = this.getPinchCenter();
+      if (this.modernContext()) {
+        if (this.lastModernPinchCenter) {
+          const dx = zoomCenter.x - this.lastModernPinchCenter.x;
+          const dy = zoomCenter.y - this.lastModernPinchCenter.y;
+          if (dx || dy) this.eventBus.emit(new DragEvent(dx, dy));
+        }
+        this.lastModernPinchCenter = zoomCenter;
+      }
 
       if (Math.abs(pinchDelta) > 1) {
-        const zoomCenter = this.getPinchCenter();
         this.eventBus.emit(
           new ZoomEvent(zoomCenter.x, zoomCenter.y, -pinchDelta * 2),
         );
@@ -1140,6 +1255,12 @@ export class InputHandler {
     }
     if (this.uiState.ghostStructure !== null) {
       this.setGhostStructure(null);
+      return;
+    }
+    if (this.modernContext() && !event.ctrlKey && !event.metaKey) {
+      this.eventBus.emit(
+        new ModernTargetEvent(event.clientX, event.clientY, event.shiftKey),
+      );
       return;
     }
     // If a warship/boat is selected, right-click cancels the selection rather
@@ -1363,7 +1484,11 @@ export class InputHandler {
     ) {
       return true;
     }
-    if (element.tagName === "TEXTAREA" || element.isContentEditable) {
+    if (
+      element.tagName === "TEXTAREA" ||
+      element.tagName === "SELECT" ||
+      element.isContentEditable
+    ) {
       return true;
     }
     if (element.tagName === "INPUT") {
@@ -1383,6 +1508,10 @@ export class InputHandler {
     }
     globalThis.removeEventListener(
       `${USER_SETTINGS_CHANGED_EVENT}:${KEYBINDS_KEY}`,
+      this.onKeybindsChanged,
+    );
+    globalThis.removeEventListener(
+      MODERN_KEYBINDS_CHANGED,
       this.onKeybindsChanged,
     );
     this.listenerAbort?.abort();

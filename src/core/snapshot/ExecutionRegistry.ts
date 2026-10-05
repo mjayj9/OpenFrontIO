@@ -19,6 +19,11 @@ import { FactoryExecutionSnapshot } from "../execution/FactoryExecution";
 import { MarkDisconnectedExecutionSnapshot } from "../execution/MarkDisconnectedExecution";
 import { MirvExecutionSnapshot } from "../execution/MIRVExecution";
 import { MissileSiloExecutionSnapshot } from "../execution/MissileSiloExecution";
+import { ModernPortTrainingExecutionSnapshot } from "../execution/ModernPortTrainingExecution";
+import {
+  ModernCommandExecutionSnapshot,
+  ModernSystemsExecutionSnapshot,
+} from "../execution/ModernSystemsExecution";
 import { ModernWorldExecutionSnapshot } from "../execution/ModernWorldExecution";
 import { MoveWarshipExecutionSnapshot } from "../execution/MoveWarshipExecution";
 import { NationExecutionSnapshot } from "../execution/NationExecution";
@@ -55,6 +60,9 @@ import type { ExecutionSnapshotType } from "./ExecutionSnapshot";
  * replaced it.
  */
 export const EXECUTION_SNAPSHOT_TYPES = [
+  ModernPortTrainingExecutionSnapshot,
+  ModernSystemsExecutionSnapshot,
+  ModernCommandExecutionSnapshot,
   ModernWorldExecutionSnapshot,
   TrainingExecutionSnapshot,
   AllianceExtensionExecutionSnapshot,

@@ -16,11 +16,12 @@ import {
   RankedType,
 } from "../core/game/Game";
 import { maps } from "../core/game/Maps.gen";
-import { modernWorld, validateModernStart } from "../core/game/ModernWorld";
+import { modernEntries, validateModernStart } from "../core/game/ModernWorld";
 import {
   assignTeamsLobbyPreview,
   resolveTeamsList,
 } from "../core/game/TeamAssignment";
+import { modernAssignmentsFor } from "../core/modern/ModernAssignments";
 import {
   ClientID,
   ClientMessage,
@@ -346,6 +347,7 @@ export class GameServer {
   }
 
   public updateGameConfig(gameConfig: Partial<GameConfig>): void {
+    if (this.stage === "started" && gameConfig.modernMode !== undefined) return;
     applyGameConfigPatch(this.gameConfig, gameConfig);
     if (!this.gameConfig.modernMode) {
       this.clients.active().forEach((c) => {
@@ -1156,6 +1158,10 @@ export class GameServer {
     this._startTime = Date.now();
     this.lastPingUpdate = this._startTime;
     this.gameStartInfo = result.data satisfies GameStartInfo;
+    if (this.gameConfig.modernMode?.scenario === "modern-regions-v2")
+      this.gameStartInfo.modernAssignments = modernAssignmentsFor(
+        this.gameStartInfo,
+      );
     this.telemetry.emit(
       "match_started",
       {
@@ -1400,7 +1406,7 @@ export class GameServer {
       this.modernLobbyStatus(client, { error: "not_player" });
       return;
     }
-    if (!modernWorld.countries.some((c) => c.id === countryId)) {
+    if (!modernEntries(this.gameConfig).some((c) => c.id === countryId)) {
       this.modernLobbyStatus(client, { error: "unsupported" });
       return;
     }
@@ -2053,6 +2059,7 @@ export class GameServer {
           teamIndex: player.teamIndex,
           friends: player.friends,
           isLobbyCreator: player.isLobbyCreator,
+          ...(player.countryId ? { countryId: player.countryId } : {}),
         } satisfies PlayerRecord;
       },
     );
@@ -2071,6 +2078,7 @@ export class GameServer {
         this.gameStartInfo.tribes,
         [...this.reports.values()],
         this.publicGameType,
+        this.gameStartInfo.modernAssignments,
       ),
     );
   }

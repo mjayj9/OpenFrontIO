@@ -1,5 +1,6 @@
 // @vitest-environment node
 import {
+  automaticSaveId,
   deleteSave,
   exportSave,
   importSave,
@@ -248,6 +249,26 @@ it("stores actual compressed simulation plus complete turns, paused state and ed
   );
   expect(diffSnapshots(restored.snapshot(saveBuild), fixture.snapshot)).toEqual(
     [],
+  );
+});
+
+it("keeps distinct autosaves for new matches with a repeated seed/game ID", async () => {
+  const runA = "00000000-0000-4000-8000-000000000001";
+  const runB = "00000000-0000-4000-8000-000000000002";
+  const a = { ...fixture, runId: runA, id: automaticSaveId(saveBuild, runA) };
+  const b = { ...fixture, runId: runB, id: automaticSaveId(saveBuild, runB) };
+  await writeSave(a);
+  await writeSave(b);
+  await writeSave({ ...a, name: "Updated autosave of the same run" });
+  expect(await listSaves()).toHaveLength(2);
+  expect((await readSave(a.id)).runId).toBe(runA);
+  expect((await readSave(b.id)).snapshot).toEqual(fixture.snapshot);
+  expect((await readSave(b.id)).name).toBe(fixture.name);
+  const joined = vi.fn();
+  page.addEventListener("join-lobby", joined);
+  await resumeSave(a.id);
+  expect((joined.mock.calls[0][0] as CustomEvent).detail.savedGame.runId).toBe(
+    runA,
   );
 });
 

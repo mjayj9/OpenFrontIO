@@ -13,6 +13,7 @@ import {
 import { TileRef } from "../game/GameMap";
 import { MotionPlanRecord } from "../game/MotionPlans";
 import { targetTransportTile } from "../game/TransportShipUtils";
+import { modernSystemsFor } from "../modern/ModernSystems";
 import { WaterPathFinder } from "../pathfinding/PathFinder";
 import { PathStatus } from "../pathfinding/types";
 import { execSnapshotType } from "../snapshot/ExecutionSnapshot";
@@ -142,6 +143,12 @@ export class TransportShipExecution implements Execution {
       troops: this.troops,
       targetTile: this.dst,
     });
+    modernSystemsFor(mg)?.forces.transportStarted(
+      this.attacker.id(),
+      this.boat.id(),
+      this.dst,
+      this.boat.troops(),
+    );
 
     const fullPath = this.pathFinder.findPath(this.src, this.dst) ?? [this.src];
     if (fullPath.length === 0 || fullPath[0] !== this.src) {
@@ -185,6 +192,11 @@ export class TransportShipExecution implements Execution {
       return;
     }
     if (!this.boat.isActive()) {
+      modernSystemsFor(this.mg)?.forces.transportRemaining(
+        this.boat.id(),
+        0,
+        this.boat.tile(),
+      );
       this.active = false;
       return;
     }
@@ -231,6 +243,11 @@ export class TransportShipExecution implements Execution {
           `TransportShipExecution: retreating but no retreat destination found`,
         );
         this.attacker.addTroops(this.boat.troops());
+        modernSystemsFor(this.mg)?.forces.transportRemaining(
+          this.boat.id(),
+          this.boat.troops(),
+          this.src ?? this.boat.tile(),
+        );
         this.boat.delete(false);
         this.active = false;
         return;
@@ -250,6 +267,11 @@ export class TransportShipExecution implements Execution {
           const deaths = this.boat.troops() * (malusForRetreat / 100);
           const survivors = this.boat.troops() - deaths;
           this.attacker.addTroops(survivors);
+          modernSystemsFor(this.mg)?.forces.transportRemaining(
+            this.boat.id(),
+            survivors,
+            this.dst,
+          );
           this.boat.delete(false);
           this.active = false;
 
@@ -271,7 +293,16 @@ export class TransportShipExecution implements Execution {
         this.attacker.conquer(this.dst);
         if (this.target.isPlayer() && this.attacker.isFriendly(this.target)) {
           this.attacker.addTroops(this.boat.troops());
+          modernSystemsFor(this.mg)?.forces.transportRemaining(
+            this.boat.id(),
+            this.boat.troops(),
+            this.dst,
+          );
         } else {
+          modernSystemsFor(this.mg)?.forces.transportRemaining(
+            this.boat.id(),
+            this.boat.troops(),
+          );
           this.mg.addExecution(
             new AttackExecution(
               this.boat.troops(),
@@ -301,6 +332,11 @@ export class TransportShipExecution implements Execution {
           `TransportShip path not found: boat@(${map.x(boatTile)},${map.y(boatTile)}) -> dst@(${map.x(this.dst)},${map.y(this.dst)}), attacker=${this.attacker.id()}, target=${this.target.id()}`,
         );
         this.attacker.addTroops(this.boat.troops());
+        modernSystemsFor(this.mg)?.forces.transportRemaining(
+          this.boat.id(),
+          this.boat.troops(),
+          this.src ?? this.boat.tile(),
+        );
         this.boat.delete(false);
         this.active = false;
         return;

@@ -66,6 +66,7 @@ import type {
 } from "./codec/ReplayTypes";
 import { terrainOf } from "./codec/Terrain";
 import { processInBrowser, type Processing } from "./LocalProcessing";
+import { drawModernReplayOverlay } from "./ModernReplayOverlay";
 import { ReplayAppearance } from "./ReplayAppearance";
 import { CameraGestures, ReplayCamera } from "./ReplayCamera";
 import { formatGameTime, timelineFrames } from "./ReplayControls";
@@ -482,12 +483,22 @@ export class ReplayViewer extends LitElement {
     if (this.abort.signal.aborted) return;
 
     let last: number | null = null;
+    const modernCanvas = this.querySelector<HTMLCanvasElement>(
+      ".modern-replay-overlay",
+    )!;
     const loop = (now: number) => {
       camera.step(last === null ? 0 : now - last);
       last = now;
       playback.tick(now);
       view.setCameraState(camera.x, camera.y, camera.zoom * renderDpr());
       draw(now);
+      if (gsi.config.modernMode?.scenario === "modern-regions-v2")
+        drawModernReplayOverlay(
+          modernCanvas,
+          adapter.modernSystems(),
+          header.mapWidth,
+          camera,
+        );
       this.rafId = requestAnimationFrame(loop);
     };
     this.rafId = requestAnimationFrame(loop);
@@ -771,6 +782,9 @@ export class ReplayViewer extends LitElement {
         does, so the settings menu shows on top. -->
       <div class="fixed inset-0 z-[9000] bg-black text-white select-none">
         <canvas class="absolute inset-0 w-full h-full"></canvas>
+        <canvas
+          class="modern-replay-overlay absolute inset-0 w-full h-full pointer-events-none"
+        ></canvas>
         <div
           class="absolute inset-0 touch-none cursor-grab active:cursor-grabbing"
           @pointerdown=${this.onPointerDown}

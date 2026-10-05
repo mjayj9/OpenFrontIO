@@ -1,4 +1,5 @@
 import { AllPlayersStats, ClientID, Winner } from "../Schemas";
+import type { ModernState } from "../modern/ModernState";
 import {
   EmojiMessage,
   GameUpdates,
@@ -107,6 +108,7 @@ export enum GameUpdateType {
   GamePaused,
   DonateEvent,
   AIStatus,
+  ModernSystems,
 }
 
 export type GameUpdate =
@@ -133,7 +135,13 @@ export type GameUpdate =
   | SpawnPhaseEndUpdate
   | GamePausedUpdate
   | DonateEventUpdate
-  | AIStatusUpdate;
+  | AIStatusUpdate
+  | ModernSystemsUpdate;
+
+export interface ModernSystemsUpdate {
+  type: GameUpdateType.ModernSystems;
+  state: ModernState;
+}
 
 /** Worker-local, read-only AI inspection. No server/network response is used
  * by the planner. State itself lives in its versioned execution snapshot.

@@ -87,6 +87,7 @@ import {
   restoreMenuChrome,
 } from "./MenuChrome";
 import { modalRouter } from "./ModalRouter";
+import { ModernWorldModal } from "./ModernWorldModal";
 import { updateAccountNavButton } from "./NavAccountButton";
 import { initNavigation } from "./Navigation";
 import "./NewsModal";
@@ -626,8 +627,25 @@ class Client {
     // Tutorial entry points (play-page card, help page): back to the play page
     // if needed (so a username problem is visible), then a default solo game
     // with the guide on.
-    document.addEventListener("start-tutorial", () => {
+    document.addEventListener("start-tutorial", (event) => {
       if (hlpModal?.isOpen()) hlpModal.close();
+      const chapter = (event as CustomEvent<{ chapter?: string }>).detail
+        ?.chapter;
+      if (chapter?.startsWith("modern_")) {
+        const lesson = chapter.slice(7) as
+          | "regions"
+          | "population"
+          | "commands"
+          | "air"
+          | "climate"
+          | "ports"
+          | "nuclear"
+          | "ai";
+        document
+          .querySelector<ModernWorldModal>("modern-world-modal")
+          ?.startModernPractice(lesson);
+        return;
+      }
       if (this.usernameInput && !this.usernameInput.canPlay()) return;
       void (
         document.querySelector("single-player-modal") as SinglePlayerModal

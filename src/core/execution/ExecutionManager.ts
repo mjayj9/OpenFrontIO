@@ -16,6 +16,7 @@ import { EmbargoAllExecution } from "./EmbargoAllExecution";
 import { EmbargoExecution } from "./EmbargoExecution";
 import { EmojiExecution } from "./EmojiExecution";
 import { MarkDisconnectedExecution } from "./MarkDisconnectedExecution";
+import { ModernCommandExecution } from "./ModernSystemsExecution";
 import { MoveWarshipExecution } from "./MoveWarshipExecution";
 import { NationExecution } from "./NationExecution";
 import { NoOpExecution } from "./NoOpExecution";
@@ -61,6 +62,12 @@ export class Executor {
 
     // create execution
     switch (intent.type) {
+      case "modern_command":
+      case "modern_produce":
+      case "modern_develop":
+      case "modern_repair":
+      case "modern_train":
+        return new ModernCommandExecution(player.id(), intent);
       case "attack": {
         return new AttackExecution(
           intent.troops,

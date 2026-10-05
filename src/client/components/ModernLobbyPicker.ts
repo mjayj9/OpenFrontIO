@@ -3,12 +3,21 @@ import { customElement, property, state } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
 import { EventBus } from "../../core/EventBus";
 import {
+  factionsForCountry,
+  modernFaction,
+  ModernFaction,
+  modernFactions,
+  modernRegions,
+} from "../../core/game/ModernRegions";
+import {
   modernCountry,
   ModernCountry,
   modernWorld,
 } from "../../core/game/ModernWorld";
+import { MODERN_RULES } from "../../core/modern/ModernRules";
 import { ClientInfo, GameConfig } from "../../core/Schemas";
 import type { LangSelector } from "../LangSelector";
+import { modernAreaException } from "../ModernRegionDetails";
 import { ModernLobbyStatusEvent, SendSelectCountryEvent } from "../Transport";
 import { translateText } from "../Utils";
 
@@ -29,6 +38,21 @@ for (const [index, start, count] of modernWorld.runs) {
   }
   paths.set(index, path);
 }
+const factionPaths = new Map<number, string>();
+for (const [index, start, count] of modernRegions.runs) {
+  let position = start,
+    remaining = count,
+    path = factionPaths.get(index) ?? "";
+  while (remaining > 0) {
+    const x = position % modernRegions.width,
+      y = Math.floor(position / modernRegions.width);
+    const width = Math.min(remaining, modernRegions.width - x);
+    path += `M${x} ${y}h${width}v1h-${width}z`;
+    position += width;
+    remaining -= width;
+  }
+  factionPaths.set(index, path);
+}
 
 @customElement("modern-lobby-picker")
 export class ModernLobbyPicker extends LitElement {
@@ -38,6 +62,7 @@ export class ModernLobbyPicker extends LitElement {
   @property({ attribute: false }) mode: GameConfig["modernMode"];
   @state() private query = "";
   @state() private previewId = "KOR";
+  @state() private parentCountryId = "KOR";
   @state() private status = "";
   private subscribedBus: EventBus | null = null;
   private readonly onStatus = (event: ModernLobbyStatusEvent) => {
@@ -45,7 +70,7 @@ export class ModernLobbyPicker extends LitElement {
       `modern_lobby.${event.status.error ?? "reserved"}`,
       {
         country: this.countryName(
-          modernCountry(event.status.countryId ?? this.previewId),
+          this.country(event.status.countryId ?? this.previewId),
         ),
       },
     );
@@ -68,6 +93,8 @@ export class ModernLobbyPicker extends LitElement {
         (c) => c.clientID === this.currentClientID,
       )?.countryId;
       if (current && current !== previous) this.previewId = current;
+      if (current && this.isV2())
+        this.parentCountryId = modernFaction(current).parentCountryId;
     }
   }
   disconnectedCallback(): void {
@@ -82,7 +109,13 @@ export class ModernLobbyPicker extends LitElement {
       this.subscribedBus.on(ModernLobbyStatusEvent, this.onStatus);
     }
   }
-  private countryName(country: ModernCountry): string {
+  private isV2() {
+    return this.mode?.scenario === "modern-regions-v2";
+  }
+  private country(id: string): ModernCountry | ModernFaction {
+    return this.isV2() ? modernFaction(id) : modernCountry(id);
+  }
+  private countryName(country: ModernCountry | ModernFaction): string {
     return document
       .querySelector<LangSelector>("lang-selector")
       ?.currentLang?.startsWith("ko")
@@ -98,7 +131,12 @@ export class ModernLobbyPicker extends LitElement {
   }
   render() {
     const me = this.clients.find((c) => c.clientID === this.currentClientID);
-    const selected = modernCountry(this.previewId);
+    const all = this.isV2() ? modernFactions : modernWorld.countries;
+    const selected = this.country(
+      all.some((entry) => entry.id === this.previewId)
+        ? this.previewId
+        : all[0].id,
+    );
     const occupied = this.holder(selected.id);
     const canReserve = Boolean(
       me &&
@@ -110,7 +148,7 @@ export class ModernLobbyPicker extends LitElement {
       this.mode?.balance === "asymmetric"
         ? Math.min(4, 1 + Math.floor(selected.tiles / 12000))
         : 1;
-    const list = modernWorld.countries.filter((c) =>
+    const list = all.filter((c) =>
       `${c.name} ${c.nameKo} ${c.id}`
         .toLowerCase()
         .includes(this.query.toLowerCase()),
@@ -126,20 +164,51 @@ export class ModernLobbyPicker extends LitElement {
         role="img"
         style="width:100%;max-height:30dvh;background:#18384e;aspect-ratio:2/1"
       >
-        ${modernWorld.countries.map((c) => {
+        ${all.map((c) => {
           const holder = this.holder(c.id);
-          return svg`<path d=${paths.get(c.index) ?? ""} fill=${c.id === selected.id ? "#fff799" : holder ? "#666f80" : `hsl(${(c.index * 137) % 360} 55% 58%)`} stroke="#142b38" stroke-width=${c.id === selected.id ? 3 : 0.5} tabindex="0" role="button" aria-label=${this.countryName(c)} @click=${() => (this.previewId = c.id)} @keydown=${(
-            event: KeyboardEvent,
-          ) => {
+          return svg`<path d=${(this.isV2() ? factionPaths : paths).get(c.index) ?? ""} fill=${c.id === selected.id ? "#fff799" : holder ? "#666f80" : `hsl(${(c.index * 137) % 360} 55% 58%)`} stroke="#142b38" stroke-width=${c.id === selected.id ? 3 : 0.5} tabindex="0" role="button" aria-label=${this.countryName(c)} @click=${() => {
+            this.previewId = c.id;
+            this.parentCountryId =
+              "parentCountryId" in c ? c.parentCountryId : c.id;
+          }} @keydown=${(event: KeyboardEvent) => {
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
               this.previewId = c.id;
+              this.parentCountryId =
+                "parentCountryId" in c ? c.parentCountryId : c.id;
             }
           }}><title>${this.countryName(c)}${holder ? ` — ${holder.username}` : ""}</title></path>`;
         })}
       </svg>
       <div class="grid md:grid-cols-2 gap-3">
         <div>
+          ${this.isV2()
+            ? html`<label
+                >${translateText("modern.country")}<select
+                  class="bg-gray-800 p-2 w-full"
+                  aria-label=${translateText("modern_v2.parent_country")}
+                  .value=${this.parentCountryId}
+                  @change=${(event: Event) => {
+                    this.parentCountryId = (
+                      event.target as HTMLSelectElement
+                    ).value;
+                    this.previewId = factionsForCountry(
+                      this.parentCountryId,
+                    )[0].id;
+                  }}
+                >
+                  ${modernWorld.countries.map(
+                    (country) =>
+                      html`<option
+                        value=${country.id}
+                        ?selected=${country.id === this.parentCountryId}
+                      >
+                        ${this.countryName(country)}
+                      </option>`,
+                  )}
+                </select></label
+              >`
+            : null}
           <input
             type="search"
             class="p-2 bg-gray-800 w-full"
@@ -154,16 +223,28 @@ export class ModernLobbyPicker extends LitElement {
             class="p-2 bg-gray-800 w-full mt-2"
             aria-label=${translateText("modern.country")}
             .value=${this.previewId}
-            @change=${(event: Event) =>
-              (this.previewId = (event.target as HTMLSelectElement).value)}
+            @change=${(event: Event) => {
+              this.previewId = (event.target as HTMLSelectElement).value;
+              if (this.isV2())
+                this.parentCountryId = modernFaction(
+                  this.previewId,
+                ).parentCountryId;
+            }}
           >
-            ${list.map(
-              (c) =>
-                html`<option value=${c.id} ?selected=${c.id === this.previewId}>
-                  ${this.countryName(c)}${this.holder(c.id)
-                    ? ` (${this.holder(c.id)!.username})`
-                    : ""}
-                </option>`,
+            ${list.map((c) =>
+              !this.isV2() ||
+              this.query ||
+              ("parentCountryId" in c &&
+                c.parentCountryId === this.parentCountryId)
+                ? html`<option
+                    value=${c.id}
+                    ?selected=${c.id === this.previewId}
+                  >
+                    ${this.countryName(c)}${this.holder(c.id)
+                      ? ` (${this.holder(c.id)!.username})`
+                      : ""}
+                  </option>`
+                : null,
             )}
           </select>
         </div>
@@ -182,19 +263,60 @@ export class ModernLobbyPicker extends LitElement {
           <p>
             ${translateText("modern.neighbors")}:
             ${selected.neighbors
-              .map((id) => this.countryName(modernCountry(id)))
+              .map((id) => this.countryName(this.country(id)))
               .join(", ") || translateText("modern.island")}
           </p>
-          <p>
-            ${translateText("modern.initial", {
-              tiles: selected.tiles,
-              troops: 80000 * factor,
-              gold: 400000 * factor,
-            })}
-          </p>
+          ${this.isV2() && "areaKm2" in selected
+            ? html`<p>
+                  ${translateText("modern_v2.area", {
+                    area: Math.round(selected.areaKm2).toLocaleString(),
+                  })}
+                </p>
+                <p>
+                  ${translateText("modern_v2.adaptation")}:
+                  ${selected.adaptedClimates
+                    .map((climate) =>
+                      translateText(`modern_v2.climate.${climate}`),
+                    )
+                    .join(", ")}
+                </p>
+                <p>
+                  ${translateText("modern_v2.common_start", {
+                    population:
+                      this.mode?.initialPopulation ??
+                      MODERN_RULES.initialPopulation,
+                    gold: MODERN_RULES.initialGold,
+                    army: Math.floor(
+                      ((this.mode?.initialPopulation ??
+                        MODERN_RULES.initialPopulation) *
+                        MODERN_RULES.initialArmyPermille) /
+                        1000,
+                    ),
+                  })}
+                </p>
+                ${selected.areaException
+                  ? html`<div>
+                      ${translateText("modern_v2.area_exception")}:
+                      ${modernAreaException(selected)}
+                      <details>
+                        <summary>
+                          ${translateText("modern_v2.area_source_details")}
+                        </summary>
+                        ${selected.areaException.reason} ·
+                        ${selected.areaException.correction}
+                      </details>
+                    </div>`
+                  : null}`
+            : html`<p>
+                ${translateText("modern.initial", {
+                  tiles: selected.tiles,
+                  troops: 80000 * factor,
+                  gold: 400000 * factor,
+                })}
+              </p>`}
           <p>
             ${translateText(
-              selected.represented
+              "represented" in selected && selected.represented
                 ? "modern.small_country"
                 : "modern.recommendation",
             )}
@@ -218,7 +340,7 @@ export class ModernLobbyPicker extends LitElement {
           <p>
             ${me?.countryId
               ? translateText("modern_lobby.reserved", {
-                  country: this.countryName(modernCountry(me.countryId)),
+                  country: this.countryName(this.country(me.countryId)),
                 })
               : translateText(
                   me?.spectator
@@ -236,7 +358,7 @@ export class ModernLobbyPicker extends LitElement {
               html`<li>
                 ${c.username}:
                 ${c.countryId
-                  ? this.countryName(modernCountry(c.countryId))
+                  ? this.countryName(this.country(c.countryId))
                   : translateText("modern_lobby.unselected")}
               </li>`,
           )}

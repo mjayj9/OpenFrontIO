@@ -229,6 +229,21 @@ export class SendSpectateEvent implements GameEvent {
 export class SendSelectCountryEvent implements GameEvent {
   constructor(public readonly countryId: string) {}
 }
+export type ModernIntent = Extract<
+  Intent,
+  {
+    type:
+      | "modern_command"
+      | "modern_produce"
+      | "modern_develop"
+      | "modern_repair"
+      | "modern_train";
+  }
+>;
+/** These commands use the same authenticated intent relay as Classic. */
+export class SendModernIntentEvent implements GameEvent {
+  constructor(public readonly intent: ModernIntent) {}
+}
 export class ModernLobbyStatusEvent implements GameEvent {
   constructor(public readonly status: ServerModernLobbyStatus) {}
 }
@@ -379,6 +394,9 @@ export class Transport {
         countryId: e.countryId,
       } satisfies ClientSelectCountryMessage);
     });
+    this.subscribe(SendModernIntentEvent, (event) =>
+      this.sendIntent(event.intent),
+    );
   }
 
   private subscribe<T extends GameEvent>(

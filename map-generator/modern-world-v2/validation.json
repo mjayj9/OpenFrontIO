@@ -1,0 +1,14 @@
+{
+  "hash": "dc9636c7fa7200fcf9380f249f0dacae365fcb108d10bad1feac952128e0aac6",
+  "parentHash": "a7839a1b8c8f22feb7607c70b81131096b91db09963ab707a7aef8bffb1aa052",
+  "factions": 294,
+  "splitParents": 24,
+  "splitRegions": 120,
+  "inRangeRegions": 86,
+  "exceptions": 34,
+  "conservedTiles": 491821,
+  "uniqueAdminUnits": 1711,
+  "ports": 221,
+  "climateTiles": 491821,
+  "allChecksPassed": true
+}

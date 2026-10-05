@@ -6,6 +6,7 @@ import { EventBus } from "../../src/core/EventBus";
 import { UnitType } from "../../src/core/game/Game";
 import { GameUpdateType } from "../../src/core/game/GameUpdates";
 import type { UserSettings } from "../../src/core/game/UserSettings";
+import type { ModernState } from "../../src/core/modern/ModernState";
 
 vi.mock("../../src/client/Utils", async (importOriginal) => {
   const original =
@@ -160,6 +161,185 @@ describe("Tutorial panel uses actual game state", () => {
     await panel.updateComplete;
     expect(panel.textContent).toContain("education.chapter");
     expect(panel.educationSnapshot().chapter).toBe("economy");
+  });
+
+  it("starts the actual matching modern scenario when changing or repeating practice", () => {
+    const previousConfig = panel.game.config();
+    vi.spyOn(panel.game, "config").mockReturnValue({
+      ...previousConfig,
+      gameConfig: () => ({
+        modernMode: {
+          scenario: "modern-regions-v2",
+          trainingLesson: "regions",
+        },
+      }),
+    } as ReturnType<GameView["config"]>);
+    const start = vi.fn();
+    document.addEventListener("start-tutorial", start);
+    const ui = panel as unknown as {
+      chooseChapter: (
+        chapter: "modern_regions" | "modern_ports",
+        restart?: boolean,
+      ) => void;
+    };
+    ui.chooseChapter("modern_ports");
+    expect(start).toHaveBeenLastCalledWith(
+      expect.objectContaining({ detail: { chapter: "modern_ports" } }),
+    );
+    ui.chooseChapter("modern_regions", true);
+    expect(start).toHaveBeenLastCalledWith(
+      expect.objectContaining({ detail: { chapter: "modern_regions" } }),
+    );
+    expect(start).toHaveBeenCalledTimes(2);
+    ui.chooseChapter("modern_regions");
+    expect(start).toHaveBeenCalledTimes(2);
+    expect(panel.educationSnapshot().chapter).toBe("modern_regions");
+    document.removeEventListener("start-tutorial", start);
+  });
+
+  it("waits for modern scenario bootstrap instead of marking practice unavailable", async () => {
+    const previousConfig = panel.game.config();
+    vi.spyOn(panel.game, "config").mockReturnValue({
+      ...previousConfig,
+      gameConfig: () => ({
+        modernMode: {
+          scenario: "modern-regions-v2",
+          initialPopulation: 1000000,
+        },
+      }),
+    } as ReturnType<GameView["config"]>);
+    let systems: ModernState | null = null;
+    panel.game.modernSystems = () => systems;
+    panel.init();
+    requestChapter("modern_regions");
+    panel.tick();
+    expect(panel.educationSnapshot().progress.outcomes).toEqual({});
+    systems = {
+      version: 2,
+      tick: 1,
+      seed: 1,
+      nextForceId: 1,
+      factions: [
+        {
+          playerId: "human-one",
+          factionId: "KOR",
+          parentCountryId: "KOR",
+          ownedAreaUnits: 1,
+          aiLevel: null,
+          aiRole: "human",
+          climateAdaptation: ["temperate"],
+          completedTraining: 0,
+          populationTransferredTo: null,
+          nuclearStrikes: [],
+          population: {
+            total: 1000000,
+            civilian: 970000,
+            available: 12000,
+            army: 18000,
+            navy: 0,
+            air: 0,
+            dead: 0,
+          },
+        },
+      ],
+      ports: [],
+      forces: [],
+      bases: [],
+      samAircraftReloads: [],
+      aiPlans: [],
+    };
+    panel.tick();
+    await panel.updateComplete;
+    expect(panel.educationSnapshot().progress.outcomes.modern_regions).toBe(
+      "practiced",
+    );
+    expect(panel.querySelector<HTMLSelectElement>("select")?.value).toBe(
+      "modern_regions",
+    );
+    const force = {
+      id: "air",
+      playerId: "human-one",
+      branch: "air",
+      kind: "fighter",
+      phase: "engaging",
+      baseId: "base",
+      tile: 5,
+      completedMissions: 0,
+      casualties: 0,
+    } as ModernState["forces"][number];
+    systems.forces.push(force);
+    systems.bases.push({
+      id: "base",
+      playerId: "human-one",
+      tile: 5,
+      capacity: 24,
+      health: 1000,
+      maxHealth: 1000,
+    });
+    const evidence = panel as unknown as {
+      buildModernEvidence: (player: unknown) => {
+        airReturns: number;
+        airRearms: number;
+        nuclearImpacts: number;
+      };
+    };
+    evidence.buildModernEvidence(panel.game.myPlayer());
+    force.phase = "rearming";
+    expect(evidence.buildModernEvidence(panel.game.myPlayer()).airReturns).toBe(
+      0,
+    );
+    force.phase = "engaging";
+    evidence.buildModernEvidence(panel.game.myPlayer());
+    force.completedMissions = 1;
+    force.phase = "rearming";
+    expect(evidence.buildModernEvidence(panel.game.myPlayer()).airReturns).toBe(
+      1,
+    );
+    expect(evidence.buildModernEvidence(panel.game.myPlayer()).airReturns).toBe(
+      1,
+    );
+    force.phase = "returning";
+    expect(evidence.buildModernEvidence(panel.game.myPlayer()).airReturns).toBe(
+      2,
+    );
+    force.phase = "rearming";
+    expect(evidence.buildModernEvidence(panel.game.myPlayer()).airReturns).toBe(
+      2,
+    );
+    const player = panel.game.myPlayer()!;
+    Object.assign(player, { smallID: () => 1 });
+    vi.spyOn(player, "units").mockReturnValue([
+      { id: () => 7, targetTile: () => 20 } as unknown as ReturnType<
+        typeof player.units
+      >[number],
+    ]);
+    panel.game.ownerID = () => 2;
+    let impacted: number[] = [];
+    let update = {
+      type: GameUpdateType.Unit,
+      unitType: UnitType.AtomBomb,
+      id: 7,
+      ownerID: 1,
+      reachedTarget: false,
+    };
+    panel.game.recentlyNukedTiles = () => impacted;
+    vi.spyOn(panel.game, "updatesSinceLastTick").mockImplementation(
+      () =>
+        ({ [GameUpdateType.Unit]: [update] }) as ReturnType<
+          GameView["updatesSinceLastTick"]
+        >,
+    );
+    expect(evidence.buildModernEvidence(player).nuclearImpacts).toBe(0);
+    impacted = [20];
+    expect(evidence.buildModernEvidence(player).nuclearImpacts).toBe(0);
+    update = { ...update, ownerID: 2, reachedTarget: true };
+    expect(evidence.buildModernEvidence(player).nuclearImpacts).toBe(0);
+    update = { ...update, ownerID: 1 };
+    expect(evidence.buildModernEvidence(player).nuclearImpacts).toBe(1);
+    expect(evidence.buildModernEvidence(player).nuclearImpacts).toBe(1);
+    const saved = panel.educationSnapshot();
+    expect(saved.evidence.modern.nuclearImpacts).toEqual([7]);
+    expect(panel.restoreEducationSnapshot(saved)).toBe(true);
   });
 
   it.each(["current", "legacy"] as const)(

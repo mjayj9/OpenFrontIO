@@ -84,6 +84,11 @@ export class ReplayUnitView {
 }
 
 export class ReplayPlayerView {
+  modernFaction() {
+    return this.game
+      .modernSystems()
+      ?.factions.find((faction) => faction.playerId === this.id());
+  }
   enhancedAI() {
     return aiProfile(this.game.config().gameConfig(), this.id(), this.type());
   }
@@ -279,6 +284,9 @@ export class ReplayPlayerView {
 }
 
 export class ReplayGameView {
+  modernSystems() {
+    return this.frame?.modernSystems ?? null;
+  }
   aiStrategyOf(id: string): AIStatusUpdate | null {
     return this.frame?.aiStrategies?.get(id) ?? null;
   }

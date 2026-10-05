@@ -8,6 +8,10 @@ import {
 } from "../game/Game";
 import { TileRef } from "../game/GameMap";
 import { ErrorUpdate, GameUpdateViewData } from "../game/GameUpdates";
+import {
+  ModernCommandKind,
+  ModernCommandPreview,
+} from "../modern/ModernForceTypes";
 import { ClientID, GameStartInfo, Turn } from "../Schemas";
 
 export type WorkerMessageType =
@@ -32,6 +36,21 @@ export type WorkerMessageType =
   | "transport_ship_spawn_result"
   | "snapshot"
   | "snapshot_result";
+// Modern orders are resolved by the same core path finder as the execution.
+export interface ModernPreviewMessage {
+  type: "modern_force_preview";
+  id: string;
+  playerId: string;
+  forceId: string;
+  target: TileRef;
+  command: ModernCommandKind;
+  queue?: boolean;
+}
+export interface ModernPreviewResultMessage {
+  type: "modern_force_preview_result";
+  id: string;
+  result: ModernCommandPreview;
+}
 
 // Base interface for all messages
 interface BaseWorkerMessage {
@@ -161,6 +180,7 @@ export interface SnapshotResultMessage extends BaseWorkerMessage {
 
 // Union types for type safety
 export type MainThreadMessage =
+  | ModernPreviewMessage
   | InitMessage
   | TurnMessage
   | PlayerActionsMessage
@@ -173,6 +193,7 @@ export type MainThreadMessage =
 
 // Message send from worker
 export type WorkerMessage =
+  | ModernPreviewResultMessage
   | InitializedMessage
   | GameUpdateMessage
   | GameUpdateBatchMessage

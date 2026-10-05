@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   // reconnecting has given up, never at page load.
   reloadWouldRescue: vi.fn((_status: ServerListStatus): boolean => false),
   showInGameAlert: vi.fn(async (_message: string) => {}),
+  setDevelopmentLobbyConnection: vi.fn(),
 }));
 
 // start() asks the server list which server to use; the answer is what is
@@ -33,6 +34,7 @@ vi.mock("../src/client/ServerList", async (importOriginal) => {
     ensureServerList: mocks.ensureServerList,
     refreshServerList: mocks.refreshServerList,
     reloadWouldRescue: mocks.reloadWouldRescue,
+    setDevelopmentLobbyConnection: mocks.setDevelopmentLobbyConnection,
   };
 });
 
@@ -93,7 +95,43 @@ function makeSocket(options?: { onUpdateAvailable?: () => void }) {
 
 describe("PublicLobbySocket.handleMessage", () => {
   beforeEach(() => {
+    mocks.setDevelopmentLobbyConnection.mockClear();
     vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  it("proves connection only after a decoded frame and clears it when stopped", () => {
+    const { socket, dispatch } = makeSocket();
+    vi.stubGlobal("WebSocket", { OPEN: 1 });
+    const ws = { readyState: 1, close: vi.fn() };
+    (socket as any).ws = ws;
+    (socket as any).handleOpen();
+    expect(mocks.setDevelopmentLobbyConnection).not.toHaveBeenCalled();
+    dispatch(fullMessage(1000, { ffa: [] }));
+    expect(mocks.setDevelopmentLobbyConnection).toHaveBeenLastCalledWith(
+      socket,
+      true,
+    );
+    socket.stop();
+    expect(mocks.setDevelopmentLobbyConnection).toHaveBeenLastCalledWith(
+      socket,
+      false,
+    );
+    expect(ws.close).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+  });
+
+  it("invalid frames revoke a previously proven connection", () => {
+    const { socket, dispatch } = makeSocket();
+    vi.stubGlobal("WebSocket", { OPEN: 1 });
+    (socket as any).ws = { readyState: 1, close: vi.fn() };
+    dispatch(fullMessage(1000, { ffa: [] }));
+    dispatch(new Uint8Array([255, 255, 255]));
+    expect(mocks.setDevelopmentLobbyConnection).toHaveBeenLastCalledWith(
+      socket,
+      false,
+    );
+    socket.stop();
+    vi.unstubAllGlobals();
   });
 
   it("delivers a full snapshot to the callback", () => {

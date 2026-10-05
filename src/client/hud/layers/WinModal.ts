@@ -128,6 +128,12 @@ export class WinModal extends LitElement implements Controller {
 
   innerHtml() {
     const mode = this.game?.config().gameConfig().modernMode;
+    const modern = this.game?.modernSystems?.();
+    const ownedArea = this.game?.myPlayer()?.modernFaction?.()?.ownedAreaUnits;
+    const totalArea = modern?.factions.reduce(
+      (sum, f) => sum + f.ownedAreaUnits,
+      0,
+    );
     if (mode)
       return html`<p>
         ${translateText("modern.result", {
@@ -138,8 +144,10 @@ export class WinModal extends LitElement implements Controller {
           minutes: this.game.config().gameConfig().maxTimerValue ?? 30,
           territory:
             Math.round(
-              ((this.game.myPlayer()?.numTilesOwned() ?? 0) * 1000) /
-                this.game.numLandTiles(),
+              ownedArea !== undefined && totalArea
+                ? (ownedArea * 1000) / totalArea
+                : ((this.game.myPlayer()?.numTilesOwned() ?? 0) * 1000) /
+                    this.game.numLandTiles(),
             ) / 10,
         })}
       </p>`;

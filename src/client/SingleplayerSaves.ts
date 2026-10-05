@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { modernAssignmentsFor } from "../core/modern/ModernAssignments";
 import {
   GameConfigSchema,
   GameRecordSchema,
@@ -19,6 +20,10 @@ import { openReplayViewer } from "./replay/ReplayEntry";
 
 export const saveBuild =
   typeof __FORK_BUILD__ === "string" ? __FORK_BUILD__ : "test-build";
+/** Storage identity: seeded local game IDs can repeat across new matches. */
+export function automaticSaveId(build: string, runId: string): string {
+  return `${runId}-${build.slice(0, 12)}-auto`;
+}
 export interface SaveSummary {
   id: string;
   name: string;
@@ -28,6 +33,7 @@ export interface SaveSummary {
 }
 export interface SavedGame extends SaveSummary {
   format: 1;
+  runId?: string;
   gameStartInfo: GameStartInfo;
   snapshot: Uint8Array;
   turns: Turn[];
@@ -37,6 +43,7 @@ export interface SavedGame extends SaveSummary {
 }
 const envelopeSchema = z.object({
   format: z.literal(1),
+  runId: z.string().uuid().optional(),
   id: z.string().max(100),
   name: z.string().max(100),
   createdAt: z.number().finite(),
@@ -187,6 +194,14 @@ export function reviewGame(start: GameStartInfo, turns: Turn[]): void {
       start.lobbyCreatedAt,
       start.lobbyCreatedAt + turns.length * 100,
       undefined,
+      start.lobbyCreatedAt,
+      start.visibleAt,
+      start.tribes,
+      undefined,
+      undefined,
+      start.config.modernMode?.scenario === "modern-regions-v2"
+        ? (start.modernAssignments ?? modernAssignmentsFor(start))
+        : undefined,
     ),
     gitCommit: ClientEnv.gitCommit(),
   });

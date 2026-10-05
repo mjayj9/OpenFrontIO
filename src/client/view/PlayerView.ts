@@ -45,6 +45,11 @@ const EMBARGO_TINT_TARGET = { r: 255, g: 0, b: 0, a: 1 };
 const BORDER_TINT_RATIO = 0.35;
 
 export class PlayerView {
+  modernFaction() {
+    return this.game
+      .modernSystems()
+      ?.factions.find((faction) => faction.playerId === this.id());
+  }
   private _aiStrategy: AIStatusUpdate | null = null;
   aiStrategy(): Readonly<AIStatusUpdate> | null {
     return this._aiStrategy;

@@ -9,6 +9,7 @@ import {
   UnitType,
 } from "../game/Game";
 import { TileRef } from "../game/GameMap";
+import { modernIncome } from "../modern/ModernSystems";
 import { WaterPathFinder } from "../pathfinding/PathFinder";
 import { PathStatus } from "../pathfinding/types";
 import { execSnapshotType } from "../snapshot/ExecutionSnapshot";
@@ -190,17 +191,21 @@ export class TradeShipExecution implements Execution {
 
     if (this.wasCaptured && this.tradeShip!.owner() === this.origOwner) {
       // Retaken by its original owner: the payout stands, but nobody pirated it.
-      this.origOwner.addGold(gold, this._dstPort.tile());
+      this.origOwner.addGold(
+        modernIncome(this.mg, this.origOwner, gold),
+        this._dstPort.tile(),
+      );
     } else if (this.wasCaptured) {
-      this.tradeShip!.owner().addGold(gold, this._dstPort.tile());
-      this.tradeShip!.owner().addPiracyGold(gold);
+      const income = modernIncome(this.mg, this.tradeShip!.owner(), gold);
+      this.tradeShip!.owner().addGold(income, this._dstPort.tile());
+      this.tradeShip!.owner().addPiracyGold(income);
       this.mg.displayMessage(
         "events_display.received_gold_from_captured_ship",
         MessageType.CAPTURED_ENEMY_UNIT,
         this.tradeShip!.owner().id(),
-        gold,
+        income,
         {
-          gold: renderNumber(gold),
+          gold: renderNumber(income),
           name: this.origOwner.displayName(),
         },
         undefined,
@@ -209,16 +214,33 @@ export class TradeShipExecution implements Execution {
       // Record stats
       this.mg
         .stats()
-        .boatCapturedTrade(this.tradeShip!.owner(), this.origOwner, gold);
+        .boatCapturedTrade(this.tradeShip!.owner(), this.origOwner, income);
     } else {
-      this.srcPort.owner().addGold(gold, this.srcPort.tile());
-      this._dstPort.owner().addGold(gold, this._dstPort.tile());
-      this.srcPort.owner().addTradeGold(gold);
-      this._dstPort.owner().addTradeGold(gold);
+      const sourceIncome = modernIncome(this.mg, this.srcPort.owner(), gold);
+      const targetIncome = modernIncome(this.mg, this._dstPort.owner(), gold);
+      this.srcPort.owner().addGold(sourceIncome, this.srcPort.tile());
+      this._dstPort.owner().addGold(targetIncome, this._dstPort.tile());
+      this.srcPort.owner().addTradeGold(sourceIncome);
+      this._dstPort.owner().addTradeGold(targetIncome);
       // Record stats
-      this.mg
-        .stats()
-        .boatArriveTrade(this.srcPort.owner(), this._dstPort.owner(), gold);
+      if (sourceIncome === targetIncome) {
+        this.mg
+          .stats()
+          .boatArriveTrade(
+            this.srcPort.owner(),
+            this._dstPort.owner(),
+            sourceIncome,
+          );
+      } else {
+        this.mg
+          .stats()
+          .boatArriveTrade(
+            this.srcPort.owner(),
+            this._dstPort.owner(),
+            sourceIncome,
+            targetIncome,
+          );
+      }
     }
     return;
   }

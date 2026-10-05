@@ -1,4 +1,5 @@
 import { Cell } from "../core/game/Game";
+import { modernFactions } from "../core/game/ModernRegions";
 import { modernWorld } from "../core/game/ModernWorld";
 import { TransformHandler } from "./TransformHandler";
 import { GameView } from "./view";
@@ -47,7 +48,11 @@ export function mountModernCapitalOverlay(
       context.textBaseline = "middle";
       context.lineWidth = 3;
       context.strokeStyle = "#101820";
-      for (const country of modernWorld.countries) {
+      const countries =
+        game.config().gameConfig().modernMode?.scenario === "modern-regions-v2"
+          ? modernFactions
+          : modernWorld.countries;
+      for (const country of countries) {
         const point = transform.worldToScreenCoordinates(
           new Cell(country.capital[0], country.capital[1]),
         );

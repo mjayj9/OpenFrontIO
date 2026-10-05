@@ -15,6 +15,8 @@ import {
   tileTraversalScratch,
   TileTraversalScratch,
 } from "../game/TileTraversalScratch";
+import { isModernV2 } from "../modern/ModernRules";
+import { modernSystemsFor } from "../modern/ModernSystems";
 import { execSnapshotType } from "../snapshot/ExecutionSnapshot";
 import type {
   ExecRecord,
@@ -94,13 +96,15 @@ export class PlayerExecution implements Execution {
       return;
     }
 
-    const troopInc = this.config.troopIncreaseRate(this.player);
-    this.player.addTroops(troopInc);
-    const goldFromWorkers = this.config.goldAdditionRate(this.player);
-    this.player.addGold(goldFromWorkers);
-
-    // Record stats
-    this.mg.stats().goldWork(this.player, goldFromWorkers);
+    const modern = modernSystemsFor(this.mg);
+    if (modern) modern.economy(this.player);
+    else {
+      const troopInc = this.config.troopIncreaseRate(this.player);
+      this.player.addTroops(troopInc);
+      const goldFromWorkers = this.config.goldAdditionRate(this.player);
+      this.player.addGold(goldFromWorkers);
+      this.mg.stats().goldWork(this.player, goldFromWorkers);
+    }
 
     for (const alliance of this.player.alliances()) {
       if (alliance.expiresAt() <= this.mg.ticks()) {
@@ -469,6 +473,7 @@ export class PlayerExecution implements Execution {
   }
 
   private removeCluster(cluster: readonly TileRef[]) {
+    if (isModernV2(this.config.gameConfig())) return;
     for (const t of cluster) {
       if (this.mg?.ownerID(t) !== this.player?.smallID()) {
         // Other removeCluster operations could change tile owners,

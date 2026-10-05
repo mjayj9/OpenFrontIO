@@ -53,6 +53,11 @@ export const SEC_UNITS_REMOVED = 1 << 5;
 export const SEC_TERRAIN = 1 << 6;
 
 export class FrameEncoder {
+  private modernSystems: Record<string, unknown> | null = null;
+  private applyModernSystems(misc: MiscUpdates | null): void {
+    for (const raw of misc?.ModernSystems ?? [])
+      this.modernSystems = raw as Record<string, unknown>;
+  }
   private aiStrategies = new Map<string, Record<string, unknown>>();
   private applyAIStrategies(misc: MiscUpdates | null): void {
     for (const raw of misc?.AIStatus ?? []) {
@@ -99,6 +104,7 @@ export class FrameEncoder {
     ctx: EncodeCtx,
   ): void {
     this.applyAIStrategies(frame.misc);
+    this.applyModernSystems(frame.misc);
     this.applyTiles(frame.tiles);
     this.applyTerrain(frame.tiles);
 
@@ -126,9 +132,17 @@ export class FrameEncoder {
     // current set, while deltas carry only thought-tick changes.
     writeMisc(
       w,
-      this.aiStrategies.size === 0
+      this.aiStrategies.size === 0 && this.modernSystems === null
         ? frame.misc
-        : { ...frame.misc, AIStatus: [...this.aiStrategies.values()] },
+        : {
+            ...frame.misc,
+            ...(this.aiStrategies.size
+              ? { AIStatus: [...this.aiStrategies.values()] }
+              : {}),
+            ...(this.modernSystems
+              ? { ModernSystems: [this.modernSystems] }
+              : {}),
+          },
     );
 
     writeTerrain(w, [...this.terrainOverrides.keys()], this.terrain);
@@ -136,6 +150,7 @@ export class FrameEncoder {
 
   encodeDelta(w: BinaryWriter, frame: NormalizedFrame, ctx: EncodeCtx): void {
     this.applyAIStrategies(frame.misc);
+    this.applyModernSystems(frame.misc);
     const tiles = this.applyTiles(frame.tiles);
     const terrain = this.applyTerrain(frame.tiles);
 

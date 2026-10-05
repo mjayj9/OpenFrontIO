@@ -89,6 +89,7 @@ export class SettingKeybind extends LitElement {
 
   private handleKeydown(e: KeyboardEvent) {
     if (!this.listening) return;
+    if (e.isComposing || e.keyCode === 229) return;
 
     if (e.key === "Escape") {
       // Cancel listening on Escape without bubbling to close parent modals

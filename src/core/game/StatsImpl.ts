@@ -287,10 +287,15 @@ export class StatsImpl implements Stats {
     this._addBoat(player, "trade", BOAT_INDEX_SENT, 1);
   }
 
-  boatArriveTrade(player: Player, target: Player, gold: BigIntLike): void {
+  boatArriveTrade(
+    player: Player,
+    target: Player,
+    gold: BigIntLike,
+    targetGold: BigIntLike = gold,
+  ): void {
     this._addBoat(player, "trade", BOAT_INDEX_ARRIVE, 1);
     this._addGold(player, GOLD_INDEX_TRADE, gold);
-    this._addGold(target, GOLD_INDEX_TRADE, gold);
+    this._addGold(target, GOLD_INDEX_TRADE, targetGold);
   }
 
   boatCapturedTrade(player: Player, target: Player, gold: BigIntLike): void {

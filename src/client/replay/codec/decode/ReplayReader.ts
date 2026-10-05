@@ -65,6 +65,17 @@ interface Chunk {
 }
 
 export class ReplayReader {
+  private modernSystems:
+    | import("../../../../core/modern/ModernState").ModernState
+    | null = null;
+  private applyModernSystems(misc: MiscUpdates | null): void {
+    for (const raw of misc?.ModernSystems ?? [])
+      this.modernSystems = (
+        raw as {
+          state: import("../../../../core/modern/ModernState").ModernState;
+        }
+      ).state;
+  }
   private aiStrategies = new Map<string, AIStatusUpdate>();
   private applyAIStrategies(misc: MiscUpdates | null): void {
     for (const raw of misc?.AIStatus ?? []) {
@@ -241,6 +252,7 @@ export class ReplayReader {
       changedTerrain,
       miscUpdates: misc,
       aiStrategies: this.aiStrategies,
+      modernSystems: this.modernSystems,
     };
   }
 
@@ -305,6 +317,8 @@ export class ReplayReader {
     const misc = readMisc(r);
     this.aiStrategies = new Map();
     this.applyAIStrategies(misc);
+    this.modernSystems = null;
+    this.applyModernSystems(misc);
     this.terrain = new Map();
     this.readTerrain(r);
     return misc;
@@ -388,6 +402,7 @@ export class ReplayReader {
     if (mask & SEC_NAMES) this.readNames(r);
     const misc = mask & SEC_MISC ? readMisc(r) : null;
     this.applyAIStrategies(misc);
+    this.applyModernSystems(misc);
 
     if (mask & SEC_UNITS_REMOVED) {
       const count = r.readVarUint();

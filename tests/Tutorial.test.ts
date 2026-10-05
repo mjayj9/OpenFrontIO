@@ -1,5 +1,6 @@
 import {
   chapterSteps,
+  ModernTutorialEvidence,
   STEP_DONE_LINGER_TICKS,
   TUTORIAL_STEPS,
   TutorialContext,
@@ -207,7 +208,10 @@ describe("TutorialProgress", () => {
       mirvDisabled: true,
       samDisabled: true,
     });
-    expect(p.total(c)).toBe(TUTORIAL_STEPS.length - 17);
+    expect(p.total(c)).toBe(
+      TUTORIAL_STEPS.filter((step) => !step.id.startsWith("modern_")).length -
+        17,
+    );
 
     settle(p, c);
     settle(p, { ...c, tilesOwned: 1 });
@@ -327,6 +331,145 @@ describe("TutorialProgress", () => {
     expect(p.finished()).toBe(true);
   });
 });
+describe("Modern lessons require actual simulation evidence", () => {
+  const modern = (
+    patch: Partial<ModernTutorialEvidence> = {},
+  ): ModernTutorialEvidence => ({
+    independent: true,
+    equalPopulation: true,
+    branchesUsed: [],
+    selectionCount: 0,
+    armyMissions: 0,
+    navyMissions: 0,
+    airMissions: 0,
+    airOutbounds: 0,
+    airReturns: 0,
+    airRearms: 0,
+    airCasualties: 0,
+    airBases: 1,
+    completedTraining: 0,
+    armyCasualties: 0,
+    portCaptures: 0,
+    portLevels: 0,
+    portIncome: 0,
+    blockadesSeen: 0,
+    nuclearLaunches: 0,
+    nuclearIncomeLoss: 0,
+    completedStops: 0,
+    climatePreviewAdapted: false,
+    climatePreviewHarsh: false,
+    climateAdaptedBattles: 0,
+    climateHarshBattles: 0,
+    aiLevelsVisible: false,
+    ...patch,
+  });
+  it.each([
+    ["modern_army_move", { armyMissions: 1 }],
+    ["modern_navy_move", { navyMissions: 1 }],
+    ["modern_stop", { completedStops: 1 }],
+    ["modern_airbase", { airBases: 2 }],
+    ["modern_air_launch", { airOutbounds: 1 }],
+    ["modern_air_return", { airReturns: 1, airRearms: 1 }],
+    ["modern_air_intercept", { airCasualties: 1 }],
+    ["modern_climate_train", { completedTraining: 1 }],
+    ["modern_mobilization", { armyCasualties: 1 }],
+    ["modern_port_capture", { portCaptures: 1 }],
+    ["modern_port_develop", { portLevels: 1, portIncome: 200 }],
+    ["modern_port_blockade", { blockadesSeen: 1 }],
+    ["modern_port_defend", { blockadesSuffered: 1, portRecoveries: 1 }],
+    [
+      "modern_nuclear_penalty",
+      { nuclearLaunches: 1, nuclearIncomeLoss: 150, nuclearImpacts: 1 },
+    ],
+  ] as const)(
+    "%s cannot be completed by acknowledging text or unchanged state",
+    (id, change) => {
+      const progress = new TutorialProgress([
+        TUTORIAL_STEPS.find((step) => step.id === id)!,
+      ]);
+      progress.update(ctx({ modern: modern() }));
+      progress.acknowledge();
+      progress.update(ctx({ modern: modern() }));
+      expect(progress.stepDone()).toBe(false);
+      progress.update(ctx({ modern: modern(change) }));
+      expect(progress.result()[id]).toBe("practiced");
+    },
+  );
+  it("requires the student's actual nuclear impact as well as launch responsibility", () => {
+    const progress = new TutorialProgress([
+      TUTORIAL_STEPS.find((step) => step.id === "modern_nuclear_penalty")!,
+    ]);
+    progress.update(ctx({ modern: modern() }));
+    progress.update(
+      ctx({
+        modern: modern({
+          nuclearLaunches: 1,
+          nuclearIncomeLoss: 150,
+          armyCasualties: 1000,
+        }),
+      }),
+    );
+    expect(progress.stepDone()).toBe(false);
+    progress.update(
+      ctx({
+        modern: modern({
+          nuclearLaunches: 1,
+          nuclearIncomeLoss: 150,
+          nuclearImpacts: 1,
+        }),
+      }),
+    );
+    expect(progress.stepDone()).toBe(true);
+  });
+
+  it("requires two real climate exchanges as well as both public previews", () => {
+    const progress = new TutorialProgress([
+      TUTORIAL_STEPS.find((step) => step.id === "modern_climate_compare")!,
+    ]);
+    progress.update(ctx({ modern: modern() }));
+    progress.update(
+      ctx({
+        modern: modern({
+          climatePreviewAdapted: true,
+          climatePreviewHarsh: true,
+          armyCasualties: 10,
+        }),
+      }),
+    );
+    expect(progress.stepDone()).toBe(false);
+    progress.update(
+      ctx({
+        modern: modern({
+          climatePreviewAdapted: true,
+          climatePreviewHarsh: true,
+          climateAdaptedBattles: 1,
+          climateHarshBattles: 1,
+        }),
+      }),
+    );
+    expect(progress.stepDone()).toBe(true);
+  });
+  it("preserves modern practice baseline across saves and rejects corrupt evidence", () => {
+    const step = TUTORIAL_STEPS.find(
+      (entry) => entry.id === "modern_air_intercept",
+    )!;
+    const progress = new TutorialProgress([step]);
+    progress.update(ctx({ modern: modern({ airCasualties: 2 }) }));
+    const saved = progress.snapshot(),
+      restored = new TutorialProgress([step]);
+    expect(restored.restore(saved)).toBe(true);
+    restored.update(ctx({ modern: modern({ airCasualties: 2 }) }));
+    expect(restored.stepDone()).toBe(false);
+    restored.update(ctx({ modern: modern({ airCasualties: 3 }) }));
+    expect(restored.stepDone()).toBe(true);
+    expect(
+      new TutorialProgress([step]).restore({
+        ...saved,
+        baseline: { ...saved.baseline!, modern: modern({ airCasualties: -1 }) },
+      }),
+    ).toBe(false);
+  });
+});
 
 describe("TutorialProgress.skip", () => {
   it("moves past the current step without completing it", () => {
@@ -368,7 +511,9 @@ describe("TutorialProgress step counter", () => {
     const before = ctx({ hasSpawned: true });
     p.update(before);
     const total = p.total(before);
-    expect(total).toBe(TUTORIAL_STEPS.length);
+    expect(total).toBe(
+      TUTORIAL_STEPS.filter((step) => !step.id.startsWith("modern_")).length,
+    );
 
     const after = ctx({
       hasSpawned: true,

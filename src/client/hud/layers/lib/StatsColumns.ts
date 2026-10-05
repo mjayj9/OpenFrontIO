@@ -194,8 +194,17 @@ export const COLUMN_DEFS: readonly ColumnDef[] = [
     id: "tiles",
     labelKey: "leaderboard.owned",
     headerVisual: { kind: "icon", src: claimIcon, white: true },
-    value: (player) => player.numTilesOwned(),
+    value: (player) =>
+      player.modernFaction?.()?.ownedAreaUnits ?? player.numTilesOwned(),
     cell: (row, game) => {
+      const modern = game.modernSystems?.();
+      if (modern) {
+        const area = modern.factions.reduce(
+          (sum, f) => sum + f.ownedAreaUnits,
+          0,
+        );
+        return formatPercentage(area > 0 ? row.value / area : 0);
+      }
       const validTiles = game.numLandTiles() - game.numTilesWithFallout();
       return formatPercentage(validTiles > 0 ? row.value / validTiles : 0);
     },

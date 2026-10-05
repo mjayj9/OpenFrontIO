@@ -20,6 +20,7 @@ import {
   UnitType,
 } from "../game/Game";
 import { UserSettings } from "../game/UserSettings";
+import { isModernV2, MODERN_RULES } from "../modern/ModernRules";
 import { GameConfig, TeamCountConfig } from "../Schemas";
 import { NukeType } from "../StatsSchemas";
 import { assertNever, sigmoid, toInt, within } from "../Util";
@@ -89,6 +90,11 @@ export function parseGameEnv(value: string | undefined): GameEnv {
 }
 
 export interface AttackLogicInput {
+  modernClimate?: {
+    attackerPermille: number;
+    defenderPermille: number;
+    movementPermille: number;
+  };
   terrain: TerrainType;
   attackTroops: number;
   attacker: { type: PlayerType; numTiles: number };
@@ -430,6 +436,7 @@ export class Config {
   }
   infiniteGold(): boolean {
     return (
+      !isModernV2(this._gameConfig) &&
       !this._gameConfig.enhancedAI?.fairResources &&
       this._gameConfig.infiniteGold
     );
@@ -439,6 +446,7 @@ export class Config {
   }
   infiniteTroops(): boolean {
     return (
+      !isModernV2(this._gameConfig) &&
       !this._gameConfig.enhancedAI?.fairResources &&
       this._gameConfig.infiniteTroops
     );
@@ -592,10 +600,13 @@ export class Config {
         break;
       case UnitType.Warship:
         info = {
-          cost: this.costWrapper(
-            (numUnits: number) => Math.min(1_000_000, (numUnits + 1) * 250_000),
-            UnitType.Warship,
-          ),
+          cost: isModernV2(this._gameConfig)
+            ? () => BigInt(MODERN_RULES.forces.warshipCost)
+            : this.costWrapper(
+                (numUnits: number) =>
+                  Math.min(1_000_000, (numUnits + 1) * 250_000),
+                UnitType.Warship,
+              ),
           maxHealth: 1000,
         };
         break;
@@ -718,7 +729,8 @@ export class Config {
   }
 
   private activeHostCheats(): GameConfig["hostCheats"] {
-    return this._gameConfig.enhancedAI?.fairResources
+    return this._gameConfig.enhancedAI?.fairResources ||
+      isModernV2(this._gameConfig)
       ? undefined
       : this._gameConfig.hostCheats;
   }
@@ -755,7 +767,11 @@ export class Config {
   }
 
   public conquerGoldAmount(captured: Player): Gold {
-    if (this._gameConfig.enhancedAI?.fairResources) return captured.gold() / 2n;
+    if (
+      this._gameConfig.enhancedAI?.fairResources ||
+      isModernV2(this._gameConfig)
+    )
+      return captured.gold() / 2n;
     if (
       captured.type() === PlayerType.Bot ||
       captured.type() === PlayerType.Nation
@@ -905,7 +921,19 @@ export class Config {
    * attack is. The result reports that as a fraction of the tick.
    */
   attackLogic(input: AttackLogicInput): AttackLogicResult {
-    const { attackTroops, attacker, defender } = input;
+    const { attackTroops } = input;
+    // Neutralize image projection and tile count in modern population combat.
+    // Terrain and defense posts retain their existing independent rules.
+    const modern = isModernV2(this._gameConfig);
+    const attacker = modern
+      ? { ...input.attacker, numTiles: 10_000 }
+      : input.attacker;
+    const defender =
+      input.defender === null
+        ? null
+        : modern
+          ? { ...input.defender, numTiles: 10_000 }
+          : input.defender;
     let { mag, tileCost } = terrainAttackBase(input.terrain);
 
     if (defender !== null && input.defenderHasDefensePost) {
@@ -990,16 +1018,28 @@ export class Config {
       attacker.numTiles,
       LARGE_ATTACKER_SPEED_DEPTH,
     );
+    const climate = input.modernClimate;
+    const ratio = climate
+      ? within(
+          Math.floor(
+            (climate.attackerPermille * 1000) / climate.defenderPermille,
+          ),
+          MODERN_RULES.climateRatioMinPermille,
+          MODERN_RULES.climateRatioMaxPermille,
+        )
+      : 1000;
     return {
-      attackerTroopLoss,
-      defenderTroopLoss,
+      attackerTroopLoss: (attackerTroopLoss * 1000) / ratio,
+      defenderTroopLoss: (defenderTroopLoss * ratio) / 1000,
       tickFraction:
-        (speedCost *
+        (((speedCost *
           tileCost *
           largeAttackerSpeedBonus *
           largeDefenderBonus *
           traitorCostMod) /
-        input.borderSize,
+          input.borderSize) *
+          1000) /
+        (climate?.movementPermille ?? 1000),
     };
   }
 
@@ -1035,6 +1075,15 @@ export class Config {
   }
 
   startManpower(playerInfo: PlayerInfo): number {
+    if (isModernV2(this._gameConfig))
+      return (
+        Math.floor(
+          ((this._gameConfig.modernMode?.initialPopulation ??
+            MODERN_RULES.initialPopulation) *
+            MODERN_RULES.initialArmyPermille) /
+            1000,
+        ) * MODERN_RULES.rawTroopsPerPerson
+      );
     if (
       this._gameConfig.enhancedAI?.fairResources &&
       playerInfo.playerType !== PlayerType.Human
@@ -1061,6 +1110,23 @@ export class Config {
   }
 
   maxTroops(player: Player | PlayerView): number {
+    if (isModernV2(this._gameConfig)) {
+      const p = player.modernFaction?.()?.population;
+      return (
+        Math.max(
+          0,
+          Math.floor(
+            ((p?.total ??
+              this._gameConfig.modernMode?.initialPopulation ??
+              MODERN_RULES.initialPopulation) *
+              MODERN_RULES.mobilizationPermille) /
+              1000,
+          ) -
+            (p?.navy ?? 0) -
+            (p?.air ?? 0),
+        ) * MODERN_RULES.rawTroopsPerPerson
+      );
+    }
     const maxTroops =
       player.type() === PlayerType.Human && this.hasInfiniteTroopsFor(player)
         ? 1_000_000_000
@@ -1096,6 +1162,11 @@ export class Config {
   }
 
   troopIncreaseRate(player: Player | PlayerView): number {
+    if (isModernV2(this._gameConfig))
+      return Math.min(
+        MODERN_RULES.replenishmentPerTick * MODERN_RULES.rawTroopsPerPerson,
+        Math.max(0, this.maxTroops(player) - player.troops()),
+      );
     const max = this.maxTroops(player);
 
     let toAdd = 10 + pow(player.troops(), 0.73) / 4;
@@ -1136,6 +1207,11 @@ export class Config {
   }
 
   goldAdditionRate(player: Player | PlayerView): Gold {
+    if (isModernV2(this._gameConfig))
+      return BigInt(
+        player.modernFaction()?.workerIncomePerTick ??
+          MODERN_RULES.workerGoldPerTick,
+      );
     const multiplier = this.goldMultiplierFor(player);
     let baseRate: bigint;
     if (

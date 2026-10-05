@@ -5,8 +5,12 @@ import {
   GameMode,
   GameType,
 } from "../../src/core/game/Game";
+import {
+  modernFactions,
+  modernRegions,
+} from "../../src/core/game/ModernRegions";
 import { modernWorld } from "../../src/core/game/ModernWorld";
-import { GameConfig } from "../../src/core/Schemas";
+import { GameConfig, PartialGameRecord } from "../../src/core/Schemas";
 import { createGameWireContext } from "../../src/core/ZbinWire";
 import {
   makeClient,
@@ -231,5 +235,145 @@ describe("Modern private lobby — authoritative binary reservations", () => {
     expect(
       message?.type === "start" && message.gameStartInfo.config.gameMap,
     ).toBe(GameMapType.World);
+  });
+});
+
+describe("Modern regions final controller assignments", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
+  });
+  const create = (archive?: (record: PartialGameRecord) => Promise<void>) => {
+    const first = makeClient(),
+      second = makeClient();
+    const game = makeGame({
+      creatorPersistentID: first.persistentID,
+      deps: archive ? { archive } : undefined,
+      config: {
+        ...modernConfig,
+        modernMode: {
+          ...modernConfig.modernMode!,
+          scenario: "modern-regions-v2",
+          version: 2,
+          dataHash: modernRegions.hash,
+          participantSlots: 4,
+          fillEmptySlots: true,
+          aiLevelWeights: { low: 0, medium: 0, high: 1 },
+        },
+      },
+    });
+    game.joinClient(first);
+    game.joinClient(second);
+    return { game, first, second };
+  };
+  it("independent regions of one country have distinct controllers; empty slots reuse world AI", async () => {
+    const { game, first, second } = create(),
+      regions = modernFactions.filter((f) => f.parentCountryId === "RUS");
+    await mockWsOf(first).emit({
+      type: "select_country",
+      countryId: regions[0].id,
+    });
+    await mockWsOf(second).emit({
+      type: "select_country",
+      countryId: regions[1].id,
+    });
+    startGame(game);
+    const a = mockWsOf(first)
+        .sent()
+        .find((m) => m.type === "start"),
+      b = mockWsOf(second)
+        .sent()
+        .find((m) => m.type === "start");
+    expect(a?.type).toBe("start");
+    expect(b?.type).toBe("start");
+    if (a?.type !== "start" || b?.type !== "start")
+      throw new Error("Missing binary start");
+    expect(a.gameStartInfo.modernAssignments).toEqual(
+      b.gameStartInfo.modernAssignments,
+    );
+    const assigned = a.gameStartInfo.modernAssignments!;
+    expect(assigned).toHaveLength(modernFactions.length);
+    expect(new Set(assigned.map((f) => f.playerId)).size).toBe(
+      modernFactions.length,
+    );
+    expect(assigned.filter((f) => f.aiRole === "human")).toHaveLength(2);
+    expect(assigned.filter((f) => f.aiRole === "invited-slot")).toHaveLength(2);
+    expect(
+      assigned
+        .filter((f) => f.aiLevel !== null)
+        .every((f) => f.aiLevel === "high"),
+    ).toBe(true);
+  });
+  it("simultaneous region reservation is exclusive and cannot change after start", async () => {
+    const { game, first, second } = create();
+    await Promise.all([
+      mockWsOf(first).emit({ type: "select_country", countryId: "KOR" }),
+      mockWsOf(second).emit({ type: "select_country", countryId: "KOR" }),
+    ]);
+    expect(first.countryId).toBe("KOR");
+    expect(second.countryId).toBeUndefined();
+    await mockWsOf(second).emit({ type: "select_country", countryId: "JPN" });
+    startGame(game);
+    await mockWsOf(second).emit({ type: "select_country", countryId: "KOR" });
+    expect(second.countryId).toBe("JPN");
+    game.updateGameConfig({
+      modernMode: { ...modernConfig.modernMode!, dataHash: "0".repeat(64) },
+    });
+    expect(game.gameInfo().gameConfig?.modernMode?.dataHash).toBe(
+      modernRegions.hash,
+    );
+  });
+  it("AI auto-fill off keeps world controllers without inventing invite participants", async () => {
+    const { game, first, second } = create();
+    game.updateGameConfig({
+      modernMode: {
+        ...game.gameInfo().gameConfig!.modernMode!,
+        fillEmptySlots: false,
+      },
+    });
+    await mockWsOf(first).emit({ type: "select_country", countryId: "KOR" });
+    await mockWsOf(second).emit({ type: "select_country", countryId: "JPN" });
+    startGame(game);
+    const message = mockWsOf(first)
+      .sent()
+      .find((m) => m.type === "start");
+    expect(message?.type).toBe("start");
+    if (message?.type !== "start") throw new Error("Missing start");
+    expect(message.gameStartInfo.players).toHaveLength(2);
+    expect(
+      message.gameStartInfo.modernAssignments!.filter(
+        (f) => f.aiRole === "invited-slot",
+      ),
+    ).toHaveLength(0);
+  });
+  it("archives the frozen region reservations and individual AI assignments for replays", async () => {
+    const archive = vi.fn(async (_record: PartialGameRecord) => {});
+    const { game, first, second } = create(archive);
+    const regions = modernFactions.filter((f) => f.parentCountryId === "RUS");
+    await mockWsOf(first).emit({
+      type: "select_country",
+      countryId: regions[0].id,
+    });
+    await mockWsOf(second).emit({
+      type: "select_country",
+      countryId: regions[1].id,
+    });
+    startGame(game);
+    const started = mockWsOf(first)
+      .sent()
+      .find((m) => m.type === "start");
+    if (started?.type !== "start") throw new Error("Missing binary start");
+    await game.end();
+    expect(archive).toHaveBeenCalledOnce();
+    const record = archive.mock.calls[0][0];
+    expect(record.info.players.map((p) => p.countryId)).toEqual([
+      regions[0].id,
+      regions[1].id,
+    ]);
+    expect(record.info.modernAssignments).toEqual(
+      started.gameStartInfo.modernAssignments,
+    );
+    expect(record.info.modernAssignments).toHaveLength(modernFactions.length);
   });
 });

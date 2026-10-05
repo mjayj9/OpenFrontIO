@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GameEnv } from "../core/configuration/Config";
 import { GameID } from "../core/Schemas";
 import {
   commitsMatch,
@@ -116,6 +117,11 @@ export type ServerListStatus =
   | "no-server";
 
 let cached: { list: ServerList; fetchedAt: number } | null = null;
+// Only a decoded frame from an actual local development lobby proves that
+// its independent game server is available while the optional account API is
+// absent. Sources are tracked separately so stopping one socket cannot erase
+// another socket's live connection.
+const developmentLobbyConnections = new Set<object>();
 let inflight: Promise<ServerList | null> | null = null;
 // When the last attempt settled, and whether it came back empty-handed. A
 // page with no list at all uses this to stay off the network between
@@ -167,6 +173,7 @@ let warnedMalformed = false;
 
 /** Test-only. */
 export function resetServerList(): void {
+  developmentLobbyConnections.clear();
   stopServerListPolling();
   cached = null;
   inflight = null;
@@ -259,7 +266,47 @@ export function backendReachable(): boolean | null {
  */
 export function backendUnreachableConfirmed(): boolean {
   return (
-    reachable === false && consecutiveFailures >= CONFIRM_OUTAGE_AFTER_FAILURES
+    reachable === false &&
+    consecutiveFailures >= CONFIRM_OUTAGE_AFTER_FAILURES &&
+    !localDevelopmentLobbyAvailable()
+  );
+}
+
+function localDevelopmentLobbyAvailable(): boolean {
+  if (developmentLobbyConnections.size === 0) return false;
+  try {
+    if (ClientEnv.env() !== GameEnv.Dev) return false;
+    const localHosts = new Set(["localhost", "127.0.0.1", "[::1]"]);
+    if (!localHosts.has(window.location.hostname)) return false;
+    const letter = ClientEnv.instanceLetter();
+    const own =
+      letter === undefined ? undefined : ClientEnv.cluster()?.[letter];
+    return (
+      own !== undefined &&
+      Number.isInteger(own.numWorkers) &&
+      own.numWorkers > 0 &&
+      localHosts.has(new URL(`http://${own.host}`).hostname) &&
+      localHosts.has(new URL(ClientEnv.serverWsBase()).hostname)
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** Called by the actual lobby socket after decoding a frame, and on teardown. */
+export function setDevelopmentLobbyConnection(
+  source: object,
+  connected: boolean,
+) {
+  const wasConfirmed = backendUnreachableConfirmed();
+  if (connected) developmentLobbyConnections.add(source);
+  else developmentLobbyConnections.delete(source);
+  const confirmed = backendUnreachableConfirmed();
+  if (wasConfirmed === confirmed) return;
+  document.dispatchEvent(
+    new CustomEvent<BackendReachabilityDetail>("backend-reachability", {
+      detail: { reachable: reachable === true, confirmed },
+    }),
   );
 }
 

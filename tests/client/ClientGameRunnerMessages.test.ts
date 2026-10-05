@@ -176,6 +176,8 @@ function makeStartedRunner(
   const gameView = {
     config: () => ({ isRandomSpawn: () => false, isReplay: () => false }),
     inSpawnPhase: () => false,
+    isPaused: vi.fn(() => false),
+    modernSystems: vi.fn(() => null),
     myPlayer: () => opts.myPlayer ?? null,
     update: vi.fn(),
   };
@@ -513,6 +515,24 @@ describe("ClientGameRunner in-game messages", () => {
     expect(transport.turnComplete).toHaveBeenCalled();
     expect(emitSpy).toHaveBeenCalledWith(new SendHashEvent(3, 42));
     expect(gameView.update).toHaveBeenCalled();
+  });
+
+  it("refreshes throttled HUDs at pause and modern bootstrap boundaries", () => {
+    const { gameView, renderer, workerCallback } = makeStartedRunner(true);
+    gameView.update.mockImplementationOnce(() => {
+      gameView.isPaused.mockReturnValue(true);
+    });
+    workerCallback({ updates: { [GameUpdateType.Hash]: [] } });
+    expect(renderer.tick).toHaveBeenLastCalledWith(true);
+
+    gameView.update.mockImplementationOnce(() => {
+      // The interface mock only needs the transition from absent to present.
+      gameView.modernSystems.mockReturnValue({} as never);
+    });
+    workerCallback({ updates: { [GameUpdateType.Hash]: [] } });
+    expect(renderer.tick).toHaveBeenLastCalledWith(true);
+    workerCallback({ updates: { [GameUpdateType.Hash]: [] } });
+    expect(renderer.tick).toHaveBeenLastCalledWith(false);
   });
 
   it("feeds tick execution and wire tick interval to the game metrics", () => {

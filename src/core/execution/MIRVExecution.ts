@@ -11,6 +11,7 @@ import {
   UnitType,
 } from "../game/Game";
 import { TileRef } from "../game/GameMap";
+import { registerModernNuclearLaunch } from "../modern/ModernSystems";
 import { UniversalPathFinding } from "../pathfinding/PathFinder";
 import {
   ParabolaUniversalPathFinder,
@@ -107,6 +108,7 @@ export class MirvExecution implements Execution {
         targetPlayer: this.targetPlayer,
       });
       this.mg.recordMirvLaunch();
+      registerModernNuclearLaunch(this.mg, this.player, this.nuke.id());
       this.mg.stats().bombLaunch(this.player, this.targetPlayer, UnitType.MIRV);
 
       // Betrayal on launch — only once the missile has actually spawned, so

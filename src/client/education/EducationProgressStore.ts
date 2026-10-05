@@ -19,18 +19,22 @@ export class EducationProgressStore {
 
   load(chapter: TutorialChapterID): TutorialProgressSnapshot | null {
     try {
-      const raw = this.getStorage().getItem(this.key(chapter));
+      const raw =
+        this.getStorage().getItem(this.key(chapter)) ??
+        this.getStorage().getItem(`education.progress.v2.${chapter}`);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (
-        parsed.version !== EDUCATION_VERSION ||
+        (parsed.version !== EDUCATION_VERSION && parsed.version !== 2) ||
         (parsed.stepId !== null && typeof parsed.stepId !== "string") ||
         !parsed.outcomes ||
         typeof parsed.outcomes !== "object" ||
         Array.isArray(parsed.outcomes)
       )
         return null;
-      return parsed;
+      // Existing lesson IDs retain their evidence. New lessons have no outcomes;
+      // the original v2 record stays available for recovery.
+      return { ...parsed, version: EDUCATION_VERSION };
     } catch {
       return null;
     }

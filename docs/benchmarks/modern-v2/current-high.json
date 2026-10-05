@@ -1,0 +1,2722 @@
+{
+  "kind": "modern-v2-full-world-core",
+  "mode": "high",
+  "failedPathCache": "bounded owner-revision cache",
+  "seed": 2026,
+  "ticks": 1200,
+  "node": "v24.15.0",
+  "platform": "win32",
+  "os": "10.0.26200",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "logicalCPUs": 24,
+  "scenarioHash": "dc9636c7fa7200fcf9380f249f0dacae365fcb108d10bad1feac952128e0aac6",
+  "coreSourceHash": "b76f47b090aa372de5c3e0be378fbe95e3f6e272f57275c0f8c06e6e2405a6e0",
+  "sourceUnchangedDuringMeasurement": true,
+  "players": 253,
+  "initialPlayers": 294,
+  "aiLevels": {
+    "low": 0,
+    "medium": 0,
+    "high": 293
+  },
+  "beforePopulation": [
+    {
+      "id": "AFG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AGO-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AGO-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ALB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AND",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ARE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ARG-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ARG-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ARG-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ARM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ATG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r10",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r11",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r12",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUS-r13",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AUT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "AZE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BDI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BEL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BEN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BFA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BGD",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BGR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BHR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BHS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BIH",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BLR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BLZ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BOL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRA-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BRN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BTN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "BWA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAF",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CAN-r10",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CHN-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CIV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CMR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "COD-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "COD-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "COG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "COL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "COM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CPV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CRI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CUB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CYP",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "CZE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DEU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DJI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DMA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DNK-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DNK-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DNK-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DNK-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DOM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DZA-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "DZA-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ECU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "EGY",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ERI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ESP",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "EST",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ETH",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "FIN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "FJI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "FRA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "FSM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GAB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GBR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GEO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GHA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GIN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GMB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GNB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GNQ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GRC",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GRD",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GTM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "GUY",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "HND",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "HRV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "HTI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "HUN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IDN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IDN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IDN-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IND-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IND-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IND-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IND-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IND-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IRL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IRN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IRN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "IRQ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ISL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ISR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ITA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "JAM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "JOR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "JPN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KAS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KAZ-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KAZ-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KAZ-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KEN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KGZ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KHM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KIR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KNA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KOR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": null,
+      "role": "human"
+    },
+    {
+      "id": "KOS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "KWT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LAO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LBN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LBR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LBY-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LBY-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LCA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LIE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LKA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LSO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LTU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LUX",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "LVA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MAR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MCO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MDA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MDG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MDV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MEX-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MEX-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MHL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MKD",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MLI-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MLI-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MLT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MMR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MNE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MNG-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MNG-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MOZ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MRT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MUS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MWI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "MYS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NAM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NER",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NGA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NIC",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NLD",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NOR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NPL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NRU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "NZL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "OMN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PAK",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PAN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PER-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PER-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PHL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PLW",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PNG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "POL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PRK",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PRT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PRY",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "PSX",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "QAT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ROU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r10",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r11",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r12",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r13",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r14",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r15",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r16",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r17",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RUS-r18",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "RWA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SAU-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SAU-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SDN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SDN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SDS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SEN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SGP",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SLB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SLE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SLV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SMR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SOM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SRB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "STP",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SUR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SVK",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SVN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SWE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SWZ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SYC",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "SYR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TCD-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TCD-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TGO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "THA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TJK",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TKM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TLS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TON",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TTO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TUN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TUR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TUV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TWN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "TZA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "UGA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "UKR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "URY",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r10",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r11",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r12",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r13",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r14",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r15",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r16",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "USA-r17",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "UZB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "VAT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "VCT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "VEN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "VNM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "VUT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "WSM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "YEM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ZAF-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ZAF-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ZMB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    },
+    {
+      "id": "ZWE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high",
+      "role": "world"
+    }
+  ],
+  "finalPopulationAccounting": {
+    "living": 288601161,
+    "dead": 5398839,
+    "livingPlusDead": 294000000,
+    "expectedInitialPopulation": 294000000,
+    "invalidBranchSums": [],
+    "aliveWithoutPopulation": []
+  },
+  "startupMs": 223.7978,
+  "tickTiming": {
+    "count": 1200,
+    "p50Ms": 24.519000000000233,
+    "p95Ms": 117.1810000000005,
+    "p99Ms": 183.82510000000184,
+    "maxMs": 572.943900000002,
+    "meanMs": 36.15767016666672,
+    "over100ms": 92
+  },
+  "heapPeakBytes": 142720448,
+  "rssPeakBytes": 386686976,
+  "waterPathQueries": 919,
+  "railPathQueries": 4529,
+  "armyPaths": {
+    "queries": 11543,
+    "searches": 8049,
+    "visited": 1430030,
+    "cacheHits": 3367
+  },
+  "units": 2108,
+  "formations": 3464,
+  "planes": 1027,
+  "alive": 253,
+  "stateHash": 1993887419,
+  "coreHash": 14218090755697128,
+  "finalTick": 1202,
+  "limits": [
+    "Core and update generation only; no browser/GPU rendering or network transfer.",
+    "Path counts are API queries, including memo hits, not expanded nodes.",
+    "Legacy has a different controller count/population model; compare idle vs mixed to isolate v2 decision overhead.",
+    "Peak heap/RSS sampled every 25 ticks; not exact allocation totals.",
+    "Legacy is this fork's modern-world-v1 with NationExecution and enhanced profiles, not an unmodified upstream Classic baseline."
+  ],
+  "commandWarnings": {
+    "count": 21,
+    "messages": {
+      "cannot build City": 1,
+      "cannot build Defense Post": 13,
+      "cannot build trade ship": 2,
+      "MoveWarshipExecution: warship # not found": 1,
+      "cannot build Factory": 4
+    }
+  }
+}

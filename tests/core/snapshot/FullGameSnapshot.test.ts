@@ -167,8 +167,16 @@ describe.each(VARIANTS)("full game snapshots: %s", (_, overrides) => {
       // alive at a tick boundary. BasicExecutions.test.ts covers it directly.
       const neverStored = new Set(["Pause"]);
       // Mode-specific initializers are exercised by ModernWorld.test.ts and
-      // TrainingExecution.test.ts, rather than this Classic scripted match.
-      const otherScenarios = new Set(["ModernWorld", "Training"]);
+      // TrainingExecution.test.ts and ModernSystems.test.ts, rather than this
+      // Classic scripted match. Those tests snapshot active modern commands,
+      // population/forces and the staged port opponent response.
+      const otherScenarios = new Set([
+        "ModernWorld",
+        "Training",
+        "ModernSystems",
+        "ModernCommand",
+        "ModernPortTraining",
+      ]);
       const missing = EXECUTION_SNAPSHOT_TYPES.map((t) => t.name).filter(
         (name) =>
           !reference.execTypes.has(name) &&

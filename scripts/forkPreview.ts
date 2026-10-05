@@ -12,9 +12,6 @@ process.env.TURNSTILE_SITE_KEY ??= "1x00000000000000000000AA";
 const { renderHtmlContent } = await import("../src/server/RenderHtml");
 const root = path.resolve("static"),
   port = Number(process.env.FORK_PREVIEW_PORT ?? 9002);
-const html = await renderHtmlContent(path.join(root, "index.html"), {
-  perServer: false,
-});
 http
   .createServer(async (req, res) => {
     try {
@@ -26,6 +23,11 @@ http
         return;
       }
       if (pathname === "/" || !path.extname(pathname)) {
+        // A new build replaces hashed bundle names. Refresh its HTML together
+        // with those assets instead of retaining references to removed files.
+        const html = await renderHtmlContent(path.join(root, "index.html"), {
+          perServer: false,
+        });
         res
           .writeHead(200, {
             "Content-Type": "text/html; charset=utf-8",
@@ -34,14 +36,16 @@ http
           .end(html);
         return;
       }
+      const bytes = await fs.readFile(file);
       res
         .writeHead(200, {
           "Content-Type": lookup(file) ?? "application/octet-stream",
           "Cache-Control": "no-cache",
         })
-        .end(await fs.readFile(file));
+        .end(bytes);
     } catch {
-      res.writeHead(404).end("Resource unavailable");
+      if (!res.headersSent) res.writeHead(404);
+      res.end("Resource unavailable");
     }
   })
   .listen(port, "127.0.0.1", () =>

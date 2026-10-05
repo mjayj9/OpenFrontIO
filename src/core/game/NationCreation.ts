@@ -11,9 +11,9 @@ import {
   PlayerType,
 } from "./Game";
 import {
+  modernEntries,
   modernHumanCountryIds,
   modernPlayerInfo,
-  modernWorld,
 } from "./ModernWorld";
 import { AdditionalNation, Nation as ManifestNation } from "./TerrainMapLoader";
 
@@ -39,7 +39,7 @@ export function createNationsForGame(
 ): Nation[] {
   if (gameStart.config.modernMode) {
     const humans = modernHumanCountryIds(gameStart);
-    return modernWorld.countries
+    return modernEntries(gameStart.config)
       .filter((c) => !humans.has(c.id))
       .map(
         (c) =>

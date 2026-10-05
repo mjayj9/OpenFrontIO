@@ -5,6 +5,7 @@ import {
   EDUCATION_FEATURES,
   INTERNAL_GAME_CONFIG_KEYS,
   INTERNAL_INTENTS,
+  INTERNAL_MODERN_CONFIG_KEYS,
   searchEducationFeatures,
 } from "../src/client/education/FeatureRegistry";
 import {
@@ -75,6 +76,35 @@ describe("Public feature education coverage", () => {
             `${feature.featureId}.${field}`,
           ).toBeGreaterThan(1);
       }
+    }
+  });
+  it("covers every public modern scenario setting and all eight practical chapters", () => {
+    const covered = new Set(
+      EDUCATION_FEATURES.flatMap((feature) => feature.settings),
+    );
+    for (const key of Object.keys(
+      GameConfigSchema.shape.modernMode.unwrap().shape,
+    )) {
+      expect(
+        covered.has(`modernMode.${key}`) || key in INTERNAL_MODERN_CONFIG_KEYS,
+        key,
+      ).toBe(true);
+    }
+    for (const id of [
+      "regions",
+      "population",
+      "commands",
+      "air",
+      "climate",
+      "ports",
+      "nuclear",
+      "ai",
+    ]) {
+      const chapter =
+        `modern_${id}` as (typeof TUTORIAL_CHAPTERS)[number]["id"];
+      expect(chapterSteps(chapter).length, chapter).toBeGreaterThan(0);
+      for (const step of chapterSteps(chapter))
+        expect(step.manual, step.id).not.toBe(true);
     }
   });
 

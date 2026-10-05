@@ -12,6 +12,7 @@ import {
   Relation,
 } from "../../../core/game/Game";
 import { TileRef } from "../../../core/game/GameMap";
+import { modernFaction } from "../../../core/game/ModernRegions";
 import { Emoji, flattenedEmojiTable } from "../../../core/Util";
 import { fetchLobbyListed } from "../../Api";
 import { actionButton } from "../../components/ui/ActionButton";
@@ -22,6 +23,7 @@ import {
   MouseUpEvent,
   SwapRocketDirectionEvent,
 } from "../../InputHandler";
+import type { LangSelector } from "../../LangSelector";
 import { themeProvider } from "../../theme/ThemeProvider";
 import {
   PlayerReportedEvent,
@@ -272,6 +274,11 @@ export class PlayerPanel extends LitElement implements Controller {
     this.resetProfile();
     this.actions = actions;
     this.tile = tile;
+    if (this.uiState && this.g.modernSystems?.()) {
+      const owner = this.g.owner(tile);
+      if (owner.isPlayer() && owner.modernFaction?.()?.aiLevel)
+        this.uiState.modernAIInfoInspected = true;
+    }
     this.moderationTarget = null;
     this.reportTarget = null;
     this.isVisible = true;
@@ -672,8 +679,20 @@ export class PlayerPanel extends LitElement implements Controller {
         : undefined;
 
     const enhanced = other.enhancedAI?.();
+    const modern = other.modernFaction?.();
+    const region = modern ? modernFaction(modern.factionId) : undefined;
+    const regionName = region
+      ? document
+          .querySelector<LangSelector>("lang-selector")
+          ?.currentLang?.startsWith("ko")
+        ? region.nameKo
+        : region.name
+      : other.displayName();
     const team = other.team?.() ?? null;
     const aiStatus = other.aiStrategy?.();
+    const modernPlan = this.g
+      .modernSystems?.()
+      ?.aiPlans.find((plan) => plan.playerId === other.id());
     const chip =
       other.type() === PlayerType.Human
         ? null
@@ -696,9 +715,9 @@ export class PlayerPanel extends LitElement implements Controller {
         <div class="flex-1 min-w-0">
           <h2
             class="text-xl font-bold tracking-[-0.01em] text-zinc-50 truncate"
-            title=${other.displayName()}
+            title=${regionName}
           >
-            ${other.displayName()}
+            ${regionName}
           </h2>
         </div>
         ${chip
@@ -728,7 +747,11 @@ export class PlayerPanel extends LitElement implements Controller {
       ${enhanced
         ? html`<p class="text-xs text-cyan-200 mt-1" role="status">
             ${translateText("enhanced_ai.badge")} ·
-            ${translateText(`difficulty.${enhanced.difficulty.toLowerCase()}`)}
+            ${modern?.aiLevel
+              ? translateText(`modern_v2.ai_level.${modern.aiLevel}`)
+              : translateText(
+                  `difficulty.${enhanced.difficulty.toLowerCase()}`,
+                )}
             ·
             ${translateText("enhanced_ai.personality_" + enhanced.personality)}
           </p>`
@@ -767,6 +790,49 @@ export class PlayerPanel extends LitElement implements Controller {
                   </p>
                 </details>`
               : ""}`
+        : ""}
+      ${modernPlan
+        ? html`<p class="text-xs text-zinc-300" role="status">
+              ${translateText(`modern_v2.goal.${modernPlan.goal}`)}
+            </p>
+            ${import.meta.env.DEV
+              ? html`<details class="text-xs text-zinc-400">
+                  <summary>${translateText("enhanced_ai.debug_title")}</summary>
+                  <p>
+                    ${translateText("modern_v2.ai_plan", {
+                      operations: modernPlan.operations,
+                      seconds: Math.max(
+                        0,
+                        Math.ceil(
+                          (modernPlan.nextThinkTick - this.g.ticks()) / 10,
+                        ),
+                      ),
+                      target:
+                        modernPlan.target === null
+                          ? translateText("modern_v2.no_target")
+                          : `${this.g.x(modernPlan.target)}, ${this.g.y(modernPlan.target)}`,
+                    })}
+                  </p>
+                  <p>
+                    ${translateText("enhanced_ai.reserve", {
+                      troops: renderTroops(other.troops()),
+                    })}
+                  </p>
+                </details>`
+              : ""}`
+        : ""}
+      ${modern
+        ? html`<p class="text-xs text-cyan-200 mt-1">
+              ${translateText(`modern_v2.role.${modern.aiRole}`)} ·
+              ${translateText("modern_v2.population")}:
+              ${renderNumber(modern.population.total)}
+            </p>
+            <p class="text-xs text-zinc-300">
+              ${translateText("modern_v2.adaptation")}:
+              ${modern.climateAdaptation
+                .map((climate) => translateText(`modern_v2.climate.${climate}`))
+                .join(", ")}
+            </p>`
         : ""}
       ${this.renderTraitorBadge(other)}
       ${this.renderRelationPillIfNation(other, my)}

@@ -18,6 +18,7 @@ import {
   ShowBuildMenuEvent,
   ShowEmojiMenuEvent,
 } from "../../InputHandler";
+import { modernNuclearNotice } from "../../ModernNuclearNotice";
 import { TransformHandler } from "../../TransformHandler";
 import {
   BuildUnitIntentEvent,
@@ -462,6 +463,14 @@ export class BuildMenu extends LitElement implements Controller {
                       >${item.description &&
                       translateText(item.description)}</span
                     >
+                    ${modernNuclearNotice(this.game, item.unitType)
+                      ? html`<span class="build-description text-orange-200"
+                          >${modernNuclearNotice(
+                            this.game,
+                            item.unitType,
+                          )}</span
+                        >`
+                      : ""}
                     <span class="build-cost" translate="no">
                       ${renderNumber(
                         this.game && this.game.myPlayer() ? this.cost(item) : 0,

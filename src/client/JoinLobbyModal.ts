@@ -21,6 +21,7 @@ import {
   PublicGameInfo,
 } from "../core/Schemas";
 import { GameMode, GameType, HumansVsNations } from "../core/game/Game";
+import { modernFactions } from "../core/game/ModernRegions";
 import { getApiBase } from "./Api";
 import { crazyGamesSDK } from "./CrazyGamesSDK";
 import { PublicLobbySocket } from "./LobbySocket";
@@ -884,8 +885,11 @@ export class JoinLobbyModal extends BaseModal {
     this.syncCountdownTimer();
     if (lobby.gameConfig) {
       const mapChanged = this.gameConfig?.gameMap !== lobby.gameConfig.gameMap;
+      const scenarioChanged =
+        this.gameConfig?.modernMode?.scenario !==
+        lobby.gameConfig.modernMode?.scenario;
       this.gameConfig = lobby.gameConfig;
-      if (mapChanged) {
+      if (mapChanged || scenarioChanged) {
         this.loadNationCount();
       }
     }
@@ -972,12 +976,18 @@ export class JoinLobbyModal extends BaseModal {
       const mapData = terrainMapFileLoader.getMapData(currentMap);
       const manifest = await mapData.manifest();
       if (this.gameConfig?.gameMap === currentMap) {
-        this.nationCount = manifest.nations.length;
+        this.nationCount =
+          this.gameConfig.modernMode?.scenario === "modern-regions-v2"
+            ? modernFactions.length
+            : manifest.nations.length;
       }
     } catch (error) {
       console.warn("Failed to load nation count", error);
       if (this.gameConfig?.gameMap === currentMap) {
-        this.nationCount = 0;
+        this.nationCount =
+          this.gameConfig.modernMode?.scenario === "modern-regions-v2"
+            ? modernFactions.length
+            : 0;
       }
     }
   }

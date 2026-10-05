@@ -1,0 +1,45 @@
+{
+  "kind": "modern-v2-full-world-core",
+  "mode": "legacy",
+  "seed": 2026,
+  "ticks": 1200,
+  "node": "v24.15.0",
+  "platform": "win32",
+  "os": "10.0.26200",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "logicalCPUs": 24,
+  "scenarioHash": "a7839a1b8c8f22feb7607c70b81131096b91db09963ab707a7aef8bffb1aa052",
+  "players": 104,
+  "aiLevels": {
+    "low": 0,
+    "medium": 0,
+    "high": 0
+  },
+  "startupMs": 192.24939999999998,
+  "tickTiming": {
+    "count": 1200,
+    "p50Ms": 7.350500000000466,
+    "p95Ms": 45.8770999999997,
+    "p99Ms": 133.14690000000155,
+    "maxMs": 503.8682000000008,
+    "meanMs": 14.164416166666655,
+    "over100ms": 16
+  },
+  "heapPeakBytes": 124027040,
+  "rssPeakBytes": 355500032,
+  "waterPathQueries": 1311,
+  "railPathQueries": 4583,
+  "units": 1554,
+  "formations": 0,
+  "planes": 0,
+  "alive": 104,
+  "stateHash": 0,
+  "coreHash": 3177886621181388,
+  "finalTick": 1202,
+  "limits": [
+    "Core and update generation only; no browser/GPU rendering or network transfer.",
+    "Path counts are API queries, including memo hits, not expanded nodes.",
+    "Legacy has a different controller count/population model; compare idle vs mixed to isolate v2 decision overhead.",
+    "Peak heap/RSS sampled every 25 ticks; not exact allocation totals."
+  ]
+}

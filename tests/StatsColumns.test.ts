@@ -38,6 +38,23 @@ describe("Stats column registry", () => {
     expect(columnById("player").isOrderable).toBe(false);
     expect(columnById("tiles").isOrderable).toBe(true);
   });
+  it("sorts modern ownership by geographical area instead of projected pixel count", () => {
+    const game = makeGameView();
+    const a = makePlayerView();
+    const b = makePlayerView();
+    a.numTilesOwned = () => 10000;
+    b.numTilesOwned = () => 100;
+    a.modernFaction = () => ({ ownedAreaUnits: 1000 }) as never;
+    b.modernFaction = () => ({ ownedAreaUnits: 2000 }) as never;
+    game.modernSystems = () =>
+      ({ factions: [a.modernFaction()!, b.modernFaction()!] }) as never;
+    const owned = columnById("tiles");
+    expect(owned.value!(a, game)).toBe(1000);
+    expect(owned.value!(b, game)).toBe(2000);
+    expect(
+      owned.cell({ ...emptyRow, value: owned.value!(a, game) }, game),
+    ).toBe("33.3%");
+  });
 
   it("gives the team column its own icon, not the player one", () => {
     expect(columnById("team").headerVisual).toEqual({

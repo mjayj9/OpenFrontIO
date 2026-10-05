@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { ModernWorldModal } from "../../src/client/ModernWorldModal";
+import {
+  modernFactions,
+  modernRegions,
+} from "../../src/core/game/ModernRegions";
 import { modernPlayerInfo, modernWorld } from "../../src/core/game/ModernWorld";
+import { MODERN_RULES } from "../../src/core/modern/ModernRules";
 import { GameStartInfo, GameStartInfoSchema } from "../../src/core/Schemas";
 
 describe("modern country start metadata", () => {
@@ -10,7 +15,12 @@ describe("modern country start metadata", () => {
     modal.addEventListener("join-lobby", (event) => {
       start = (event as CustomEvent).detail.gameStartInfo;
     });
-    const ui = modal as unknown as { countryId: string; start: () => void };
+    const ui = modal as unknown as {
+      countryId: string;
+      rulesVersion: number;
+      start: () => void;
+    };
+    ui.rulesVersion = 1;
     const failures: string[] = [];
     for (const country of modernWorld.countries) {
       ui.countryId = country.id;
@@ -49,5 +59,64 @@ describe("modern country start metadata", () => {
     } finally {
       selector.remove();
     }
+  });
+  it("starts every independent region with one controller and the common population rules", () => {
+    const modal = new ModernWorldModal();
+    let start: GameStartInfo | undefined;
+    modal.addEventListener("join-lobby", (event) => {
+      start = (event as CustomEvent).detail.gameStartInfo;
+    });
+    const ui = modal as unknown as {
+      countryId: string;
+      factionId: string;
+      start: () => void;
+    };
+    for (const faction of modernFactions) {
+      ui.countryId = faction.parentCountryId;
+      ui.factionId = faction.id;
+      ui.start();
+      expect(GameStartInfoSchema.safeParse(start).success, faction.id).toBe(
+        true,
+      );
+      expect(start!.players).toHaveLength(1);
+      expect(start!.config.modernMode).toMatchObject({
+        scenario: "modern-regions-v2",
+        version: 2,
+        dataHash: modernRegions.hash,
+        countryId: faction.id,
+        factionId: faction.id,
+        balance: "balanced",
+        initialPopulation: MODERN_RULES.initialPopulation,
+        aiLevelWeights: { low: 1, medium: 1, high: 1 },
+      });
+      expect(start!.gameID.startsWith("MR")).toBe(true);
+      expect(start!.config.enhancedAI?.fairResources).toBe(true);
+    }
+  });
+  it("starts modern lessons through the real v2 initializer rather than Classic training", () => {
+    const modal = new ModernWorldModal();
+    let start: GameStartInfo | undefined;
+    modal.addEventListener("join-lobby", (event) => {
+      start = (event as CustomEvent).detail.gameStartInfo;
+    });
+    modal.startModernPractice("air");
+    expect(start!.config.training).not.toBe(true);
+    expect(start!.config.modernMode).toMatchObject({
+      scenario: "modern-regions-v2",
+      trainingLesson: "air",
+      victory: "timed",
+    });
+    modal.startModernPractice("climate");
+    expect(start!.config.modernMode).toMatchObject({
+      countryId: "PAK",
+      trainingLesson: "climate",
+      initialPopulation: MODERN_RULES.initialPopulation,
+    });
+    modal.startModernPractice("ports");
+    expect(start!.config.modernMode).toMatchObject({
+      countryId: "PRT",
+      trainingLesson: "ports",
+      initialPopulation: MODERN_RULES.initialPopulation,
+    });
   });
 });

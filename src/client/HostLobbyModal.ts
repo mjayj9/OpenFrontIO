@@ -18,8 +18,10 @@ import {
   GameMode,
   UnitType,
 } from "../core/game/Game";
+import { modernFactions, modernRegions } from "../core/game/ModernRegions";
 import { modernWorld } from "../core/game/ModernWorld";
 import { UserSettings } from "../core/game/UserSettings";
+import { MODERN_RULES } from "../core/modern/ModernRules";
 import {
   ClientInfo,
   GameConfig,
@@ -153,6 +155,7 @@ export class HostLobbyModal extends BaseModal {
   // could otherwise be applied out of order by the server, leaving the UI
   // showing the opposite of the real listed state.
   private listingRequestInFlight = false;
+  private pendingModernPreset = false;
 
   private readonly handleLobbyInfo = (event: LobbyInfoEvent) => {
     const lobby = event.lobby;
@@ -175,7 +178,10 @@ export class HostLobbyModal extends BaseModal {
         this.selectedMap = GameMapType.ModernWorld;
         this.compactMap = false;
         this.bots = 0;
-        this.nations = modernWorld.countries.length;
+        this.nations =
+          this.modernMode.scenario === "modern-regions-v2"
+            ? modernFactions.length
+            : modernWorld.countries.length;
         this.gameMode = GameMode.FFA;
         this.selectedDifficulty = lobby.gameConfig.difficulty;
         this.modernNukes = !lobby.gameConfig.disabledUnits?.includes(
@@ -192,6 +198,10 @@ export class HostLobbyModal extends BaseModal {
     }
     this.autoStartAt = lobby.autoStartAt ?? null;
     this.queued = lobby.queued ?? false;
+    if (this.pendingModernPreset && this.hydratedLobby) {
+      this.pendingModernPreset = false;
+      this.setModernPreset(true);
+    }
   };
 
   private getRandomString(): string {
@@ -424,6 +434,12 @@ export class HostLobbyModal extends BaseModal {
   }
 
   protected renderBody() {
+    const activePlayers = this.clients.filter((client) => !client.spectator);
+    const canFillWithAI =
+      this.modernMode?.scenario === "modern-regions-v2" &&
+      this.modernMode.fillEmptySlots === true &&
+      activePlayers.length >= 1 &&
+      (this.modernMode.participantSlots ?? 8) > activePlayers.length;
     const secondsRemaining =
       this.lobbyStartAt !== null
         ? getSecondsUntilServerTimestamp(
@@ -435,7 +451,7 @@ export class HostLobbyModal extends BaseModal {
       secondsRemaining === null
         ? this.queued
           ? translateText("host_modal.queued_waiting")
-          : this.clients.length === 1
+          : this.clients.length === 1 && !canFillWithAI
             ? translateText("host_modal.waiting")
             : translateText("game_settings.start")
         : // A queued lobby's countdown belongs to the public queue; the host
@@ -808,6 +824,7 @@ export class HostLobbyModal extends BaseModal {
         <!-- Player List / footer -->
         <div class="p-6 pt-4 border-t border-white/10 bg-black/20 shrink-0">
           <o-button
+            data-test-lobby-start
             variant=${secondsRemaining !== null ? "warning" : "primary"}
             width="block"
             size="lg"
@@ -815,7 +832,7 @@ export class HostLobbyModal extends BaseModal {
             .uppercase=${secondsRemaining === null}
             ?disable=${this.queued ||
             (this.lobbyStartAt === null &&
-              (this.clients.filter((c) => !c.spectator).length < 2 ||
+              ((activePlayers.length < 2 && !canFillWithAI) ||
                 Boolean(
                   this.modernMode &&
                   this.clients.some((c) => !c.spectator && !c.countryId),
@@ -875,6 +892,7 @@ export class HostLobbyModal extends BaseModal {
   }
 
   protected onOpen(args?: Record<string, unknown>): void {
+    this.pendingModernPreset = args?.modernPreset === true;
     // Re-armed here (not in onClose's reset) so that once
     // closeWithoutLeaving() disarms it, no close cascade — e.g. another
     // modal's close() navigating via showPage, which force-closes this one —
@@ -1101,10 +1119,15 @@ export class HostLobbyModal extends BaseModal {
   private setModernPreset(enabled: boolean): void {
     this.modernMode = enabled
       ? {
-          scenario: "modern-world-v1",
-          version: 1,
-          dataHash: modernWorld.hash,
+          scenario: "modern-regions-v2",
+          version: 2,
+          dataHash: modernRegions.hash,
           countryId: "KOR",
+          factionId: "KOR",
+          initialPopulation: MODERN_RULES.initialPopulation,
+          aiLevelWeights: { low: 1, medium: 1, high: 1 },
+          participantSlots: 8,
+          fillEmptySlots: true,
           balance: "balanced",
           victory: "territory",
           targetPercent: 60,
@@ -1116,8 +1139,8 @@ export class HostLobbyModal extends BaseModal {
     this.compactMap = false;
     this.gameMode = GameMode.FFA;
     this.bots = enabled ? 0 : 400;
-    this.nations = enabled ? modernWorld.countries.length : 0;
-    this.defaultNationCount = enabled ? modernWorld.countries.length : 0;
+    this.nations = enabled ? modernFactions.length : 0;
+    this.defaultNationCount = enabled ? modernFactions.length : 0;
     this.randomSpawn = false;
     if (enabled) {
       this.infiniteGold = this.infiniteTroops = this.instantBuild = false;
@@ -1126,7 +1149,7 @@ export class HostLobbyModal extends BaseModal {
       this.maxTimerValue = 30;
       this.enhancedAI = {
         tribePercent: 0,
-        nationPercent: 25,
+        nationPercent: 100,
         personality: "mixed",
         fairResources: true,
         seed: 1,
@@ -1150,53 +1173,151 @@ export class HostLobbyModal extends BaseModal {
     >
       <legend>${translateText("modern.title")}</legend>
       <p>
-        ${translateText("modern.scope", {
-          count: modernWorld.countries.length,
-          width: modernWorld.width,
-          height: modernWorld.height,
-        })}
+        ${translateText(
+          mode.scenario === "modern-regions-v2"
+            ? "modern_v2.scope"
+            : "modern.scope",
+          {
+            count:
+              mode.scenario === "modern-regions-v2"
+                ? modernFactions.length
+                : modernWorld.countries.length,
+            width: modernWorld.width,
+            height: modernWorld.height,
+          },
+        )}
       </p>
       <p>${translateText("modern_lobby.rules")}</p>
       <div class="grid sm:grid-cols-2 gap-3">
-        <label
-          >${translateText("modern.difficulty")}<select
-            class="block bg-gray-800 p-2 w-full"
-            .value=${this.selectedDifficulty}
-            @change=${(event: Event) => {
-              this.selectedDifficulty = (event.target as HTMLSelectElement)
-                .value as Difficulty;
-              void this.putGameConfig();
-            }}
-          >
-            ${Object.values(Difficulty).map(
-              (d) =>
-                html`<option
-                  value=${d}
-                  ?selected=${d === this.selectedDifficulty}
+        ${mode.scenario === "modern-regions-v2"
+          ? html`<p>${translateText("modern_v2.split_policy")}</p>
+              <label
+                >${translateText("modern_v2.initial_population")}<input
+                  type="number"
+                  class="block w-full bg-gray-800 p-2"
+                  min="100000"
+                  max="10000000"
+                  .value=${String(
+                    mode.initialPopulation ?? MODERN_RULES.initialPopulation,
+                  )}
+                  @change=${(event: Event) =>
+                    this.changeModern({
+                      initialPopulation: Math.max(
+                        100000,
+                        Math.min(
+                          10000000,
+                          Math.round(
+                            Number((event.target as HTMLInputElement).value) ||
+                              MODERN_RULES.initialPopulation,
+                          ),
+                        ),
+                      ),
+                    })} /></label
+              >${(["low", "medium", "high"] as const).map(
+                (level) =>
+                  html`<label
+                    >${translateText(`modern_v2.ai_weight.${level}`)}<input
+                      type="number"
+                      class="block w-full bg-gray-800 p-2"
+                      min="0"
+                      max="100"
+                      .value=${String(mode.aiLevelWeights?.[level] ?? 1)}
+                      @change=${(event: Event) => {
+                        const weights = {
+                          low: 1,
+                          medium: 1,
+                          high: 1,
+                          ...mode.aiLevelWeights,
+                          [level]: Math.max(
+                            0,
+                            Math.min(
+                              100,
+                              Math.round(
+                                Number(
+                                  (event.target as HTMLInputElement).value,
+                                ) || 0,
+                              ),
+                            ),
+                          ),
+                        };
+                        if (Object.values(weights).some((weight) => weight > 0))
+                          this.changeModern({ aiLevelWeights: weights });
+                      }}
+                  /></label>`,
+              )}
+              <p>${translateText("modern_v2.ai_weights_hint")}</p>
+              <label
+                >${translateText("modern_v2.participant_slots")}<input
+                  type="number"
+                  class="block w-full bg-gray-800 p-2"
+                  min="2"
+                  max="32"
+                  .value=${String(mode.participantSlots ?? 8)}
+                  @change=${(event: Event) =>
+                    this.changeModern({
+                      participantSlots: Math.max(
+                        2,
+                        Math.min(
+                          32,
+                          Math.round(
+                            Number((event.target as HTMLInputElement).value) ||
+                              8,
+                          ),
+                        ),
+                      ),
+                    })} /></label
+              ><label
+                ><input
+                  type="checkbox"
+                  .checked=${mode.fillEmptySlots ?? true}
+                  @change=${(event: Event) =>
+                    this.changeModern({
+                      fillEmptySlots: (event.target as HTMLInputElement)
+                        .checked,
+                    })}
+                />${translateText("modern_v2.fill_empty_slots")}</label
+              >
+              <p>${translateText("modern_v2.slot_roles")}</p>`
+          : html`<label
+                >${translateText("modern.difficulty")}<select
+                  class="block bg-gray-800 p-2 w-full"
+                  .value=${this.selectedDifficulty}
+                  @change=${(event: Event) => {
+                    this.selectedDifficulty = (
+                      event.target as HTMLSelectElement
+                    ).value as Difficulty;
+                    void this.putGameConfig();
+                  }}
                 >
-                  ${translateText(`difficulty.${d.toLowerCase()}`)}
-                </option>`,
-            )}
-          </select></label
-        >
-        <label
-          >${translateText("modern.balance")}<select
-            class="block bg-gray-800 p-2 w-full"
-            .value=${mode.balance}
-            @change=${(event: Event) =>
-              this.changeModern({
-                balance: (event.target as HTMLSelectElement)
-                  .value as typeof mode.balance,
-              })}
-          >
-            ${["balanced", "asymmetric"].map(
-              (b) =>
-                html`<option value=${b} ?selected=${b === mode.balance}>
-                  ${translateText(`modern.${b}`)}
-                </option>`,
-            )}
-          </select></label
-        >
+                  ${Object.values(Difficulty).map(
+                    (d) =>
+                      html`<option
+                        value=${d}
+                        ?selected=${d === this.selectedDifficulty}
+                      >
+                        ${translateText(`difficulty.${d.toLowerCase()}`)}
+                      </option>`,
+                  )}
+                </select></label
+              >
+              <label
+                >${translateText("modern.balance")}<select
+                  class="block bg-gray-800 p-2 w-full"
+                  .value=${mode.balance}
+                  @change=${(event: Event) =>
+                    this.changeModern({
+                      balance: (event.target as HTMLSelectElement)
+                        .value as typeof mode.balance,
+                    })}
+                >
+                  ${["balanced", "asymmetric"].map(
+                    (b) =>
+                      html`<option value=${b} ?selected=${b === mode.balance}>
+                        ${translateText(`modern.${b}`)}
+                      </option>`,
+                  )}
+                </select></label
+              >`}
         <label
           >${translateText("modern.victory")}<select
             class="block bg-gray-800 p-2 w-full"
@@ -1980,10 +2101,16 @@ export class HostLobbyModal extends BaseModal {
       const manifest = await mapData.manifest();
       // Only update if the map hasn't changed
       if (this.selectedMap === currentMap) {
-        this.defaultNationCount = manifest.nations.length;
-        this.nations = this.compactMap
-          ? Math.max(0, Math.floor(manifest.nations.length * 0.25))
+        // A modern preset may have been selected while the manifest loaded.
+        const isRegional = this.modernMode?.scenario === "modern-regions-v2";
+        const count = isRegional
+          ? modernFactions.length
           : manifest.nations.length;
+        this.defaultNationCount = count;
+        this.nations =
+          this.compactMap && !isRegional
+            ? Math.max(0, Math.floor(count * 0.25))
+            : count;
       }
     } catch (error) {
       console.warn("Failed to load nation count", error);

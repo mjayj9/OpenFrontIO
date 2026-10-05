@@ -9,13 +9,23 @@ import {
   GameType,
   UnitType,
 } from "../core/game/Game";
+import {
+  factionsForCountry,
+  modernFaction,
+  ModernFaction,
+  modernFactions,
+  modernRegions,
+} from "../core/game/ModernRegions";
 import { modernCountry, modernWorld } from "../core/game/ModernWorld";
-import { GameStartInfo } from "../core/Schemas";
+import { MODERN_RULES } from "../core/modern/ModernRules";
+import { GameStartInfo, RENDERABLE_NAME_CHARS } from "../core/Schemas";
 import { generateID } from "../core/Util";
 import { BaseModal } from "./components/BaseModal";
 import { modalHeader } from "./components/ui/ModalHeader";
+import { HostLobbyModal } from "./HostLobbyModal";
 import type { LangSelector } from "./LangSelector";
 import { JoinLobbyEvent } from "./Main";
+import { modernAreaException } from "./ModernRegionDetails";
 import { renderNumber, renderTroops, translateText } from "./Utils";
 
 const countryPaths = new Map<number, string>();
@@ -33,9 +43,40 @@ for (const [index, start, count] of modernWorld.runs) {
   }
   countryPaths.set(index, path);
 }
+const factionPaths = new Map<number, string>();
+for (const [index, start, count] of modernRegions.runs) {
+  let position = start,
+    remaining = count,
+    path = factionPaths.get(index) ?? "";
+  while (remaining > 0) {
+    const x = position % modernRegions.width,
+      y = Math.floor(position / modernRegions.width);
+    const width = Math.min(remaining, modernRegions.width - x);
+    path += `M${x} ${y}h${width}v1h-${width}z`;
+    position += width;
+    remaining -= width;
+  }
+  factionPaths.set(index, path);
+}
 @customElement("modern-world-modal")
 export class ModernWorldModal extends BaseModal {
   @state() private countryId = "KOR";
+  @state() private factionId = "KOR";
+  @state() private rulesVersion: 1 | 2 = 2;
+  @state() private initialPopulation = MODERN_RULES.initialPopulation as number;
+  @state() private aiWeights = { low: 1, medium: 1, high: 1 };
+  @state() private participantSlots = 1;
+  @state() private fillEmptySlots = false;
+  private trainingLesson:
+    | "regions"
+    | "population"
+    | "commands"
+    | "air"
+    | "climate"
+    | "ports"
+    | "nuclear"
+    | "ai"
+    | undefined;
   @state() private query = "";
   @state() private difficulty = Difficulty.Medium;
   @state() private balance: "balanced" | "asymmetric" = "balanced";
@@ -59,13 +100,46 @@ export class ModernWorldModal extends BaseModal {
       ariaLabel: translateText("common.back"),
     });
   }
-  private name(c: (typeof modernWorld.countries)[number]): string {
+  private name(
+    c: (typeof modernWorld.countries)[number] | ModernFaction,
+  ): string {
     const language =
       document.querySelector<LangSelector>("lang-selector")?.currentLang;
     return language?.startsWith("ko") ? c.nameKo : c.name;
   }
+  private chooseCountry(id: string): void {
+    this.countryId = id;
+    this.factionId = factionsForCountry(id)[0]?.id ?? id;
+  }
+  public startModernPractice(
+    lesson: NonNullable<ModernWorldModal["trainingLesson"]>,
+  ): void {
+    this.rulesVersion = 2;
+    // Pakistan has adjacent arid (adapted) and continental (unadapted)
+    // ground borders close to its start. Egypt would require a distant
+    // amphibious operation to reach a harsh unadapted climate.
+    this.chooseCountry(
+      lesson === "climate" ? "PAK" : lesson === "ports" ? "PRT" : "KOR",
+    );
+    this.trainingLesson = lesson;
+    this.nukes = lesson === "nuclear";
+    this.protectionSeconds = 0;
+    this.aiPercent = 100;
+    this.minutes = 120;
+    this.victory = "timed";
+    this.start();
+    this.trainingLesson = undefined;
+  }
   protected renderBody(): TemplateResult {
-    const selected = modernCountry(this.countryId);
+    const regions = factionsForCountry(this.countryId);
+    const selected =
+      this.rulesVersion === 2
+        ? modernFaction(
+            regions.some((region) => region.id === this.factionId)
+              ? this.factionId
+              : regions[0].id,
+          )
+        : modernCountry(this.countryId);
     const list = modernWorld.countries.filter((c) =>
       `${c.name} ${c.nameKo} ${c.id}`
         .toLowerCase()
@@ -75,26 +149,56 @@ export class ModernWorldModal extends BaseModal {
       class="p-4 text-white space-y-4 max-h-[80dvh] overflow-auto"
     >
       <p>
-        ${translateText("modern.scope", {
-          count: modernWorld.countries.length,
-          width: modernWorld.width,
-          height: modernWorld.height,
-        })}
+        ${translateText(
+          this.rulesVersion === 2 ? "modern_v2.scope" : "modern.scope",
+          {
+            count:
+              this.rulesVersion === 2
+                ? modernFactions.length
+                : modernWorld.countries.length,
+            width: modernWorld.width,
+            height: modernWorld.height,
+          },
+        )}
       </p>
+      <label
+        >${translateText("modern_v2.ruleset")}<select
+          class="bg-gray-800 p-2 ml-2"
+          .value=${String(this.rulesVersion)}
+          @change=${(event: Event) =>
+            (this.rulesVersion = Number(
+              (event.target as HTMLSelectElement).value,
+            ) as 1 | 2)}
+        >
+          <option value="2" ?selected=${this.rulesVersion === 2}>
+            ${translateText("modern_v2.ruleset_new")}
+          </option>
+          <option value="1" ?selected=${this.rulesVersion === 1}>
+            ${translateText("modern_v2.ruleset_legacy")}
+          </option>
+        </select></label
+      >
       <svg
         viewBox="0 0 2000 1000"
         role="img"
         aria-label=${translateText("modern.map_selection")}
         style="width:100%;max-height:40dvh;background:#18384e;aspect-ratio:2/1"
       >
-        ${modernWorld.countries.map(
+        ${(this.rulesVersion === 2
+          ? modernFactions
+          : modernWorld.countries
+        ).map(
           (c) =>
-            svg`<path d=${countryPaths.get(c.index) ?? ""} fill=${c.id === this.countryId ? "#fff799" : `hsl(${(c.index * 137) % 360} 55% 58%)`} stroke="#182a35" stroke-width=${c.id === this.countryId ? 3 : 0.5} tabindex="0" role="button" aria-label=${this.name(c)} @click=${() => (this.countryId = c.id)} @keydown=${(
-              e: KeyboardEvent,
-            ) => {
+            svg`<path d=${(this.rulesVersion === 2 ? factionPaths : countryPaths).get(c.index) ?? ""} fill=${c.id === selected.id ? "#fff799" : `hsl(${(c.index * 137) % 360} 55% 58%)`} stroke="#182a35" stroke-width=${c.id === selected.id ? 3 : 0.5} tabindex="0" role="button" aria-label=${this.name(c)} @click=${() => {
+              this.countryId =
+                "parentCountryId" in c ? c.parentCountryId : c.id;
+              this.factionId = c.id;
+            }} @keydown=${(e: KeyboardEvent) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                this.countryId = c.id;
+                this.countryId =
+                  "parentCountryId" in c ? c.parentCountryId : c.id;
+                this.factionId = c.id;
               }
             }}><title>${this.name(c)}</title></path>`,
         )}
@@ -116,7 +220,7 @@ export class ModernWorldModal extends BaseModal {
             aria-label=${translateText("modern.country")}
             .value=${this.countryId}
             @change=${(e: Event) =>
-              (this.countryId = (e.target as HTMLSelectElement).value)}
+              this.chooseCountry((e.target as HTMLSelectElement).value)}
           >
             ${list.map(
               (c) =>
@@ -125,6 +229,33 @@ export class ModernWorldModal extends BaseModal {
                 </option>`,
             )}
           </select>
+          ${this.rulesVersion === 2
+            ? html`<label class="block mt-2"
+                  >${translateText("modern_v2.independent_region")}<select
+                    class="w-full p-2 bg-gray-800"
+                    aria-label=${translateText("modern_v2.independent_region")}
+                    .value=${selected.id}
+                    @change=${(event: Event) =>
+                      (this.factionId = (
+                        event.target as HTMLSelectElement
+                      ).value)}
+                  >
+                    ${regions.map(
+                      (region) =>
+                        html`<option
+                          value=${region.id}
+                          ?selected=${region.id === selected.id}
+                        >
+                          ${this.name(region)} · ${renderNumber(region.areaKm2)}
+                          km²
+                        </option>`,
+                    )}
+                  </select></label
+                >
+                <p class="text-sm mt-1">
+                  ${translateText("modern_v2.split_policy")}
+                </p>`
+            : nothing}
         </div>
         <div class="p-3 rounded bg-gray-800">
           <h3 class="text-xl">
@@ -141,31 +272,90 @@ export class ModernWorldModal extends BaseModal {
             ${translateText("modern.capital")}: ${selected.capitalName}
             (${selected.capital.join(", ")})
           </p>
+          ${"areaKm2" in selected
+            ? html`<p>
+                  ${translateText("modern_v2.area", {
+                    area: renderNumber(selected.areaKm2),
+                  })}
+                </p>
+                <p>
+                  ${translateText("modern_v2.adaptation")}:
+                  ${selected.adaptedClimates
+                    .map((climate) =>
+                      translateText(`modern_v2.climate.${climate}`),
+                    )
+                    .join(", ")}
+                </p>
+                <p>
+                  ${translateText("modern_v2.major_ports")}:
+                  ${modernRegions.ports
+                    .filter((port) => port.factionId === selected.id)
+                    .map((port) => port.name)
+                    .join(", ") || translateText("modern_v2.landlocked")}
+                </p>
+                ${selected.areaException
+                  ? html`<div class="text-yellow-200">
+                      ${translateText("modern_v2.area_exception")}:
+                      ${modernAreaException(selected)}
+                      <details>
+                        <summary>
+                          ${translateText("modern_v2.area_source_details")}
+                        </summary>
+                        ${selected.areaException.reason} ·
+                        ${selected.areaException.correction}
+                      </details>
+                    </div>`
+                  : nothing}
+                <p>
+                  ${translateText("modern_v2.common_start", {
+                    population: renderNumber(this.initialPopulation),
+                    gold: renderNumber(
+                      this.trainingLesson ? 4000000 : MODERN_RULES.initialGold,
+                    ),
+                    army: renderNumber(
+                      Math.floor(
+                        (this.initialPopulation *
+                          MODERN_RULES.initialArmyPermille) /
+                          1000,
+                      ),
+                    ),
+                  })}
+                </p>`
+            : nothing}
           <p>
             ${translateText("modern.neighbors")}:
             ${selected.neighbors
-              .map((id) => this.name(modernCountry(id)))
+              .map((id) =>
+                this.name(
+                  this.rulesVersion === 2
+                    ? modernFaction(id)
+                    : modernCountry(id),
+                ),
+              )
               .join(", ") || translateText("modern.island")}
           </p>
-          <p>
-            ${translateText("modern.initial", {
-              tiles: selected.tiles,
-              troops: renderTroops(
-                this.balance === "balanced"
-                  ? 80000
-                  : 80000 * Math.min(4, 1 + Math.floor(selected.tiles / 12000)),
-              ),
-              gold: renderNumber(
-                this.balance === "balanced"
-                  ? 400000
-                  : 400000 *
-                      Math.min(4, 1 + Math.floor(selected.tiles / 12000)),
-              ),
-            })}
-          </p>
+          ${this.rulesVersion === 1
+            ? html`<p>
+                ${translateText("modern.initial", {
+                  tiles: selected.tiles,
+                  troops: renderTroops(
+                    this.balance === "balanced"
+                      ? 80000
+                      : 80000 *
+                          Math.min(4, 1 + Math.floor(selected.tiles / 12000)),
+                  ),
+                  gold: renderNumber(
+                    this.balance === "balanced"
+                      ? 400000
+                      : 400000 *
+                          Math.min(4, 1 + Math.floor(selected.tiles / 12000)),
+                  ),
+                })}
+              </p>`
+            : nothing}
           <p>
             ${translateText(
-              selected.represented
+              "represented" in selected && selected.represented
                 ? "modern.small_country"
                 : "modern.recommendation",
             )}
@@ -173,37 +363,65 @@ export class ModernWorldModal extends BaseModal {
         </div>
       </div>
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <label
-          >${translateText("modern.difficulty")}<select
-            class="block bg-gray-800 p-2 w-full"
-            .value=${this.difficulty}
-            @change=${(e: Event) =>
-              (this.difficulty = (e.target as HTMLSelectElement)
-                .value as Difficulty)}
-          >
-            ${Object.values(Difficulty).map(
-              (d) =>
-                html`<option value=${d} ?selected=${d === this.difficulty}>
-                  ${translateText(`difficulty.${d.toLowerCase()}`)}
-                </option>`,
-            )}
-          </select></label
-        >
-        <label
-          >${translateText("modern.balance")}<select
-            class="block bg-gray-800 p-2 w-full"
-            @change=${(e: Event) =>
-              (this.balance = (e.target as HTMLSelectElement)
-                .value as typeof this.balance)}
-          >
-            <option value="balanced">
-              ${translateText("modern.balanced")}
-            </option>
-            <option value="asymmetric">
-              ${translateText("modern.asymmetric")}
-            </option>
-          </select></label
-        >
+        ${this.rulesVersion === 1
+          ? html`<label
+                >${translateText("modern.difficulty")}<select
+                  class="block bg-gray-800 p-2 w-full"
+                  .value=${this.difficulty}
+                  @change=${(e: Event) =>
+                    (this.difficulty = (e.target as HTMLSelectElement)
+                      .value as Difficulty)}
+                >
+                  ${Object.values(Difficulty).map(
+                    (d) =>
+                      html`<option
+                        value=${d}
+                        ?selected=${d === this.difficulty}
+                      >
+                        ${translateText(`difficulty.${d.toLowerCase()}`)}
+                      </option>`,
+                  )}
+                </select></label
+              >
+              <label
+                >${translateText("modern.balance")}<select
+                  class="block bg-gray-800 p-2 w-full"
+                  @change=${(e: Event) =>
+                    (this.balance = (e.target as HTMLSelectElement)
+                      .value as typeof this.balance)}
+                >
+                  <option
+                    value="balanced"
+                    ?selected=${this.balance === "balanced"}
+                  >
+                    ${translateText("modern.balanced")}
+                  </option>
+                  <option
+                    value="asymmetric"
+                    ?selected=${this.balance === "asymmetric"}
+                  >
+                    ${translateText("modern.asymmetric")}
+                  </option>
+                </select></label
+              >`
+          : html`${this.numberInput(
+                "modern_v2.initial_population",
+                this.initialPopulation,
+                100000,
+                10000000,
+                (value) => (this.initialPopulation = value),
+              )}${(["low", "medium", "high"] as const).map((level) =>
+                this.numberInput(
+                  `modern_v2.ai_weight.${level}`,
+                  this.aiWeights[level],
+                  0,
+                  100,
+                  (value) => {
+                    this.aiWeights = { ...this.aiWeights, [level]: value };
+                  },
+                ),
+              )}
+              <p>${translateText("modern_v2.ai_weights_hint")}</p>`}
         <label
           >${translateText("modern.victory")}<select
             class="block bg-gray-800 p-2 w-full"
@@ -213,7 +431,7 @@ export class ModernWorldModal extends BaseModal {
           >
             ${["territory", "capitals", "timed", "total"].map(
               (v) =>
-                html`<option value=${v}>
+                html`<option value=${v} ?selected=${v === this.victory}>
                   ${translateText(`modern.${v}`)}
                 </option>`,
             )}
@@ -242,13 +460,15 @@ export class ModernWorldModal extends BaseModal {
           600,
           (v) => (this.protectionSeconds = v),
         )}
-        ${this.numberInput(
-          "modern.ai_percent",
-          this.aiPercent,
-          0,
-          100,
-          (v) => (this.aiPercent = v),
-        )}
+        ${this.rulesVersion === 1
+          ? this.numberInput(
+              "modern.ai_percent",
+              this.aiPercent,
+              0,
+              100,
+              (v) => (this.aiPercent = v),
+            )
+          : html`<p>${translateText("modern_v2.ai_all_enhanced")}</p>`}
         ${this.numberInput(
           "modern.seed",
           this.seed,
@@ -284,10 +504,70 @@ export class ModernWorldModal extends BaseModal {
           ${translateText("modern.capital_elimination")}</label
         >
       </div>
-      <p>${translateText("modern.fair")}</p>
-      <button class="w-full p-3 rounded bg-blue-600" @click=${this.start}>
+      <p>
+        ${translateText(
+          this.rulesVersion === 2 ? "modern_v2.fair" : "modern.fair",
+        )}
+      </p>
+      <button
+        class="w-full p-3 rounded bg-blue-600 disabled:opacity-50"
+        ?disabled=${this.rulesVersion === 2 &&
+        !Object.values(this.aiWeights).some((value) => value > 0)}
+        @click=${this.start}
+      >
         ${translateText("game_settings.start")}
       </button>
+      ${this.rulesVersion === 2
+        ? html`<button
+              class="w-full p-3 rounded bg-gray-700"
+              @click=${() => {
+                this.close();
+                document
+                  .querySelector<HostLobbyModal>("host-lobby-modal")
+                  ?.open({ modernPreset: true });
+              }}
+            >
+              ${translateText("modern_v2.invite")}
+            </button>
+            <details class="text-sm">
+              <summary>${translateText("modern_v2.map_sources")}</summary>
+              <p>
+                Natural Earth · geoBoundaries / OpenStreetMap ·
+                <a
+                  class="underline"
+                  href="https://doi.org/10.1038/s41597-023-02549-6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Beck et al. (2023)</a
+                >
+              </p>
+              <p>
+                <a
+                  class="underline"
+                  href="https://opendatacommons.org/licenses/odbl/1-0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >ODbL 1.0</a
+                >
+                ·
+                <a
+                  class="underline"
+                  href="https://github.com/mjayj9/OpenFrontIO/blob/feature/strategic-ai-modern-world/map-generator/modern-world-v2/LICENSES.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >${translateText("modern_v2.map_sources")}</a
+                >
+                ·
+                <a
+                  class="underline"
+                  href="https://creativecommons.org/licenses/by/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >CC BY 4.0</a
+                >
+              </p>
+            </details>`
+        : nothing}
     </div>`;
   }
   private numberInput(
@@ -314,11 +594,19 @@ export class ModernWorldModal extends BaseModal {
     /></label>`;
   }
   private start = (): void => {
-    const country = modernCountry(this.countryId),
+    const candidates = factionsForCountry(this.countryId);
+    const country =
+        this.rulesVersion === 2
+          ? modernFaction(
+              candidates.some((faction) => faction.id === this.factionId)
+                ? this.factionId
+                : candidates[0].id,
+            )
+          : modernCountry(this.countryId),
       clientID = generateID();
     // Same preset seed creates the same world AI ids/decisions. UI clock is
     // only metadata, never consumed by simulation.
-    const gameID = `MW${String(this.seed).padStart(6, "0")}`;
+    const gameID = `${this.rulesVersion === 2 ? "MR" : "MW"}${String(this.seed).padStart(6, "0")}`;
     const gameStartInfo: GameStartInfo = {
       gameID,
       lobbyCreatedAt: Date.now(),
@@ -328,7 +616,11 @@ export class ModernWorldModal extends BaseModal {
       players: [
         {
           clientID,
-          username: country.name.replace(/'/g, "").replace(/&/g, "and"),
+          username: ("gameName" in country ? country.gameName : country.name)
+            .replace(/'/g, "")
+            .replace(/&/g, "and")
+            .replace(new RegExp(`[^${RENDERABLE_NAME_CHARS}]`, "gu"), "")
+            .slice(0, 27),
           clanTag: null,
         },
       ],
@@ -353,17 +645,29 @@ export class ModernWorldModal extends BaseModal {
           : [UnitType.AtomBomb, UnitType.HydrogenBomb, UnitType.MIRV],
         enhancedAI: {
           tribePercent: 0,
-          nationPercent: this.aiPercent,
+          nationPercent: this.rulesVersion === 2 ? 100 : this.aiPercent,
           personality: "mixed",
           fairResources: true,
           seed: this.seed,
         },
         modernMode: {
-          scenario: "modern-world-v1",
-          version: 1,
-          dataHash: modernWorld.hash,
-          countryId: this.countryId,
-          balance: this.balance,
+          scenario:
+            this.rulesVersion === 2 ? "modern-regions-v2" : "modern-world-v1",
+          version: this.rulesVersion,
+          dataHash:
+            this.rulesVersion === 2 ? modernRegions.hash : modernWorld.hash,
+          countryId: country.id,
+          ...(this.rulesVersion === 2
+            ? {
+                factionId: country.id,
+                initialPopulation: this.initialPopulation,
+                aiLevelWeights: this.aiWeights,
+                participantSlots: this.participantSlots,
+                fillEmptySlots: this.fillEmptySlots,
+                trainingLesson: this.trainingLesson,
+              }
+            : {}),
+          balance: this.rulesVersion === 2 ? "balanced" : this.balance,
           victory: this.victory,
           targetPercent: this.targetPercent,
           protectionTicks: this.protectionSeconds * 10,

@@ -10,6 +10,10 @@ import {
 } from "../game/Game";
 import { TileRef } from "../game/GameMap";
 import { ErrorUpdate, GameUpdateViewData } from "../game/GameUpdates";
+import {
+  ModernCommandKind,
+  ModernCommandPreview,
+} from "../modern/ModernForceTypes";
 import { ClientID, GameStartInfo, Turn } from "../Schemas";
 import { generateID } from "../Util";
 import { WorkerMessage } from "./WorkerMessages";
@@ -182,6 +186,43 @@ export class WorkerClient {
         type: "snapshot",
         id: messageId,
         gitCommit,
+      });
+    });
+  }
+  modernForcePreview(
+    playerId: string,
+    forceId: string,
+    target: TileRef,
+    command: ModernCommandKind,
+    queue = false,
+  ): Promise<ModernCommandPreview> {
+    return new Promise((resolve, reject) => {
+      if (!this.isInitialized) {
+        reject(new Error("Worker not initialized"));
+        return;
+      }
+      const id = generateID();
+      const timeout = setTimeout(() => {
+        this.messageHandlers.delete(id);
+        reject(new Error("Command preview timeout"));
+      }, 10_000);
+      this.messageHandlers.set(id, (message) => {
+        if (message.type === "modern_force_preview_result") {
+          clearTimeout(timeout);
+          resolve(message.result);
+        } else if (message.type === "game_error") {
+          clearTimeout(timeout);
+          reject(new Error(message.error.errMsg));
+        }
+      });
+      this.worker!.postMessage({
+        type: "modern_force_preview",
+        id,
+        playerId,
+        forceId,
+        target,
+        command,
+        queue,
       });
     });
   }

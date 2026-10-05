@@ -11,9 +11,9 @@ import {
   Team,
 } from "../game/Game";
 import {
-  modernPlayerId,
+  modernEntries,
+  modernEntryPlayerId,
   modernProgress,
-  modernWorld,
 } from "../game/ModernWorld";
 import { execSnapshotType } from "../snapshot/ExecutionSnapshot";
 import type { ExecRecord, SnapshotReader } from "../snapshot/SnapshotContext";
@@ -65,9 +65,17 @@ export class WinCheckExecution implements Execution {
   private checkModernWinner(): void {
     const game = this.mg!;
     const mode = game.config().gameConfig().modernMode!;
+    const entries = modernEntries(game.config().gameConfig());
+    const modernArea = game.modernSystems();
+    const areaOf = (p: Player) =>
+      modernArea?.factions.find((f) => f.playerId === p.id())?.ownedAreaUnits ??
+      p.numTilesOwned();
+    const totalArea = modernArea
+      ? modernArea.factions.reduce((n, f) => n + f.ownedAreaUnits, 0)
+      : game.numLandTiles() - game.numTilesWithFallout();
     if (mode.capitalElimination) {
-      for (const country of modernWorld.countries) {
-        const controller = game.player(modernPlayerId(country));
+      for (const country of entries) {
+        const controller = game.player(modernEntryPlayerId(country));
         const owner = game.owner(
           game.ref(country.capital[0], country.capital[1]),
         );
@@ -80,28 +88,19 @@ export class WinCheckExecution implements Execution {
     }
     const sorted = game
       .players()
-      .sort(
-        (a, b) =>
-          b.numTilesOwned() - a.numTilesOwned() || a.smallID() - b.smallID(),
-      );
+      .sort((a, b) => areaOf(b) - areaOf(a) || a.smallID() - b.smallID());
     if (!sorted.length) return;
     let winner: Player | undefined;
     if (mode.victory === "capitals") {
       const capitals = sorted
         .map((p) => ({ p, score: modernProgress(game, p).ownedCapitals }))
         .sort((a, b) => b.score - a.score || a.p.smallID() - b.p.smallID());
-      if (
-        capitals[0].score * 100 >=
-        modernWorld.countries.length * mode.targetPercent
-      )
+      if (capitals[0].score * 100 >= entries.length * mode.targetPercent)
         winner = capitals[0].p;
     } else if (mode.victory === "total") {
       if (sorted.length === 1) winner = sorted[0];
     } else if (mode.victory === "territory") {
-      if (
-        sorted[0].numTilesOwned() * 100 >=
-        (game.numLandTiles() - game.numTilesWithFallout()) * mode.targetPercent
-      )
+      if (areaOf(sorted[0]) * 100 >= totalArea * mode.targetPercent)
         winner = sorted[0];
     }
     const timer = game.config().gameConfig().maxTimerValue ?? 30;

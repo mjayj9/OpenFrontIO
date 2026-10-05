@@ -14,6 +14,12 @@ This personal fork adds opt-in deterministic enhanced AI, searchable English/Kor
 education and prepared training, modern country ownership, and real singleplayer
 snapshot saves. See [Enhanced AI](docs/EnhancedAI.md), [education](docs/Education.md),
 [Modern World](docs/ModernWorld.md), and [private modern rooms](docs/ModernLobby.md).
+Modern v2 adds independent administrative regions, equal starting population,
+army/navy/air commands, finite aircraft, local climate, major-port development
+and nuclear responsibility. See [controls and training](docs/ModernClient.md),
+[region data and exceptions](docs/ModernRegions.md),
+[military rules](docs/modern-forces.md), and
+[verification and limitations](docs/ModernV2Verification.md).
 The source and asset licenses and existing copyright notices are retained.
 
 For modern singleplayer or training without the separate account/ranked API:
@@ -27,8 +33,12 @@ npm run preview:fork
 Open `http://127.0.0.1:9002`. Choose **Modern countries** or **Tutorial** on the
 main page. The **Saved singleplayer games** button manages complete running-game
 saves; the in-game **Saves and victory objective** menu saves and restarts a match.
-Modern World v1 uses 198 scenario controllers at 2000×1000, with explicit tiny
-territory and dependency/dispute policies. This preview does not provide public
+Modern v2 uses 294 independent factions from 198 parent-country controllers at
+2000×1000. Large countries require a regional selection; all factions start with
+the same configurable game population (default 1,000,000). Modern World v1
+remains a separate rule choice. Tiny-territory and dependency/dispute policies
+and the 34 administrative area exceptions are documented in the region report.
+This preview does not provide public
 matchmaking, accounts, or private room hosting; those use the existing deployment.
 Classic stays available and enhanced AI remains an explicit setting.
 

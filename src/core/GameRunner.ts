@@ -29,13 +29,14 @@ import { TileRef } from "./game/GameMap";
 import { GameMapLoader } from "./game/GameMapLoader";
 import { ErrorUpdate, GameUpdateViewData } from "./game/GameUpdates";
 import {
+  modernEntries,
   modernHumanCountryIds,
   modernPlayerInfo,
-  modernWorld,
   validateModernStart,
 } from "./game/ModernWorld";
 import { createNationsForGame } from "./game/NationCreation";
 import { loadTerrainMap as loadGameMap } from "./game/TerrainMapLoader";
+import { modernAssignmentsFor } from "./modern/ModernAssignments";
 import { PseudoRandom } from "./PseudoRandom";
 import { ClientID, GameStartInfo, Turn } from "./Schemas";
 import {
@@ -53,6 +54,8 @@ export async function createGameRunner(
 ): Promise<GameRunner> {
   const config = new Config(gameStart.config, null, false, gameStart.listed);
   validateModernStart(gameStart);
+  if (gameStart.config.modernMode?.scenario === "modern-regions-v2")
+    gameStart.modernAssignments ??= modernAssignmentsFor(gameStart);
   const gameMap = await loadGameMap(
     gameStart.config.gameMap,
     gameStart.config.gameMapSize,
@@ -66,7 +69,7 @@ export async function createGameRunner(
     : undefined;
 
   const humans = gameStart.config.modernMode
-    ? modernWorld.countries
+    ? modernEntries(gameStart.config)
         .filter((country) => selectedCountries!.has(country.id))
         .map((country) => modernPlayerInfo(country, gameStart))
     : gameStart.players.map((p) => {
@@ -109,7 +112,7 @@ export async function createGameRunner(
     ),
     callBack,
   );
-  gr.init();
+  gr.init(gameStart.modernAssignments);
   return gr;
 }
 
@@ -194,17 +197,22 @@ export class GameRunner {
     return update;
   }
 
-  init() {
+  init(assignments?: GameStartInfo["modernAssignments"]) {
     const training = this.game.config().gameConfig().training;
     if (training) {
       this.game.addExecution(new TrainingExecution());
     } else if (this.game.config().gameConfig().modernMode) {
-      this.game.addExecution(new ModernWorldExecution());
+      this.game.addExecution(new ModernWorldExecution(assignments));
     }
     if (this.game.config().gameConfig().gameType !== GameType.Singleplayer) {
       this.game.addExecution(new SpawnTimerExecution());
     }
-    if (!training && this.game.config().spawnNations()) {
+    if (
+      !training &&
+      this.game.config().spawnNations() &&
+      this.game.config().gameConfig().modernMode?.scenario !==
+        "modern-regions-v2"
+    ) {
       this.game.addExecution(...this.execManager.nationExecutions());
     }
     if (

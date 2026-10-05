@@ -408,7 +408,7 @@ export class GameRenderer {
     this.layerTickState.clear();
   }
 
-  tick() {
+  tick(forceRefresh = false) {
     const nowMs = performance.now();
     const shouldProfileTick = FrameProfiler.isEnabled();
 
@@ -424,7 +424,11 @@ export class GameRenderer {
       };
 
       const intervalMs = layer.getTickIntervalMs?.() ?? 0;
-      if (intervalMs > 0 && nowMs - state.lastTickAtMs < intervalMs) {
+      if (
+        !forceRefresh &&
+        intervalMs > 0 &&
+        nowMs - state.lastTickAtMs < intervalMs
+      ) {
         this.layerTickState.set(layer, state);
         continue;
       }

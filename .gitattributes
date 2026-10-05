@@ -29,3 +29,9 @@
 # Packed terrain can contain no NUL bytes and still be binary. Never normalize it.
 resources/maps/modernworld/*.bin binary
 map-generator/modern-world/owners.raw binary
+map-generator/modern-world-v2/*.raw binary
+map-generator/modern-world-v2/source/*.tif binary
+map-generator/modern-world-v2/source/*.geojson.gz binary
+map-generator/modern-world-v2/source/*.zip binary
+# Keep the third-party climate legend verbatim, including its source whitespace.
+map-generator/modern-world-v2/source/climate-legend.txt -whitespace

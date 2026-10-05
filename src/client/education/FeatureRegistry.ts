@@ -215,7 +215,116 @@ export const EDUCATION_FEATURES: readonly EducationFeature[] = [
   feature("clan", "reference"),
   feature("statistics", "reference"),
   feature("cosmetics", "reference"),
-  feature("modern", "modern", [], [], ["modernMode"], [], ["modern"]),
+  feature(
+    "modern",
+    "modern",
+    [],
+    [],
+    [
+      "modernMode",
+      "modernMode.scenario",
+      "modernMode.balance",
+      "modernMode.victory",
+      "modernMode.targetPercent",
+      "modernMode.protectionTicks",
+      "modernMode.capitalElimination",
+      "modernMode.trainingLesson",
+    ],
+    [],
+    ["modern"],
+  ),
+  feature(
+    "modern_regions",
+    "modern_regions",
+    [],
+    [],
+    ["modernMode.countryId", "modernMode.factionId"],
+    ["modern_regions"],
+    ["modern"],
+  ),
+  feature(
+    "modern_population",
+    "modern_population",
+    ["modern_produce"],
+    [],
+    ["modernMode.initialPopulation"],
+    ["modern_population", "modern_mobilization"],
+    ["modern"],
+  ),
+  feature(
+    "modern_commands",
+    "modern_commands",
+    ["modern_command"],
+    [],
+    [],
+    [
+      "modern_branches",
+      "modern_select",
+      "modern_army_move",
+      "modern_stop",
+      "modern_navy_move",
+    ],
+    ["modern"],
+  ),
+  feature(
+    "modern_air",
+    "modern_air",
+    [],
+    [],
+    [],
+    [
+      "modern_airbase",
+      "modern_air_launch",
+      "modern_air_return",
+      "modern_air_intercept",
+    ],
+    ["modern"],
+  ),
+  feature(
+    "modern_climate",
+    "modern_climate",
+    ["modern_train"],
+    [],
+    [],
+    ["modern_climate_compare", "modern_climate_train"],
+    ["modern"],
+  ),
+  feature(
+    "modern_ports",
+    "modern_ports",
+    ["modern_develop", "modern_repair"],
+    [],
+    [],
+    [
+      "modern_port_capture",
+      "modern_port_develop",
+      "modern_port_blockade",
+      "modern_port_defend",
+    ],
+    ["modern"],
+  ),
+  feature(
+    "modern_nuclear",
+    "modern_nuclear",
+    [],
+    [],
+    [],
+    ["modern_nuclear_penalty"],
+    ["modern"],
+  ),
+  feature(
+    "modern_ai",
+    "modern_ai",
+    [],
+    [],
+    [
+      "modernMode.aiLevelWeights",
+      "modernMode.participantSlots",
+      "modernMode.fillEmptySlots",
+    ],
+    ["modern_ai_levels"],
+    ["modern", "multiplayer"],
+  ),
 ];
 
 /** No public UI: protocol plumbing, admin-only integration, host-private data. */
@@ -229,6 +338,10 @@ export const INTERNAL_GAME_CONFIG_KEYS: Readonly<Record<string, string>> = {
   pool: "Private sibling lobby credentials",
 };
 export const INTERNAL_INTENTS = ["mark_disconnected"] as const;
+export const INTERNAL_MODERN_CONFIG_KEYS: Readonly<Record<string, string>> = {
+  version: "Scenario compatibility metadata, never chosen independently",
+  dataHash: "Pinned offline scenario checksum",
+};
 
 /** Every public configurable keyboard action is discoverable under this entry.
  * Help reads the current effective bindings, including unassigned actions. */

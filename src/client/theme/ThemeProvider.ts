@@ -2,6 +2,10 @@ import { Colord, colord, LabaColor } from "colord";
 import { aiProfile } from "../../core/ai/AIProfile";
 import { ColoredTeams, PlayerType, Team } from "../../core/game/Game";
 import type { PlayerUpdate } from "../../core/game/GameUpdates";
+import {
+  modernFactionPlayerId,
+  modernFactions,
+} from "../../core/game/ModernRegions";
 import { modernPlayerId, modernWorld } from "../../core/game/ModernWorld";
 import { UserSettings } from "../../core/game/UserSettings";
 import type { GameConfig } from "../../core/Schemas";
@@ -365,6 +369,15 @@ const modernNeighbors: ReadonlyMap<string, readonly string[]> = new Map(
   ]),
 );
 const noNeighbors: ReadonlyMap<string, readonly string[]> = new Map();
+const factionPlayers = new Map(
+  modernFactions.map((faction) => [faction.id, modernFactionPlayerId(faction)]),
+);
+const regionNeighbors: ReadonlyMap<string, readonly string[]> = new Map(
+  modernFactions.map((faction) => [
+    modernFactionPlayerId(faction),
+    faction.neighbors.map((id) => factionPlayers.get(id)!).sort(),
+  ]),
+);
 
 /** Shared live/replay initial allocation; preserves simulation dictionary order. */
 export function prepareThemePlayers(
@@ -373,7 +386,13 @@ export function prepareThemePlayers(
   config?: GameConfig,
 ): void {
   if (theme instanceof SettingsTheme)
-    theme.setNeighborIds(config?.modernMode ? modernNeighbors : noNeighbors);
+    theme.setNeighborIds(
+      config?.modernMode?.scenario === "modern-regions-v2"
+        ? regionNeighbors
+        : config?.modernMode
+          ? modernNeighbors
+          : noNeighbors,
+    );
   // Humans/nations exist before tribes spawn. Keep the same class order
   // when reconnect/restore presents every identity in one full update.
   const order = (p: Pick<PlayerUpdate, "playerType">) =>

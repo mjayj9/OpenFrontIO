@@ -8,6 +8,7 @@ import {
   ensureServerList,
   refreshServerList,
   reloadWouldRescue,
+  setDevelopmentLobbyConnection,
 } from "./ServerList";
 import { describeSocketClose } from "./SocketClose";
 import { translateText } from "./Utils";
@@ -209,6 +210,9 @@ export class PublicLobbySocket {
       const message = decodeLobbyMessage(
         new Uint8Array(event.data as ArrayBuffer),
       );
+      if (this.ws?.readyState === WebSocket.OPEN) {
+        setDevelopmentLobbyConnection(this, true);
+      }
       this.wsConnectionAttempts = 0;
       this.gaveUp = false;
       if (message.type === "full") {
@@ -246,6 +250,7 @@ export class PublicLobbySocket {
       };
       this.onLobbiesUpdate(this.lastFull);
     } catch (error) {
+      setDevelopmentLobbyConnection(this, false);
       console.error("Error parsing WebSocket message:", error);
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         try {
@@ -296,6 +301,7 @@ export class PublicLobbySocket {
   }
 
   private handleClose(url: string, event: CloseEvent, openedAt: number | null) {
+    setDevelopmentLobbyConnection(this, false);
     if (this.stopped) return;
     if (!this.wsAttemptCounted) {
       this.wsAttemptCounted = true;
@@ -351,6 +357,7 @@ export class PublicLobbySocket {
   // known the next attempt has to re-run discovery, not re-dial an empty
   // worker path.
   private handleConnectError(error: unknown, rediscover = false) {
+    setDevelopmentLobbyConnection(this, false);
     console.warn("Error connecting WebSocket:", error);
     if (!this.wsAttemptCounted) {
       this.wsAttemptCounted = true;
@@ -382,6 +389,7 @@ export class PublicLobbySocket {
   }
 
   private disconnectWebSocket() {
+    setDevelopmentLobbyConnection(this, false);
     if (this.ws) {
       this.ws.close();
       this.ws = null;

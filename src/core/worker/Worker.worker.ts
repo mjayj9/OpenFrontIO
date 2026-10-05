@@ -7,6 +7,12 @@ import {
   GameRunner,
 } from "../GameRunner";
 import {
+  climateCombatEfficiency,
+  climateMovementEfficiency,
+} from "../modern/ModernClimate";
+import { forcePreview } from "../modern/ModernForces";
+import { modernFactionState } from "../modern/ModernState";
+import {
   AttackClusteredPositionsResultMessage,
   InitializedMessage,
   MainThreadMessage,
@@ -147,6 +153,52 @@ ctx.addEventListener("message", async (e: MessageEvent<MainThreadMessage>) => {
   const message = e.data;
 
   switch (message.type) {
+    case "modern_force_preview": {
+      if (!gameRunner) throw new Error("Game runner not initialized");
+      const game = (await gameRunner).game,
+        state = game.modernSystems();
+      const force = state?.forces.find(
+        (f) => f.id === message.forceId && f.playerId === message.playerId,
+      );
+      const result =
+        state && force
+          ? forcePreview(
+              game,
+              state,
+              force,
+              message.target,
+              message.command,
+              undefined,
+              {
+                reserve: () => false,
+                release: () => {},
+                casualties: () => {},
+                climateEfficiency: (id, tile) =>
+                  climateCombatEfficiency(modernFactionState(state, id), tile),
+                climateMovementEfficiency: (id, tile) =>
+                  climateMovementEfficiency(
+                    modernFactionState(state, id),
+                    tile,
+                  ),
+              },
+              message.queue ?? false,
+            )
+          : {
+              valid: false,
+              reason: "not_force_owner",
+              path: [],
+              etaTicks: 0,
+              rangeTiles: 0,
+              risk: "uncertain" as const,
+              climateEfficiencyPermille: 1000,
+            };
+      sendMessage({
+        type: "modern_force_preview_result",
+        id: message.id!,
+        result,
+      });
+      break;
+    }
     case "init":
       try {
         // Set before createGameRunner so map fetches via mapLoader pick up the

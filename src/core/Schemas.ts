@@ -29,32 +29,7 @@ import { flattenedEmojiTable, LOBBY_LABEL_MAX } from "./Util";
 export type GameID = string;
 export type ClientID = string;
 
-export type Intent =
-  | SpawnIntent
-  | AttackIntent
-  | CancelAttackIntent
-  | BoatAttackIntent
-  | CancelBoatIntent
-  | AllianceRequestIntent
-  | AllianceRejectIntent
-  | AllianceExtensionIntent
-  | BreakAllianceIntent
-  | TargetPlayerIntent
-  | EmojiIntent
-  | DonateGoldIntent
-  | DonateTroopsIntent
-  | BuildUnitIntent
-  | EmbargoIntent
-  | QuickChatIntent
-  | MoveWarshipIntent
-  | MarkDisconnectedIntent
-  | EmbargoAllIntent
-  | UpgradeStructureIntent
-  | DeleteUnitIntent
-  | KickPlayerIntent
-  | TogglePauseIntent
-  | UpdateGameConfigIntent
-  | ToggleGameStartTimer;
+export type Intent = z.infer<typeof IntentSchema>;
 
 export type AttackIntent = z.infer<typeof AttackIntentSchema>;
 export type CancelAttackIntent = z.infer<typeof CancelAttackIntentSchema>;
@@ -331,7 +306,7 @@ const ClientInfoSchema = z.object({
   // Server-owned modern lobby reservation; independent of the client/player id.
   countryId: z
     .string()
-    .regex(/^[A-Z]{3}$/)
+    .regex(/^[A-Za-z0-9_-]{3,64}$/)
     .optional(),
 });
 
@@ -546,10 +521,36 @@ export const GameConfigSchema = z.object({
   // Offline scenario identity is part of settings, snapshots and game records.
   modernMode: z
     .object({
-      scenario: z.literal("modern-world-v1"),
-      version: zb.uint({ min: 1, max: 1 }),
+      scenario: z.enum(["modern-world-v1", "modern-regions-v2"]),
+      version: zb.uint({ min: 1, max: 2 }),
       dataHash: z.string().regex(/^[a-f0-9]{64}$/),
-      countryId: z.string().regex(/^[A-Z]{3}$/),
+      countryId: z.string().regex(/^[A-Za-z0-9_-]{3,64}$/),
+      factionId: z
+        .string()
+        .regex(/^[A-Za-z0-9_-]{3,64}$/)
+        .optional(),
+      initialPopulation: zb.uint({ min: 100_000, max: 10_000_000 }).optional(),
+      aiLevelWeights: z
+        .object({
+          low: zb.uint({ max: 100 }),
+          medium: zb.uint({ max: 100 }),
+          high: zb.uint({ max: 100 }),
+        })
+        .optional(),
+      participantSlots: zb.uint({ min: 1, max: 32 }).optional(),
+      fillEmptySlots: z.boolean().optional(),
+      trainingLesson: z
+        .enum([
+          "regions",
+          "population",
+          "commands",
+          "air",
+          "climate",
+          "ports",
+          "nuclear",
+          "ai",
+        ])
+        .optional(),
       balance: z.enum(["balanced", "asymmetric"]),
       victory: z.enum(["territory", "capitals", "timed", "total"]),
       targetPercent: zb.uint({ min: 10, max: 100 }),
@@ -890,6 +891,39 @@ export const IntentSchema = z.discriminatedUnion("type", [
   TogglePauseIntentSchema,
   UpdateGameConfigIntentSchema,
   ToggleGameStartTimerIntentSchema,
+  z.object({
+    type: z.literal("modern_command"),
+    forceIds: z.array(z.string().max(64)).min(1).max(32),
+    command: z.enum([
+      "move",
+      "attack",
+      "patrol",
+      "escort",
+      "blockade",
+      "air_superiority",
+      "intercept",
+      "strike",
+      "stop",
+      "cancel",
+      "wait",
+    ]),
+    target: zb.uint(),
+    queue: z.boolean().optional(),
+  }),
+  z.object({
+    type: z.literal("modern_produce"),
+    branch: z.enum(["army", "navy", "air"]),
+    kind: z.enum(["army", "warship", "fighter", "strike", "airbase"]),
+    baseId: z.string().max(64).optional(),
+    tile: zb.uint().optional(),
+    count: zb.uint({ min: 1, max: 8 }),
+  }),
+  z.object({ type: z.literal("modern_develop"), portId: z.string().max(64) }),
+  z.object({ type: z.literal("modern_repair"), portId: z.string().max(64) }),
+  z.object({
+    type: z.literal("modern_train"),
+    climate: z.enum(["arid", "tropical", "temperate", "continental", "polar"]),
+  }),
 ]);
 
 // StampedIntent = Intent with server-stamped clientID (used in turns and execution)
@@ -1005,7 +1039,7 @@ export const PlayerSchema = z.object({
   teamIndex: zb.uint().optional(),
   countryId: z
     .string()
-    .regex(/^[A-Z]{3}$/)
+    .regex(/^[A-Za-z0-9_-]{3,64}$/)
     .optional(),
 });
 
@@ -1021,6 +1055,18 @@ export const TribeSchema = z
 export type Tribe = z.infer<typeof TribeSchema>;
 
 export const GameStartInfoSchema = z.object({
+  modernAssignments: z
+    .array(
+      z.object({
+        factionId: z.string().max(64),
+        playerId: z.string().max(64),
+        clientID: z.string().nullable(),
+        aiLevel: z.enum(["low", "medium", "high"]).nullable(),
+        aiRole: z.enum(["human", "world", "invited-slot"]),
+      }),
+    )
+    .max(500)
+    .optional(),
   gameID: ID,
   lobbyCreatedAt: zb.uint(),
   visibleAt: zb.uint().optional(),
@@ -1155,7 +1201,7 @@ export const ServerModernLobbyStatusSchema = z.object({
   type: z.literal("modern_lobby_status"),
   countryId: z
     .string()
-    .regex(/^[A-Z]{3}$/)
+    .regex(/^[A-Za-z0-9_-]{3,64}$/)
     .optional(),
   error: z
     .enum([
@@ -1325,7 +1371,7 @@ export const ClientSpectateMessageSchema = z.object({
 
 export const ClientSelectCountryMessageSchema = z.object({
   type: z.literal("select_country"),
-  countryId: z.string().regex(/^[A-Z]{3}$/),
+  countryId: z.string().regex(/^[A-Za-z0-9_-]{3,64}$/),
 });
 
 export const ClientMessageSchema = zb.discriminatedUnion("type", [

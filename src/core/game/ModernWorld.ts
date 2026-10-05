@@ -1,4 +1,6 @@
-import { GameStartInfo } from "../Schemas";
+import { GameConfig, GameStartInfo } from "../Schemas";
+import { validateModernAssignments } from "../modern/ModernAssignments";
+import { isModernV2 } from "../modern/ModernRules";
 import {
   Game,
   GameMapSize,
@@ -9,10 +11,25 @@ import {
   PlayerInfo,
   PlayerType,
 } from "./Game";
+import {
+  modernFaction,
+  modernFactionPlayerId,
+  modernFactions,
+  modernRegions,
+} from "./ModernRegions";
 import data from "./ModernWorldData.json";
 
 export const modernWorld = data;
 export type ModernCountry = (typeof data.countries)[number];
+export type ModernPlayable = ModernCountry | (typeof modernFactions)[number];
+export function modernEntries(config: GameConfig): ModernPlayable[] {
+  return isModernV2(config) ? modernFactions : modernWorld.countries;
+}
+export function modernEntryPlayerId(entry: ModernPlayable): string {
+  return "factionId" in entry
+    ? modernFactionPlayerId(entry)
+    : modernPlayerId(entry);
+}
 export const modernPlayerId = (country: ModernCountry): string =>
   `world${String(country.index).padStart(3, "0")}`;
 export function countryForPlayer(id: string): ModernCountry | undefined {
@@ -41,9 +58,27 @@ export function modernHumanCountryIds(start: GameStartInfo): Set<string> {
 export function validateModernStart(start: GameStartInfo): void {
   const mode = start.config.modernMode;
   if (!mode) return;
+  if (isModernV2(start.config)) {
+    validateModernAssignments(start);
+    if (mode.balance !== "balanced")
+      throw new Error(
+        "Modern regions require equal population and common starting budgets",
+      );
+    const weights = mode.aiLevelWeights ?? { low: 1, medium: 1, high: 1 };
+    if (weights.low + weights.medium + weights.high === 0)
+      throw new Error("Modern AI weights cannot all be zero");
+    if (
+      mode.participantSlots !== undefined &&
+      start.players.length > mode.participantSlots
+    )
+      throw new Error("Human participants exceed reserved slots");
+    if (mode.factionId !== undefined && mode.factionId !== mode.countryId)
+      throw new Error("Modern selected faction fields differ");
+  }
   if (
-    mode.dataHash !== modernWorld.hash ||
-    mode.version !== modernWorld.version
+    mode.dataHash !==
+      (isModernV2(start.config) ? modernRegions.hash : modernWorld.hash) ||
+    mode.version !== (isModernV2(start.config) ? 2 : 1)
   ) {
     throw new Error("Modern scenario version/hash differs from this build");
   }
@@ -64,7 +99,8 @@ export function validateModernStart(start: GameStartInfo): void {
       player.countryId ?? (singleplayer ? mode.countryId : undefined);
     if (!countryId)
       throw new Error("Every modern room player must select a country");
-    modernCountry(countryId);
+    if (isModernV2(start.config)) modernFaction(countryId);
+    else modernCountry(countryId);
     if (selected.has(countryId))
       throw new Error("Modern country selected by multiple players");
     selected.add(countryId);
@@ -82,7 +118,7 @@ export function validateModernStart(start: GameStartInfo): void {
   }
 }
 export function modernPlayerInfo(
-  country: ModernCountry,
+  country: ModernPlayable,
   start: GameStartInfo,
 ): PlayerInfo {
   const human = start.players.find(
@@ -93,10 +129,10 @@ export function modernPlayerInfo(
           : undefined)) === country.id,
   );
   return new PlayerInfo(
-    country.name,
+    "gameName" in country ? country.gameName : country.name,
     human ? PlayerType.Human : PlayerType.Nation,
     human?.clientID ?? null,
-    modernPlayerId(country),
+    modernEntryPlayerId(country),
     human
       ? (human.isLobbyCreator ??
           start.config.gameType === GameType.Singleplayer)
@@ -112,16 +148,31 @@ export function modernProgress(
   player: Player,
 ): { ownedCapitals: number; totalCapitals: number; territoryPercent: number } {
   let ownedCapitals = 0;
-  for (const c of modernWorld.countries) {
+  const entries = modernEntries(game.config().gameConfig());
+  for (const c of entries) {
     const tile = game.ref(c.capital[0], c.capital[1]);
     if (game.owner(tile) === player) ownedCapitals++;
   }
   return {
     ownedCapitals,
-    totalCapitals: modernWorld.countries.length,
-    territoryPercent: Math.floor(
-      (player.numTilesOwned() * 100) /
-        Math.max(1, game.numLandTiles() - game.numTilesWithFallout()),
-    ),
+    totalCapitals: entries.length,
+    territoryPercent: game.modernSystems()
+      ? Math.floor(
+          ((game
+            .modernSystems()!
+            .factions.find((f) => f.playerId === player.id())?.ownedAreaUnits ??
+            0) *
+            100) /
+            Math.max(
+              1,
+              game
+                .modernSystems()!
+                .factions.reduce((n, f) => n + f.ownedAreaUnits, 0),
+            ),
+        )
+      : Math.floor(
+          (player.numTilesOwned() * 100) /
+            Math.max(1, game.numLandTiles() - game.numTilesWithFallout()),
+        ),
   };
 }

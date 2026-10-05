@@ -1,0 +1,64 @@
+{
+  "kind": "modern-v2-full-world-core",
+  "mode": "legacy",
+  "failedPathCache": "bounded owner-revision cache",
+  "seed": 2026,
+  "ticks": 1200,
+  "node": "v24.15.0",
+  "platform": "win32",
+  "os": "10.0.26200",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "logicalCPUs": 24,
+  "scenarioHash": "a7839a1b8c8f22feb7607c70b81131096b91db09963ab707a7aef8bffb1aa052",
+  "players": 104,
+  "initialPlayers": 198,
+  "aiLevels": {
+    "low": 0,
+    "medium": 0,
+    "high": 0
+  },
+  "startupMs": 192.93599999999998,
+  "tickTiming": {
+    "count": 1200,
+    "p50Ms": 7.662299999999959,
+    "p95Ms": 45.6877999999997,
+    "p99Ms": 138.6909999999998,
+    "maxMs": 496.1165000000001,
+    "meanMs": 14.647828583333322,
+    "over100ms": 19
+  },
+  "heapPeakBytes": 119645296,
+  "rssPeakBytes": 337772544,
+  "waterPathQueries": 1311,
+  "railPathQueries": 4583,
+  "armyPaths": {
+    "queries": 0,
+    "searches": 0,
+    "visited": 0,
+    "cacheHits": 0
+  },
+  "units": 1554,
+  "formations": 0,
+  "planes": 0,
+  "alive": 104,
+  "stateHash": 0,
+  "coreHash": 3177886621181388,
+  "finalTick": 1202,
+  "limits": [
+    "Core and update generation only; no browser/GPU rendering or network transfer.",
+    "Path counts are API queries, including memo hits, not expanded nodes.",
+    "Legacy has a different controller count/population model; compare idle vs mixed to isolate v2 decision overhead.",
+    "Peak heap/RSS sampled every 25 ticks; not exact allocation totals.",
+    "Legacy is this fork's modern-world-v1 with NationExecution and enhanced profiles, not an unmodified upstream Classic baseline."
+  ],
+  "commandWarnings": {
+    "count": 29,
+    "messages": {
+      "Failed to spawn warship for Myanmar at #": 1,
+      "Failed to spawn warship for Colombia at #": 1,
+      "cannot build Defense Post": 22,
+      "cannot build trade ship": 1,
+      "captured trade ship cannot find route": 4
+    }
+  }
+}
