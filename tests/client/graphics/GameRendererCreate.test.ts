@@ -101,4 +101,26 @@ describe("createRenderer", () => {
     eventBus.emit(new ShowEmojiMenuEvent(1, 1));
     expect(emojiTable.isVisible).toBe(true);
   });
+
+  it("refreshes the final paused HUD state without waiting for another tick", () => {
+    let state = 0;
+    let displayed = -1;
+    const refresh = vi.fn(() => (displayed = state));
+    vi.spyOn(performance, "now").mockReturnValue(100);
+    const renderer = new GameRenderer(
+      {} as ConstructorParameters<typeof GameRenderer>[0],
+      {} as ConstructorParameters<typeof GameRenderer>[1],
+      [{ tick: refresh, getTickIntervalMs: () => 1000 }],
+      {} as ConstructorParameters<typeof GameRenderer>[3],
+    );
+    renderer.tick();
+    state = 1;
+    renderer.tick();
+    expect(displayed).toBe(0);
+    renderer.tick(true);
+    expect(displayed).toBe(1);
+    expect(refresh).toHaveBeenCalledTimes(2);
+    renderer.tick();
+    expect(refresh).toHaveBeenCalledTimes(2);
+  });
 });

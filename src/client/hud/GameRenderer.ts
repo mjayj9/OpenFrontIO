@@ -375,6 +375,7 @@ export function createRenderer(
 
 export class GameRenderer {
   private layerTickState = new Map<Controller, { lastTickAtMs: number }>();
+  private listenerAbort = new AbortController();
 
   constructor(
     public transformHandler: TransformHandler,
@@ -390,15 +391,24 @@ export class GameRenderer {
 
     this.layers.forEach((l) => l.init?.());
 
-    window.addEventListener("resize", () =>
-      this.transformHandler.updateCanvasBoundingRect(),
+    window.addEventListener(
+      "resize",
+      () => this.transformHandler.updateCanvasBoundingRect(),
+      { signal: this.listenerAbort.signal },
     );
 
     //show whole map on startup
     this.transformHandler.centerAll(0.9);
   }
 
-  tick() {
+  dispose() {
+    this.listenerAbort.abort();
+    this.layers.forEach((layer) => layer.dispose?.());
+    this.transformHandler.dispose();
+    this.layerTickState.clear();
+  }
+
+  tick(forceRefresh = false) {
     const nowMs = performance.now();
     const shouldProfileTick = FrameProfiler.isEnabled();
 
@@ -414,7 +424,11 @@ export class GameRenderer {
       };
 
       const intervalMs = layer.getTickIntervalMs?.() ?? 0;
-      if (intervalMs > 0 && nowMs - state.lastTickAtMs < intervalMs) {
+      if (
+        !forceRefresh &&
+        intervalMs > 0 &&
+        nowMs - state.lastTickAtMs < intervalMs
+      ) {
         this.layerTickState.set(layer, state);
         continue;
       }

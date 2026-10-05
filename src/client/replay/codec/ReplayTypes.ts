@@ -6,6 +6,7 @@
  * straight to the renderer.
  */
 
+import type { AIStatusUpdate } from "../../../core/game/GameUpdates";
 import type {
   NameEntry,
   PlayerState,
@@ -177,6 +178,9 @@ export interface ReplayData {
 
 /** Full game state at one frame, as rebuilt by ReplayReader. */
 export interface ReplayFrame {
+  modernSystems?: import("../../../core/modern/ModernState").ModernState | null;
+  /** Latest AI goal per controller; reconstructed from keyframe + deltas. */
+  aiStrategies?: ReadonlyMap<string, AIStatusUpdate>;
   frame: number;
   tick: number;
   tileState: Uint16Array;

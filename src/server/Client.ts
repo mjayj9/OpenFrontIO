@@ -14,6 +14,7 @@ export class Client {
   public hashes: Map<Tick, number> = new Map();
 
   public reportedWinner: Winner | null = null;
+  public countryId: string | undefined;
 
   constructor(
     public readonly clientID: ClientID,

@@ -5,7 +5,7 @@
  */
 
 import { type Colord, colord } from "colord";
-import type { Team } from "../../core/game/Game";
+import { ColoredTeams, type Team } from "../../core/game/Game";
 import type { PlayerCosmetics } from "../../core/Schemas";
 import type { Theme } from "../theme/ThemeProvider";
 
@@ -16,13 +16,18 @@ import type { Theme } from "../theme/ThemeProvider";
  * `focused` whether they're the local player, whose border stands out.
  */
 export function resolvePlayerColors(
-  theme: Pick<Theme, "borderColor" | "focusedBorderColor">,
+  theme: Pick<Theme, "borderColor" | "focusedBorderColor"> &
+    Partial<Pick<Theme, "teamColor">>,
   themed: Colord,
   cosmetics: PlayerCosmetics,
   team: Team | null,
   focused: boolean,
 ): { territory: Colord; border: Colord } {
-  const themedBorder = theme.borderColor(themed);
+  // Enhanced tribes retain the Bot team outline; shared here for both live
+  // views and replay palettes. Explicit cosmetics still take precedence.
+  const outline =
+    team === ColoredTeams.Bot ? theme.teamColor?.(team) : undefined;
+  const themedBorder = theme.borderColor(outline ?? themed);
   // A pattern without a palette of its own is drawn in the theme's colours.
   const palette = cosmetics.pattern
     ? (cosmetics.pattern.colorPalette ?? {

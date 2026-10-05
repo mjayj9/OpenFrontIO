@@ -58,7 +58,12 @@ export interface Stats {
   boatSendTrade(player: Player, target: Player): void;
 
   // Player's trade ship arrives at target, both players earn gold
-  boatArriveTrade(player: Player, target: Player, gold: number | bigint): void;
+  boatArriveTrade(
+    player: Player,
+    target: Player,
+    gold: number | bigint,
+    targetGold?: number | bigint,
+  ): void;
 
   // Player's trade ship, captured from target, arrives. Player earns gold.
   boatCapturedTrade(

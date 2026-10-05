@@ -1,0 +1,359 @@
+{
+  "build": "136124f0dcd95989e64ba26fe1af2b030a0798dda83230558b0b186a86ee96df",
+  "coreAssetFingerprint": "64a4a035a0e4",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "input": "Normal menu → Modern practice → camera/QWE → real left/box/Shift selection → hover → unpaused right click",
+  "hover": {
+    "tick": 637,
+    "selected": ["force-1466", "force-1467"],
+    "previews": [
+      [
+        "force-1466",
+        {
+          "preview": {
+            "valid": true,
+            "reason": null,
+            "path": [
+              577705, 579705, 579706, 579707, 579708, 579709, 579710, 579711,
+              581711, 583711, 583712, 583713, 583714, 585714, 585715, 585716,
+              585717, 585718, 587718
+            ],
+            "etaTicks": 72,
+            "rangeTiles": 0,
+            "risk": "low",
+            "climateEfficiencyPermille": 1100
+          },
+          "command": "move"
+        }
+      ],
+      [
+        "force-1467",
+        {
+          "preview": {
+            "valid": true,
+            "reason": null,
+            "path": [
+              579705, 581705, 581706, 581707, 583707, 583708, 583709, 583710,
+              583711, 583712, 583713, 583714, 583715, 585715, 585716, 587716,
+              587717, 587718
+            ],
+            "etaTicks": 68,
+            "rangeTiles": 0,
+            "risk": "low",
+            "climateEfficiencyPermille": 1100
+          },
+          "command": "move"
+        }
+      ]
+    ]
+  },
+  "before": {
+    "paused": false,
+    "hit": "<div id=\"game-input-overlay\" style=\"position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; touch-action: none;\"></div>",
+    "target": {
+      "x": 661.5665438226006,
+      "y": 309.8267964494579
+    }
+  },
+  "samples": [
+    {
+      "tick": 738,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579705,
+          "x": 1705,
+          "y": 289,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 581705,
+          "x": 1705,
+          "y": 290,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 747,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579708,
+          "x": 1708,
+          "y": 289,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 583707,
+          "x": 1707,
+          "y": 291,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 756,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579710,
+          "x": 1710,
+          "y": 289,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 583709,
+          "x": 1709,
+          "y": 291,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 766,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 581711,
+          "x": 1711,
+          "y": 290,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 775,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583713,
+          "x": 1713,
+          "y": 291,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 583714,
+          "x": 1714,
+          "y": 291,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 784,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 585714,
+          "x": 1714,
+          "y": 292,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 585715,
+          "x": 1715,
+          "y": 292,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 794,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 585716,
+          "x": 1716,
+          "y": 292,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 587716,
+          "x": 1716,
+          "y": 293,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 730
+          },
+          "missions": 0
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 803,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 587718,
+          "x": 1718,
+          "y": 293,
+          "phase": "idle",
+          "command": null,
+          "missions": 0
+        },
+        {
+          "id": "force-1467",
+          "tile": 587718,
+          "x": 1718,
+          "y": 293,
+          "phase": "idle",
+          "command": null,
+          "missions": 1
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 812,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 587718,
+          "x": 1718,
+          "y": 293,
+          "phase": "idle",
+          "command": null,
+          "missions": 1
+        },
+        {
+          "id": "force-1467",
+          "tile": 587718,
+          "x": 1718,
+          "y": 293,
+          "phase": "idle",
+          "command": null,
+          "missions": 1
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    },
+    {
+      "tick": 821,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 587718,
+          "x": 1718,
+          "y": 293,
+          "phase": "idle",
+          "command": null,
+          "missions": 1
+        },
+        {
+          "id": "force-1467",
+          "tile": 587718,
+          "x": 1718,
+          "y": 293,
+          "phase": "idle",
+          "command": null,
+          "missions": 1
+        }
+      ],
+      "status": "명령을 전송했습니다. 부대의 실제 상태를 확인하세요."
+    }
+  ]
+}

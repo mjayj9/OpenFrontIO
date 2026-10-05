@@ -1,0 +1,2399 @@
+{
+  "kind": "modern-v2-full-world-core",
+  "mode": "high",
+  "seed": 2026,
+  "ticks": 1200,
+  "node": "v24.15.0",
+  "platform": "win32",
+  "os": "10.0.26200",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "logicalCPUs": 24,
+  "scenarioHash": "dc9636c7fa7200fcf9380f249f0dacae365fcb108d10bad1feac952128e0aac6",
+  "players": 266,
+  "aiLevels": {
+    "low": 0,
+    "medium": 0,
+    "high": 293
+  },
+  "beforePopulation": [
+    {
+      "id": "AFG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AGO-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AGO-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ALB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AND",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ARE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ARG-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ARG-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ARG-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ARM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ATG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r10",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r11",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r12",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUS-r13",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AUT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "AZE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BDI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BEL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BEN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BFA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BGD",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BGR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BHR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BHS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BIH",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BLR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BLZ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BOL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRA-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BRN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BTN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "BWA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAF",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CAN-r10",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CHN-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CIV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CMR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "COD-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "COD-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "COG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "COL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "COM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CPV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CRI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CUB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CYP",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "CZE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DEU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DJI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DMA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DNK-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DNK-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DNK-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DNK-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DOM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DZA-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "DZA-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ECU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "EGY",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ERI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ESP",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "EST",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ETH",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "FIN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "FJI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "FRA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "FSM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GAB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GBR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GEO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GHA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GIN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GMB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GNB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GNQ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GRC",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GRD",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GTM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "GUY",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "HND",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "HRV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "HTI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "HUN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IDN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IDN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IDN-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IND-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IND-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IND-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IND-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IND-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IRL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IRN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IRN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "IRQ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ISL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ISR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ITA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "JAM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "JOR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "JPN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KAS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KAZ-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KAZ-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KAZ-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KEN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KGZ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KHM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KIR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KNA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KOR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": null
+    },
+    {
+      "id": "KOS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "KWT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LAO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LBN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LBR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LBY-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LBY-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LCA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LIE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LKA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LSO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LTU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LUX",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "LVA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MAR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MCO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MDA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MDG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MDV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MEX-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MEX-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MHL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MKD",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MLI-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MLI-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MLT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MMR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MNE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MNG-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MNG-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MOZ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MRT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MUS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MWI",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "MYS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NAM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NER",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NGA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NIC",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NLD",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NOR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NPL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NRU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "NZL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "OMN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PAK",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PAN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PER-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PER-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PHL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PLW",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PNG",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "POL",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PRK",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PRT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PRY",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "PSX",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "QAT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ROU",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r10",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r11",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r12",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r13",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r14",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r15",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r16",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r17",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RUS-r18",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "RWA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SAU-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SAU-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SDN-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SDN-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SDS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SEN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SGP",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SLB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SLE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SLV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SMR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SOM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SRB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "STP",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SUR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SVK",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SVN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SWE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SWZ",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SYC",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "SYR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TCD-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TCD-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TGO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "THA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TJK",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TKM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TLS",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TON",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TTO",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TUN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TUR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TUV",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TWN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "TZA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "UGA",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "UKR",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "URY",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r03",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r04",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r05",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r06",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r07",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r08",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r09",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r10",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r11",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r12",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r13",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r14",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r15",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r16",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "USA-r17",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "UZB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "VAT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "VCT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "VEN",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "VNM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "VUT",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "WSM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "YEM",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ZAF-r01",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ZAF-r02",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ZMB",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    },
+    {
+      "id": "ZWE",
+      "N0": 1000000,
+      "available": 11200,
+      "army": 18000,
+      "air": 800,
+      "level": "high"
+    }
+  ],
+  "startupMs": 210.8653,
+  "tickTiming": {
+    "count": 1200,
+    "p50Ms": 19.798399999999674,
+    "p95Ms": 102.28229999999894,
+    "p99Ms": 152.21249999999782,
+    "maxMs": 371.9712999999974,
+    "meanMs": 29.791505916666658,
+    "over100ms": 65
+  },
+  "heapPeakBytes": 144076160,
+  "rssPeakBytes": 367931392,
+  "waterPathQueries": 1007,
+  "railPathQueries": 4510,
+  "units": 2030,
+  "formations": 3134,
+  "planes": 1188,
+  "alive": 266,
+  "stateHash": 3547937342,
+  "coreHash": 29046531442649936,
+  "finalTick": 1202,
+  "limits": [
+    "Core and update generation only; no browser/GPU rendering or network transfer.",
+    "Path counts are API queries, including memo hits, not expanded nodes.",
+    "Legacy has a different controller count/population model; compare idle vs mixed to isolate v2 decision overhead.",
+    "Peak heap/RSS sampled every 25 ticks; not exact allocation totals."
+  ]
+}

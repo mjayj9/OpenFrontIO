@@ -11,6 +11,7 @@ import {
   UnitType,
 } from "../../../core/game/Game";
 import { TileRef } from "../../../core/game/GameMap";
+import { DEFAULT_MODERN_FORCE_RULES } from "../../../core/modern/ModernForceTypes";
 import { Controller } from "../../Controller";
 import {
   CloseViewEvent,
@@ -18,9 +19,12 @@ import {
   ShowBuildMenuEvent,
   ShowEmojiMenuEvent,
 } from "../../InputHandler";
+import { MODERN_ICONS } from "../../ModernMapDisplay";
+import { modernNuclearNotice } from "../../ModernNuclearNotice";
 import { TransformHandler } from "../../TransformHandler";
 import {
   BuildUnitIntentEvent,
+  SendModernIntentEvent,
   SendUpgradeStructureIntentEvent,
 } from "../../Transport";
 import { UIState } from "../../UIState";
@@ -128,34 +132,49 @@ export class BuildMenu extends LitElement implements Controller {
   public game: GameView;
   public eventBus: EventBus;
   public uiState: UIState;
-  private clickedTile: TileRef;
+  private clickedTile: TileRef | undefined;
   public playerBuildables: BuildableUnit[] | null = null;
   private filteredBuildTable: BuildItemDisplay[][] = buildTable;
   public transformHandler: TransformHandler;
+  private subscribedBus: EventBus | null = null;
+  private disposed = false;
+  private menuGeneration = 0;
+  private nextRequest = 0;
+  private pendingRequest: number | null = null;
+  private readonly onHideMenu = () => this.hideMenu();
+  private readonly onShowBuildMenu = (e: ShowBuildMenuEvent) => {
+    if (this.disposed || !this.game.myPlayer()?.isAlive() || !this._hidden) {
+      // Players sometimes hold control while building a unit, so keep an
+      // already open menu at its original location.
+      return;
+    }
+    const clickedCell = this.transformHandler.screenToWorldCoordinates(
+      e.x,
+      e.y,
+    );
+    if (!this.game.isValidCoord(clickedCell.x, clickedCell.y)) return;
+    this.showMenu(this.game.ref(clickedCell.x, clickedCell.y));
+  };
 
   init() {
-    this.eventBus.on(ShowBuildMenuEvent, (e) => {
-      if (!this.game.myPlayer()?.isAlive()) {
-        return;
-      }
-      if (!this._hidden) {
-        // Players sometimes hold control while building a unit,
-        // so if the menu is already open, ignore the event.
-        return;
-      }
-      const clickedCell = this.transformHandler.screenToWorldCoordinates(
-        e.x,
-        e.y,
-      );
-      if (!this.game.isValidCoord(clickedCell.x, clickedCell.y)) {
-        return;
-      }
-      const tile = this.game.ref(clickedCell.x, clickedCell.y);
-      this.showMenu(tile);
-    });
-    this.eventBus.on(CloseViewEvent, () => this.hideMenu());
-    this.eventBus.on(ShowEmojiMenuEvent, () => this.hideMenu());
-    this.eventBus.on(MouseDownEvent, () => this.hideMenu());
+    this.dispose();
+    this.disposed = false;
+    this.subscribedBus = this.eventBus;
+    this.eventBus.on(ShowBuildMenuEvent, this.onShowBuildMenu);
+    this.eventBus.on(CloseViewEvent, this.onHideMenu);
+    this.eventBus.on(ShowEmojiMenuEvent, this.onHideMenu);
+    this.eventBus.on(MouseDownEvent, this.onHideMenu);
+  }
+
+  dispose() {
+    this.subscribedBus?.off(ShowBuildMenuEvent, this.onShowBuildMenu);
+    this.subscribedBus?.off(CloseViewEvent, this.onHideMenu);
+    this.subscribedBus?.off(ShowEmojiMenuEvent, this.onHideMenu);
+    this.subscribedBus?.off(MouseDownEvent, this.onHideMenu);
+    this.subscribedBus = null;
+    this.disposed = true;
+    this.hideMenu();
+    this.filteredBuildTable = buildTable;
   }
 
   tick() {
@@ -383,6 +402,7 @@ export class BuildMenu extends LitElement implements Controller {
   }
 
   public sendBuildOrUpgrade(buildableUnit: BuildableUnit, tile: TileRef): void {
+    if (this.disposed || this._hidden) return;
     if (buildableUnit.canUpgrade !== false) {
       this.eventBus.emit(
         new SendUpgradeStructureIntentEvent(
@@ -403,12 +423,114 @@ export class BuildMenu extends LitElement implements Controller {
     this.hideMenu();
   }
 
+  private modernBuildReason(kind: "armybase" | "airbase"): string | null {
+    const tile = this.clickedTile,
+      me = this.game?.myPlayer();
+    if (
+      tile === undefined ||
+      !me ||
+      !this.game.isLand(tile) ||
+      this.game.isImpassable(tile) ||
+      this.game.ownerID(tile) !== me.smallID()
+    )
+      return "base_requires_owned_land";
+    const branch = kind === "armybase" ? "army" : "air";
+    const bases = this.game.modernSystems()?.bases ?? [];
+    if (
+      bases.some(
+        (base) => base.tile === tile && (base.branch ?? "air") === branch,
+      )
+    )
+      return "base_already_exists";
+    if (
+      bases.filter(
+        (base) =>
+          base.playerId === me.id() && (base.branch ?? "air") === branch,
+      ).length >= DEFAULT_MODERN_FORCE_RULES.maxBasesPerFaction
+    )
+      return "base_limit";
+    if (
+      me.gold() <
+      BigInt(
+        kind === "armybase"
+          ? DEFAULT_MODERN_FORCE_RULES.armybaseCost
+          : DEFAULT_MODERN_FORCE_RULES.airbaseCost,
+      )
+    )
+      return "insufficient_gold";
+    return null;
+  }
+  private modernBuild(kind: "armybase" | "airbase"): void {
+    if (
+      this.disposed ||
+      this._hidden ||
+      this.clickedTile === undefined ||
+      this.modernBuildReason(kind) ||
+      this.game.isPaused()
+    )
+      return;
+    this.eventBus.emit(
+      new SendModernIntentEvent({
+        type: "modern_produce",
+        branch: kind === "armybase" ? "army" : "air",
+        kind,
+        tile: this.clickedTile,
+        count: 1,
+      }),
+    );
+    this.hideMenu();
+  }
+  private modernBuildRow() {
+    if (
+      this.game?.config()?.gameConfig().modernMode?.scenario !==
+      "modern-regions-v2"
+    )
+      return "";
+    return html`<div class="build-row">
+      ${(["armybase", "airbase"] as const).map((kind) => {
+        const reason = this.modernBuildReason(kind);
+        return html`<button
+          class="build-button"
+          data-modern-highlight=${kind}
+          ?disabled=${Boolean(reason) || this.game.isPaused()}
+          title=${reason
+            ? translateText(`modern_v2.reason.${reason}`)
+            : translateText("repair.base_rules")}
+          @click=${() => this.modernBuild(kind)}
+        >
+          <img src=${MODERN_ICONS[kind]} alt="" width="40" height="40" />
+          <span class="build-name"
+            >${translateText(`modern_v2.kind.${kind}`)}</span
+          >
+          <span class="build-description"
+            >${translateText(
+              kind === "armybase"
+                ? "repair.base_desc_army"
+                : "repair.base_desc_air",
+            )}</span
+          >
+          <span class="build-cost"
+            >${renderNumber(
+              kind === "armybase"
+                ? DEFAULT_MODERN_FORCE_RULES.armybaseCost
+                : DEFAULT_MODERN_FORCE_RULES.airbaseCost,
+            )} <img src=${goldCoinIcon} width="12" height="12" alt="gold" /> ·
+            ${(kind === "armybase"
+              ? DEFAULT_MODERN_FORCE_RULES.armybaseBuildTicks
+              : DEFAULT_MODERN_FORCE_RULES.airbaseBuildTicks) / 10}s</span
+          >
+        </button>`;
+      })}
+    </div>`;
+  }
+
   render() {
     return html`
       <div
         class="build-menu ${this._hidden ? "hidden" : ""}"
         @contextmenu=${(e: MouseEvent) => e.preventDefault()}
       >
+        ${this.modernBuildRow()}
         ${this.filteredBuildTable.map(
           (row) => html`
             <div class="build-row">
@@ -426,6 +548,7 @@ export class BuildMenu extends LitElement implements Controller {
                   <button
                     class="build-button"
                     @click=${() =>
+                      this.clickedTile !== undefined &&
                       this.sendBuildOrUpgrade(buildableUnit, this.clickedTile)}
                     ?disabled=${!enabled}
                     title=${!enabled
@@ -439,12 +562,28 @@ export class BuildMenu extends LitElement implements Controller {
                       height="40"
                     />
                     <span class="build-name">
-                      ${item.key && translateText(item.key)}
+                      ${item.unitType === UnitType.Port &&
+                      this.game.modernSystems?.()
+                        ? translateText("modern_v2.kind.navybase")
+                        : item.key && translateText(item.key)}
                     </span>
                     <span class="build-description"
                       >${item.description &&
-                      translateText(item.description)}</span
+                      translateText(
+                        item.unitType === UnitType.Port &&
+                          this.game.modernSystems?.()
+                          ? "repair.base_desc_navy"
+                          : item.description,
+                      )}</span
                     >
+                    ${modernNuclearNotice(this.game, item.unitType)
+                      ? html`<span class="build-description text-orange-200"
+                          >${modernNuclearNotice(
+                            this.game,
+                            item.unitType,
+                          )}</span
+                        >`
+                      : ""}
                     <span class="build-cost" translate="no">
                       ${renderNumber(
                         this.game && this.game.myPlayer() ? this.cost(item) : 0,
@@ -473,27 +612,52 @@ export class BuildMenu extends LitElement implements Controller {
   }
 
   hideMenu() {
+    this.menuGeneration++;
     this._hidden = true;
+    this.clickedTile = undefined;
+    this.playerBuildables = null;
+    this.pendingRequest = null;
     this.requestUpdate();
   }
 
   showMenu(clickedTile: TileRef) {
+    if (this.disposed) return;
+    this.menuGeneration++;
     this.clickedTile = clickedTile;
+    this.playerBuildables = null;
+    this.pendingRequest = null;
     this._hidden = false;
     this.refresh();
   }
 
   private refresh() {
-    this.game
-      .myPlayer()
-      ?.buildables(this.clickedTile, BuildMenus.types)
-      .then((buildables) => {
-        this.playerBuildables = buildables;
-        this.requestUpdate();
-      });
-
     // remove disabled buildings from the buildtable
     this.filteredBuildTable = this.getBuildableUnits();
+    if (this.disposed || this._hidden || this.pendingRequest !== null) return;
+    const game = this.game;
+    const player = game.myPlayer();
+    const tile = this.clickedTile;
+    if (!player || tile === undefined) return;
+    const generation = this.menuGeneration;
+    const request = ++this.nextRequest;
+    this.pendingRequest = request;
+    const release = () => {
+      if (this.pendingRequest === request) this.pendingRequest = null;
+    };
+    void player.buildables(tile, BuildMenus.types).then((buildables) => {
+      if (
+        !this.disposed &&
+        !this._hidden &&
+        this.game === game &&
+        this.clickedTile === tile &&
+        this.menuGeneration === generation &&
+        this.pendingRequest === request
+      ) {
+        this.playerBuildables = buildables;
+        this.requestUpdate();
+      }
+      release();
+    }, release);
   }
 
   private getBuildableUnits(): BuildItemDisplay[][] {

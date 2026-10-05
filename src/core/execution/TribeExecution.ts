@@ -1,5 +1,13 @@
 ﻿import { z } from "zod";
-import { Execution, Game, Player, Structures } from "../game/Game";
+import { AI_WEIGHTS, aiProfile } from "../ai/AIProfile";
+import {
+  Difficulty,
+  Execution,
+  Game,
+  Player,
+  Structures,
+  UnitType,
+} from "../game/Game";
 import { PseudoRandom } from "../PseudoRandom";
 import { execSnapshotType } from "../snapshot/ExecutionSnapshot";
 import type {
@@ -15,7 +23,9 @@ import {
 } from "../snapshot/SnapshotType";
 import { simpleHash } from "../Util";
 import { AllianceExtensionExecution } from "./alliance/AllianceExtensionExecution";
+import { ConstructionExecution } from "./ConstructionExecution";
 import { DeleteUnitExecution } from "./DeleteUnitExecution";
+import { UpgradeStructureExecution } from "./UpgradeStructureExecution";
 import { AiAttackBehavior } from "./utils/AiAttackBehavior";
 
 export class TribeExecution implements Execution {
@@ -46,6 +56,20 @@ export class TribeExecution implements Execution {
 
   init(mg: Game) {
     this.mg = mg;
+    if (
+      aiProfile(mg.config().gameConfig(), this.tribe.id(), this.tribe.type())
+    ) {
+      const difficulty = mg.config().gameConfig().difficulty;
+      this.attackRate =
+        difficulty === Difficulty.Easy
+          ? 90
+          : difficulty === Difficulty.Medium
+            ? 70
+            : difficulty === Difficulty.Hard
+              ? 55
+              : 40;
+      this.attackTick %= this.attackRate;
+    }
   }
 
   tick(ticks: number) {
@@ -72,9 +96,121 @@ export class TribeExecution implements Execution {
       return;
     }
 
+    if (
+      aiProfile(
+        this.mg.config().gameConfig(),
+        this.tribe.id(),
+        this.tribe.type(),
+      )
+    ) {
+      this.handleEnhancedAlliances();
+      this.maybeBuildEnhanced();
+      this.attackBehavior.maybeAttack();
+      return;
+    }
     this.acceptAllAllianceRequests();
     this.deleteNextStructure();
     this.maybeAttack();
+  }
+
+  strategyStatus() {
+    return this.attackBehavior?.strategyStatus() ?? null;
+  }
+
+  private handleEnhancedAlliances() {
+    const profile = aiProfile(
+      this.mg.config().gameConfig(),
+      this.tribe.id(),
+      this.tribe.type(),
+    );
+    if (profile === null) return;
+    const weights = AI_WEIGHTS[profile.personality];
+    for (const req of this.tribe.incomingAllianceRequests()) {
+      const other = req.requestor();
+      const hostileFront = this.tribe
+        .nearby()
+        .some((p) => p.isPlayer() && p !== other && !this.tribe.isFriendly(p));
+      const benefit =
+        weights.diplomacy +
+        (hostileFront ? 40 : 0) +
+        (other.troops() >= this.tribe.troops() ? 20 : 0);
+      const risk =
+        (other.isTraitor() ? 130 : 0) +
+        this.tribe.alliances().length * 40 +
+        (other.hasEmbargoAgainst(this.tribe) ? 60 : 0);
+      if (
+        !this.mg.config().gameConfig().disableAlliances &&
+        benefit > risk + 50
+      )
+        req.accept();
+      else req.reject();
+    }
+    for (const alliance of this.tribe.alliances()) {
+      if (
+        alliance.onlyOneAgreedToExtend() &&
+        !alliance.other(this.tribe).isTraitor()
+      )
+        this.mg.addExecution(
+          new AllianceExtensionExecution(
+            this.tribe,
+            alliance.other(this.tribe).id(),
+          ),
+        );
+    }
+  }
+
+  /** Lightweight tribes preserve captured economy and attempt at most 16 placements.
+   * No nation naval, nuclear or full-map building planner is instantiated.
+   */
+  private maybeBuildEnhanced() {
+    const profile = aiProfile(
+      this.mg.config().gameConfig(),
+      this.tribe.id(),
+      this.tribe.type(),
+    );
+    if (
+      profile === null ||
+      Math.floor(this.mg.ticks() / this.attackRate) % 3 !== 0
+    )
+      return;
+    const useful = this.tribe
+      .units()
+      .filter((u) => Structures.has(u.type()) && !u.isUnderConstruction());
+    for (const unit of useful) {
+      if (unit.level() < 3 && this.tribe.canUpgradeUnit(unit)) {
+        this.mg.addExecution(
+          new UpgradeStructureExecution(this.tribe, unit.id()),
+        );
+        return;
+      }
+    }
+    const type =
+      this.tribe.incomingAttacks().length > 0
+        ? UnitType.DefensePost
+        : profile.personality === "economic"
+          ? UnitType.Factory
+          : UnitType.City;
+    if (
+      this.mg.config().isUnitDisabled(type) ||
+      this.tribe.unitCount(type) >= 2 ||
+      this.tribe.gold() < this.mg.unitInfo(type).cost(this.mg, this.tribe)
+    )
+      return;
+    const box = this.tribe.largestClusterBoundingBox;
+    if (!box) return;
+    for (let i = 0; i < 16; i++) {
+      const x = this.random.nextInt(box.min.x, box.max.x + 1);
+      const y = this.random.nextInt(box.min.y, box.max.y + 1);
+      if (!this.mg.isValidCoord(x, y)) continue;
+      const tile = this.mg.ref(x, y);
+      if (
+        this.mg.owner(tile) !== this.tribe ||
+        !this.tribe.canBuild(type, tile)
+      )
+        continue;
+      this.mg.addExecution(new ConstructionExecution(this.tribe, type, tile));
+      return;
+    }
   }
 
   private acceptAllAllianceRequests() {

@@ -1,4 +1,6 @@
 import { AllPlayersStats, ClientID, Winner } from "../Schemas";
+import type { ModernForceCommand } from "../modern/ModernForceTypes";
+import type { ModernState } from "../modern/ModernState";
 import {
   EmojiMessage,
   GameUpdates,
@@ -106,6 +108,9 @@ export enum GameUpdateType {
   SpawnPhaseEnd,
   GamePaused,
   DonateEvent,
+  AIStatus,
+  ModernSystems,
+  ModernForcesFrame,
 }
 
 export type GameUpdate =
@@ -131,7 +136,48 @@ export type GameUpdate =
   | EmbargoUpdate
   | SpawnPhaseEndUpdate
   | GamePausedUpdate
-  | DonateEventUpdate;
+  | DonateEventUpdate
+  | AIStatusUpdate
+  | ModernSystemsUpdate
+  | ModernForcesFrameUpdate;
+
+export interface ModernSystemsUpdate {
+  type: GameUpdateType.ModernSystems;
+  state: ModernState;
+}
+
+/** Actual force motion at the core tick cadence. Append-only force indices,
+ * stride 9: index, tile, phase, pathIndex, personnel, aircraft, attackRaw,
+ * frontier tile (0xffffffff absent), last mission tick. */
+export interface ModernForcesFrameUpdate {
+  type: GameUpdateType.ModernForcesFrame;
+  tick: number;
+  positions: Uint32Array;
+  /** Only changed orders/routes; do not clone every force each tick. */
+  routes?: ModernForceRouteUpdate[];
+}
+export interface ModernForceRouteUpdate {
+  index: number;
+  command: ModernForceCommand | null;
+  queue: ModernForceCommand[];
+  path: TileRef[];
+  cooldownUntil: number;
+  lastReason: string | null;
+}
+
+/** Worker-local, read-only AI inspection. No server/network response is used
+ * by the planner. State itself lives in its versioned execution snapshot.
+ */
+export interface AIStatusUpdate {
+  type: GameUpdateType.AIStatus;
+  playerID: PlayerID;
+  goal: "expand" | "attack" | "recover" | "defend" | "economy" | "support";
+  target: PlayerID | null;
+  reason: string;
+  reserve: number;
+  candidateCount: number;
+  buildingPriority: UnitType[];
+}
 
 export interface BonusEventUpdate {
   type: GameUpdateType.BonusEvent;

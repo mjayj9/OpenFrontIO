@@ -1,0 +1,683 @@
+{
+  "kind": "actual-region-modern-high-vs-low",
+  "scenarioHash": "dc9636c7fa7200fcf9380f249f0dacae365fcb108d10bad1feac952128e0aac6",
+  "seeds": 1,
+  "ticks": 3000,
+  "matches": 8,
+  "highWins": 7,
+  "lowWins": 1,
+  "ties": 0,
+  "highWinPercent": 87.5,
+  "summaries": [
+    {
+      "pair": "small continental/coastal",
+      "matches": 2,
+      "highWins": 2,
+      "lowWins": 0,
+      "ties": 0,
+      "highWinPercent": 100,
+      "averageHighAreaGain": 107701568,
+      "averageLowAreaGain": -107701568,
+      "averageHighDeaths": 3651.5,
+      "averageLowDeaths": 18651,
+      "averageStallTicks": 2673.5
+    },
+    {
+      "pair": "temperate/coastal with overseas territory",
+      "matches": 2,
+      "highWins": 2,
+      "lowWins": 0,
+      "ties": 0,
+      "highWinPercent": 100,
+      "averageHighAreaGain": 253899588,
+      "averageLowAreaGain": -253899588,
+      "averageHighDeaths": 17408.5,
+      "averageLowDeaths": 10360,
+      "averageStallTicks": 1223
+    },
+    {
+      "pair": "large arid administrative regions",
+      "matches": 2,
+      "highWins": 2,
+      "lowWins": 0,
+      "ties": 0,
+      "highWinPercent": 100,
+      "averageHighAreaGain": 505876496,
+      "averageLowAreaGain": -505876496,
+      "averageHighDeaths": 14303,
+      "averageLowDeaths": 6977,
+      "averageStallTicks": 1834
+    },
+    {
+      "pair": "high latitude/polar coastal",
+      "matches": 2,
+      "highWins": 1,
+      "lowWins": 1,
+      "ties": 0,
+      "highWinPercent": 50,
+      "averageHighAreaGain": 69795125.5,
+      "averageLowAreaGain": -69795125.5,
+      "averageHighDeaths": 13095.5,
+      "averageLowDeaths": 4772,
+      "averageStallTicks": 2158.5
+    }
+  ],
+  "rows": [
+    {
+      "pair": "small continental/coastal",
+      "seed": 0,
+      "swap": false,
+      "before": [
+        {
+          "id": "KOR",
+          "level": "high",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 97176590,
+          "tiles": 352,
+          "climates": [
+            "continental",
+            "temperate"
+          ],
+          "ports": 3
+        },
+        {
+          "id": "PRK",
+          "level": "low",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 122627940,
+          "tiles": 471,
+          "climates": [
+            "continental"
+          ],
+          "ports": 0
+        }
+      ],
+      "results": [
+        {
+          "id": "KOR",
+          "level": "high",
+          "alive": true,
+          "gold": 166788,
+          "rawArmy": 198669,
+          "dead": 4132,
+          "population": 1976364,
+          "area": 219544173,
+          "areaGained": 122367583,
+          "tiles": 822,
+          "planes": 8,
+          "completedMissions": 19,
+          "portIncome": 1600
+        },
+        {
+          "id": "PRK",
+          "level": "low",
+          "alive": true,
+          "gold": 0,
+          "rawArmy": 0,
+          "dead": 18704,
+          "population": 800,
+          "area": 260357,
+          "areaGained": -122367583,
+          "tiles": 1,
+          "planes": 8,
+          "completedMissions": 7,
+          "portIncome": 0
+        }
+      ],
+      "winner": "high",
+      "scoreRule": "elimination, otherwise net geodesic area gained at time limit",
+      "ticks": 3000,
+      "survivalTicks": 3000,
+      "lastTerritoryTick": 353,
+      "stallTicks": 2647,
+      "stateHash": 1099204673,
+      "p95TickMs": 0.16859999999996944
+    },
+    {
+      "pair": "small continental/coastal",
+      "seed": 0,
+      "swap": true,
+      "before": [
+        {
+          "id": "KOR",
+          "level": "low",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 97176590,
+          "tiles": 352,
+          "climates": [
+            "continental",
+            "temperate"
+          ],
+          "ports": 3
+        },
+        {
+          "id": "PRK",
+          "level": "high",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 122627940,
+          "tiles": 471,
+          "climates": [
+            "continental"
+          ],
+          "ports": 0
+        }
+      ],
+      "results": [
+        {
+          "id": "KOR",
+          "level": "low",
+          "alive": true,
+          "gold": 0,
+          "rawArmy": 0,
+          "dead": 18598,
+          "population": 800,
+          "area": 4141037,
+          "areaGained": -93035553,
+          "tiles": 15,
+          "planes": 8,
+          "completedMissions": 12,
+          "portIncome": 0
+        },
+        {
+          "id": "PRK",
+          "level": "high",
+          "alive": true,
+          "gold": 276286,
+          "rawArmy": 208277,
+          "dead": 3171,
+          "population": 1977431,
+          "area": 215663493,
+          "areaGained": 93035553,
+          "tiles": 808,
+          "planes": 8,
+          "completedMissions": 17,
+          "portIncome": 2000
+        }
+      ],
+      "winner": "high",
+      "scoreRule": "elimination, otherwise net geodesic area gained at time limit",
+      "ticks": 3000,
+      "survivalTicks": 3000,
+      "lastTerritoryTick": 300,
+      "stallTicks": 2700,
+      "stateHash": 506510209,
+      "p95TickMs": 0.13819999999998345
+    },
+    {
+      "pair": "temperate/coastal with overseas territory",
+      "seed": 0,
+      "swap": false,
+      "before": [
+        {
+          "id": "DEU",
+          "level": "high",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 357460840,
+          "tiles": 1451,
+          "climates": [
+            "temperate",
+            "continental"
+          ],
+          "ports": 3
+        },
+        {
+          "id": "FRA",
+          "level": "low",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 657695670,
+          "tiles": 2520,
+          "climates": [
+            "temperate",
+            "tropical"
+          ],
+          "ports": 11
+        }
+      ],
+      "results": [
+        {
+          "id": "DEU",
+          "level": "high",
+          "alive": true,
+          "gold": 173488,
+          "rawArmy": 33989,
+          "dead": 20600,
+          "population": 979400,
+          "area": 626542254,
+          "areaGained": 269081414,
+          "tiles": 2482,
+          "planes": 8,
+          "completedMissions": 36,
+          "portIncome": 2400
+        },
+        {
+          "id": "FRA",
+          "level": "low",
+          "alive": true,
+          "gold": 58498,
+          "rawArmy": 116117,
+          "dead": 12387,
+          "population": 987613,
+          "area": 388614256,
+          "areaGained": -269081414,
+          "tiles": 1489,
+          "planes": 8,
+          "completedMissions": 38,
+          "portIncome": 552
+        }
+      ],
+      "winner": "high",
+      "scoreRule": "elimination, otherwise net geodesic area gained at time limit",
+      "ticks": 3000,
+      "survivalTicks": 3000,
+      "lastTerritoryTick": 1966,
+      "stallTicks": 1034,
+      "stateHash": 816956633,
+      "p95TickMs": 0.2604999999999791
+    },
+    {
+      "pair": "temperate/coastal with overseas territory",
+      "seed": 0,
+      "swap": true,
+      "before": [
+        {
+          "id": "DEU",
+          "level": "low",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 357460840,
+          "tiles": 1451,
+          "climates": [
+            "temperate",
+            "continental"
+          ],
+          "ports": 3
+        },
+        {
+          "id": "FRA",
+          "level": "high",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 657695670,
+          "tiles": 2520,
+          "climates": [
+            "temperate",
+            "tropical"
+          ],
+          "ports": 11
+        }
+      ],
+      "results": [
+        {
+          "id": "DEU",
+          "level": "low",
+          "alive": true,
+          "gold": 199184,
+          "rawArmy": 156652,
+          "dead": 8333,
+          "population": 991667,
+          "area": 118743078,
+          "areaGained": -238717762,
+          "tiles": 482,
+          "planes": 8,
+          "completedMissions": 58,
+          "portIncome": 0
+        },
+        {
+          "id": "FRA",
+          "level": "high",
+          "alive": true,
+          "gold": 99068,
+          "rawArmy": 97812,
+          "dead": 14217,
+          "population": 985783,
+          "area": 896413432,
+          "areaGained": 238717762,
+          "tiles": 3489,
+          "planes": 8,
+          "completedMissions": 30,
+          "portIncome": 3400
+        }
+      ],
+      "winner": "high",
+      "scoreRule": "elimination, otherwise net geodesic area gained at time limit",
+      "ticks": 3000,
+      "survivalTicks": 3000,
+      "lastTerritoryTick": 1588,
+      "stallTicks": 1412,
+      "stateHash": 2500897789,
+      "p95TickMs": 0.2258999999999105
+    },
+    {
+      "pair": "large arid administrative regions",
+      "seed": 0,
+      "swap": false,
+      "before": [
+        {
+          "id": "DZA-r02",
+          "level": "high",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 1159509470,
+          "tiles": 3330,
+          "climates": [
+            "arid",
+            "temperate"
+          ],
+          "ports": 0
+        },
+        {
+          "id": "LBY-r01",
+          "level": "low",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 816722530,
+          "tiles": 2323,
+          "climates": [
+            "arid"
+          ],
+          "ports": 0
+        }
+      ],
+      "results": [
+        {
+          "id": "DZA-r02",
+          "level": "high",
+          "alive": true,
+          "gold": 500744,
+          "rawArmy": 109387,
+          "dead": 13060,
+          "population": 986940,
+          "area": 1654183837,
+          "areaGained": 494674367,
+          "tiles": 4737,
+          "planes": 8,
+          "completedMissions": 24,
+          "portIncome": 0
+        },
+        {
+          "id": "LBY-r01",
+          "level": "low",
+          "alive": true,
+          "gold": 248668,
+          "rawArmy": 160547,
+          "dead": 7944,
+          "population": 992056,
+          "area": 322048163,
+          "areaGained": -494674367,
+          "tiles": 916,
+          "planes": 8,
+          "completedMissions": 12,
+          "portIncome": 0
+        }
+      ],
+      "winner": "high",
+      "scoreRule": "elimination, otherwise net geodesic area gained at time limit",
+      "ticks": 3000,
+      "survivalTicks": 3000,
+      "lastTerritoryTick": 1366,
+      "stallTicks": 1634,
+      "stateHash": 2077265159,
+      "p95TickMs": 0.1190999999998894
+    },
+    {
+      "pair": "large arid administrative regions",
+      "seed": 0,
+      "swap": true,
+      "before": [
+        {
+          "id": "DZA-r02",
+          "level": "low",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 1159509470,
+          "tiles": 3330,
+          "climates": [
+            "arid"
+          ],
+          "ports": 0
+        },
+        {
+          "id": "LBY-r01",
+          "level": "high",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 816722530,
+          "tiles": 2323,
+          "climates": [
+            "arid"
+          ],
+          "ports": 0
+        }
+      ],
+      "results": [
+        {
+          "id": "DZA-r02",
+          "level": "low",
+          "alive": true,
+          "gold": 296268,
+          "rawArmy": 179884,
+          "dead": 6010,
+          "population": 993990,
+          "area": 642430845,
+          "areaGained": -517078625,
+          "tiles": 1845,
+          "planes": 8,
+          "completedMissions": 4,
+          "portIncome": 0
+        },
+        {
+          "id": "LBY-r01",
+          "level": "high",
+          "alive": true,
+          "gold": 183592,
+          "rawArmy": 84525,
+          "dead": 15546,
+          "population": 984454,
+          "area": 1333801155,
+          "areaGained": 517078625,
+          "tiles": 3808,
+          "planes": 8,
+          "completedMissions": 24,
+          "portIncome": 0
+        }
+      ],
+      "winner": "high",
+      "scoreRule": "elimination, otherwise net geodesic area gained at time limit",
+      "ticks": 3000,
+      "survivalTicks": 3000,
+      "lastTerritoryTick": 966,
+      "stallTicks": 2034,
+      "stateHash": 2687076643,
+      "p95TickMs": 0.10880000000020118
+    },
+    {
+      "pair": "high latitude/polar coastal",
+      "seed": 0,
+      "swap": false,
+      "before": [
+        {
+          "id": "NOR",
+          "level": "high",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 386809310,
+          "tiles": 3195,
+          "climates": [
+            "continental",
+            "polar"
+          ],
+          "ports": 4
+        },
+        {
+          "id": "SWE",
+          "level": "low",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 445650580,
+          "tiles": 2603,
+          "climates": [
+            "continental"
+          ],
+          "ports": 1
+        }
+      ],
+      "results": [
+        {
+          "id": "NOR",
+          "level": "high",
+          "alive": true,
+          "gold": 128508,
+          "rawArmy": 108072,
+          "dead": 13191,
+          "population": 986809,
+          "area": 340198515,
+          "areaGained": -46610795,
+          "tiles": 2810,
+          "planes": 8,
+          "completedMissions": 37,
+          "portIncome": 1200
+        },
+        {
+          "id": "SWE",
+          "level": "low",
+          "alive": true,
+          "gold": 251080,
+          "rawArmy": 208380,
+          "dead": 3160,
+          "population": 996840,
+          "area": 492261375,
+          "areaGained": 46610795,
+          "tiles": 2988,
+          "planes": 8,
+          "completedMissions": 2,
+          "portIncome": 300
+        }
+      ],
+      "winner": "low",
+      "scoreRule": "elimination, otherwise net geodesic area gained at time limit",
+      "ticks": 3000,
+      "survivalTicks": 3000,
+      "lastTerritoryTick": 470,
+      "stallTicks": 2530,
+      "stateHash": 2880000487,
+      "p95TickMs": 0.17390000000000327
+    },
+    {
+      "pair": "high latitude/polar coastal",
+      "seed": 0,
+      "swap": true,
+      "before": [
+        {
+          "id": "NOR",
+          "level": "low",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 386809310,
+          "tiles": 3195,
+          "climates": [
+            "continental",
+            "polar"
+          ],
+          "ports": 4
+        },
+        {
+          "id": "SWE",
+          "level": "high",
+          "N0": 1000000,
+          "gold": 400000,
+          "army": 18000,
+          "air": 800,
+          "area": 445650580,
+          "tiles": 2603,
+          "climates": [
+            "continental"
+          ],
+          "ports": 1
+        }
+      ],
+      "results": [
+        {
+          "id": "NOR",
+          "level": "low",
+          "alive": true,
+          "gold": 153976,
+          "rawArmy": 176145,
+          "dead": 6384,
+          "population": 993616,
+          "area": 200608264,
+          "areaGained": -186201046,
+          "tiles": 1657,
+          "planes": 8,
+          "completedMissions": 66,
+          "portIncome": 200
+        },
+        {
+          "id": "SWE",
+          "level": "high",
+          "alive": true,
+          "gold": 260924,
+          "rawArmy": 109980,
+          "dead": 13000,
+          "population": 987000,
+          "area": 631851626,
+          "areaGained": 186201046,
+          "tiles": 4141,
+          "planes": 8,
+          "completedMissions": 29,
+          "portIncome": 2000
+        }
+      ],
+      "winner": "high",
+      "scoreRule": "elimination, otherwise net geodesic area gained at time limit",
+      "ticks": 3000,
+      "survivalTicks": 3000,
+      "lastTerritoryTick": 1213,
+      "stallTicks": 1787,
+      "stateHash": 2265184279,
+      "p95TickMs": 0.15709999999990032
+    }
+  ],
+  "limits": [
+    "Two active controllers; other world territory neutral. This is not a full-world win-rate study.",
+    "Both controllers have equal N0, gold, army and pilots; geography and personality vary and starting positions are swapped.",
+    "Timed result uses net geodesic area gained, not the production victory screen.",
+    "Alliances and nuclear weapons disabled for controlled military comparison; other modern economy/climate/air/navy rules enabled.",
+    "p95 includes core execution only, without rendering or GameRunner updates."
+  ]
+}

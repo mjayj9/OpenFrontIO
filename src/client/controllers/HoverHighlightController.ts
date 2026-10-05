@@ -19,6 +19,9 @@ import { GameView, UnitView } from "../view";
 
 export class HoverHighlightController implements Controller {
   private lastOwnerID = 0;
+  private registered = false;
+  private readonly mouseMoveHandler = (e: MouseMoveEvent) =>
+    this.onMouseMove(e);
 
   constructor(
     private game: GameView,
@@ -28,7 +31,15 @@ export class HoverHighlightController implements Controller {
   ) {}
 
   init() {
-    this.eventBus.on(MouseMoveEvent, (e) => this.onMouseMove(e));
+    if (this.registered) return;
+    this.registered = true;
+    this.eventBus.on(MouseMoveEvent, this.mouseMoveHandler);
+  }
+
+  dispose() {
+    if (!this.registered) return;
+    this.eventBus.off(MouseMoveEvent, this.mouseMoveHandler);
+    this.registered = false;
   }
 
   private navalHighlightEnabled(): boolean {

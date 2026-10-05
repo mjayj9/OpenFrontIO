@@ -14,7 +14,7 @@ import { isDesktopShell } from "../DesktopShell";
 import { homeHref, translateText } from "../Utils";
 import { TICKS_PER_SECOND } from "./ReplayPlayback";
 
-const SPEEDS = [0.5, 1, 2, 4, 8, 16, 32];
+export const REPLAY_SPEEDS = [0.5, 1, 2, 4, 8, 16, 32];
 // Same icons as the in-game controls (GameRightSidebar).
 const playIcon = assetUrl("images/PlayIconWhite.svg");
 const pauseIcon = assetUrl("images/PauseIconWhite.svg");
@@ -225,7 +225,7 @@ export class ReplayControls extends LitElement {
           ${translateText("replay_panel.replay_speed")}
         </div>
         <div class="grid grid-cols-4 gap-2">
-          ${SPEEDS.map(
+          ${REPLAY_SPEEDS.map(
             (sp) =>
               html`<button
                 class="py-0.5 px-1 text-sm text-white rounded-sm border transition border-gray-500 hover:border-gray-200 ${sp ===

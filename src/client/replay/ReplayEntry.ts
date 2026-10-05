@@ -74,11 +74,19 @@ export function replayViewerHref(gameID: string): string {
  * on, or the viewer sent this game back, and the caller should use the
  * client-side replay.
  */
-export function openReplayViewer(gameID: string, record: GameRecord): boolean {
-  if (!new UserSettings().replayViewer()) return false;
-  if (classicGames().has(gameID)) return false;
+export function openReplayViewer(
+  gameID: string,
+  record: GameRecord,
+  explicitReview = false,
+): boolean {
+  if (!explicitReview && !new UserSettings().replayViewer()) return false;
+  if (!explicitReview && classicGames().has(gameID)) return false;
   handOverRecord(gameID, record);
-  const href = replayViewerHref(gameID);
+  // A local review hands its record over in memory. Preserve the live query:
+  // dropping it would navigate the document and lose the offline record.
+  const href = explicitReview
+    ? `${window.location.pathname}${window.location.search}#replay-viewer=${encodeURIComponent(gameID)}`
+    : replayViewerHref(gameID);
   // Main opens the viewer on hashchange. Setting the same hash again
   // doesn't fire the event, so fire it ourselves.
   if (window.location.hash === new URL(href, window.location.href).hash) {

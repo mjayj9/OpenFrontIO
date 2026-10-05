@@ -6,6 +6,14 @@ import {
   SharedWaterCache,
   SharedWaterCacheSnapshot,
 } from "../execution/nation/SharedWaterCache";
+import { transferModernArea } from "../modern/ModernArea";
+import {
+  migrateLegacyModernState,
+  ModernState,
+  modernStateHash,
+  ModernStateSchema,
+} from "../modern/ModernState";
+import { modernSystemsFor } from "../modern/ModernSystems";
 import { AbstractGraph } from "../pathfinding/algorithms/AbstractGraph";
 import { WaterPathFinder } from "../pathfinding/PathFinder";
 import { PathFinder } from "../pathfinding/types";
@@ -104,6 +112,13 @@ export function createGame(
 export type CellString = string;
 
 export class GameImpl implements Game {
+  private modernState: ModernState | null = null;
+  modernSystems(): ModernState | null {
+    return this.modernState;
+  }
+  setModernSystems(state: ModernState | null): void {
+    this.modernState = state;
+  }
   private _ticks = 0;
   private startTick: number | null = null;
 
@@ -523,6 +538,55 @@ export class GameImpl implements Game {
     return this._ticks;
   }
 
+  /** Read-only display bootstrap after restore; does not advance the sim. */
+  fullViewUpdate(): import("./GameUpdates").GameUpdateViewData {
+    const updates = createGameUpdatesMap();
+    if (this.modernState)
+      updates[GameUpdateType.ModernSystems].push({
+        type: GameUpdateType.ModernSystems,
+        state: structuredClone(this.modernState),
+      });
+    updates[GameUpdateType.Player] = this.allPlayers().map((p) =>
+      (p as PlayerImpl).toFullUpdate(),
+    );
+    updates[GameUpdateType.Unit] = this.units().map((u) => u.toUpdate());
+    if (this._winner !== null)
+      updates[GameUpdateType.Win].push({
+        type: GameUpdateType.Win,
+        winner: this.makeWinner(this._winner),
+        allPlayersStats: this.stats().stats(),
+      });
+    const rails = new Set<number>();
+    for (const station of this.railNetwork().stationManager().getAll()) {
+      for (const rail of station.getRailroads()) {
+        if (rails.has(rail.id)) continue;
+        rails.add(rail.id);
+        updates[GameUpdateType.RailroadConstructionEvent].push({
+          type: GameUpdateType.RailroadConstructionEvent,
+          id: rail.id,
+          tiles: rail.tiles,
+        });
+      }
+    }
+    if (this.startTick !== null)
+      updates[GameUpdateType.SpawnPhaseEnd].push({
+        type: GameUpdateType.SpawnPhaseEnd,
+        startTick: this.startTick,
+      });
+    updates[GameUpdateType.GamePaused].push({
+      type: GameUpdateType.GamePaused,
+      paused: this.isPaused(),
+    });
+    const pairs = new Uint32Array(this.width() * this.height() * 2);
+    for (let tile = 0; tile < this.width() * this.height(); tile++) {
+      pairs[tile * 2] = tile;
+      pairs[tile * 2 + 1] =
+        (this.map().tileState(tile) & 0xffff) |
+        (this.map().terrainByte(tile) << 16);
+    }
+    return { tick: this.ticks(), updates, packedTileUpdates: pairs };
+  }
+
   executeNextTick(): GameUpdates {
     this.updates = createGameUpdatesMap();
     this.tileUpdatePairs.length = 0;
@@ -663,7 +727,7 @@ export class GameImpl implements Game {
     this._players.forEach((p) => {
       hash += p.hash();
     });
-    return hash;
+    return hash + modernStateHash(this.modernState);
   }
 
   terraNullius(): TerraNullius {
@@ -797,6 +861,10 @@ export class GameImpl implements Game {
   }
 
   conquer(owner: PlayerImpl, tile: TileRef): void {
+    // A fully annexed modern controller cannot resurrect through an old
+    // in-flight order after its population has moved to the conqueror.
+    if (this.modernState && owner.modernFaction()?.populationTransferredTo)
+      return;
     if (!this.isLand(tile)) {
       throw Error(`cannot conquer water`);
     }
@@ -804,6 +872,12 @@ export class GameImpl implements Game {
       throw Error(`cannot conquer impassable terrain`);
     }
     const previousOwner = this.owner(tile) as TerraNullius | PlayerImpl;
+    transferModernArea(
+      this.modernState,
+      tile,
+      previousOwner.isPlayer() ? previousOwner.id() : null,
+      owner.id(),
+    );
     if (previousOwner.isPlayer()) {
       previousOwner._lastTileChange = this._ticks;
       previousOwner._tileChangeVersion++;
@@ -829,6 +903,7 @@ export class GameImpl implements Game {
     }
 
     const previousOwner = this.owner(tile) as PlayerImpl;
+    transferModernArea(this.modernState, tile, previousOwner.id(), null);
     previousOwner._lastTileChange = this._ticks;
     previousOwner._tileChangeVersion++;
     previousOwner._tiles.delete(tile);
@@ -1437,6 +1512,7 @@ export class GameImpl implements Game {
     const execs = this.execs.map((e) => w.exec(e));
     const unInitExecs = this.unInitExecs.map((e) => w.exec(e));
     return {
+      modernSystems: this.modernState,
       ticks: this._ticks,
       startTick: this.startTick,
       humans: this._humans.map(playerInfoData),
@@ -1489,6 +1565,7 @@ export class GameImpl implements Game {
    * every player, unit and execution has been restored.
    */
   restoreState(s: GameState, r: SnapshotReader): void {
+    this.modernState = s.modernSystems;
     this._ticks = s.ticks;
     this.startTick = s.startTick;
     this.execs = s.execs.map((i) => r.exec(i));
@@ -1538,6 +1615,16 @@ export class GameImpl implements Game {
   }
 
   conquerPlayer(conqueror: Player, conquered: Player) {
+    // Classic's cleanup announces conquest before its remaining border fill.
+    // Independent modern islands/enclaves can survive that fill and retain
+    // their population, treasury and recovery until the last tile is lost.
+    if (
+      this.modernState &&
+      (conquered.isAlive() ||
+        conquered.modernFaction()?.populationTransferredTo)
+    )
+      return;
+    modernSystemsFor(this)?.annex(conqueror, conquered);
     if (conquered.isDisconnected() && conqueror.isOnSameTeam(conquered)) {
       const ships = conquered
         .units()
@@ -1552,12 +1639,14 @@ export class GameImpl implements Game {
       }
     }
 
-    // Don't transfer gold when the conquered player didn't play (never attacked anyone)
-    // This is especially important when starting gold is enabled
+    // Classic skips inactive human windfalls. Fair competition applies the same
+    // capture rule to every controller, including players that have not attacked.
     const stats = this._stats.getPlayerStats(conquered);
     const attacksSent = stats?.attacks?.[ATTACK_INDEX_SENT] ?? 0n;
     const skipGoldTransfer =
-      attacksSent === 0n && conquered.type() === PlayerType.Human;
+      !this._config.gameConfig().enhancedAI?.fairResources &&
+      attacksSent === 0n &&
+      conquered.type() === PlayerType.Human;
     const gold = skipGoldTransfer ? 0n : conquered.gold();
     const goldCaptured = skipGoldTransfer
       ? 0n
@@ -1623,8 +1712,16 @@ export class GameImpl implements Game {
 
 export const GameSnapshot = snapshotType({
   name: "Game",
-  version: 1,
+  version: 3,
+  migrations: {
+    1: (data) => ({ ...data, modernSystems: null }),
+    2: (data) => ({
+      ...data,
+      modernSystems: migrateLegacyModernState(data.modernSystems),
+    }),
+  },
   schema: z.object({
+    modernSystems: ModernStateSchema.nullable(),
     ticks: zInt(),
     startTick: zInt().nullable(),
     humans: z.array(PlayerInfoSchema),

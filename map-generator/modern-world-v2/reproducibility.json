@@ -1,0 +1,22 @@
+{
+  "scenarioHash": "dc9636c7fa7200fcf9380f249f0dacae365fcb108d10bad1feac952128e0aac6",
+  "byteIdentical": true,
+  "elapsedSeconds": 264.214,
+  "filesBefore": {
+    "src/core/game/ModernRegionsData.json": "10521369826753c0368b0ad2970ad743aabe74da364d2c89629df925249feb64",
+    "map-generator/modern-world-v2/owners.raw": "f408bd3149047a47281d87da44914858ab0acb07b58c72d0ceb6bdf262c5059c",
+    "map-generator/modern-world-v2/climate.raw": "91a12f9d3f452d161b06fce7c6ac6c82ef00b4fcfa5daeca11d9d795423ad84c",
+    "map-generator/modern-world-v2/factions.csv": "f49f13eac09b12a6ee69a6364c0ded145eed376ec7e6df8eba24dca8ca298eb3",
+    "map-generator/modern-world-v2/generated-summary.json": "264e12f773ac0cb198f9406322fca55940246cb93a6b1eac9c5c9ccbf0b5ecdb"
+  },
+  "filesAfter": {
+    "src/core/game/ModernRegionsData.json": "10521369826753c0368b0ad2970ad743aabe74da364d2c89629df925249feb64",
+    "map-generator/modern-world-v2/owners.raw": "f408bd3149047a47281d87da44914858ab0acb07b58c72d0ceb6bdf262c5059c",
+    "map-generator/modern-world-v2/climate.raw": "91a12f9d3f452d161b06fce7c6ac6c82ef00b4fcfa5daeca11d9d795423ad84c",
+    "map-generator/modern-world-v2/factions.csv": "f49f13eac09b12a6ee69a6364c0ded145eed376ec7e6df8eba24dca8ca298eb3",
+    "map-generator/modern-world-v2/generated-summary.json": "264e12f773ac0cb198f9406322fca55940246cb93a6b1eac9c5c9ccbf0b5ecdb"
+  },
+  "command": "python map-generator/modern-world-v2/reproduce.py",
+  "networkAccess": false,
+  "cache": "optional derived cache, keyed by every generator, policy, source and parent byte"
+}

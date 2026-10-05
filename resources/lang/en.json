@@ -145,6 +145,15 @@
   "account_settings_modal": {
     "title": "Account Settings"
   },
+  "attack_preview": {
+    "caution": "caution",
+    "commitment": "Send about {troops} ({percent}%) · remain about {remaining}",
+    "high": "high",
+    "lower": "lower",
+    "risk": "Rough risk: {risk} · nearby defense posts: {defenses}",
+    "uncertain": "Uncertain: terrain, reinforcements and other fronts can change the outcome.",
+    "unknown": "insufficient data"
+  },
   "ban_notice": {
     "appeal": "If you believe this is a mistake, contact us on Discord.",
     "category": {
@@ -533,6 +542,14 @@
     "teammate_afk_neighbor_info": "You can attack disconnected teammates.",
     "traitor_neighbor_info": "You can betray traitors without becoming a traitor yourself."
   },
+  "controls": {
+    "ai_legend": "Enhanced AI uses colored territory and an AI+ label. Basic tribes stay gray; teammates share a team hue. Similar colors require reading the name and identity badge.",
+    "cancel_placement": "Cancel placement",
+    "map_legend": "Map legend",
+    "swap_side": "Move controls to the other side",
+    "touch_preview": "Hold to preview. Slide away to cancel. Release to select, then tap a valid map location.",
+    "unit_requirements": "Check the required port or missile silo, reload, owned land and coastal placement."
+  },
   "cosmetics": {
     "adfree": "ad-free for life!",
     "ai_label": "Made with AI assistance",
@@ -722,6 +739,497 @@
     "slow": "Slow",
     "veryfast": "Very Fast"
   },
+  "education": {
+    "all_features": "All features",
+    "chapter": "Chapter",
+    "chapter_complete": "Chapter ended: {practiced} practiced, {read} read, {skipped} skipped. Skipped exercises are still available to practice again.",
+    "chapters": {
+      "basic": "Basic course (about 5–8 min)",
+      "diplomacy": "Diplomacy",
+      "economy": "Economy and defenses",
+      "full": "Full practice sequence",
+      "modern": "Modern countries",
+      "modern_ai": "Individual AI and invitation fill",
+      "modern_air": "Real air operations",
+      "modern_climate": "Climate and adaptation",
+      "modern_commands": "Army/navy/air map commands",
+      "modern_nuclear": "Nuclear responsibility",
+      "modern_population": "Population and manpower",
+      "modern_ports": "Major-port economy",
+      "modern_regions": "Independent regions and common start",
+      "naval": "Coasts and naval play",
+      "weapons": "Advanced weapons"
+    },
+    "completion": "Evidence",
+    "description": "Description",
+    "exercise": "Try or inspect",
+    "feature_count": "{count} of {total} features",
+    "features": {
+      "accessibility": {
+        "completion": "Reference only; labels and icons remain readable.",
+        "description": "Choose graphics and color assistance in settings. Labels, borders, badges and relationships supplement territory colors. Adjust quality for your device; display changes do not change deterministic AI decisions.",
+        "exercise": "Try a color assistance theme and inspect adjacent countries at two zoom levels.",
+        "prerequisites": "Settings available.",
+        "title": "Graphics, labels and color accessibility"
+      },
+      "account": {
+        "completion": "Reference only; the service confirms signed-in status.",
+        "description": "Use the account menu and supported sign-in providers. Account services are external to this repository and require network access. Single-player training does not require new account API development.",
+        "exercise": "Inspect sign-in and account settings without sharing tokens.",
+        "prerequisites": "Available authentication service for sign-in.",
+        "title": "Account and sign-in"
+      },
+      "ai": {
+        "completion": "Reference only; player information displays the configured AI profile.",
+        "description": "Tribes and nations are separate controllers. Difficulty can include resource advantages; inspect the displayed settings before a match. Strategic personality and decision strength are separate from country identity and color.",
+        "exercise": "Compare difficulty, AI count and disclosed resource rules.",
+        "prerequisites": "AI settings in a supported single-player or custom lobby.",
+        "title": "AI controllers and difficulty"
+      },
+      "alliance": {
+        "completion": "An active alliance is practical evidence; rejection does not count as success.",
+        "description": "Request an alliance; the recipient may accept or reject. Respond to incoming requests, extend before expiry or break an alliance. Betrayal applies the existing traitor penalty and can damage diplomacy.",
+        "exercise": "Request an alliance and wait for acceptance; if refused, choose another partner or retry later.",
+        "prerequisites": "Alliances enabled and a living eligible partner.",
+        "title": "Alliance request, rejection, extension and betrayal"
+      },
+      "attack": {
+        "completion": "Owned land increases; opponent conquest requires an actual conquest event.",
+        "description": "Attack adjacent wilderness or an enemy border. Compare troops, terrain and defenses. Attacks consume committed troops; an ongoing attack or gold income does not prove you captured land.",
+        "exercise": "Gain land, then conquer a nearby opponent while retaining defenders.",
+        "prerequisites": "Spawn phase ended, reachable border and enough troops.",
+        "title": "Expansion and land conquest"
+      },
+      "attack_ratio": {
+        "completion": "The guide observes a real ratio change.",
+        "description": "The ratio determines the troops committed to an attack. A high ratio leaves fewer defenders. Use the slider or your currently assigned ratio keys; expected risk is approximate.",
+        "exercise": "Adjust the attack ratio and inspect the remaining troop reserve.",
+        "prerequisites": "The control panel is visible.",
+        "title": "Attack ratio and troop commitment"
+      },
+      "audio": {
+        "completion": "Reference only; the chosen settings persist.",
+        "description": "Adjust master, music, effects, alerts, ambience and interface levels. Background or focus settings govern when sounds play. Choose useful alerts without covering the map with message panels.",
+        "exercise": "Change a category volume and inspect focus/mute controls.",
+        "prerequisites": "Audio available and settings open.",
+        "title": "Audio and notification controls"
+      },
+      "camera": {
+        "completion": "Reference only; camera movements are not scored by the practical course.",
+        "description": "Pan, zoom, center on your country, switch map view and toggle coordinates. Ownership colors and borders show who controls land; zoom out to inspect other fronts.",
+        "exercise": "Move the camera, zoom and find your territory. Use current settings for keyboard controls.",
+        "prerequisites": "An open match or replay.",
+        "title": "Map movement, zoom and territory"
+      },
+      "city": {
+        "completion": "An active completed city belongs to you.",
+        "description": "Build cities on legal owned land to increase troop capacity. The active build menu supplies the current cost and placement restrictions. A construction site is not a completed city.",
+        "exercise": "Place a city and wait for construction to finish.",
+        "prerequisites": "Cities enabled, enough gold and legal owned tile.",
+        "title": "City"
+      },
+      "clan": {
+        "completion": "Reference only; the service confirms membership and tag.",
+        "description": "The clan menu manages available clan actions through the existing service. Tags identify affiliation; a lobby can hide tags. Clan membership does not override the match's team and alliance rules.",
+        "exercise": "Inspect your clan and the lobby's tag display setting.",
+        "prerequisites": "Account, connectivity and applicable clan permissions.",
+        "title": "Clans and clan tags"
+      },
+      "communication": {
+        "completion": "Reference only; the message is displayed to the allowed recipient.",
+        "description": "Use contextual quick chat or send emoji through the player menu. Collapse or close chat when it covers the battlefield. Messages do not change combat orders.",
+        "exercise": "Open the message menu, choose a phrase or emoji, and close it.",
+        "prerequisites": "Communication controls and an allowed recipient.",
+        "title": "Quick chat and emoji"
+      },
+      "cosmetics": {
+        "completion": "Reference only; the confirmed owned selection is displayed.",
+        "description": "Use inventory and shop controls for supported appearances. Some items require an account, entitlement or purchase through the existing service. Free accessibility labels and borders remain useful alongside cosmetics.",
+        "exercise": "Preview an appearance and inspect its availability before choosing it.",
+        "prerequisites": "Existing inventory/shop service and applicable account entitlement.",
+        "title": "Inventory, appearance and shop"
+      },
+      "defense": {
+        "completion": "An active completed defense post belongs to you.",
+        "description": "Defense posts strengthen nearby defense. Check the placement preview and frontier; overlapping posts can waste gold compared with covering an exposed border.",
+        "exercise": "Complete a defense post near an important frontier.",
+        "prerequisites": "Defense posts enabled and an affordable legal site.",
+        "title": "Defense post"
+      },
+      "delete": {
+        "completion": "Reference only; cancellation leaves the unit, deletion removes it.",
+        "description": "The unit menu exposes deletion for eligible owned units. Inspect the confirmation and any refund shown; removal does not promise a full refund and may remove a useful defense or route.",
+        "exercise": "Inspect the removal control before confirming or cancelling.",
+        "prerequisites": "An owned unit with a deletion control.",
+        "title": "Delete a unit or cancel construction"
+      },
+      "doomsday": {
+        "completion": "Reference only; observe the rule's actual game-state effects.",
+        "description": "Special public rules can add a doomsday clock or overtime pressure. Inspect the displayed countdown and rule details; do not assume the normal conquest pacing or resource behavior.",
+        "exercise": "Read the active rule and countdown before committing troops.",
+        "prerequisites": "A match with the special rule enabled.",
+        "title": "Doomsday clock and overtime"
+      },
+      "embargo": {
+        "completion": "Reference only; observe the embargo status and trade effect.",
+        "description": "Start or stop trade restrictions for a country or all countries using the available controls. Embargoes affect eligible trade, so political pressure can also reduce your income.",
+        "exercise": "Inspect the trade status and the start/stop restriction controls.",
+        "prerequisites": "An eligible target and trade controls.",
+        "title": "Embargo and embargo all"
+      },
+      "factory": {
+        "completion": "Factory completion is practiced; train behavior is explained separately.",
+        "description": "Factories create train stations and connect eligible nearby cities, ports and factories. Trains and rails are generated by the economy; you do not build a train directly. Connections must satisfy route rules.",
+        "exercise": "Finish a factory, then inspect its automatically generated connections.",
+        "prerequisites": "Factories enabled, affordable land site and eligible nearby structures for connections.",
+        "title": "Factory, trains and connected economy"
+      },
+      "fronts": {
+        "completion": "Reference only; judge territorial change and troop losses.",
+        "description": "Incoming attacks reduce safety elsewhere. Preserve a troop reserve, reinforce a valuable border and counterattack only when the commitment is affordable. Concentrating force can outperform many small attacks.",
+        "exercise": "Inspect every incoming front before choosing one response.",
+        "prerequisites": "Enemies or incoming attacks.",
+        "title": "Counterattacks and several fronts"
+      },
+      "identity": {
+        "completion": "Reference only; compare the visible identity labels.",
+        "description": "Basic tribes remain gray. Names, flags, AI badges and player information distinguish controllers. Team and alliance markings carry relationship information; color alone is insufficient.",
+        "exercise": "Inspect a human, tribe and nation, then check their team or alliance.",
+        "prerequisites": "Player labels or player information available.",
+        "title": "Humans, tribes, nations and teams"
+      },
+      "keybindings": {
+        "completion": "Reference only; one key input should invoke the intended action once.",
+        "description": "Controls and button labels share the effective bindings. Nonconflicting custom keys are preserved. Legacy bindings that conflict with required modern controls are backed up with a visible migration notice. Rebind or reset them in Settings.",
+        "exercise": "Rebind an action and verify the guide and hotbar show the effective key.",
+        "prerequisites": "A keyboard and settings menu.",
+        "title": "Keyboard shortcuts and rebinding"
+      },
+      "lobby": {
+        "completion": "Reference only; server-confirmed lobby settings govern the match.",
+        "description": "Create a custom room, share its invite and configure settings before start. The host controls the start timer and eligible player removal. Anonymized names and clan-tag rules affect display. Public listing may require an account entitlement.",
+        "exercise": "Review the lobby settings and player list before starting.",
+        "prerequisites": "Network connectivity; host controls require ownership of the room.",
+        "title": "Create, invite, configure and host a room"
+      },
+      "mobile": {
+        "completion": "Reference only; cancellation must leave resources and units unchanged.",
+        "description": "Drag to pan, pinch to zoom and tap territory for contextual actions. Preview action cost and placement before committing; close or cancel to back out. Inspect available quickbar layout and handedness options in settings.",
+        "exercise": "Preview a legal build and cancel before confirming another action.",
+        "prerequisites": "A touch device or touch-enabled browser.",
+        "title": "Touch controls and quickbar"
+      },
+      "modern": {
+        "completion": "Reference only; initial ownership and the actual scenario result must be verified in play.",
+        "description": "Choose a supported country before starting. Initial owned tiles represent the scenario's processed borders; capitals and starting economy are game scenario data. Inspect coverage and map resolution rather than assuming every small country is represented.",
+        "exercise": "Search or select a country, inspect its neighbors, start on its territory and conquer another country.",
+        "prerequisites": "Modern scenario selected and a supported country.",
+        "title": "Modern world: country selection and conquest"
+      },
+      "modern_ai": {
+        "completion": "The core roster contains fixed AI levels. Lobby fill is validated by server/core tests; reading this lesson does not pretend to verify an online room.",
+        "description": "AI levels are independent seeded low/medium/high decisions with default 1:1:1 weights. Personality and climate adaptation are separate. Invitation AI fills empty participant slots at the start; unselected world factions have their own AI without duplicate control.",
+        "exercise": "Inspect actual AI level labels and common population, then configure participant slots and autofill before inviting another human.",
+        "prerequisites": "Modern v2 AI game or private invitation room. Online room creation uses the existing lobby service.",
+        "title": "Individual AI levels and invitation-slot fill"
+      },
+      "modern_air": {
+        "completion": "A new core base, outbound/returning/rearming transitions and actual aircraft casualties are required.",
+        "description": "Fighters contest airspace and intercept. Strike aircraft damage ground troops, facilities and ports without capturing land. Sorties use a base, radius, personnel, upkeep, real flight positions, return and resupply cooldown. SAM aircraft interception has its own cost and reload.",
+        "exercise": "Build another base, send a squadron on patrol or strike, watch its return and rearm, then observe an actual interception casualty.",
+        "prerequisites": "An operating airbase and owned aircraft. Interception exercise also needs enabled SAM or enemy fighters.",
+        "title": "Airbases, sorties and interception"
+      },
+      "modern_climate": {
+        "completion": "Both preview efficiencies plus actual ground casualties are checked; training requires its completed core counter.",
+        "description": "Historical regional climate is separate from terrain and temporary weather. Army adaptation applies at the engagement tile, with mild climates spared harsh penalties. Capture does not instantly train troops. Training costs time and gold and has two adaptation slots.",
+        "exercise": "Compare actual-route climate previews on adapted and harsh unadapted battle locations, fight, then complete a new adaptation training.",
+        "prerequisites": "Modern v2, an army group and enough gold. The overlay is an explanation of climate, not current weather.",
+        "title": "Regional climate and adaptation training"
+      },
+      "modern_commands": {
+        "completion": "Actual camera/selection/valid preview, acknowledged queue/movement/stop, paid base completion and paid unit production are checked.",
+        "description": "Branch selection does not launch units. Click, box or add-select units, point to preview, then right-click to move or attack. Shift queues; Stop halts a real order; Esc cancels preview or selection.",
+        "exercise": "Practice camera, branches, selection, arrows, immediate orders, queue and stop. Complete army-base construction, training and naval-base ship movement.",
+        "prerequisites": "Independent Regions and an owned unit. All effective keys appear in Controls; mobile uses branch and target buttons.",
+        "title": "Q/W/E and map commands"
+      },
+      "modern_nuclear": {
+        "completion": "A new acknowledged launch responsibility record and active income penalty must exist; merely opening the launch menu does not complete it.",
+        "description": "Each launch applies a timed penalty to the firing faction even if intercepted or its target disappears. MIRV is one launch, not one penalty per warhead. Repeated penalties cap income and replenishment losses and expire by game tick. Victim damage is separate.",
+        "exercise": "Inspect the launch warning, fire once, observe victim damage and your own economic penalty, then compare conventional aircraft or army.",
+        "prerequisites": "Use the nuclear training chapter with enabled weapons, a ready owned silo and enough gold.",
+        "title": "Nuclear cost and lasting responsibility"
+      },
+      "modern_population": {
+        "completion": "Equal initial ledgers are checked against N0. The loss exercise requires actual army casualties.",
+        "description": "Every human and AI starts with the same game population N0 and common budget. Civilian, available, army, navy and air personnel sum to living population. Losses and transfers conserve people; actual national population is unused.",
+        "exercise": "Open the ledger, produce a squadron, engage an opponent and inspect casualties and replenishment.",
+        "prerequisites": "Modern v2 and an owned force. Aircraft need available personnel, gold and capacity.",
+        "title": "Equal population and military accounting"
+      },
+      "modern_ports": {
+        "completion": "Completion requires real capture, finished development, increased income, an enemy-port blockade, and observing then ending an own-port blockade with recovered income.",
+        "description": "Named historical port locations have one unique portId. Initially closed, they earn a bounded bonus only for their current owner after paid development. Damage, blockade and connection change operation. General ports keep ordinary trade without copying the unique bonus.",
+        "exercise": "Capture a major port, repair damage when needed, pay for development and observe increased income. Blockade an enemy port and respond to an enemy blockade of your own.",
+        "prerequisites": "Own or capture a designated major port. Development needs gold and time; blockade needs an owned nearby fleet.",
+        "title": "Capture, develop and blockade major ports"
+      },
+      "modern_regions": {
+        "completion": "Core state contains unique faction and controller IDs; no region has two rulers.",
+        "description": "Countries exceeding 1.2M km² split along administrative boundaries, with a 0.8–1.2M km² goal. Every region has its own controller, center and adaptation; area exceptions retain reasons. Tiles are not km².",
+        "exercise": "Choose a Russian, Chinese or Indian region and inspect its area, exception and administrative center before starting.",
+        "prerequisites": "Modern regions v2. Select a country, then an independent region.",
+        "title": "Independent regions and geographic area"
+      },
+      "modes": {
+        "completion": "Reference only; the started match reflects the selected mode.",
+        "description": "Select a map, size and mode. FFA has individual opponents; teams share victory and relationships. Humans versus nations groups the controllers. Ranked public matches have their own eligibility and rules.",
+        "exercise": "Inspect map preview and teams before starting.",
+        "prerequisites": "The main menu or a configurable lobby.",
+        "title": "Single-player, FFA, teams and humans versus nations"
+      },
+      "nukes": {
+        "completion": "An atom bomb in flight validates launch, not guaranteed damage or victory.",
+        "description": "Inspect price, legal range, blast preview and friendly-fire risk before launch. Hydrogen bombs have different devastation rules; MIRV creates warheads automatically. SAM defenses and reloads affect results. Water targeting follows lobby rules.",
+        "exercise": "Use a weapons training match; launch an atom bomb only at the intended target.",
+        "prerequisites": "The selected weapon enabled, ready silo, gold and legal target.",
+        "title": "Atom bomb, hydrogen bomb and MIRV"
+      },
+      "pause_speed": {
+        "completion": "Reference only; the game tick or replay cursor stops and resumes.",
+        "description": "Single-player and replay controls permit pausing or changing speed. Public multiplayer is governed by server rules; local pause cannot stop another player's simulation. Pausing the tutorial guide alone does not pause play.",
+        "exercise": "Use the current pause key or game controls, then resume.",
+        "prerequisites": "A mode permitting the requested pause or speed action.",
+        "title": "Pause and simulation speed"
+      },
+      "port": {
+        "completion": "An active completed port belongs to you.",
+        "description": "Ports require owned coastal land. They support automatic trade and warship construction. An inland tile fails the coast condition; use the build menu to inspect a legal shore site.",
+        "exercise": "Complete a port on a legal coast.",
+        "prerequisites": "Ports enabled, coast and enough gold.",
+        "title": "Port"
+      },
+      "profile": {
+        "completion": "Reference only; confirmed edits appear on your profile.",
+        "description": "Inspect your player profile and username settings. Verified names, avatars and account details depend on the existing account service. Free-form match names must satisfy the renderer's allowed characters.",
+        "exercise": "Open the profile and inspect the permitted edit controls.",
+        "prerequisites": "Profile service and sign-in for account edits.",
+        "title": "Profile and username"
+      },
+      "replay": {
+        "completion": "Reference only; playback follows the recorded sequence.",
+        "description": "Open the existing replay viewer for a recorded match. Scrub time, inspect territorial change and use playback speed controls. Record compatibility follows the build/version policy; a replay is not a live saved game.",
+        "exercise": "Review a major battle and compare the map before and after.",
+        "prerequisites": "A supported recorded match.",
+        "title": "Replay and review"
+      },
+      "resources": {
+        "completion": "Resource explanations are recorded as read, not as successful construction.",
+        "description": "Troops regenerate toward capacity; cities increase capacity. Territory and automatic trade support gold income. Starting gold, multipliers and infinite-resource settings change the rules and appear before play.",
+        "exercise": "Read troops, gold and growth; compare resource modifiers with the lobby settings.",
+        "prerequisites": "A spawned country and visible resource panel.",
+        "title": "Troops, gold, growth and economy rules"
+      },
+      "results": {
+        "completion": "Reference only; a new match starts with fresh game state.",
+        "description": "The result screen reports the actual winner and game mode. Inspect territorial progress and replay options, then start another match. Single-player and training do not count as ranked public results.",
+        "exercise": "Compare the victory objective with the result, then restart.",
+        "prerequisites": "A finished match.",
+        "title": "Victory, defeat and restart"
+      },
+      "retreat": {
+        "completion": "Reference only; check that the outgoing attack retreats or ends.",
+        "description": "Use the outgoing-attack control to cancel or retreat. Withdrawal follows the existing combat rules; it does not instantly undo casualties or conquered land.",
+        "exercise": "Inspect an ongoing attack and use its cancel control when the risk rises.",
+        "prerequisites": "An outgoing attack that can be cancelled.",
+        "title": "Cancel an attack and withdraw"
+      },
+      "rules": {
+        "completion": "Reference only; disabled actions are unavailable in both simulation and guide.",
+        "description": "Read the actual lobby rules: disabled units, alliance duration, resources, random spawn, time limit and public modifiers. Unavailable practices are filtered out; choose another training chapter with the feature enabled.",
+        "exercise": "Compare the unit menu with disabled-unit rules.",
+        "prerequisites": "The active game settings.",
+        "title": "Disabled units and special rules"
+      },
+      "sam": {
+        "completion": "Reference only; an actual interception shows defensive success.",
+        "description": "SAM launchers automatically intercept eligible airborne threats within their game-defined range and cooldown. SAM missiles are automatically generated; they are not manually built. Upgrades change available defense.",
+        "exercise": "Inspect defense range, construction and cooldown against a legal missile threat.",
+        "prerequisites": "SAM enabled, gold and a legal owned site.",
+        "title": "SAM launcher and air defense"
+      },
+      "save": {
+        "completion": "Reference only; the restored game continues from the stored tick.",
+        "description": "Use supported single-player save controls to store a simulation snapshot. Course progress and lobby options are not a running-game save. Keep exports where available; storage can fail or a different build can reject a save.",
+        "exercise": "Save during play, load it and compare territory, resources and AI state.",
+        "prerequisites": "Single-player save controls, browser storage and the same supported build.",
+        "title": "Save, load and continue a running game"
+      },
+      "silo": {
+        "completion": "A completed silo validates construction; launch readiness is checked separately.",
+        "description": "Nuclear launches need a completed ready silo, sufficient gold and a legal target. Construction and cooldown prevent launching even if you own a silo. Inspect its readiness indicator.",
+        "exercise": "Complete a silo and wait until it is ready.",
+        "prerequisites": "Silos enabled, affordable site and legal placement.",
+        "title": "Missile silo and reload"
+      },
+      "spawn": {
+        "completion": "The simulation confirms you have spawned and play has begun.",
+        "description": "Choose land during the spawn phase. Random spawn chooses for you. Modern mode assigns your selected country's territory. Protection and lobby start delay follow the displayed rules.",
+        "exercise": "Choose a legal start and wait until the spawn phase ends.",
+        "prerequisites": "Join a match as a player; a spectator cannot spawn.",
+        "title": "Starting position and protection"
+      },
+      "spectator": {
+        "completion": "Reference only; spectator state prevents player commands.",
+        "description": "Join as a spectator when the lobby permits. Watch countries and relationships without spawning or sending combat commands. Observer name visibility may be restricted by the host.",
+        "exercise": "Choose spectate and inspect the map without taking ownership.",
+        "prerequisites": "A lobby or match permitting spectating.",
+        "title": "Spectate"
+      },
+      "statistics": {
+        "completion": "Reference only; API records show the qualifying match.",
+        "description": "Public profile statistics and rankings come from the existing API. Eligibility and match classification govern updates. Offline single-player and training are separate from ranked public games.",
+        "exercise": "Inspect the match type beside a statistic or leaderboard.",
+        "prerequisites": "Statistics service and qualifying recorded matches.",
+        "title": "Statistics, leaderboards and ranked play"
+      },
+      "support": {
+        "completion": "Reference only; the confirmed donation changes both players' resources.",
+        "description": "Eligible allies or teammates can receive support. Donations to humans may be disabled by lobby rules. Inspect the recipient and amount before sending; aid reduces your own reserve.",
+        "exercise": "Open the donation controls and inspect amount and recipient.",
+        "prerequisites": "An eligible recipient, resources and donations allowed by the rules.",
+        "title": "Troop and gold donations"
+      },
+      "target": {
+        "completion": "Reference only; the target indicator appears.",
+        "description": "Mark another player as a target to communicate priorities through the existing allied or team display. A target marker is advice; it is not an attack order.",
+        "exercise": "Mark a target and inspect the shared target indicator.",
+        "prerequisites": "A living player and target control.",
+        "title": "Mark a target"
+      },
+      "trade": {
+        "completion": "Reference only; automatic trade arrival and income show the effect.",
+        "description": "Ports automatically send trade ships to eligible trading ports sharing accessible water. War, embargoes and missing routes can prevent trade. Trade ships are not manually built from the unit menu.",
+        "exercise": "Inspect trade ships and gold while toggling trade restrictions only when useful.",
+        "prerequisites": "Completed ports, a legal trading partner and connected water.",
+        "title": "Trade ships and sea income"
+      },
+      "transport": {
+        "completion": "The guide observes your transport afloat; successful landing is a separate outcome.",
+        "description": "Send troops from your coast across water to a legal destination. The existing route and enemy warships affect arrival. Transport is a troop commitment, not a directly purchased economic ship.",
+        "exercise": "Send a transport; inspect its route and cancel option.",
+        "prerequisites": "Transport enabled, owned shore, troops and a reachable water route.",
+        "title": "Transport ship and landing"
+      },
+      "upgrade": {
+        "completion": "Reference only; verify its level or auto-upgrade state changes.",
+        "description": "Eligible completed structures can be upgraded. Automatic upgrade repeats upgrades when the game permits and resources are available. Inspect the current price; stop automatic upgrading when the reserve is needed elsewhere.",
+        "exercise": "Open a structure's controls and inspect manual and automatic upgrade choices.",
+        "prerequisites": "An owned upgradeable structure and enough gold.",
+        "title": "Upgrade and automatic upgrade"
+      },
+      "warship": {
+        "completion": "Warship construction is practiced; selection and firing are reference topics.",
+        "description": "Build warships from eligible ports and move them over water. They fire shells automatically. Select one, box-select several or use select-all with your effective bindings; enemy warships can intercept transport.",
+        "exercise": "Complete a warship, then inspect single and multiple selection movement.",
+        "prerequisites": "Warships enabled, completed port, legal water destination and gold.",
+        "title": "Warships, movement and selection"
+      }
+    },
+    "guide_paused": "Only the guide is paused. The match continues; use the game pause control in single-player to stop the simulation.",
+    "hint": "Hint",
+    "modern_hints": {
+      "modern_air_produce": "An unfinished, damaged or full base cannot produce. Wait for completion or repair; choose another base if capacity is full.",
+      "modern_army_train": "Select an operational army base. Automatic formation uses existing army reserve first; available-personnel training must fit the mobilization cap. The pool choice and cost are shown before production.",
+      "modern_armybase": "Choose a separate owned land tile. The price, time and base limit are in the build tooltip. Pause also pauses construction.",
+      "modern_box_select": "Drag empty ground around a group. Shift-click a different group; Shift-clicking an already selected group does not add people.",
+      "modern_camera": "Click the map before using keys. Text fields suppress map controls. On touch, use two fingers to pan and pinch to zoom.",
+      "modern_cursor": "Select a living owned unit first. Choose owned land for a safe first army route; ships require connected water.",
+      "modern_navybase": "Use your coastline where the port preview is valid. A completed port is one naval base; trade and major-port bonuses are not duplicated.",
+      "modern_queue": "The second destination must be valid. The dashed route appears only after the core accepts it; wait for an actual completed move."
+    },
+    "modern_steps": {
+      "modern_ai_levels": "Inspect the actual AI levels shown in country information. Levels are fixed by the seed and do not change the common starting population.",
+      "modern_air_intercept": "Patrol near hostile aircraft with a fighter, or send a sortie near enabled enemy SAM. Wait for actual aircraft losses. Move the target inside the base radius and read the risk before ordering.",
+      "modern_air_launch": "Choose Air {airKey} and click a fighter. Point within its base radius and right-click to patrol; a strike aircraft instead attacks an enemy target. Watch actual outbound aircraft; out-of-range targets show a reason.",
+      "modern_air_produce": "Select the new operational air base, then produce a fighter or strike aircraft. Check the reserved cost, personnel and capacity. Wait for an actual new squadron at its base.",
+      "modern_air_return": "Complete a short patrol, then watch Returning and Rearming. Wait for the actual return and resupply timer; no new sortie during rearming. Aircraft never capture land.",
+      "modern_airbase": "Choose Air base in Build menu or Bases & production and right-click owned land. Check its price and press Confirm construction. Wait for completion; its capacity and health appear in the base information.",
+      "modern_army_move": "Point to nearby owned land and right-click. The arrow becomes solid and stays while the army moves. Wait until it arrives. Against enemies, the army must actually fight and capture the ground. Touch: confirm the preview.",
+      "modern_army_train": "In Bases & production choose your operational Army base and Train army. Cost and personnel are reserved once. Wait for the new unit to appear at the base; check the reserve and formation counts.",
+      "modern_armybase": "Open Build menu or Bases & production. Choose Army base and right-click owned land. Check the price and press Confirm construction. Wait until its construction timer ends and the base is operational.",
+      "modern_box_select": "Drag a box around one army group. Hold Shift and click another to add it. Selection counts must actually increase. If no second unit is visible, use {cameraKey} to find your starting groups.",
+      "modern_branches": "Press Army {armyKey}, Navy {navyKey}, Air {airKey}, or each button below. The highlighted branch changes; this does not send units.",
+      "modern_camera": "Use the arrow keys to move the map, then zoom with the wheel or {zoomInKey}/{zoomOutKey}. {cameraKey} returns to your units. Both a real camera move and zoom complete this step.",
+      "modern_climate_compare": "Enable Climate overlay. Compare adapted and harsh unadapted army previews, then fight real ground exchanges in both climates. Both previews and actual losses in each climate are required.",
+      "modern_climate_train": "Choose a new adaptation in Population and train it for {cost} gold and {seconds} game seconds. Capture alone does not train troops.",
+      "modern_cursor": "With units selected, point to nearby owned land. Each unit shows a curved dotted arrow to this cursor target. Wait for the valid preview; a reason appears if the route is impossible. Touch: Target, then tap the land.",
+      "modern_mobilization": "Fight a real army engagement and inspect the ledger's losses and replenishment. Producing a new branch uses existing manpower rather than creating people.",
+      "modern_navy_move": "Choose Navy {navyKey}. In Bases & production produce a warship at an operational port and wait for its completion. Click the ship, point to nearby connected sea and right-click. Wait for actual arrival.",
+      "modern_navybase": "Choose Naval base in Bases & production. Right-click a valid owned coastline, check its price and press Confirm construction. Wait for the Port to finish; it also keeps its normal trade role.",
+      "modern_nuclear_penalty": "In this nuclear-only lesson, launch from a ready silo after reviewing the costs. Watch the firing faction's active economic penalty and the victim's separate damage.",
+      "modern_population": "All independent factions start with {population} people. Open Population: civilian + available + army + navy + air = living population. Reserve troops are part of army personnel, not extra people.",
+      "modern_port_blockade": "Produce and select a warship, choose Blockade near an enemy named port and confirm. The actual port state must list your blocking faction.",
+      "modern_port_capture": "Use Army to capture the tile of a named enemy major port. Its core owner and capture count must change; aircraft alone cannot capture it.",
+      "modern_port_defend": "Observe enemy warships blockading a developed port and reducing its income. Respond with your navy, end the blockade, and verify that the port income actually recovers.",
+      "modern_port_develop": "Open an owned major port, pay for Development and wait for completion. Its level and actual income must rise together; blockade or damage may delay the income gain.",
+      "modern_queue": "Right-click a nearby owned destination, then Shift-right-click another while moving. A dashed queued route follows the active solid route. Complete one real movement with an acknowledged queued order.",
+      "modern_regions": "Inspect the selected independent region: its controller is unique. Shared parent country does not grant an alliance. Check the region's real area and any disclosed exception.",
+      "modern_select": "Choose Army {armyKey}, then left-click your army icon. A selection ring and the selected count confirm selection. {selectKey} selects your visible army units. Touch: tap the icon.",
+      "modern_stop": "Start another short move, then press {stopKey} or Stop while it is moving. Wait for the acknowledged idle state. {cancelKey} cancels preview or selection; it does not stop an active order."
+    },
+    "modern_touch_steps": {
+      "modern_air_intercept": "Choose a fighter and patrol near enemy aircraft, or target near enabled enemy SAM inside your base radius. Observe real aircraft losses and the risk.",
+      "modern_air_launch": "Tap Air and a fighter. Use Target inside its base radius and Confirm order to patrol. A strike aircraft attacks an enemy target. Watch the actual outbound aircraft.",
+      "modern_air_produce": "Select an operational Air base and produce a fighter or strike aircraft. Wait for actual paid production; aircraft use personnel, capacity, gold and time.",
+      "modern_air_return": "After a short patrol, watch Returning and Rearming. Wait for actual return and resupply. Aircraft cannot capture land or launch again while rearming.",
+      "modern_airbase": "Choose Air base in Bases & production, tap owned land, check the price and Confirm construction. Wait for completion and inspect its capacity and health.",
+      "modern_army_move": "Use Target to preview nearby owned land and tap Confirm order. The solid route stays while your army actually moves. Wait for arrival; enemy land requires combat.",
+      "modern_army_train": "Choose an operational army base in Bases & production and tap Train army. Wait for the paid new unit to appear at that base.",
+      "modern_armybase": "In Bases & production choose Army base, tap valid owned land, check its price and Confirm construction. Wait until the base is operational.",
+      "modern_box_select": "Drag with one finger around one army group. Enable Add to selection, then tap another group. The actual selection count must increase.",
+      "modern_branches": "Tap Army, Navy and Air below in turn. The highlighted branch changes; selecting a branch does not launch units.",
+      "modern_camera": "Drag with two fingers to move the map, then pinch to zoom. Both a real pan and zoom complete this step.",
+      "modern_cursor": "With units selected, enable Target and tap or drag to nearby owned land. Each unit previews a curved arrow. Wait for a valid route; an impossible target explains why.",
+      "modern_navy_move": "Choose Navy, then produce a Warship at an operational port. Tap the finished ship, use Target on connected water and Confirm order. Wait for its actual arrival.",
+      "modern_navybase": "Choose Naval base in Bases & production, tap a valid owned shore and Confirm construction. Wait for the Port to finish; its trade role remains.",
+      "modern_queue": "Start a move. Enable Queue command, then Target and another valid owned destination. Confirm the preview. Wait for an acknowledged queued route and a completed real move.",
+      "modern_select": "Tap Army, then tap one of your army icons. The selection ring and count confirm selection. Select visible units selects your visible army.",
+      "modern_stop": "Start a short move, then tap Stop while it is moving. Wait for actual idle state. Cancel clears placement or selection; Stop halts an active order."
+    },
+    "modes": "Modes",
+    "modes_list": {
+      "classic": "Classic",
+      "modern": "Modern world",
+      "multiplayer": "Multiplayer",
+      "training": "Training"
+    },
+    "no_results": "No matching feature. Try a shorter search or another chapter.",
+    "pause_guide": "Pause guide",
+    "practice": {
+      "attack_nations": "The nearby tribes are blocked by nations. Conquer an accessible opponent while keeping a reserve, or skip and retry on a different training map. Completion requires a real conquest.",
+      "attack_wilderness": "Expand into adjacent land with a small attack. This exercise completes only after your territory actually increases. Sending an attack alone is not enough; watch your troop reserve.",
+      "capture_tribes": "Conquer a nearby gray tribe. Compare its troops with yours, keep a reserve, and wait until its remaining territory becomes yours. Earning gold alone does not complete this exercise."
+    },
+    "practice_chapter": "Start this practice chapter",
+    "practice_confirmed": "The game's state confirms this action succeeded.",
+    "practice_hint": "An exercise completes after the game confirms the result. Wait for captured land or completed construction. Check the build menu for cost and placement, or skip this exercise and return later.",
+    "prerequisites": "Needs",
+    "read_confirmed": "Explanation read. This is separate from practical completion.",
+    "reference": "Searchable feature guide and glossary",
+    "reference_intro": "The basic practice is short. Repeat a topic when needed, or search every public feature here. Reading a reference does not mark a practical exercise as completed. Prices and availability come from the current game's build menu.",
+    "repeat": "Practice again",
+    "resume": "Resume chapter",
+    "resume_guide": "Resume guide",
+    "search": "Search feature, action or term",
+    "storage_error": "Course progress could not be saved. Browser storage may be full or blocked. Existing saved progress is retained; keep this game open and retry later.",
+    "touch_hint": "Drag to pan and pinch to zoom. Tap territory to open the radial menu. Preview the action and cost, then choose it; dismiss the menu to cancel. Build on owned land and reach a coast for boats.",
+    "trainee": "Trainee",
+    "training_rules": "Prepared training: 1,200 coastal tiles, 10,000 initial displayed troops (subject to the troop cap), 10M gold, one weak practice tribe and one cooperative nation. These training advantages are separate from competitive AI rules.",
+    "training_spawn": "Your practice country starts on a prepared coast. Find its highlighted territory, then expand into nearby land. Starting-position selection is covered in the searchable feature guide.",
+    "unbound": "Unassigned; use the menu"
+  },
   "effects": {
     "nukeType": {
       "atom": "Atom",
@@ -737,6 +1245,47 @@
       "transportShipTrail": "Boat Trail",
       "warship": "Warship"
     }
+  },
+  "enhanced_ai": {
+    "badge": "Enhanced AI",
+    "candidates": "Candidates evaluated: {count}",
+    "challenge_description": "Challenge: existing difficulty resource bonuses apply to AI, including classic troop/capacity/growth and tribe combat modifiers. The bonuses vary by Easy/Medium/Hard/Impossible; this is not fair competition.",
+    "debug_title": "AI decision details",
+    "enable": "Enable enhanced AI profiles",
+    "fair_description": "Difficulty adjusts decisions. Human and AI use the same troop/gold rules and receive half of any defeated controller's gold. Infinite resources and host cheats are disabled; finite global starting gold and income settings apply to everyone.",
+    "fair_resources": "Fair competition: equal economy and combat rules",
+    "goal": {
+      "attack": "Concentrating an offensive",
+      "defend": "Strengthening defense",
+      "economy": "Growing the economy",
+      "expand": "Expanding territory",
+      "recover": "Rebuilding reserves",
+      "support": "Supporting an ally"
+    },
+    "marker": "AI+",
+    "nationPercent": "Enhanced nations",
+    "percent_description": "Selection is deterministic by player id and seed. These percentages are thresholds, so actual counts can vary. AI+ badges show enhanced controllers.",
+    "personality": "Personality",
+    "personality_defensive": "Defensive",
+    "personality_diplomatic": "Diplomatic",
+    "personality_economic": "Economic",
+    "personality_expansionist": "Expansionist",
+    "personality_naval": "Naval",
+    "priority": "Construction priority: {units}",
+    "reason": {
+      "aggregate_front_threat": "Several hostile fronts require a larger reserve.",
+      "allied_front_under_pressure": "An ally needs help on an active front.",
+      "continue_committed_front": "Continue the current target while its value remains competitive.",
+      "counter_active_attack": "Counter an active offensive before committing to another front.",
+      "productive_investment": "Investment has a better return than the available attacks.",
+      "route_or_reserve_blocked": "No sufficiently safe route or affordable force is available.",
+      "safe_overseas_opportunity": "A reachable overseas target offers growth.",
+      "territory_value_after_costs": "Territory and facilities outweigh estimated combat cost.",
+      "unclaimed_land": "Unclaimed land offers inexpensive growth."
+    },
+    "reserve": "Defensive reserve: {troops}",
+    "settings": "Enhanced AI",
+    "tribePercent": "Enhanced tribes"
   },
   "error_modal": {
     "connection_error": "Connection error!",
@@ -1048,25 +1597,9 @@
     "singleplayer_game_paused": "Game paused"
   },
   "help_modal": {
-    "action_attack_altclick": "Attack (when left click is set to open menu)",
-    "action_auto_upgrade": "Auto-upgrade nearest building",
-    "action_build": "Open build menu",
-    "action_coordinate_grid": "Toggle coordinate grid overlay",
-    "action_emote": "Open emote menu",
-    "action_enter": "Builds unit under cursor",
-    "action_esc": "Closes menu. Cancels unit build preview.",
-    "action_game_speed": "Game speed down / up (single player)",
-    "action_move_camera": "Move camera",
-    "action_pause_game": "Pause / Resume game",
-    "action_ratio_change": "Decrease/Increase attack ratio",
-    "action_reset_gfx": "Reset graphics",
-    "action_warship_multiselect": "Select multiple warships (drag to draw selection box)",
-    "action_warship_selectall": "Select all your warships",
-    "action_zoom": "Zoom out/in",
     "ally_betray": "Betray your ally, ending the alliance, halting trade, and weakening your defense. Trading between you is paused for 5 minutes (or until you become allies again) and others may stop trading too. And unless the other player was a traitor themselves, you'll be marked a traitor for 30 seconds. During this time an icon will be above your name and you will have a 50% defense debuff. Tribes are less likely to ally with you and players will think twice before doing so.",
     "ally_donate": "Donate some of your troops to your ally. Used when they're low on troops and are being attacked, or when they need that extra power to crush an enemy.",
     "ally_donate_gold": "Donate some of your gold to your ally. Used when they're low on gold and need it for buildings, or when your team member is saving for that MIRV.",
-    "bomb_direction": "Atom / Hydrogen bomb arc direction",
     "build_atom_desc": "Small explosive bomb that destroys territory, buildings, ships and boats. Spawns from the nearest Missile Silo and lands in the area you first clicked to build it.",
     "build_city_desc": "Increases your max population. Useful when you can't expand your territory or you're about to hit your population limit.",
     "build_defense_desc": "Increases defenses around nearby borders, which show a checkered pattern. Attacks from enemies are slower and have more casualties.",
@@ -1082,7 +1615,6 @@
     "build_sam_desc": "Can intercept enemy missiles in its 100 pixel range. The SAM has a 7.5 second cooldown.",
     "build_silo_desc": "Allows launching missiles.",
     "build_warship_desc": "Patrols in an area, capturing enemy trade ships and destroying their Boats (transport ships) and Warships. Spawns from the nearest Port and patrols the area you first clicked to build it. You can control Warships by attack-clicking on them (see action Attack under Hotkeys) and then attack-clicking the new area you want them to move to. Warships can level up (max level 3) by capturing enemy trade ships and destroying their transport boats and Warships. Leveling up increases the Warship's damage and health.",
-    "drag": "drag",
     "exit_confirmation": "Are you sure you want to exit the game?",
     "game_id_tooltip": "Game ID",
     "hotkeys": "Hotkeys",
@@ -1198,6 +1730,456 @@
     "visibility_private": "Private",
     "visibility_public": "Public",
     "waiting": "Waiting for players..."
+  },
+  "input_actions": {
+    "altKey": {
+      "description": "Hold for documented alternate controls; it does not trigger an action by itself.",
+      "label": "Alternate action modifier"
+    },
+    "attackRatioDown": {
+      "description": "Decrease attack ratio by {amount}%",
+      "label": "Decrease Attack Ratio"
+    },
+    "attackRatioUp": {
+      "description": "Increase attack ratio by {amount}%",
+      "label": "Increase Attack Ratio"
+    },
+    "autoUpgrade": {
+      "description": "Use the existing facility setting when available; no undocumented Shift-middle action is implied.",
+      "label": "Automatic upgrade"
+    },
+    "boatAttack": {
+      "description": "Send a boat attack to the tile under your cursor.",
+      "label": "Boat Attack"
+    },
+    "boxSelectWarships": {
+      "description": "Hold this key and drag to select multiple warships.",
+      "label": "Box-Select Warships"
+    },
+    "breakAlliance": {
+      "description": "Break alliance with the player whose tile is under your cursor.",
+      "label": "Break Alliance (Betray)"
+    },
+    "buildAirBase": {
+      "description": "Build on owned land; capacity, construction time and damage affect sorties.",
+      "label": "Build air base"
+    },
+    "buildArmyBase": {
+      "description": "Choose Bases & production, then owned land; wait for construction before training.",
+      "label": "Build army base"
+    },
+    "buildAtomBomb": {
+      "description": "Prepare the weapon and target; one key press must not launch a nuclear weapon.",
+      "label": "Prepare atom bomb"
+    },
+    "buildCity": {
+      "description": "Build a City under your cursor.",
+      "label": "Build City"
+    },
+    "buildDefensePost": {
+      "description": "Build a Defense Post under your cursor.",
+      "label": "Build Defense Post"
+    },
+    "buildFactory": {
+      "description": "Build a Factory under your cursor.",
+      "label": "Build Factory"
+    },
+    "buildHydrogenBomb": {
+      "description": "Prepare the weapon and inspect its cost, target and responsibility penalty before confirming.",
+      "label": "Prepare hydrogen bomb"
+    },
+    "buildMIRV": {
+      "description": "Prepare the MIRV target; one launch incurs one responsibility penalty.",
+      "label": "Prepare MIRV"
+    },
+    "buildMenu": {
+      "description": "Open construction choices; placement still needs a valid target.",
+      "label": "Open build menu"
+    },
+    "buildMenuModifier": {
+      "description": "Hold this key while clicking to open the build menu.",
+      "label": "Build Menu Modifier"
+    },
+    "buildMissileSilo": {
+      "description": "Build a Missile Silo under your cursor.",
+      "label": "Build Missile Silo"
+    },
+    "buildNavalBase": {
+      "description": "Build or develop an owned navigable coastal port; military and trade roles share one facility.",
+      "label": "Build naval base"
+    },
+    "buildPort": {
+      "description": "Build a Port under your cursor.",
+      "label": "Build Port"
+    },
+    "buildSamLauncher": {
+      "description": "Build a SAM Launcher under your cursor.",
+      "label": "Build SAM Launcher"
+    },
+    "buildWarship": {
+      "description": "Build a Warship under your cursor.",
+      "label": "Build Warship"
+    },
+    "cancel": {
+      "description": "Close the top dialog, cancel placement or preview, then clear selection. Active orders require Stop.",
+      "label": "Cancel current context"
+    },
+    "cancelAttack": {
+      "description": "Use the existing attack cancellation action or the selected modern unit cancellation.",
+      "label": "Withdraw land attack"
+    },
+    "cancelTransport": {
+      "description": "Select a transport and cancel it through the existing transport controls.",
+      "label": "Cancel transport"
+    },
+    "centerCamera": {
+      "description": "In modern mode center selected units, or your country when none are selected.",
+      "label": "Center camera"
+    },
+    "confirmPlacement": {
+      "description": "Confirm a valid prepared construction target; inspect dangerous weapons before launching.",
+      "label": "Confirm placement"
+    },
+    "coordinateGrid": {
+      "description": "Toggle the alphanumeric grid overlay",
+      "label": "Coordinate Grid"
+    },
+    "deleteFacility": {
+      "description": "Select an owned facility and its delete action; confirm the actual removal.",
+      "label": "Delete facility"
+    },
+    "developPort": {
+      "description": "Select an owned major port and pay for the next development stage; income changes after completion.",
+      "label": "Develop major port"
+    },
+    "donateGold": {
+      "description": "Use country diplomacy to send gold when the rules permit.",
+      "label": "Donate gold"
+    },
+    "donateTroops": {
+      "description": "Use country diplomacy to transfer eligible troops; modern population accounting transfers people once.",
+      "label": "Donate troops"
+    },
+    "embargo": {
+      "description": "Use country diplomacy to disable trade with a selected faction.",
+      "label": "Embargo"
+    },
+    "emojiMenuModifier": {
+      "description": "Hold this key while clicking to open the emoji menu.",
+      "label": "Emoji Menu Modifier"
+    },
+    "gameSpeedDown": {
+      "description": "Only permitted local modes change simulation playback speed.",
+      "label": "Decrease game speed"
+    },
+    "gameSpeedUp": {
+      "description": "Only permitted local modes change simulation playback speed.",
+      "label": "Increase game speed"
+    },
+    "groundAttack": {
+      "description": "Send a ground attack to the tile under your cursor.",
+      "label": "Ground Attack"
+    },
+    "help": {
+      "description": "Open the complete effective controls table and training chapters.",
+      "label": "Controls and help"
+    },
+    "loadGame": {
+      "description": "Choose a compatible save in save management; old-build errors retain the original save.",
+      "label": "Load / continue"
+    },
+    "markTarget": {
+      "description": "Use the target action in country diplomacy to share a target.",
+      "label": "Mark target"
+    },
+    "modernAir": {
+      "description": "Select fighters or strike aircraft; aircraft cannot capture land.",
+      "label": "Select air force"
+    },
+    "modernAirAlternate": {
+      "description": "Select fighters or strike aircraft; aircraft cannot capture land.",
+      "label": "Select air force"
+    },
+    "modernArmy": {
+      "description": "Select the army branch; selecting alone issues no order.",
+      "label": "Select army"
+    },
+    "modernArmyAlternate": {
+      "description": "Select the army branch; selecting alone issues no order.",
+      "label": "Select army"
+    },
+    "modernNavy": {
+      "description": "Select ships; land is not a naval destination.",
+      "label": "Select navy"
+    },
+    "modernNavyAlternate": {
+      "description": "Select ships; land is not a naval destination.",
+      "label": "Select navy"
+    },
+    "modernSelectVisible": {
+      "description": "Select owned units of the current branch visible on the map.",
+      "label": "Select visible branch units"
+    },
+    "modernStop": {
+      "description": "Stop acknowledged active orders of selected units.",
+      "label": "Stop selected units"
+    },
+    "moveDown": {
+      "description": "Move the camera downward",
+      "label": "Move Camera Down"
+    },
+    "moveDownArrow": {
+      "description": "Move the camera downward",
+      "label": "Move Camera Down"
+    },
+    "moveLeft": {
+      "description": "Move the camera to the left",
+      "label": "Move Camera Left"
+    },
+    "moveLeftArrow": {
+      "description": "Move the camera to the left",
+      "label": "Move Camera Left"
+    },
+    "moveRight": {
+      "description": "Move the camera to the right",
+      "label": "Move Camera Right"
+    },
+    "moveRightArrow": {
+      "description": "Move the camera to the right",
+      "label": "Move Camera Right"
+    },
+    "moveUp": {
+      "description": "Move the camera upward",
+      "label": "Move Camera Up"
+    },
+    "moveUpArrow": {
+      "description": "Move the camera upward",
+      "label": "Move Camera Up"
+    },
+    "pauseGame": {
+      "description": "Available only in permitted singleplayer or replay; paused games do not grow troops.",
+      "label": "Pause / resume"
+    },
+    "performanceOverlay": {
+      "description": "Show the existing developer performance display.",
+      "label": "Performance display"
+    },
+    "pointerAdditional": {
+      "description": "Shift-left-click adds units to the current selection.",
+      "label": "Add selection"
+    },
+    "pointerBoxSelect": {
+      "description": "Drag a box to select the current branch in modern mode. Classic uses its configured ship-selection modifier.",
+      "label": "Box selection"
+    },
+    "pointerBuildMenu": {
+      "description": "Hold the configured build-menu modifier and left-click the map. On Mac the default is Command.",
+      "label": "Build menu modifier click"
+    },
+    "pointerCommand": {
+      "description": "Modern: right-click a valid cursor preview to move or attack immediately. Classic: context menu.",
+      "label": "Destination / context menu"
+    },
+    "pointerEmojiMenu": {
+      "description": "Hold the configured emoji-menu modifier and left-click a country.",
+      "label": "Communication modifier click"
+    },
+    "pointerPan": {
+      "description": "Modern: Alt-drag; Classic: normal drag. Touch: two-finger pan.",
+      "label": "Drag camera"
+    },
+    "pointerQueue": {
+      "description": "Shift-right-click adds a valid destination after the current order.",
+      "label": "Queue destination"
+    },
+    "pointerRatio": {
+      "description": "Shift-wheel changes the attack percentage.",
+      "label": "Change attack ratio"
+    },
+    "pointerSelect": {
+      "description": "Modern: left-click an owned unit. Classic: usual map actions.",
+      "label": "Select unit / classic map click"
+    },
+    "pointerUpgrade": {
+      "description": "Middle-click chooses a nearby affordable facility for an upgrade.",
+      "label": "Upgrade nearby facility"
+    },
+    "pointerZoom": {
+      "description": "Scroll the wheel. Touch: pinch with two fingers.",
+      "label": "Map zoom"
+    },
+    "produceFighter": {
+      "description": "Choose an operational air base with spare capacity and wait for paid production and crew training.",
+      "label": "Produce fighter"
+    },
+    "produceStrike": {
+      "description": "Produce a strike squadron at an operational air base; capacity and finite personnel apply.",
+      "label": "Produce strike aircraft"
+    },
+    "produceWarship": {
+      "description": "Choose an operational naval base and wait for the paid ship and crew to finish.",
+      "label": "Build warship"
+    },
+    "quickChat": {
+      "description": "Choose a country and the existing communication menu. Typing suppresses military keys.",
+      "label": "Quick chat / emoji"
+    },
+    "repairPort": {
+      "description": "Pay and wait to repair an owned damaged port; capture retains its actual state.",
+      "label": "Repair major port"
+    },
+    "replayGame": {
+      "description": "Open the result replay; replay does not accept military commands.",
+      "label": "Review replay"
+    },
+    "replayJumpBack": {
+      "description": "Move back 100 recorded frames.",
+      "label": "Replay back 100 frames"
+    },
+    "replayJumpForward": {
+      "description": "Move forward 100 recorded frames.",
+      "label": "Replay forward 100 frames"
+    },
+    "replaySeek": {
+      "description": "Use the replay timeline to inspect another recorded tick. This sends no game order.",
+      "label": "Replay timeline"
+    },
+    "replayStepBack": {
+      "description": "Move back one recorded frame; replay accepts no military order.",
+      "label": "Previous replay frame"
+    },
+    "replayStepForward": {
+      "description": "Move forward one recorded frame.",
+      "label": "Next replay frame"
+    },
+    "requestAlliance": {
+      "description": "Send an alliance request to the player whose tile is under your cursor.",
+      "label": "Request Alliance"
+    },
+    "resetGfx": {
+      "description": "Hold the configured graphics modifier with this key to reset rendering; this key alone does not reset.",
+      "label": "Reset graphics"
+    },
+    "restartGame": {
+      "description": "Use Restart in the save panel or result screen to begin a fresh game.",
+      "label": "Restart scenario"
+    },
+    "retaliateAttack": {
+      "description": "Send a retaliation attack to blunt/negate the force of the most recent active attacker. Only available when you are being attacked.",
+      "label": "Retaliate"
+    },
+    "saveGame": {
+      "description": "Use the save panel; this captures the actual simulation at a tick boundary.",
+      "label": "Save game"
+    },
+    "selectAllWarships": {
+      "description": "Select all of your warships on the map.",
+      "label": "Select All Warships"
+    },
+    "shiftKey": {
+      "description": "Hold for additional selection, queued orders and the documented pointer actions.",
+      "label": "Selection / order modifier"
+    },
+    "swapDirection": {
+      "description": "Toggle rocket launch direction (up/down).",
+      "label": "Swap Rocket Direction"
+    },
+    "toggleView": {
+      "description": "Alternate view (terrain/countries)",
+      "label": "Toggle View"
+    },
+    "touchAdditionalSelection": {
+      "description": "Enable Additional selection, then tap or drag your own units to add them to the current selection.",
+      "label": "Additional selection"
+    },
+    "touchCommand": {
+      "description": "Modern: choose Target, tap the map and confirm the valid preview. Classic: hold for the existing context menu.",
+      "label": "Touch target command"
+    },
+    "touchPan": {
+      "description": "Modern: pan with two fingers. Classic: drag using the normal gesture.",
+      "label": "Touch camera movement"
+    },
+    "touchQueuedCommand": {
+      "description": "Enable Queue command, then use Target and tap the map to preview a valid move or mission after the current order. Confirm to queue it.",
+      "label": "Queue next command"
+    },
+    "touchSelect": {
+      "description": "Tap an owned unit or use its screen selection button.",
+      "label": "Touch selection"
+    },
+    "touchZoom": {
+      "description": "Pinch with two fingers to zoom the map.",
+      "label": "Touch zoom"
+    },
+    "trainArmy": {
+      "description": "Choose an operational army base, pay and reserve manpower, then wait for the unit at its rally position.",
+      "label": "Train army"
+    },
+    "trainClimate": {
+      "description": "Pay for a new adaptation and wait for the core training timer; capture alone does not confer adaptation.",
+      "label": "Train climate adaptation"
+    },
+    "upgradeFacility": {
+      "description": "Use the selected facility panel; gold and current ownership are checked.",
+      "label": "Facility upgrade"
+    },
+    "zoomIn": {
+      "description": "Zoom in the map",
+      "label": "Zoom In"
+    },
+    "zoomInEqual": {
+      "description": "Zoom in the map",
+      "label": "Zoom In"
+    },
+    "zoomInNumpad": {
+      "description": "Zoom in the map",
+      "label": "Zoom In"
+    },
+    "zoomOut": {
+      "description": "Zoom out the map",
+      "label": "Zoom Out"
+    },
+    "zoomOutMinus": {
+      "description": "Zoom out the map",
+      "label": "Zoom Out"
+    },
+    "zoomOutNumpad": {
+      "description": "Zoom out the map",
+      "label": "Zoom Out"
+    }
+  },
+  "input_controls": {
+    "classic": "Classic",
+    "conflict": "This key is used by another action",
+    "context": "Context",
+    "context_help": "Typing and IME suppress game commands. Modal controls take priority. Replay is read-only. Pause/speed require an allowed mode. Unassigned actions remain available through their screen controls.",
+    "context_keybind": "Key capture",
+    "context_map": "Game map",
+    "context_modal": "Modal",
+    "context_replay": "Replay",
+    "context_text": "Text input",
+    "legacy_default": "Legacy default replaced by modern controls",
+    "long_press": "Long press",
+    "migration": "Previous bindings were backed up. Review reassigned or unassigned conflicts.",
+    "mode_only": "Available only in the stated mode",
+    "modern": "Modern",
+    "mouse_controls": "Mouse and touch controls",
+    "mouse_drag": "Left drag",
+    "mouse_left": "Left click",
+    "mouse_middle": "Middle click",
+    "mouse_right": "Right click",
+    "no_game_keys": "Game shortcuts are suspended in this context.",
+    "profile": "Controls profile",
+    "reset": "Reset this profile",
+    "shortcut_table": "Complete effective controls",
+    "target_tap": "Target button + tap",
+    "touch_drag": "Drag",
+    "touch_pinch": "Pinch",
+    "touch_tap": "Tap",
+    "two_finger": "Two-finger drag",
+    "unassigned": "Unassigned / use screen control",
+    "wheel": "Wheel"
   },
   "inventory": {
     "equipped": "Equipped",
@@ -1434,6 +2416,7 @@
     "middleeast": "Middle East",
     "milkyway": "Milky Way",
     "mississippiriver": "Mississippi River",
+    "modernworld": "Modern World",
     "montreal": "Montreal",
     "morethanluck": "More Than Luck",
     "newyorkcity": "New York City",
@@ -1554,6 +2537,259 @@
     "teams_count": "{teamCount} teams",
     "teams_of": "{teamCount} teams of {playersPerTeam}",
     "teams_title": "Teams"
+  },
+  "modern": {
+    "ai_percent": "Enhanced nation AI (%)",
+    "alliances": "Allow alliances",
+    "asymmetric": "Size-based game values (not real economic/military statistics)",
+    "balance": "Starting balance",
+    "balanced": "Balanced treasury and troop grant",
+    "capital": "Capital",
+    "capital_elimination": "Losing your capital transfers all remaining territory",
+    "capital_markers": "★ Capital markers (gold = yours)",
+    "capitals": "Capital share",
+    "country": "Choose country",
+    "difficulty": "Decision difficulty",
+    "fair": "Human and AI share the same economy and combat rules. Size determines territory capacity; treasury and initial grants follow the chosen balance. No gray tribes. Every objective uses the displayed time limit as a fallback.",
+    "initial": "Initial territory: {tiles} tiles. Starting troops: up to {troops}; treasury: {gold}. Actual troop capacity depends on territory and city level.",
+    "island": "No land neighbor — use ports and transports",
+    "map_selection": "Click a country on the world map",
+    "minutes": "Time limit (minutes)",
+    "neighbors": "Land neighbors",
+    "nukes": "Allow nuclear weapons",
+    "progress": "Objective: {objective}{requirement}. Territory {territory}%; capitals {capitals}/{total}. Time limit: {minutes} min.",
+    "protection": "Starting protection (seconds)",
+    "recommendation": "Recommended: Medium. Small or island countries benefit from alliances and naval routes.",
+    "result": "Objective: {objective}{requirement}; time limit {minutes} min. Your final territory: {territory}%. Review the replay to inspect battles, ownership, troops and economy.",
+    "scope": "198 playable controllers on a {width}×{height} world. Natural Earth 5.1.1 borders; 21 tiny countries have explicit enlarged representations. Territorial groupings follow this scenario's documented policy.",
+    "search": "Search country name or ISO code",
+    "seed": "Scenario seed",
+    "small_country": "Enlarged game representation; city and factory may share its strategic tile. Recommended: Easy.",
+    "target": "Target percentage",
+    "territory": "Territory share",
+    "threshold": " · target {target}%",
+    "timed": "Largest territory at the time limit",
+    "title": "Modern countries",
+    "total": "Complete conquest",
+    "victory": "Victory objective"
+  },
+  "modern_lobby": {
+    "available": "Available",
+    "closed": "Country selection is closed or this room is not in modern mode.",
+    "held_by": "Reserved by {player}",
+    "instructions": "Preview a country using the map, search or list, then reserve it. Each playing participant needs a different country. Unselected countries are controlled by AI.",
+    "invalid_rules": "The room's modern rules or country reservations are invalid. Restore the modern preset and select distinct countries.",
+    "not_player": "Spectators do not reserve countries. Switch to playing to choose one.",
+    "not_ready": "Every playing participant must reserve a country before the match starts.",
+    "pending": "Waiting for server confirmation…",
+    "preset": "Modern country room (private)",
+    "reserve": "Reserve this country",
+    "reserved": "Your reserved country: {country}",
+    "rules": "Normal 2000×1000 Modern World, free for all, all countries, no gray tribes. Treasury and troop grants follow the selected balance. These settings are shared by every participant.",
+    "taken": "Another participant reserved this country. Choose an available country and try again.",
+    "title": "Reserve your country",
+    "unselected": "Country not selected",
+    "unsupported": "This country is not supported by the room's scenario."
+  },
+  "modern_v2": {
+    "adaptation": "Climate adaptation",
+    "ai_all_enhanced": "All modern AI use decision profiles; individual low/medium/high levels follow the shown weights.",
+    "ai_level": {
+      "high": "High",
+      "low": "Low",
+      "medium": "Medium"
+    },
+    "ai_plan": "Active operations {operations} · next decision in {seconds}s · target {target}",
+    "ai_weight": {
+      "high": "High AI weight",
+      "low": "Low AI weight",
+      "medium": "Medium AI weight"
+    },
+    "ai_weights_hint": "Weights assign low/medium/high AI independently by seed. Defaults 1:1:1. No difficulty adds people, income or damage. At least one weight must be positive.",
+    "area": "Geographic area: {area} km²",
+    "area_exception": "Area exception",
+    "area_exception_reason": {
+      "administrative": "This grouping preserves administrative boundaries and connected territory but falls outside the usual area range.",
+      "component_area": "The area of this disconnected landmass cannot be divided entirely into regions within the usual range.",
+      "isolated": "This island or detached territory remains independent rather than joining distant regions merely to reach the target area.",
+      "parent_area": "The country's total area cannot be divided entirely into regions within the usual range."
+    },
+    "area_source_details": "Original area report and adjustment",
+    "army_reserve": "Uncommitted army reserve: {troops}",
+    "base_choice": "Sortie base",
+    "branch": {
+      "air": "Air force",
+      "army": "Army",
+      "navy": "Navy"
+    },
+    "checking_path": "Checking the actual simulation route…",
+    "climate": {
+      "arid": "Arid",
+      "continental": "Continental",
+      "polar": "Polar",
+      "temperate": "Temperate",
+      "tropical": "Tropical"
+    },
+    "climate_legend": "Yellow arid · green tropical · blue temperate · purple continental · white polar. Historical climate distribution; terrain and temporary weather are separate.",
+    "climate_overlay": "Climate overlay",
+    "command_sent": "Order sent; watch the unit's acknowledged state.",
+    "commands": "Modern military commands",
+    "common_start": "Common start: {population} people · {gold} gold · {army} army personnel. These are game values, independent of actual national population.",
+    "confirm": "Confirm order",
+    "confirm_preview": "Right-click to order; Shift-right-click adds a queued destination.",
+    "country_info": "Country info / diplomacy",
+    "develop_port": "Develop: {cost} · nominal +{increase}/s",
+    "fair": "All humans and AI start with the chosen common population, money and manpower rules. Land pixels do not increase population capacity or income. Individual AI levels change decisions without resource or damage bonuses. Each region commands its own forces; shared parent country grants no automatic alliance. No gray tribes. Every objective uses the displayed time limit as a fallback.",
+    "fill_empty_slots": "Fill empty invitation slots with AI at start",
+    "goal": {
+      "air_defense": "Securing airspace and intercepting",
+      "air_support": "Providing air support",
+      "attack": "Preparing a ground offensive",
+      "blockade": "Blockading a major port",
+      "defense": "Strengthening defenses",
+      "economy": "Growing the economy",
+      "recover": "Recovering and regrouping"
+    },
+    "ground_preview": "Estimated single-tile ground exchange: attacker loss {attacker}, defender loss {defender}, defender climate {defenderClimate}%, relative climate modifier {ratio}%. Fronts and reinforcements may change the outcome.",
+    "independent_region": "Independent region",
+    "initial_population": "Common starting population N0 (every faction)",
+    "input_hint": "Move cursor to preview · Right-click move/attack · Shift queues",
+    "invite": "Create an invitation room",
+    "keys": "Modern key settings",
+    "kind": {
+      "airbase": "Airbase",
+      "army": "Army group",
+      "armybase": "Army base",
+      "fighter": "Fighter squadron",
+      "navybase": "Naval base (port)",
+      "repair_base": "Repair base",
+      "strike": "Strike squadron",
+      "warship": "Warship"
+    },
+    "landlocked": "No owned major port. Industry and land trade still support your economy.",
+    "ledger": "Civilian {civilian} · available {available} · army {army} · navy {navy} · air {air} · dead {dead}. Military personnel are included in total population, not additional people.",
+    "major_ports": "Major ports",
+    "map_sources": "Map sources and licenses",
+    "minimize": "Minimize or show command controls",
+    "no_target": "None",
+    "no_units": "No eligible units selected. Choose a unit marker or the unit list.",
+    "nuclear_launch_notice": "On actual launch: {seconds} game seconds of income -{economy}%, replenishment -{replenishment}%, diplomatic trust -{trust}. Interception does not remove responsibility. One MIRV launch counts once; repeated launches stack up to the caps.",
+    "nuclear_status": "Nuclear responsibility: income −{economy}%, replenishment −{replenishment}%; last penalty expires in {seconds} game seconds. One MIRV launch counts once.",
+    "operation": {
+      "air_superiority": "Air superiority",
+      "attack": "Attack",
+      "auto": "Context order",
+      "blockade": "Blockade",
+      "cancel": "Cancel / retreat",
+      "escort": "Escort",
+      "intercept": "Intercept",
+      "move": "Move",
+      "patrol": "Patrol",
+      "stop": "Stop",
+      "strike": "Ground / port strike",
+      "wait": "Wait"
+    },
+    "operation_label": "Military operation",
+    "parent_country": "Parent country",
+    "participant_slots": "Invitation participant slots",
+    "paused_commands": "The game is paused. Your preview is kept. Resume the game, then execute the command.",
+    "phase": {
+      "attacking": "Attacking",
+      "destroyed": "Destroyed",
+      "engaging": "Engaging",
+      "idle": "Idle",
+      "moving": "Moving",
+      "outbound": "Outbound",
+      "rearming": "Rearming",
+      "returning": "Returning"
+    },
+    "population": "Population",
+    "port_choice": "Owned major port",
+    "port_status": "Level {level} · income {income}/s · damage {damage}% · blockading fleets {blockades}",
+    "preview": "ETA ≈ {seconds}s · air radius {range} tiles · risk {risk} · climate efficiency {efficiency}%",
+    "preview_unavailable": "Route check failed. Wait for the worker to respond and try again.",
+    "production_hint": "Production uses the shared manpower ledger. Aircraft need an owned airbase; warships need a usable port.",
+    "production_sent": "Production order sent; personnel, gold and base capacity are checked by the simulation.",
+    "queue_preview": "This is a Shift queued order. Air routes and ETA start from the base after the previous sortie returns and rearms; actual waiting time is additional. Routes and targets are checked again when the order executes.",
+    "rearm": "Ready again in {seconds}s",
+    "reason": {
+      "airbase_unavailable": "Airbase is destroyed, captured or unavailable. Use an owned operating base.",
+      "aircraft_already_sortied": "Aircraft are already on a mission. Wait for return or cancel.",
+      "aircraft_rearming": "Aircraft are resupplying. Wait for the displayed cooldown.",
+      "army_requires_land_transport": "Army needs passable land. Use a transport landing order to cross sea.",
+      "armybase_unavailable": "Build an army base on owned land and wait for completion.",
+      "base_already_exists": "A base is already at this tile. Choose another owned location.",
+      "base_capacity": "Base capacity is full, including reserved production. Select another operational base.",
+      "base_damaged_or_repairing": "Repair the base or wait for its current repair to finish.",
+      "base_limit": "Your base limit is reached. Use or repair an existing base.",
+      "base_repair_unavailable": "Choose an owned damaged base that is not already repairing.",
+      "base_requires_owned_land": "Army and air bases need your own valid land.",
+      "base_under_construction": "Wait for this base or production to finish. Pause also stops its timer.",
+      "command_queue_full": "Order queue is full. Cancel or wait for a mission to finish.",
+      "cost_unavailable": "Checking build costs. Please wait.",
+      "escort_target_lost": "The escorted owned transport is gone or its mission has ended. Select an active owned transport again.",
+      "faction_defeated": "This faction has been defeated. Start a new scenario or review the replay.",
+      "fighter_cannot_ground_strike": "Fighters intercept aircraft and contest airspace. Select a strike squadron for ground targets.",
+      "force_limit": "The faction formation limit is reached. Use existing units.",
+      "friendly_or_protected_target": "Target is friendly or under protection. Move on your own land or wait for protection to end.",
+      "front_changed": "The front changed. Review a new target.",
+      "insufficient_army_reserve": "Wait for reserve troops to accumulate, or train available personnel within the mobilization cap.",
+      "insufficient_gold": "Not enough gold. Restore income and retry.",
+      "insufficient_manpower": "Check available personnel and the common mobilization cap. For army formations, use trained reserve troops; for new air/naval personnel, release room within the cap.",
+      "insufficient_upkeep": "Not enough gold for aircraft upkeep. Restore income before more sorties.",
+      "invalid_target": "Choose a valid map tile.",
+      "mobilization_limit": "Mobilization limit reached. Retrain existing reserves.",
+      "navy_requires_navigable_water": "Navy needs connected navigable water or a valid coast.",
+      "navybase_disabled": "Ports are disabled by this game’s rules.",
+      "navybase_no_valid_site": "No legal owned coastline nearby. Choose another coast away from existing structures.",
+      "no_owned_land_path": "No owned land route within the search budget. Move closer or use transport.",
+      "no_personnel": "This unit has no personnel. Replace losses before ordering it.",
+      "no_reachable_landing": "No reachable landing shore near the target.",
+      "no_transport_departure": "No legal departure coast for transport.",
+      "no_water_path": "No water route. Choose a target in the connected sea.",
+      "not_base_owner": "Choose a base you currently own.",
+      "not_force_owner": "You can command only your own forces.",
+      "out_of_map": "Target is outside the map.",
+      "outside_air_range": "Target is beyond the base's operating radius. Build a nearer base.",
+      "path_terrain_changed": "Terrain changed along the route. Review the route again.",
+      "port_unavailable": "Own and restore an eligible major port before developing it.",
+      "retreat_requested": "Retreat requested; committed troops return through the normal retreat rules.",
+      "strike_cannot_intercept": "Strike aircraft attack ground and ports. Select fighters for interception.",
+      "target_changed": "Target ownership changed; the mission was reconsidered.",
+      "training_unavailable": "Check the current training, adaptation and funds. Finish the active training before starting another.",
+      "unknown": "The order is unavailable in this state.",
+      "waiting": "Unit is waiting for new orders.",
+      "warship_disabled_or_count": "Warships are disabled or this production count is invalid. Use a naval-enabled scenario.",
+      "warship_requires_port": "Build or select an operational owned port with navigable water.",
+      "warship_unavailable": "Warship is missing, captured or inactive. Build an owned ship at a port.",
+      "water_component_disconnected": "That sea is disconnected from the fleet's water region.",
+      "wrong_branch_mission": "This mission belongs to a different branch or aircraft kind."
+    },
+    "repair_port": "Repair port · {cost} gold, {seconds}s",
+    "risk": {
+      "high": "high",
+      "low": "low",
+      "uncertain": "uncertain"
+    },
+    "role": {
+      "human": "Human commander",
+      "invited-slot": "Invitation-slot AI",
+      "world": "World AI"
+    },
+    "ruleset": "Scenario rules",
+    "ruleset_legacy": "Original modern world v1",
+    "ruleset_new": "Independent regions · equal population · army/navy/air",
+    "scope": "{count} independent factions on a {width}×{height} world. Geographic area and population rules are separate from screen tiles.",
+    "select_all": "Select this branch",
+    "select_units": "Left-click or drag to select; move the cursor to preview, right-click to order.",
+    "selected": "{count} selected",
+    "slot_roles": "Invitation-slot AI and unselected world rulers are labeled separately. Each faction has one controller; humans reserve a faction before starting.",
+    "split_policy": "Countries above 1.2M km² are grouped along administrative boundaries, aiming for 0.8–1.2M km² per independent region. Smaller countries remain intact. Exceptions are disclosed; shared nationality gives no automatic alliance.",
+    "touch_target": "Tap target mode",
+    "train_action": "Train: {cost} gold · {seconds}s",
+    "train_climate": "Climate to train",
+    "training_remaining": "Completes in {seconds} game seconds",
+    "transport_preview": "The blue route is the transport and landing leg. Enemy warships can intercept it."
   },
   "multi_tab": {
     "detected": "Multiple open game tabs detected.",
@@ -1846,6 +3082,31 @@
     "hostile": "Hostile",
     "neutral": "Neutral"
   },
+  "repair": {
+    "additional_selection": "Add to selection",
+    "base_desc_air": "Build on owned land. Produce and rearm aircraft.",
+    "base_desc_army": "Build on owned land. Train personnel into army formations.",
+    "base_desc_navy": "Ports also serve as naval bases: trade, shipbuilding, docking and replenishment.",
+    "base_rules": "Build army and air bases on owned land, naval bases at navigable shores. Production needs an operational base, personnel, gold and time.",
+    "base_status": "{base} · Capacity {used}/{capacity} · Health {health}/{maxHealth} · Ready in {seconds}s",
+    "build_menu": "Build menu",
+    "confirm_base": "Confirm construction",
+    "entry_guide": "Army / Navy / Air: choose a branch, select your unit, move the cursor to preview, then right-click to order. Use Bases & production to create units. Help contains every effective key.",
+    "legacy_scope": "Legacy v1 uses the original national AI and territorial attacks. Army/navy/air commands require Independent Regions.",
+    "manpower_source_auto": "Automatic selection",
+    "manpower_source_available": "Train available personnel",
+    "manpower_source_effective": "Use {people} people from {pool} · available {available} · reserve {reserve}",
+    "manpower_source_reserve": "Retrain existing reserves",
+    "no_branch_units": "No units in this branch. Open Bases & production to build a base and train units.",
+    "open_controls": "Open all controls",
+    "place_base": "{base}: right-click owned land to choose its location",
+    "practice": "Practice modern controls",
+    "production_detail": "Gold {gold} · {seconds}s · Personnel {personnel}",
+    "production_queue": "Producing {kind} · {seconds}s",
+    "production_title": "Bases & production",
+    "queue_command": "Queue command",
+    "show_guide": "Show the short command guide when starting"
+  },
   "replay_panel": {
     "fastest_game_speed": "Max",
     "game_speed": "Game speed",
@@ -1871,6 +3132,34 @@
   },
   "rewards_modal": {
     "title": "Rewards"
+  },
+  "saves": {
+    "autosave": "Automatic save every 60 seconds",
+    "compatibility": "Continue with the same game build. Export an important save before deleting it or clearing browser data. If a save cannot be read or is incompatible, keep the file and use a compatible build. Failed operations do not confirm success.",
+    "confirm_delete": "Delete saved game “{name}”? Export it first if you want to keep a copy.",
+    "continue": "Continue",
+    "delete": "Delete",
+    "deleted": "Save deleted.",
+    "details": "Tick {tick} · {date} · Build {build}",
+    "empty": "No saved games yet. Save during a single-player match or import a compatible file.",
+    "error": "The save operation failed. Check storage space, file format and game build. Your existing saves remain available.",
+    "explanation": "These saves contain the running simulation, resources, ownership and AI state. They are separate from settings and course progress. Loading continues a single-player game; it does not enter public rankings.",
+    "export": "Export file",
+    "exported": "Save export requested. Check your browser's downloads.",
+    "failed_short": "Save failed. Open this panel for recovery details.",
+    "import": "Import save file",
+    "imported": "Save file imported successfully.",
+    "manage": "Manage saves",
+    "manual": "Manual save",
+    "menu": "Save and objective",
+    "name": "Save name (optional)",
+    "refresh": "Refresh list",
+    "restart": "Restart",
+    "review": "Review replay",
+    "save": "Save game",
+    "saved": "Running game saved successfully.",
+    "title": "Saved single-player games",
+    "working": "Working…"
   },
   "select_lang": {
     "title": "Select Language"
@@ -2205,19 +3494,12 @@
   "user_setting": {
     "alert_frame_desc": "Toggle the alert frame. When enabled, the frame will be displayed when you are betrayed or attacked over land.",
     "alert_frame_label": "Alert Frame",
-    "ally_keybinds": "Ally Keybinds",
     "anonymous_names_desc": "Hide real player names with random ones on your screen.",
     "anonymous_names_label": "Hidden Names",
-    "attack_keybinds": "Attack Keybinds",
-    "attack_ratio_controls": "Attack Ratio Controls",
     "attack_ratio_desc": "What percentage of your troops to send in an attack (1–100%)",
-    "attack_ratio_down": "Decrease Attack Ratio",
-    "attack_ratio_down_desc": "Decrease attack ratio by {amount}%",
     "attack_ratio_increment_desc": "How much the attack ratio keybinds change per press/scroll.",
     "attack_ratio_increment_label": "Attack Ratio Keybind Increment",
     "attack_ratio_label": "Attack Ratio",
-    "attack_ratio_up": "Increase Attack Ratio",
-    "attack_ratio_up_desc": "Increase attack ratio by {amount}%",
     "attacking_troops_overlay_desc": "Show attacker vs defender troop counts on active front lines.",
     "attacking_troops_overlay_label": "Attacking Troops Overlay",
     "audio_alerts": "Alerts & Notifications",
@@ -2240,40 +3522,6 @@
     "audio_test": "Test",
     "audio_test_master_muted": "Turn the master volume up to hear test sounds.",
     "audio_test_muted": "Turn this category up to hear the test sound.",
-    "boat_attack": "Boat Attack",
-    "boat_attack_desc": "Send a boat attack to the tile under your cursor.",
-    "box_select_warships": "Box-Select Warships",
-    "box_select_warships_desc": "Hold this key and drag to select multiple warships.",
-    "break_alliance": "Break Alliance (Betray)",
-    "break_alliance_desc": "Break alliance with the player whose tile is under your cursor.",
-    "build_atom_bomb": "Build Atom Bomb",
-    "build_atom_bomb_desc": "Build an Atom Bomb under your cursor.",
-    "build_city": "Build City",
-    "build_city_desc": "Build a City under your cursor.",
-    "build_controls": "Build Controls",
-    "build_defense_post": "Build Defense Post",
-    "build_defense_post_desc": "Build a Defense Post under your cursor.",
-    "build_factory": "Build Factory",
-    "build_factory_desc": "Build a Factory under your cursor.",
-    "build_hydrogen_bomb": "Build Hydrogen Bomb",
-    "build_hydrogen_bomb_desc": "Build a Hydrogen Bomb under your cursor.",
-    "build_menu_modifier": "Build Menu Modifier",
-    "build_menu_modifier_desc": "Hold this key while clicking to open the build menu.",
-    "build_mirv": "Build MIRV",
-    "build_mirv_desc": "Build a MIRV under your cursor.",
-    "build_missile_silo": "Build Missile Silo",
-    "build_missile_silo_desc": "Build a Missile Silo under your cursor.",
-    "build_port": "Build Port",
-    "build_port_desc": "Build a Port under your cursor.",
-    "build_sam_launcher": "Build SAM Launcher",
-    "build_sam_launcher_desc": "Build a SAM Launcher under your cursor.",
-    "build_warship": "Build Warship",
-    "build_warship_desc": "Build a Warship under your cursor.",
-    "camera_movement": "Camera Movement",
-    "center_camera": "Center Camera",
-    "center_camera_desc": "Center camera on player",
-    "coordinate_grid_desc": "Toggle the alphanumeric grid overlay",
-    "coordinate_grid_label": "Coordinate Grid",
     "cursor_cost_label_desc": "Show a cost pill under the build cursor icon",
     "cursor_cost_label_label": "Cursor Build Cost",
     "development_only": "Development Only",
@@ -2294,46 +3542,27 @@
     "easter_bug_count_label": "Bug Count",
     "easter_writing_speed_desc": "Adjust how fast you pretend to code (x1–x100)",
     "easter_writing_speed_label": "Writing Speed Multiplier",
-    "emoji_menu_modifier": "Emoji Menu Modifier",
-    "emoji_menu_modifier_desc": "Hold this key while clicking to open the emoji menu.",
     "emojis_desc": "Toggle whether emojis are shown in game",
     "emojis_label": "Emojis",
     "exit_game_info": "Return to main menu",
     "exit_game_label": "Exit Game",
     "game_menu_title": "Menu",
-    "game_speed_down": "Game Speed Down",
-    "game_speed_down_desc": "Cycle to previous game speed. Single player only.",
-    "game_speed_up": "Game Speed Up",
-    "game_speed_up_desc": "Cycle to next game speed (0.5, 1, 2, max). Single player only.",
     "go_to_player_desc": "Toggle zooming in on the player in the beginning of a game.",
     "go_to_player_label": "Go to player on start",
     "graphics_preset_desc": "Choose the preset look for the map. Fine-tune or make your own in the in-game graphics settings.",
     "graphics_preset_label": "Graphics Preset",
-    "graphics_refresh_modifier": "Graphics refresh modifier",
-    "graphics_refresh_modifier_desc": "Hold this key and {key} to refresh graphics",
-    "ground_attack": "Ground Attack",
-    "ground_attack_desc": "Send a ground attack to the tile under your cursor.",
     "help_messages_desc": "Show contextual tips and warnings during gameplay, such as army limit warnings and general gameplay advice.",
     "help_messages_label": "Help Messages",
     "highlight_glow_strength_label": "Highlight strength",
     "highlight_small_players_desc": "Add a glow to small players so they're easy to find.",
     "keybind_conflict_error": "The key {key} is already bound to another action.",
-    "keybinds_hint": "Click a key to rebind it. You can assign a single key or Shift + key combination.",
+    "keybinds_hint": "Click a binding to reassign it. Ctrl, Alt, Shift and Meta combinations are supported. Conflicts are explained; bindings can be cleared or reset per mode. Controls lists every effective binding and its context.",
     "left_click_desc": "When ON, left-click opens menu and sword button attacks. When OFF, left-click attacks directly.",
     "left_click_label": "Left Click to Open Menu",
     "lobby_id_visibility_desc": "Hide Lobby ID in private lobby creation",
     "lobby_id_visibility_label": "Hidden Lobby IDs",
     "lobby_start_alerts_desc": "Play the start chime for each lobby and ranked match by default and show a desktop notification when permitted. You can override it with the lobby bell.",
     "lobby_start_alerts_label": "Lobby Start Alerts",
-    "menu_shortcuts": "Menu Shortcuts",
-    "move_down": "Move Camera Down",
-    "move_down_desc": "Move the camera downward",
-    "move_left": "Move Camera Left",
-    "move_left_desc": "Move the camera to the left",
-    "move_right": "Move Camera Right",
-    "move_right_desc": "Move the camera to the right",
-    "move_up": "Move Camera Up",
-    "move_up_desc": "Move the camera upward",
     "nuke_alliance_safety_desc": "Prevents accidental nuke strikes on newly formed allies.",
     "nuke_alliance_safety_duration": "{count, plural, one {1 tick (0.1s)} other {{count} ticks ({seconds}s)}}",
     "nuke_alliance_safety_label": "Ally friendly-fire safety",
@@ -2341,8 +3570,6 @@
     "on": "On",
     "open_settings_desc": "Gameplay, graphics, audio and keybind settings",
     "open_settings_label": "Settings",
-    "pause_game": "Pause",
-    "pause_game_desc": "Pause or resume the game (single player and custom games for host).",
     "performance_overlay_desc": "Toggle the performance overlay. When enabled, the performance overlay will be displayed. Press shift-D during game to toggle.",
     "performance_overlay_label": "Performance Overlay",
     "press_a_key": "Press a key",
@@ -2350,20 +3577,11 @@
     "render_debug_gui_desc": "Toggle the renderer tuning panel",
     "replay_viewer_desc": "Open replays with rewind controls. Off opens the classic replay",
     "replay_viewer_label": "New Replay Viewer",
-    "request_alliance": "Request Alliance",
-    "request_alliance_desc": "Send an alliance request to the player whose tile is under your cursor.",
     "reset": "Reset",
-    "reset_gfx_desc": "Press while holding the modifier to reset rendering when experiencing display issues.",
-    "retaliate_attack": "Retaliate",
-    "retaliate_attack_desc": "Send a retaliation attack to blunt/negate the force of the most recent active attacker. Only available when you are being attacked.",
-    "select_all_warships": "Select All Warships",
-    "select_all_warships_desc": "Select all of your warships on the map.",
     "special_effects_desc": "Toggle special effects. Deactivate to improve performances",
     "special_effects_label": "Special effects",
     "steam_lobby_links_desc": "Open lobby links in the Steam app instead of joining in this browser",
     "steam_lobby_links_label": "Open Lobby Links in Steam",
-    "swap_direction": "Swap Rocket Direction",
-    "swap_direction_desc": "Toggle rocket launch direction (up/down).",
     "tab_audio": "Audio",
     "tab_display": "Display",
     "tab_gameplay": "Gameplay",
@@ -2371,16 +3589,11 @@
     "tab_keybinds": "Keybinds",
     "title": "Settings",
     "toggle_terrain": "Toggle Terrain",
-    "toggle_view": "Toggle View",
     "toggle_view_desc": "Alternate view (terrain/countries)",
     "toggle_visibility": "Toggle Visibility",
     "unbind": "Unbind",
-    "view_options": "View Options",
-    "zoom_controls": "Zoom Controls",
     "zoom_in": "Zoom In",
-    "zoom_in_desc": "Zoom in the map",
-    "zoom_out": "Zoom Out",
-    "zoom_out_desc": "Zoom out the map"
+    "zoom_out": "Zoom Out"
   },
   "username": {
     "account_invalid_chars": "Username can only contain letters, numbers, underscores, hyphens, and single spaces between words.",

@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "scenarioId": "modern-regions-v2",
+  "targetAreaKm2": 1000000,
+  "minimumAreaKm2": 800000,
+  "maximumAreaKm2": 1200000,
+  "splitThresholdKm2": 1200000,
+  "geometryJoinToleranceDegrees": 0.005,
+  "maximumSameAdminSeaGapKm": 100,
+  "partitionAttempts": 64,
+  "maritimeGrouping": "adjacent administrative units in the same original ADM0 constituent territory, with actual sea gap at most 100 km; distant dependencies excluded",
+  "maximumPortSnapTiles": 8,
+  "maximumPortScaleRank": 5,
+  "initialMajorPortLevel": 0,
+  "alwaysIncludePortNames": ["Ulsan", "Gunsan", "Pohang", "Mumbai", "Bombay", "Vladivostok"],
+  "secondAdaptationMinimumBasisPoints": 2000,
+  "climateIds": ["arid", "tropical", "temperate", "continental", "polar"],
+  "notes": "Parent sovereignty and passable terrain are inherited unchanged from modern-world v1. WGS84 geodesic land area, not projected pixels, determines splitting. ADM1 borders are retained; only oversized ADM1 units use pinned ADM2, and oversized Canadian ADM2 units use ADM3. Disconnected source administrative units remain intact; distant overseas components are never combined to manufacture the target area. Under/oversized results are explicitly reported, never silently relabelled. Raster coastline gaps are assigned to the nearest administrative geometry inside the same parent mask; no new straight or grid partition boundary is introduced. Climate is historical 1991-2020, not current weather. Ports are Natural Earth named real locations, not claimed complete or ranked by current throughput."
+}

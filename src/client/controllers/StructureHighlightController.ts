@@ -15,14 +15,23 @@ import { ToggleStructureEvent } from "../InputHandler";
 import { MapRenderer } from "../render/gl";
 
 export class StructureHighlightController implements Controller {
+  private registered = false;
+  private readonly onToggleStructure = (e: ToggleStructureEvent) =>
+    this.view.setHighlightStructureTypes(e.structureTypes);
   constructor(
     private eventBus: EventBus,
     private view: MapRenderer,
   ) {}
 
   init() {
-    this.eventBus.on(ToggleStructureEvent, (e) =>
-      this.view.setHighlightStructureTypes(e.structureTypes),
-    );
+    if (this.registered) return;
+    this.registered = true;
+    this.eventBus.on(ToggleStructureEvent, this.onToggleStructure);
+  }
+
+  dispose() {
+    if (!this.registered) return;
+    this.eventBus.off(ToggleStructureEvent, this.onToggleStructure);
+    this.registered = false;
   }
 }

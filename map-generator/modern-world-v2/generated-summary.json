@@ -1,0 +1,4966 @@
+{
+  "version": 2,
+  "scenarioId": "modern-regions-v2",
+  "parentScenarioHash": "a7839a1b8c8f22feb7607c70b81131096b91db09963ab707a7aef8bffb1aa052",
+  "terrainHash": "384a9345a15c917c667be84fc9de885785a05ef4fd98e15fde31e9c64fa01e83",
+  "width": 2000,
+  "height": 1000,
+  "projection": "Plate Carree, longitude -180..180, latitude 90..-90",
+  "areaMethod": "WGS84 ellipsoidal geodesic polygon area, pyproj.Geod; actual land geometries, not map pixels",
+  "splitPolicy": {
+    "version": 2,
+    "scenarioId": "modern-regions-v2",
+    "targetAreaKm2": 1000000,
+    "minimumAreaKm2": 800000,
+    "maximumAreaKm2": 1200000,
+    "splitThresholdKm2": 1200000,
+    "geometryJoinToleranceDegrees": 0.005,
+    "maximumSameAdminSeaGapKm": 100,
+    "partitionAttempts": 64,
+    "maritimeGrouping": "adjacent administrative units in the same original ADM0 constituent territory, with actual sea gap at most 100 km; distant dependencies excluded",
+    "maximumPortSnapTiles": 8,
+    "maximumPortScaleRank": 5,
+    "initialMajorPortLevel": 0,
+    "alwaysIncludePortNames": [
+      "Ulsan",
+      "Gunsan",
+      "Pohang",
+      "Mumbai",
+      "Bombay",
+      "Vladivostok"
+    ],
+    "secondAdaptationMinimumBasisPoints": 2000,
+    "climateIds": [
+      "arid",
+      "tropical",
+      "temperate",
+      "continental",
+      "polar"
+    ],
+    "notes": "Parent sovereignty and passable terrain are inherited unchanged from modern-world v1. WGS84 geodesic land area, not projected pixels, determines splitting. ADM1 borders are retained; only oversized ADM1 units use pinned ADM2, and oversized Canadian ADM2 units use ADM3. Disconnected source administrative units remain intact; distant overseas components are never combined to manufacture the target area. Under/oversized results are explicitly reported, never silently relabelled. Raster coastline gaps are assigned to the nearest administrative geometry inside the same parent mask; no new straight or grid partition boundary is introduced. Climate is historical 1991-2020, not current weather. Ports are Natural Earth named real locations, not claimed complete or ranked by current throughput."
+  },
+  "ports": [
+    {
+      "portId": "ne-port-1730088145",
+      "name": "Gunsan",
+      "lon": 126.5881037,
+      "lat": 35.95972222,
+      "tile": [
+        1703,
+        300
+      ],
+      "factionId": "KOR",
+      "parentCountryId": "KOR",
+      "sourceId": "1730088145",
+      "initialLevel": 0,
+      "scaleRank": 7,
+      "snapDistanceKm": 6.69
+    },
+    {
+      "portId": "ne-port-1730088147",
+      "name": "Pohang",
+      "lon": 129.4028269,
+      "lat": 36.01972222,
+      "tile": [
+        1718,
+        298
+      ],
+      "factionId": "KOR",
+      "parentCountryId": "KOR",
+      "sourceId": "1730088147",
+      "initialLevel": 0,
+      "scaleRank": 7,
+      "snapDistanceKm": 28.53
+    },
+    {
+      "portId": "ne-port-1730088155",
+      "name": "Ulsan",
+      "lon": 129.3856302,
+      "lat": 35.48777778,
+      "tile": [
+        1718,
+        302
+      ],
+      "factionId": "KOR",
+      "parentCountryId": "KOR",
+      "sourceId": "1730088155",
+      "initialLevel": 0,
+      "scaleRank": 7,
+      "snapDistanceKm": 8.55
+    },
+    {
+      "portId": "ne-port-1730088457",
+      "name": "Bombay",
+      "lon": 72.83,
+      "lat": 18.83,
+      "tile": [
+        1404,
+        395
+      ],
+      "factionId": "IND-r01",
+      "parentCountryId": "IND",
+      "sourceId": "1730088457",
+      "initialLevel": 0,
+      "scaleRank": 7,
+      "snapDistanceKm": 3.06
+    },
+    {
+      "portId": "ne-port-1730089021",
+      "name": "Lobito",
+      "lon": 13.56931684,
+      "lat": -12.33694444,
+      "tile": [
+        1075,
+        568
+      ],
+      "factionId": "AGO-r01",
+      "parentCountryId": "AGO",
+      "sourceId": "1730089021",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 2.38
+    },
+    {
+      "portId": "ne-port-1730089023",
+      "name": "Abu Dhabi",
+      "lon": 54.37267373,
+      "lat": 24.525,
+      "tile": [
+        1302,
+        363
+      ],
+      "factionId": "ARE",
+      "parentCountryId": "ARE",
+      "sourceId": "1730089023",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 9.29
+    },
+    {
+      "portId": "ne-port-1730089025",
+      "name": "Comodoro Rivadavia",
+      "lon": -67.45989399,
+      "lat": -45.85583333,
+      "tile": [
+        625,
+        754
+      ],
+      "factionId": "ARG-r01",
+      "parentCountryId": "ARG",
+      "sourceId": "1730089025",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 6.4
+    },
+    {
+      "portId": "ne-port-1730089027",
+      "name": "Mar del Plata",
+      "lon": -57.53333333,
+      "lat": -38.04277778,
+      "tile": [
+        680,
+        711
+      ],
+      "factionId": "ARG-r02",
+      "parentCountryId": "ARG",
+      "sourceId": "1730089027",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 3.65
+    },
+    {
+      "portId": "ne-port-1730089029",
+      "name": "Cairns",
+      "lon": 145.7755006,
+      "lat": -16.92972222,
+      "tile": [
+        1810,
+        594
+      ],
+      "factionId": "AUS-r01",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089029",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 15.09
+    },
+    {
+      "portId": "ne-port-1730089031",
+      "name": "Broome",
+      "lon": 122.2091873,
+      "lat": -18.0025,
+      "tile": [
+        1679,
+        600
+      ],
+      "factionId": "AUS-r06",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089031",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 14.41
+    },
+    {
+      "portId": "ne-port-1730089033",
+      "name": "Devonport",
+      "lon": 146.3675501,
+      "lat": -41.16777778,
+      "tile": [
+        1813,
+        728
+      ],
+      "factionId": "AUS-r09",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089033",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 6.71
+    },
+    {
+      "portId": "ne-port-1730089037",
+      "name": "Hobart",
+      "lon": 147.3358068,
+      "lat": -42.88027778,
+      "tile": [
+        1820,
+        739
+      ],
+      "factionId": "AUS-r09",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089037",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 38.54
+    },
+    {
+      "portId": "ne-port-1730089039",
+      "name": "Antwerpen",
+      "lon": 4.293757362,
+      "lat": 51.29777778,
+      "tile": [
+        1017,
+        214
+      ],
+      "factionId": "BEL",
+      "parentCountryId": "BEL",
+      "sourceId": "1730089039",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 80.35
+    },
+    {
+      "portId": "ne-port-1730089043",
+      "name": "Belize City",
+      "lon": -88.20194346,
+      "lat": 17.47972222,
+      "tile": [
+        509,
+        402
+      ],
+      "factionId": "BLZ",
+      "parentCountryId": "BLZ",
+      "sourceId": "1730089043",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 12.16
+    },
+    {
+      "portId": "ne-port-1730089045",
+      "name": "Hamilton",
+      "lon": -64.77638398,
+      "lat": 32.29111111,
+      "tile": [
+        640,
+        320
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089045",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 6.59
+    },
+    {
+      "portId": "ne-port-1730089047",
+      "name": "Belem",
+      "lon": -48.48474676,
+      "lat": -1.451666667,
+      "tile": [
+        731,
+        504
+      ],
+      "factionId": "BRA-r01",
+      "parentCountryId": "BRA",
+      "sourceId": "1730089047",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 73.01
+    },
+    {
+      "portId": "ne-port-1730089049",
+      "name": "Paranagua",
+      "lon": -48.51914016,
+      "lat": -25.50083333,
+      "tile": [
+        731,
+        642
+      ],
+      "factionId": "BRA-r09",
+      "parentCountryId": "BRA",
+      "sourceId": "1730089049",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 25.18
+    },
+    {
+      "portId": "ne-port-1730089051",
+      "name": "Porto Alegre",
+      "lon": -51.22408716,
+      "lat": -30.0175,
+      "tile": [
+        720,
+        668
+      ],
+      "factionId": "BRA-r09",
+      "parentCountryId": "BRA",
+      "sourceId": "1730089051",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 94.61
+    },
+    {
+      "portId": "ne-port-1730089055",
+      "name": "Recife",
+      "lon": -34.86896349,
+      "lat": -8.053611111,
+      "tile": [
+        806,
+        544
+      ],
+      "factionId": "BRA-r06",
+      "parentCountryId": "BRA",
+      "sourceId": "1730089055",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 6.46
+    },
+    {
+      "portId": "ne-port-1730089057",
+      "name": "Salvador",
+      "lon": -38.50477032,
+      "lat": -12.95861111,
+      "tile": [
+        787,
+        571
+      ],
+      "factionId": "BRA-r08",
+      "parentCountryId": "BRA",
+      "sourceId": "1730089057",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 29.33
+    },
+    {
+      "portId": "ne-port-1730089059",
+      "name": "Santos",
+      "lon": -46.30053004,
+      "lat": -23.96888889,
+      "tile": [
+        742,
+        632
+      ],
+      "factionId": "BRA-r08",
+      "parentCountryId": "BRA",
+      "sourceId": "1730089059",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 14.1
+    },
+    {
+      "portId": "ne-port-1730089061",
+      "name": "Charlottetown",
+      "lon": -63.11896349,
+      "lat": 46.23166667,
+      "tile": [
+        649,
+        242
+      ],
+      "factionId": "CAN-r06",
+      "parentCountryId": "CAN",
+      "sourceId": "1730089061",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 13.34
+    },
+    {
+      "portId": "ne-port-1730089063",
+      "name": "Halifax",
+      "lon": -63.57444052,
+      "lat": 44.65694444,
+      "tile": [
+        646,
+        252
+      ],
+      "factionId": "CAN-r06",
+      "parentCountryId": "CAN",
+      "sourceId": "1730089063",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 12.68
+    },
+    {
+      "portId": "ne-port-1730089065",
+      "name": "Nanaimo",
+      "lon": -123.926384,
+      "lat": 49.16944444,
+      "tile": [
+        307,
+        230
+      ],
+      "factionId": "CAN-r09",
+      "parentCountryId": "CAN",
+      "sourceId": "1730089065",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 90.55
+    },
+    {
+      "portId": "ne-port-1730089073",
+      "name": "Prince Rupert",
+      "lon": -130.3370436,
+      "lat": 54.30972222,
+      "tile": [
+        275,
+        198
+      ],
+      "factionId": "CAN-r09",
+      "parentCountryId": "CAN",
+      "sourceId": "1730089073",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 6.49
+    },
+    {
+      "portId": "ne-port-1730089075",
+      "name": "Saint-John",
+      "lon": -66.05989399,
+      "lat": 45.26777778,
+      "tile": [
+        633,
+        248
+      ],
+      "factionId": "CAN-r06",
+      "parentCountryId": "CAN",
+      "sourceId": "1730089075",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 7.06
+    },
+    {
+      "portId": "ne-port-1730089077",
+      "name": "Antofagasta",
+      "lon": -70.40371025,
+      "lat": -23.65027778,
+      "tile": [
+        608,
+        631
+      ],
+      "factionId": "CHL",
+      "parentCountryId": "CHL",
+      "sourceId": "1730089077",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 7.11
+    },
+    {
+      "portId": "ne-port-1730089079",
+      "name": "Iquique",
+      "lon": -70.15176678,
+      "lat": -20.20277778,
+      "tile": [
+        610,
+        612
+      ],
+      "factionId": "CHL",
+      "parentCountryId": "CHL",
+      "sourceId": "1730089079",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 6.81
+    },
+    {
+      "portId": "ne-port-1730089081",
+      "name": "Puerto Montt",
+      "lon": -72.95441696,
+      "lat": -41.48361111,
+      "tile": [
+        594,
+        730
+      ],
+      "factionId": "CHL",
+      "parentCountryId": "CHL",
+      "sourceId": "1730089081",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 3.06
+    },
+    {
+      "portId": "ne-port-1730089083",
+      "name": "Haikou",
+      "lon": 110.2749706,
+      "lat": 20.02777778,
+      "tile": [
+        1613,
+        387
+      ],
+      "factionId": "CHN-r05",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089083",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 29.46
+    },
+    {
+      "portId": "ne-port-1730089085",
+      "name": "Ningbo",
+      "lon": 121.5533569,
+      "lat": 29.86666667,
+      "tile": [
+        1675,
+        333
+      ],
+      "factionId": "CHN-r02",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089085",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.99
+    },
+    {
+      "portId": "ne-port-1730089087",
+      "name": "Xiamen",
+      "lon": 118.0200236,
+      "lat": 24.45,
+      "tile": [
+        1656,
+        364
+      ],
+      "factionId": "CHN-r02",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089087",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 16.6
+    },
+    {
+      "portId": "ne-port-1730089091",
+      "name": "Abidjan",
+      "lon": -3.966666667,
+      "lat": 5.233055556,
+      "tile": [
+        977,
+        470
+      ],
+      "factionId": "CIV",
+      "parentCountryId": "CIV",
+      "sourceId": "1730089091",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 12.56
+    },
+    {
+      "portId": "ne-port-1730089093",
+      "name": "Douala",
+      "lon": 9.685630153,
+      "lat": 4.055,
+      "tile": [
+        1052,
+        478
+      ],
+      "factionId": "CMR",
+      "parentCountryId": "CMR",
+      "sourceId": "1730089093",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 33.22
+    },
+    {
+      "portId": "ne-port-1730089095",
+      "name": "Pointe Noire",
+      "lon": 11.82691402,
+      "lat": -4.784444444,
+      "tile": [
+        1065,
+        526
+      ],
+      "factionId": "COG",
+      "parentCountryId": "COG",
+      "sourceId": "1730089095",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 4.4
+    },
+    {
+      "portId": "ne-port-1730089097",
+      "name": "Barranquilla",
+      "lon": -74.75618375,
+      "lat": 10.96722222,
+      "tile": [
+        584,
+        438
+      ],
+      "factionId": "COL",
+      "parentCountryId": "COL",
+      "sourceId": "1730089097",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.95
+    },
+    {
+      "portId": "ne-port-1730089099",
+      "name": "Moroni",
+      "lon": 43.24322733,
+      "lat": -11.70138889,
+      "tile": [
+        1240,
+        565
+      ],
+      "factionId": "COM",
+      "parentCountryId": "COM",
+      "sourceId": "1730089099",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.05
+    },
+    {
+      "portId": "ne-port-1730089101",
+      "name": "Mariel",
+      "lon": -82.75600707,
+      "lat": 23.00638889,
+      "tile": [
+        540,
+        371
+      ],
+      "factionId": "CUB",
+      "parentCountryId": "CUB",
+      "sourceId": "1730089101",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 14.48
+    },
+    {
+      "portId": "ne-port-1730089109",
+      "name": "Bremen",
+      "lon": 8.751060071,
+      "lat": 53.0975,
+      "tile": [
+        1046,
+        202
+      ],
+      "factionId": "DEU",
+      "parentCountryId": "DEU",
+      "sourceId": "1730089109",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 56.4
+    },
+    {
+      "portId": "ne-port-1730089111",
+      "name": "Hamburg",
+      "lon": 9.958480565,
+      "lat": 53.52472222,
+      "tile": [
+        1049,
+        199
+      ],
+      "factionId": "DEU",
+      "parentCountryId": "DEU",
+      "sourceId": "1730089111",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 93.43
+    },
+    {
+      "portId": "ne-port-1730089113",
+      "name": "Djibouti",
+      "lon": 43.13563015,
+      "lat": 11.60194444,
+      "tile": [
+        1239,
+        435
+      ],
+      "factionId": "DJI",
+      "parentCountryId": "DJI",
+      "sourceId": "1730089113",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 2.93
+    },
+    {
+      "portId": "ne-port-1730089115",
+      "name": "Aalborg",
+      "lon": 10.00530035,
+      "lat": 57.06111111,
+      "tile": [
+        1054,
+        181
+      ],
+      "factionId": "DNK-r01",
+      "parentCountryId": "DNK",
+      "sourceId": "1730089115",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 32.19
+    },
+    {
+      "portId": "ne-port-1730089117",
+      "name": "Fredericia",
+      "lon": 9.74057715,
+      "lat": 55.55805556,
+      "tile": [
+        1058,
+        188
+      ],
+      "factionId": "DNK-r01",
+      "parentCountryId": "DNK",
+      "sourceId": "1730089117",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 75.49
+    },
+    {
+      "portId": "ne-port-1730089121",
+      "name": "Bilbao",
+      "lon": -3.026914016,
+      "lat": 43.3425,
+      "tile": [
+        983,
+        258
+      ],
+      "factionId": "ESP",
+      "parentCountryId": "ESP",
+      "sourceId": "1730089121",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 14.9
+    },
+    {
+      "portId": "ne-port-1730089127",
+      "name": "Fox Bay",
+      "lon": -60.07073027,
+      "lat": -51.95555556,
+      "tile": [
+        666,
+        788
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089127",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 3.99
+    },
+    {
+      "portId": "ne-port-1730089133",
+      "name": "Bordeaux",
+      "lon": -0.553180212,
+      "lat": 44.86527778,
+      "tile": [
+        993,
+        250
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089133",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 48.98
+    },
+    {
+      "portId": "ne-port-1730089135",
+      "name": "Calais",
+      "lon": 1.850176678,
+      "lat": 50.96583333,
+      "tile": [
+        1010,
+        216
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089135",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 7.67
+    },
+    {
+      "portId": "ne-port-1730089137",
+      "name": "Dunkerque",
+      "lon": 2.170906949,
+      "lat": 51.02166667,
+      "tile": [
+        1012,
+        216
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089137",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 5.63
+    },
+    {
+      "portId": "ne-port-1730089139",
+      "name": "Honfleur",
+      "lon": 0.235100118,
+      "lat": 49.42222222,
+      "tile": [
+        1000,
+        224
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089139",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 21.42
+    },
+    {
+      "portId": "ne-port-1730089141",
+      "name": "Libreville",
+      "lon": 9.43368669,
+      "lat": 0.400833333,
+      "tile": [
+        1052,
+        497
+      ],
+      "factionId": "GAB",
+      "parentCountryId": "GAB",
+      "sourceId": "1730089141",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 5.73
+    },
+    {
+      "portId": "ne-port-1730089145",
+      "name": "Port Gentil",
+      "lon": 8.785276796,
+      "lat": -0.711944444,
+      "tile": [
+        1048,
+        503
+      ],
+      "factionId": "GAB",
+      "parentCountryId": "GAB",
+      "sourceId": "1730089145",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 10.95
+    },
+    {
+      "portId": "ne-port-1730089147",
+      "name": "Belfast",
+      "lon": -5.891107185,
+      "lat": 54.62055556,
+      "tile": [
+        968,
+        195
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089147",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 25.45
+    },
+    {
+      "portId": "ne-port-1730089149",
+      "name": "Dover",
+      "lon": 1.322143698,
+      "lat": 51.12083333,
+      "tile": [
+        1007,
+        215
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089149",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 10.11
+    },
+    {
+      "portId": "ne-port-1730089151",
+      "name": "Inverness",
+      "lon": -4.234746761,
+      "lat": 57.48666667,
+      "tile": [
+        978,
+        178
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089151",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 47.92
+    },
+    {
+      "portId": "ne-port-1730089153",
+      "name": "Takoradi",
+      "lon": -1.738457008,
+      "lat": 4.884166667,
+      "tile": [
+        990,
+        472
+      ],
+      "factionId": "GHA",
+      "parentCountryId": "GHA",
+      "sourceId": "1730089153",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 7.93
+    },
+    {
+      "portId": "ne-port-1730089155",
+      "name": "Basse-Terre",
+      "lon": -61.72709069,
+      "lat": 15.99638889,
+      "tile": [
+        657,
+        411
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089155",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.05
+    },
+    {
+      "portId": "ne-port-1730089157",
+      "name": "Pointe-a-Pitre",
+      "lon": -61.53845701,
+      "lat": 16.23388889,
+      "tile": [
+        658,
+        409
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089157",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 9.6
+    },
+    {
+      "portId": "ne-port-1730089159",
+      "name": "Banjul",
+      "lon": -16.57037691,
+      "lat": 13.44444444,
+      "tile": [
+        906,
+        425
+      ],
+      "factionId": "GMB",
+      "parentCountryId": "GMB",
+      "sourceId": "1730089159",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 28.37
+    },
+    {
+      "portId": "ne-port-1730089163",
+      "name": "Bata",
+      "lon": 9.738103651,
+      "lat": 1.824166667,
+      "tile": [
+        1054,
+        489
+      ],
+      "factionId": "GNQ",
+      "parentCountryId": "GNQ",
+      "sourceId": "1730089163",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 10.82
+    },
+    {
+      "portId": "ne-port-1730089169",
+      "name": "Cayenne",
+      "lon": -52.33616019,
+      "lat": 4.935277778,
+      "tile": [
+        709,
+        472
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089169",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 5.37
+    },
+    {
+      "portId": "ne-port-1730089171",
+      "name": "Kourou",
+      "lon": -52.62426384,
+      "lat": 5.158888889,
+      "tile": [
+        707,
+        471
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089171",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 4.28
+    },
+    {
+      "portId": "ne-port-1730089173",
+      "name": "Georgetown",
+      "lon": -58.1671967,
+      "lat": 6.819444444,
+      "tile": [
+        676,
+        461
+      ],
+      "factionId": "GUY",
+      "parentCountryId": "GUY",
+      "sourceId": "1730089173",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 14.06
+    },
+    {
+      "portId": "ne-port-1730089175",
+      "name": "Puerto Cortes",
+      "lon": -87.94022379,
+      "lat": 15.83333333,
+      "tile": [
+        511,
+        411
+      ],
+      "factionId": "HND",
+      "parentCountryId": "HND",
+      "sourceId": "1730089175",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 10.75
+    },
+    {
+      "portId": "ne-port-1730089181",
+      "name": "Surabaya",
+      "lon": 113.9166667,
+      "lat": -7.616666667,
+      "tile": [
+        1632,
+        542
+      ],
+      "factionId": "IDN-r01",
+      "parentCountryId": "IDN",
+      "sourceId": "1730089181",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 8.23
+    },
+    {
+      "portId": "ne-port-1730089183",
+      "name": "Manado",
+      "lon": 124.8258539,
+      "lat": 1.481944444,
+      "tile": [
+        1693,
+        491
+      ],
+      "factionId": "IDN-r03",
+      "parentCountryId": "IDN",
+      "sourceId": "1730089183",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 5.33
+    },
+    {
+      "portId": "ne-port-1730089185",
+      "name": "Senipah",
+      "lon": 117.2166667,
+      "lat": -1.05,
+      "tile": [
+        1651,
+        505
+      ],
+      "factionId": "IDN-r02",
+      "parentCountryId": "IDN",
+      "sourceId": "1730089185",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 8.9
+    },
+    {
+      "portId": "ne-port-1730089187",
+      "name": "Bhavnagar",
+      "lon": 72.20600707,
+      "lat": 21.77,
+      "tile": [
+        1401,
+        379
+      ],
+      "factionId": "IND-r01",
+      "parentCountryId": "IND",
+      "sourceId": "1730089187",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.06
+    },
+    {
+      "portId": "ne-port-1730089189",
+      "name": "Visakhapatnam",
+      "lon": 83.28722026,
+      "lat": 17.69333333,
+      "tile": [
+        1463,
+        401
+      ],
+      "factionId": "IND-r03",
+      "parentCountryId": "IND",
+      "sourceId": "1730089189",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 15.68
+    },
+    {
+      "portId": "ne-port-1730089191",
+      "name": "Limerick",
+      "lon": -8.633333333,
+      "lat": 52.66277778,
+      "tile": [
+        947,
+        206
+      ],
+      "factionId": "IRL",
+      "parentCountryId": "IRL",
+      "sourceId": "1730089191",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 58.2
+    },
+    {
+      "portId": "ne-port-1730089193",
+      "name": "Bandar Abbas",
+      "lon": 56.20424028,
+      "lat": 27.14083333,
+      "tile": [
+        1312,
+        349
+      ],
+      "factionId": "IRN-r01",
+      "parentCountryId": "IRN",
+      "sourceId": "1730089193",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 7.23
+    },
+    {
+      "portId": "ne-port-1730089195",
+      "name": "Reykjavik",
+      "lon": -21.83792697,
+      "lat": 64.14833333,
+      "tile": [
+        877,
+        143
+      ],
+      "factionId": "ISL",
+      "parentCountryId": "ISL",
+      "sourceId": "1730089195",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 10.6
+    },
+    {
+      "portId": "ne-port-1730089199",
+      "name": "Seydisfjordur",
+      "lon": -14.00424028,
+      "lat": 65.26277778,
+      "tile": [
+        922,
+        135
+      ],
+      "factionId": "ISL",
+      "parentCountryId": "ISL",
+      "sourceId": "1730089199",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 38.8
+    },
+    {
+      "portId": "ne-port-1730089203",
+      "name": "Hiroshima",
+      "lon": 132.421437,
+      "lat": 34.36527778,
+      "tile": [
+        1733,
+        306
+      ],
+      "factionId": "JPN",
+      "parentCountryId": "JPN",
+      "sourceId": "1730089203",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 62.83
+    },
+    {
+      "portId": "ne-port-1730089205",
+      "name": "Kobe",
+      "lon": 135.2381037,
+      "lat": 34.68416667,
+      "tile": [
+        1749,
+        309
+      ],
+      "factionId": "JPN",
+      "parentCountryId": "JPN",
+      "sourceId": "1730089205",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 53.11
+    },
+    {
+      "portId": "ne-port-1730089207",
+      "name": "Nagasaki",
+      "lon": 129.8595406,
+      "lat": 32.74027778,
+      "tile": [
+        1721,
+        318
+      ],
+      "factionId": "JPN",
+      "parentCountryId": "JPN",
+      "sourceId": "1730089207",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 7.86
+    },
+    {
+      "portId": "ne-port-1730089209",
+      "name": "Otaru",
+      "lon": 141.0166667,
+      "lat": 43.19694444,
+      "tile": [
+        1783,
+        259
+      ],
+      "factionId": "JPN",
+      "parentCountryId": "JPN",
+      "sourceId": "1730089209",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 10.39
+    },
+    {
+      "portId": "ne-port-1730089211",
+      "name": "Tokyo",
+      "lon": 139.788457,
+      "lat": 35.62472222,
+      "tile": [
+        1774,
+        303
+      ],
+      "factionId": "JPN",
+      "parentCountryId": "JPN",
+      "sourceId": "1730089211",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 44.47
+    },
+    {
+      "portId": "ne-port-1730089213",
+      "name": "Monrovia",
+      "lon": -10.79375736,
+      "lat": 6.345555556,
+      "tile": [
+        939,
+        464
+      ],
+      "factionId": "LBR",
+      "parentCountryId": "LBR",
+      "sourceId": "1730089213",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.73
+    },
+    {
+      "portId": "ne-port-1730089217",
+      "name": "Colombo",
+      "lon": 79.85017668,
+      "lat": 6.951388889,
+      "tile": [
+        1443,
+        461
+      ],
+      "factionId": "LKA",
+      "parentCountryId": "LKA",
+      "sourceId": "1730089217",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 3.25
+    },
+    {
+      "portId": "ne-port-1730089219",
+      "name": "Casablanca",
+      "lon": -7.600176678,
+      "lat": 33.60888889,
+      "tile": [
+        957,
+        313
+      ],
+      "factionId": "MAR",
+      "parentCountryId": "MAR",
+      "sourceId": "1730089219",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 6.32
+    },
+    {
+      "portId": "ne-port-1730089223",
+      "name": "Acapulco",
+      "lon": -99.9024735,
+      "lat": 16.84444444,
+      "tile": [
+        444,
+        405
+      ],
+      "factionId": "MEX-r01",
+      "parentCountryId": "MEX",
+      "sourceId": "1730089223",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 20.56
+    },
+    {
+      "portId": "ne-port-1730089225",
+      "name": "Mazatlan",
+      "lon": -106.393404,
+      "lat": 23.19222222,
+      "tile": [
+        408,
+        371
+      ],
+      "factionId": "MEX-r01",
+      "parentCountryId": "MEX",
+      "sourceId": "1730089225",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 10.44
+    },
+    {
+      "portId": "ne-port-1730089227",
+      "name": "Tampico",
+      "lon": -97.83368669,
+      "lat": 22.23694444,
+      "tile": [
+        456,
+        376
+      ],
+      "factionId": "MEX-r02",
+      "parentCountryId": "MEX",
+      "sourceId": "1730089227",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 0.86
+    },
+    {
+      "portId": "ne-port-1730089229",
+      "name": "Beira",
+      "lon": 34.83351001,
+      "lat": -19.81916667,
+      "tile": [
+        1194,
+        610
+      ],
+      "factionId": "MOZ",
+      "parentCountryId": "MOZ",
+      "sourceId": "1730089229",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 20.08
+    },
+    {
+      "portId": "ne-port-1730089231",
+      "name": "Maputo",
+      "lon": 32.55706714,
+      "lat": -25.97277778,
+      "tile": [
+        1181,
+        643
+      ],
+      "factionId": "MOZ",
+      "parentCountryId": "MOZ",
+      "sourceId": "1730089231",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 19.45
+    },
+    {
+      "portId": "ne-port-1730089235",
+      "name": "Nouakchott",
+      "lon": -16.02143698,
+      "lat": 18.03527778,
+      "tile": [
+        910,
+        399
+      ],
+      "factionId": "MRT",
+      "parentCountryId": "MRT",
+      "sourceId": "1730089235",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.16
+    },
+    {
+      "portId": "ne-port-1730089237",
+      "name": "Plymouth",
+      "lon": -62.21984688,
+      "lat": 16.70333333,
+      "tile": [
+        654,
+        407
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089237",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 6.71
+    },
+    {
+      "portId": "ne-port-1730089239",
+      "name": "Fort-de-France",
+      "lon": -61.05689046,
+      "lat": 14.59916667,
+      "tile": [
+        660,
+        418
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089239",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 9.7
+    },
+    {
+      "portId": "ne-port-1730089241",
+      "name": "Noumea",
+      "lon": 166.4258539,
+      "lat": -22.25972222,
+      "tile": [
+        1924,
+        623
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089241",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 3.67
+    },
+    {
+      "portId": "ne-port-1730089243",
+      "name": "Port Harcourt",
+      "lon": 7.003180212,
+      "lat": 4.769166667,
+      "tile": [
+        1038,
+        475
+      ],
+      "factionId": "NGA",
+      "parentCountryId": "NGA",
+      "sourceId": "1730089243",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 40.54
+    },
+    {
+      "portId": "ne-port-1730089245",
+      "name": "Corinto",
+      "lon": -87.16914016,
+      "lat": 12.48194444,
+      "tile": [
+        515,
+        430
+      ],
+      "factionId": "NIC",
+      "parentCountryId": "NIC",
+      "sourceId": "1730089245",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 5.42
+    },
+    {
+      "portId": "ne-port-1730089247",
+      "name": "Rotterdam",
+      "lon": 4.292873969,
+      "lat": 51.92722222,
+      "tile": [
+        1023,
+        210
+      ],
+      "factionId": "NLD",
+      "parentCountryId": "NLD",
+      "sourceId": "1730089247",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 20.79
+    },
+    {
+      "portId": "ne-port-1730089249",
+      "name": "Bergen",
+      "lon": 5.3196702,
+      "lat": 60.39694444,
+      "tile": [
+        1028,
+        163
+      ],
+      "factionId": "NOR",
+      "parentCountryId": "NOR",
+      "sourceId": "1730089249",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 21.92
+    },
+    {
+      "portId": "ne-port-1730089253",
+      "name": "Tromso",
+      "lon": 18.96878681,
+      "lat": 69.65583333,
+      "tile": [
+        1104,
+        111
+      ],
+      "factionId": "NOR",
+      "parentCountryId": "NOR",
+      "sourceId": "1730089253",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 31.19
+    },
+    {
+      "portId": "ne-port-1730089255",
+      "name": "Trondheim",
+      "lon": 10.38898704,
+      "lat": 63.43777778,
+      "tile": [
+        1057,
+        143
+      ],
+      "factionId": "NOR",
+      "parentCountryId": "NOR",
+      "sourceId": "1730089255",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 81.65
+    },
+    {
+      "portId": "ne-port-1730089257",
+      "name": "Nelson",
+      "lon": 173.271967,
+      "lat": -41.25972222,
+      "tile": [
+        1962,
+        728
+      ],
+      "factionId": "NZL",
+      "parentCountryId": "NZL",
+      "sourceId": "1730089257",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 14.52
+    },
+    {
+      "portId": "ne-port-1730089259",
+      "name": "Muscat",
+      "lon": 58.4090106,
+      "lat": 23.60666667,
+      "tile": [
+        1324,
+        368
+      ],
+      "factionId": "OMN",
+      "parentCountryId": "OMN",
+      "sourceId": "1730089259",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 7.02
+    },
+    {
+      "portId": "ne-port-1730089261",
+      "name": "Cebu",
+      "lon": 123.9226737,
+      "lat": 10.30638889,
+      "tile": [
+        1687,
+        445
+      ],
+      "factionId": "PHL",
+      "parentCountryId": "PHL",
+      "sourceId": "1730089261",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 58.08
+    },
+    {
+      "portId": "ne-port-1730089263",
+      "name": "Zamboanga",
+      "lon": 122.071437,
+      "lat": 6.902777778,
+      "tile": [
+        1678,
+        461
+      ],
+      "factionId": "PHL",
+      "parentCountryId": "PHL",
+      "sourceId": "1730089263",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 7.14
+    },
+    {
+      "portId": "ne-port-1730089265",
+      "name": "Port Moresby",
+      "lon": 147.1510601,
+      "lat": -9.467222222,
+      "tile": [
+        1817,
+        552
+      ],
+      "factionId": "PNG",
+      "parentCountryId": "PNG",
+      "sourceId": "1730089265",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 1.91
+    },
+    {
+      "portId": "ne-port-1730089267",
+      "name": "Wewak",
+      "lon": 143.65053,
+      "lat": -3.57,
+      "tile": [
+        1798,
+        519
+      ],
+      "factionId": "PNG",
+      "parentCountryId": "PNG",
+      "sourceId": "1730089267",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.04
+    },
+    {
+      "portId": "ne-port-1730089271",
+      "name": "Porto",
+      "lon": -8.61861013,
+      "lat": 41.14111111,
+      "tile": [
+        951,
+        271
+      ],
+      "factionId": "PRT",
+      "parentCountryId": "PRT",
+      "sourceId": "1730089271",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 9.43
+    },
+    {
+      "portId": "ne-port-1730089273",
+      "name": "Ponta Delgada",
+      "lon": -25.65883392,
+      "lat": 37.73694444,
+      "tile": [
+        857,
+        290
+      ],
+      "factionId": "PRT",
+      "parentCountryId": "PRT",
+      "sourceId": "1730089273",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 3.09
+    },
+    {
+      "portId": "ne-port-1730089275",
+      "name": "Papeete",
+      "lon": -149.5696702,
+      "lat": -17.53111111,
+      "tile": [
+        169,
+        597
+      ],
+      "factionId": "FRA",
+      "parentCountryId": "FRA",
+      "sourceId": "1730089275",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 8.71
+    },
+    {
+      "portId": "ne-port-1730089277",
+      "name": "Doha",
+      "lon": 51.55565371,
+      "lat": 25.29805556,
+      "tile": [
+        1286,
+        359
+      ],
+      "factionId": "QAT",
+      "parentCountryId": "QAT",
+      "sourceId": "1730089277",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 1.7
+    },
+    {
+      "portId": "ne-port-1730089281",
+      "name": "Vladivostok",
+      "lon": 131.8877503,
+      "lat": 43.09444444,
+      "tile": [
+        1732,
+        260
+      ],
+      "factionId": "RUS-r02",
+      "parentCountryId": "RUS",
+      "sourceId": "1730089281",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 3.53
+    },
+    {
+      "portId": "ne-port-1730089289",
+      "name": "Mogadishu",
+      "lon": 45.34093051,
+      "lat": 2.028888889,
+      "tile": [
+        1251,
+        488
+      ],
+      "factionId": "SOM",
+      "parentCountryId": "SOM",
+      "sourceId": "1730089289",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 9.11
+    },
+    {
+      "portId": "ne-port-1730089291",
+      "name": "Paramaribo",
+      "lon": -55.13898704,
+      "lat": 5.82,
+      "tile": [
+        693,
+        466
+      ],
+      "factionId": "SUR",
+      "parentCountryId": "SUR",
+      "sourceId": "1730089291",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 23.48
+    },
+    {
+      "portId": "ne-port-1730089293",
+      "name": "Goteborg",
+      "lon": 11.87002356,
+      "lat": 57.68916667,
+      "tile": [
+        1065,
+        179
+      ],
+      "factionId": "SWE",
+      "parentCountryId": "SWE",
+      "sourceId": "1730089293",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 4.77
+    },
+    {
+      "portId": "ne-port-1730089299",
+      "name": "Lome",
+      "lon": 1.284923439,
+      "lat": 6.139166667,
+      "tile": [
+        1007,
+        465
+      ],
+      "factionId": "TGO",
+      "parentCountryId": "TGO",
+      "sourceId": "1730089299",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 10.64
+    },
+    {
+      "portId": "ne-port-1730089303",
+      "name": "Kaohsiung",
+      "lon": 120.3070671,
+      "lat": 22.56527778,
+      "tile": [
+        1668,
+        374
+      ],
+      "factionId": "TWN",
+      "parentCountryId": "TWN",
+      "sourceId": "1730089303",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 3.61
+    },
+    {
+      "portId": "ne-port-1730089307",
+      "name": "Taichung",
+      "lon": 120.5038869,
+      "lat": 24.25833333,
+      "tile": [
+        1669,
+        365
+      ],
+      "factionId": "TWN",
+      "parentCountryId": "TWN",
+      "sourceId": "1730089307",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 5.39
+    },
+    {
+      "portId": "ne-port-1730089311",
+      "name": "Montevideo",
+      "lon": -56.20424028,
+      "lat": -34.90055556,
+      "tile": [
+        687,
+        693
+      ],
+      "factionId": "URY",
+      "parentCountryId": "URY",
+      "sourceId": "1730089311",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 8.88
+    },
+    {
+      "portId": "ne-port-1730089313",
+      "name": "Juneau",
+      "lon": -134.6700236,
+      "lat": 58.37916667,
+      "tile": [
+        244,
+        179
+      ],
+      "factionId": "USA-r01",
+      "parentCountryId": "USA",
+      "sourceId": "1730089313",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 109.42
+    },
+    {
+      "portId": "ne-port-1730089315",
+      "name": "Nome",
+      "lon": -165.4251472,
+      "lat": 64.49833333,
+      "tile": [
+        80,
+        141
+      ],
+      "factionId": "USA-r02",
+      "parentCountryId": "USA",
+      "sourceId": "1730089315",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 5.39
+    },
+    {
+      "portId": "ne-port-1730089317",
+      "name": "Hilo",
+      "lon": -155.0686101,
+      "lat": 19.73333333,
+      "tile": [
+        138,
+        389
+      ],
+      "factionId": "USA-r11",
+      "parentCountryId": "USA",
+      "sourceId": "1730089317",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 17.34
+    },
+    {
+      "portId": "ne-port-1730089321",
+      "name": "Houston",
+      "lon": -95.20212014,
+      "lat": 29.73916667,
+      "tile": [
+        474,
+        336
+      ],
+      "factionId": "USA-r14",
+      "parentCountryId": "USA",
+      "sourceId": "1730089321",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 68.49
+    },
+    {
+      "portId": "ne-port-1730089325",
+      "name": "Brownsville",
+      "lon": -97.38457008,
+      "lat": 25.95722222,
+      "tile": [
+        460,
+        355
+      ],
+      "factionId": "USA-r14",
+      "parentCountryId": "USA",
+      "sourceId": "1730089325",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 28.11
+    },
+    {
+      "portId": "ne-port-1730089327",
+      "name": "Longview",
+      "lon": -122.96702,
+      "lat": 46.11277778,
+      "tile": [
+        311,
+        243
+      ],
+      "factionId": "USA-r09",
+      "parentCountryId": "USA",
+      "sourceId": "1730089327",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 74.68
+    },
+    {
+      "portId": "ne-port-1730089329",
+      "name": "Kingstown",
+      "lon": -61.24287397,
+      "lat": 13.16916667,
+      "tile": [
+        659,
+        425
+      ],
+      "factionId": "VCT",
+      "parentCountryId": "VCT",
+      "sourceId": "1730089329",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 27.13
+    },
+    {
+      "portId": "ne-port-1730089331",
+      "name": "La Guaira",
+      "lon": -66.94022379,
+      "lat": 10.60277778,
+      "tile": [
+        628,
+        441
+      ],
+      "factionId": "VEN",
+      "parentCountryId": "VEN",
+      "sourceId": "1730089331",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 11.13
+    },
+    {
+      "portId": "ne-port-1730089333",
+      "name": "Maracaibo",
+      "lon": -71.58828033,
+      "lat": 10.68361111,
+      "tile": [
+        602,
+        439
+      ],
+      "factionId": "VEN",
+      "parentCountryId": "VEN",
+      "sourceId": "1730089333",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 23.21
+    },
+    {
+      "portId": "ne-port-1730089335",
+      "name": "Da Nang",
+      "lon": 108.2232038,
+      "lat": 16.08222222,
+      "tile": [
+        1601,
+        410
+      ],
+      "factionId": "VNM",
+      "parentCountryId": "VNM",
+      "sourceId": "1730089335",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 5.87
+    },
+    {
+      "portId": "ne-port-1730089337",
+      "name": "Port Vila",
+      "lon": 168.3058304,
+      "lat": -17.74722222,
+      "tile": [
+        1935,
+        598
+      ],
+      "factionId": "VUT",
+      "parentCountryId": "VUT",
+      "sourceId": "1730089337",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 9.13
+    },
+    {
+      "portId": "ne-port-1730089339",
+      "name": "Apia",
+      "lon": -171.7579505,
+      "lat": -13.82833333,
+      "tile": [
+        45,
+        576
+      ],
+      "factionId": "WSM",
+      "parentCountryId": "WSM",
+      "sourceId": "1730089339",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 8.56
+    },
+    {
+      "portId": "ne-port-1730089355",
+      "name": "Eureka",
+      "lon": -124.18,
+      "lat": 40.8,
+      "tile": [
+        310,
+        272
+      ],
+      "factionId": "USA-r12",
+      "parentCountryId": "USA",
+      "sourceId": "1730089355",
+      "initialLevel": 0,
+      "scaleRank": 5,
+      "snapDistanceKm": 17.67
+    },
+    {
+      "portId": "ne-port-1730089357",
+      "name": "Luanda",
+      "lon": 13.25088339,
+      "lat": -8.783888889,
+      "tile": [
+        1074,
+        548
+      ],
+      "factionId": "AGO-r01",
+      "parentCountryId": "AGO",
+      "sourceId": "1730089357",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 18.49
+    },
+    {
+      "portId": "ne-port-1730089361",
+      "name": "Kralendijk, Bonaire",
+      "lon": -68.27355713,
+      "lat": 12.14833333,
+      "tile": [
+        620,
+        432
+      ],
+      "factionId": "NLD",
+      "parentCountryId": "NLD",
+      "sourceId": "1730089361",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 3.97
+    },
+    {
+      "portId": "ne-port-1730089363",
+      "name": "Philipsburg",
+      "lon": -63.04375736,
+      "lat": 18.01444444,
+      "tile": [
+        649,
+        399
+      ],
+      "factionId": "NLD",
+      "parentCountryId": "NLD",
+      "sourceId": "1730089363",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 9.69
+    },
+    {
+      "portId": "ne-port-1730089365",
+      "name": "Adelaide",
+      "lon": 138.5079505,
+      "lat": -34.79916667,
+      "tile": [
+        1769,
+        693
+      ],
+      "factionId": "AUS-r10",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089365",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 3.43
+    },
+    {
+      "portId": "ne-port-1730089367",
+      "name": "Brisbane",
+      "lon": 153.1684335,
+      "lat": -27.3825,
+      "tile": [
+        1850,
+        651
+      ],
+      "factionId": "AUS-r03",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089367",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 14.69
+    },
+    {
+      "portId": "ne-port-1730089369",
+      "name": "Port Hedland",
+      "lon": 118.5732038,
+      "lat": -20.3175,
+      "tile": [
+        1658,
+        612
+      ],
+      "factionId": "AUS-r04",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089369",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 8.73
+    },
+    {
+      "portId": "ne-port-1730089371",
+      "name": "Chittagong",
+      "lon": 91.82585395,
+      "lat": 22.26888889,
+      "tile": [
+        1509,
+        376
+      ],
+      "factionId": "BGD",
+      "parentCountryId": "BGD",
+      "sourceId": "1730089371",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 12.69
+    },
+    {
+      "portId": "ne-port-1730089373",
+      "name": "Bridgetown",
+      "lon": -59.62408716,
+      "lat": 13.10694444,
+      "tile": [
+        668,
+        426
+      ],
+      "factionId": "BRB",
+      "parentCountryId": "BRB",
+      "sourceId": "1730089373",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 14.5
+    },
+    {
+      "portId": "ne-port-1730089379",
+      "name": "Punta Arenas",
+      "lon": -70.90477032,
+      "lat": -53.16833333,
+      "tile": [
+        600,
+        801
+      ],
+      "factionId": "CHL",
+      "parentCountryId": "CHL",
+      "sourceId": "1730089379",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 139.42
+    },
+    {
+      "portId": "ne-port-1730089381",
+      "name": "Valdivia",
+      "lon": -73.22656066,
+      "lat": -39.81666667,
+      "tile": [
+        593,
+        720
+      ],
+      "factionId": "CHL",
+      "parentCountryId": "CHL",
+      "sourceId": "1730089381",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 14.88
+    },
+    {
+      "portId": "ne-port-1730089383",
+      "name": "Dalian",
+      "lon": 121.6503534,
+      "lat": 38.93361111,
+      "tile": [
+        1675,
+        282
+      ],
+      "factionId": "CHN-r07",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089383",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 24.58
+    },
+    {
+      "portId": "ne-port-1730089385",
+      "name": "Fuzhou",
+      "lon": 119.30053,
+      "lat": 26.0475,
+      "tile": [
+        1664,
+        355
+      ],
+      "factionId": "CHN-r02",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089385",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 31.25
+    },
+    {
+      "portId": "ne-port-1730089387",
+      "name": "Qingdao",
+      "lon": 120.31702,
+      "lat": 36.09583333,
+      "tile": [
+        1669,
+        299
+      ],
+      "factionId": "CHN-r02",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089387",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 17.39
+    },
+    {
+      "portId": "ne-port-1730089389",
+      "name": "Shanghai",
+      "lon": 121.4872203,
+      "lat": 31.22194444,
+      "tile": [
+        1676,
+        326
+      ],
+      "factionId": "CHN-r02",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089389",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 26.96
+    },
+    {
+      "portId": "ne-port-1730089391",
+      "name": "Shantou",
+      "lon": 116.7040636,
+      "lat": 23.35472222,
+      "tile": [
+        1648,
+        370
+      ],
+      "factionId": "CHN-r05",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089391",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 5.62
+    },
+    {
+      "portId": "ne-port-1730089393",
+      "name": "Puntarenas",
+      "lon": -84.80424028,
+      "lat": 9.981666667,
+      "tile": [
+        528,
+        445
+      ],
+      "factionId": "CRI",
+      "parentCountryId": "CRI",
+      "sourceId": "1730089393",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 20.31
+    },
+    {
+      "portId": "ne-port-1730089399",
+      "name": "Roseau",
+      "lon": -61.38598351,
+      "lat": 15.29638889,
+      "tile": [
+        658,
+        415
+      ],
+      "factionId": "DMA",
+      "parentCountryId": "DMA",
+      "sourceId": "1730089399",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 13.15
+    },
+    {
+      "portId": "ne-port-1730089401",
+      "name": "Santo Domingo",
+      "lon": -69.87585395,
+      "lat": 18.47527778,
+      "tile": [
+        611,
+        397
+      ],
+      "factionId": "DOM",
+      "parentCountryId": "DOM",
+      "sourceId": "1730089401",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 6.37
+    },
+    {
+      "portId": "ne-port-1730089405",
+      "name": "Vigo",
+      "lon": -8.726207303,
+      "lat": 42.2425,
+      "tile": [
+        951,
+        265
+      ],
+      "factionId": "ESP",
+      "parentCountryId": "ESP",
+      "sourceId": "1730089405",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 3.62
+    },
+    {
+      "portId": "ne-port-1730089407",
+      "name": "Santa Cruz de Tenerife",
+      "lon": -16.22656066,
+      "lat": 28.47472222,
+      "tile": [
+        909,
+        341
+      ],
+      "factionId": "ESP",
+      "parentCountryId": "ESP",
+      "sourceId": "1730089407",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 8.72
+    },
+    {
+      "portId": "ne-port-1730089411",
+      "name": "Suva",
+      "lon": 178.4210836,
+      "lat": -18.1325,
+      "tile": [
+        1991,
+        600
+      ],
+      "factionId": "FJI",
+      "parentCountryId": "FJI",
+      "sourceId": "1730089411",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 7.0
+    },
+    {
+      "portId": "ne-port-1730089417",
+      "name": "Glasgow",
+      "lon": -4.303180212,
+      "lat": 55.86305556,
+      "tile": [
+        973,
+        191
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089417",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 47.29
+    },
+    {
+      "portId": "ne-port-1730089419",
+      "name": "Southampton",
+      "lon": -1.424440518,
+      "lat": 50.9025,
+      "tile": [
+        992,
+        218
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089419",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 26.39
+    },
+    {
+      "portId": "ne-port-1730089421",
+      "name": "Gibraltar",
+      "lon": -5.357243816,
+      "lat": 36.13694444,
+      "tile": [
+        967,
+        299
+      ],
+      "factionId": "ESP",
+      "parentCountryId": "ESP",
+      "sourceId": "1730089421",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 44.67
+    },
+    {
+      "portId": "ne-port-1730089423",
+      "name": "Conakry",
+      "lon": -13.70989399,
+      "lat": 9.516388889,
+      "tile": [
+        923,
+        447
+      ],
+      "factionId": "GIN",
+      "parentCountryId": "GIN",
+      "sourceId": "1730089423",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 9.87
+    },
+    {
+      "portId": "ne-port-1730089425",
+      "name": "Bissau",
+      "lon": -15.57267373,
+      "lat": 11.85833333,
+      "tile": [
+        911,
+        435
+      ],
+      "factionId": "GNB",
+      "parentCountryId": "GNB",
+      "sourceId": "1730089425",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 47.66
+    },
+    {
+      "portId": "ne-port-1730089433",
+      "name": "San Jose",
+      "lon": -90.84128386,
+      "lat": 13.91555556,
+      "tile": [
+        495,
+        422
+      ],
+      "factionId": "GTM",
+      "parentCountryId": "GTM",
+      "sourceId": "1730089433",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 5.09
+    },
+    {
+      "portId": "ne-port-1730089435",
+      "name": "Hong Kong",
+      "lon": 114.1561837,
+      "lat": 22.32111111,
+      "tile": [
+        1635,
+        375
+      ],
+      "factionId": "CHN-r05",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089435",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 26.02
+    },
+    {
+      "portId": "ne-port-1730089437",
+      "name": "Port-au-Prince",
+      "lon": -72.33969376,
+      "lat": 18.56583333,
+      "tile": [
+        598,
+        398
+      ],
+      "factionId": "HTI",
+      "parentCountryId": "HTI",
+      "sourceId": "1730089437",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 33.56
+    },
+    {
+      "portId": "ne-port-1730089439",
+      "name": "Surabaya",
+      "lon": 112.7239105,
+      "lat": -7.206388889,
+      "tile": [
+        1626,
+        540
+      ],
+      "factionId": "IDN-r01",
+      "parentCountryId": "IDN",
+      "sourceId": "1730089439",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 10.56
+    },
+    {
+      "portId": "ne-port-1730089441",
+      "name": "Dublin",
+      "lon": -6.206007067,
+      "lat": 53.34444444,
+      "tile": [
+        965,
+        203
+      ],
+      "factionId": "IRL",
+      "parentCountryId": "IRL",
+      "sourceId": "1730089441",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 2.86
+    },
+    {
+      "portId": "ne-port-1730089443",
+      "name": "Waterford",
+      "lon": -7.118786808,
+      "lat": 52.26638889,
+      "tile": [
+        960,
+        210
+      ],
+      "factionId": "IRL",
+      "parentCountryId": "IRL",
+      "sourceId": "1730089443",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 17.41
+    },
+    {
+      "portId": "ne-port-1730089453",
+      "name": "Kingston",
+      "lon": -76.82479388,
+      "lat": 17.98166667,
+      "tile": [
+        573,
+        400
+      ],
+      "factionId": "JAM",
+      "parentCountryId": "JAM",
+      "sourceId": "1730089453",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 9.83
+    },
+    {
+      "portId": "ne-port-1730089455",
+      "name": "Kitakyushu",
+      "lon": 130.8542403,
+      "lat": 33.9225,
+      "tile": [
+        1726,
+        311
+      ],
+      "factionId": "JPN",
+      "parentCountryId": "JPN",
+      "sourceId": "1730089455",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 7.83
+    },
+    {
+      "portId": "ne-port-1730089457",
+      "name": "Mombasa",
+      "lon": 39.6221437,
+      "lat": -4.053055556,
+      "tile": [
+        1220,
+        522
+      ],
+      "factionId": "KEN",
+      "parentCountryId": "KEN",
+      "sourceId": "1730089457",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 7.54
+    },
+    {
+      "portId": "ne-port-1730089459",
+      "name": "Phnom Penh",
+      "lon": 104.9209069,
+      "lat": 11.58305556,
+      "tile": [
+        1579,
+        441
+      ],
+      "factionId": "KHM",
+      "parentCountryId": "KHM",
+      "sourceId": "1730089459",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 134.25
+    },
+    {
+      "portId": "ne-port-1730089463",
+      "name": "Male",
+      "lon": 73.50706714,
+      "lat": 4.175,
+      "tile": [
+        1408,
+        475
+      ],
+      "factionId": "MDV",
+      "parentCountryId": "MDV",
+      "sourceId": "1730089463",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 26.11
+    },
+    {
+      "portId": "ne-port-1730089465",
+      "name": "Veracruz",
+      "lon": -96.13368669,
+      "lat": 19.20833333,
+      "tile": [
+        465,
+        392
+      ],
+      "factionId": "MEX-r02",
+      "parentCountryId": "MEX",
+      "sourceId": "1730089465",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 17.61
+    },
+    {
+      "portId": "ne-port-1730089469",
+      "name": "Yangon",
+      "lon": 96.16878681,
+      "lat": 16.76583333,
+      "tile": [
+        1535,
+        408
+      ],
+      "factionId": "MMR",
+      "parentCountryId": "MMR",
+      "sourceId": "1730089469",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 40.36
+    },
+    {
+      "portId": "ne-port-1730089471",
+      "name": "Wellington",
+      "lon": 174.7898704,
+      "lat": -41.2775,
+      "tile": [
+        1971,
+        728
+      ],
+      "factionId": "NZL",
+      "parentCountryId": "NZL",
+      "sourceId": "1730089471",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 17.71
+    },
+    {
+      "portId": "ne-port-1730089477",
+      "name": "Dakar",
+      "lon": -17.42514723,
+      "lat": 14.68222222,
+      "tile": [
+        903,
+        418
+      ],
+      "factionId": "SEN",
+      "parentCountryId": "SEN",
+      "sourceId": "1730089477",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 6.09
+    },
+    {
+      "portId": "ne-port-1730089479",
+      "name": "Singapore",
+      "lon": 103.7221437,
+      "lat": 1.292777778,
+      "tile": [
+        1576,
+        493
+      ],
+      "factionId": "SGP",
+      "parentCountryId": "SGP",
+      "sourceId": "1730089479",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 14.58
+    },
+    {
+      "portId": "ne-port-1730089481",
+      "name": "Freetown",
+      "lon": -13.20795053,
+      "lat": 8.494166667,
+      "tile": [
+        926,
+        452
+      ],
+      "factionId": "SLE",
+      "parentCountryId": "SLE",
+      "sourceId": "1730089481",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 6.64
+    },
+    {
+      "portId": "ne-port-1730089487",
+      "name": "Bangkok",
+      "lon": 100.5691402,
+      "lat": 13.60694444,
+      "tile": [
+        1558,
+        424
+      ],
+      "factionId": "THA",
+      "parentCountryId": "THA",
+      "sourceId": "1730089487",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 4.63
+    },
+    {
+      "portId": "ne-port-1730089491",
+      "name": "Anchorage",
+      "lon": -149.8877503,
+      "lat": 61.23555556,
+      "tile": [
+        170,
+        166
+      ],
+      "factionId": "USA-r02",
+      "parentCountryId": "USA",
+      "sourceId": "1730089491",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 138.0
+    },
+    {
+      "portId": "ne-port-1730089493",
+      "name": "Long Beach",
+      "lon": -118.2007067,
+      "lat": 33.74888889,
+      "tile": [
+        343,
+        312
+      ],
+      "factionId": "USA-r12",
+      "parentCountryId": "USA",
+      "sourceId": "1730089493",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 2.85
+    },
+    {
+      "portId": "ne-port-1730089495",
+      "name": "Oakland",
+      "lon": -122.3012367,
+      "lat": 37.79944444,
+      "tile": [
+        319,
+        290
+      ],
+      "factionId": "USA-r12",
+      "parentCountryId": "USA",
+      "sourceId": "1730089495",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 19.37
+    },
+    {
+      "portId": "ne-port-1730089497",
+      "name": "Jacksonville",
+      "lon": -81.55918728,
+      "lat": 30.38083333,
+      "tile": [
+        547,
+        331
+      ],
+      "factionId": "USA-r16",
+      "parentCountryId": "USA",
+      "sourceId": "1730089497",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 11.91
+    },
+    {
+      "portId": "ne-port-1730089499",
+      "name": "Philadelphia",
+      "lon": -75.13457008,
+      "lat": 39.89527778,
+      "tile": [
+        586,
+        281
+      ],
+      "factionId": "USA-r08",
+      "parentCountryId": "USA",
+      "sourceId": "1730089499",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 87.18
+    },
+    {
+      "portId": "ne-port-1730089501",
+      "name": "Charleston",
+      "lon": -79.92355713,
+      "lat": 32.82222222,
+      "tile": [
+        555,
+        318
+      ],
+      "factionId": "USA-r16",
+      "parentCountryId": "USA",
+      "sourceId": "1730089501",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 18.72
+    },
+    {
+      "portId": "ne-port-1730089505",
+      "name": "Newport",
+      "lon": -71.32444052,
+      "lat": 41.4825,
+      "tile": [
+        603,
+        269
+      ],
+      "factionId": "USA-r08",
+      "parentCountryId": "USA",
+      "sourceId": "1730089505",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 3.89
+    },
+    {
+      "portId": "ne-port-1730089507",
+      "name": "Ho Chi Minh City",
+      "lon": 106.7217903,
+      "lat": 10.79388889,
+      "tile": [
+        1594,
+        442
+      ],
+      "factionId": "VNM",
+      "parentCountryId": "VNM",
+      "sourceId": "1730089507",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 58.36
+    },
+    {
+      "portId": "ne-port-1730089509",
+      "name": "Aden",
+      "lon": 44.98969376,
+      "lat": 12.79555556,
+      "tile": [
+        1249,
+        428
+      ],
+      "factionId": "YEM",
+      "parentCountryId": "YEM",
+      "sourceId": "1730089509",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 11.94
+    },
+    {
+      "portId": "ne-port-1730089511",
+      "name": "Durban",
+      "lon": 31.02338045,
+      "lat": -29.88111111,
+      "tile": [
+        1172,
+        666
+      ],
+      "factionId": "ZAF-r02",
+      "parentCountryId": "ZAF",
+      "sourceId": "1730089511",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 10.18
+    },
+    {
+      "portId": "ne-port-1730089513",
+      "name": "Port Elizabeth",
+      "lon": 25.6352768,
+      "lat": -33.96138889,
+      "tile": [
+        1142,
+        688
+      ],
+      "factionId": "ZAF-r02",
+      "parentCountryId": "ZAF",
+      "sourceId": "1730089513",
+      "initialLevel": 0,
+      "scaleRank": 4,
+      "snapDistanceKm": 3.74
+    },
+    {
+      "portId": "ne-port-1730089529",
+      "name": "Oranjestad",
+      "lon": -70.03881037,
+      "lat": 12.52,
+      "tile": [
+        610,
+        430
+      ],
+      "factionId": "NLD",
+      "parentCountryId": "NLD",
+      "sourceId": "1730089529",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 7.82
+    },
+    {
+      "portId": "ne-port-1730089531",
+      "name": "Dubai",
+      "lon": 55.26931684,
+      "lat": 25.26722222,
+      "tile": [
+        1307,
+        359
+      ],
+      "factionId": "ARE",
+      "parentCountryId": "ARE",
+      "sourceId": "1730089531",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 8.51
+    },
+    {
+      "portId": "ne-port-1730089533",
+      "name": "Buenos Aires",
+      "lon": -58.3696702,
+      "lat": -34.59916667,
+      "tile": [
+        675,
+        691
+      ],
+      "factionId": "ARG-r02",
+      "parentCountryId": "ARG",
+      "sourceId": "1730089533",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 14.8
+    },
+    {
+      "portId": "ne-port-1730089535",
+      "name": "Darwin",
+      "lon": 130.854947,
+      "lat": -12.47027778,
+      "tile": [
+        1726,
+        569
+      ],
+      "factionId": "AUS-r05",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089535",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 10.23
+    },
+    {
+      "portId": "ne-port-1730089537",
+      "name": "Melbourne",
+      "lon": 144.9171967,
+      "lat": -37.83277778,
+      "tile": [
+        1805,
+        713
+      ],
+      "factionId": "AUS-r09",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089537",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 66.6
+    },
+    {
+      "portId": "ne-port-1730089541",
+      "name": "Perth",
+      "lon": 115.855477,
+      "lat": -31.96527778,
+      "tile": [
+        1642,
+        677
+      ],
+      "factionId": "AUS-r02",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089541",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 19.5
+    },
+    {
+      "portId": "ne-port-1730089543",
+      "name": "Sydney",
+      "lon": 151.1891637,
+      "lat": -33.86222222,
+      "tile": [
+        1840,
+        688
+      ],
+      "factionId": "AUS-r09",
+      "parentCountryId": "AUS",
+      "sourceId": "1730089543",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 11.98
+    },
+    {
+      "portId": "ne-port-1730089545",
+      "name": "Cotonou",
+      "lon": 2.422320377,
+      "lat": 6.346666667,
+      "tile": [
+        1013,
+        464
+      ],
+      "factionId": "BEN",
+      "parentCountryId": "BEN",
+      "sourceId": "1730089545",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 4.87
+    },
+    {
+      "portId": "ne-port-1730089547",
+      "name": "Nassau",
+      "lon": -77.32126031,
+      "lat": 25.07666667,
+      "tile": [
+        570,
+        360
+      ],
+      "factionId": "BHS",
+      "parentCountryId": "BHS",
+      "sourceId": "1730089547",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 3.86
+    },
+    {
+      "portId": "ne-port-1730089549",
+      "name": "Rio de Janeiro",
+      "lon": -43.1918139,
+      "lat": -22.88305556,
+      "tile": [
+        760,
+        627
+      ],
+      "factionId": "BRA-r08",
+      "parentCountryId": "BRA",
+      "sourceId": "1730089549",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 11.2
+    },
+    {
+      "portId": "ne-port-1730089553",
+      "name": "Liverpool",
+      "lon": -64.70371025,
+      "lat": 44.04333333,
+      "tile": [
+        640,
+        255
+      ],
+      "factionId": "CAN-r06",
+      "parentCountryId": "CAN",
+      "sourceId": "1730089553",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 3.74
+    },
+    {
+      "portId": "ne-port-1730089555",
+      "name": "Valparaiso",
+      "lon": -71.61914016,
+      "lat": -33.03527778,
+      "tile": [
+        602,
+        683
+      ],
+      "factionId": "CHL",
+      "parentCountryId": "CHL",
+      "sourceId": "1730089555",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 6.49
+    },
+    {
+      "portId": "ne-port-1730089559",
+      "name": "Guangzhou",
+      "lon": 113.409364,
+      "lat": 23.09416667,
+      "tile": [
+        1631,
+        375
+      ],
+      "factionId": "CHN-r05",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089559",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 80.36
+    },
+    {
+      "portId": "ne-port-1730089561",
+      "name": "Tianjin",
+      "lon": 117.4565371,
+      "lat": 39.00944444,
+      "tile": [
+        1653,
+        283
+      ],
+      "factionId": "CHN-r07",
+      "parentCountryId": "CHN",
+      "sourceId": "1730089561",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 15.65
+    },
+    {
+      "portId": "ne-port-1730089565",
+      "name": "Bremerhaven",
+      "lon": 8.553003534,
+      "lat": 53.56361111,
+      "tile": [
+        1047,
+        201
+      ],
+      "factionId": "DEU",
+      "parentCountryId": "DEU",
+      "sourceId": "1730089565",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 18.52
+    },
+    {
+      "portId": "ne-port-1730089569",
+      "name": "Tuborg",
+      "lon": 12.58404005,
+      "lat": 55.72611111,
+      "tile": [
+        1068,
+        188
+      ],
+      "factionId": "DNK-r01",
+      "parentCountryId": "DNK",
+      "sourceId": "1730089569",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 41.46
+    },
+    {
+      "portId": "ne-port-1730089571",
+      "name": "Guayaquil",
+      "lon": -79.9024735,
+      "lat": -2.284166667,
+      "tile": [
+        553,
+        514
+      ],
+      "factionId": "ECU",
+      "parentCountryId": "ECU",
+      "sourceId": "1730089571",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 63.26
+    },
+    {
+      "portId": "ne-port-1730089589",
+      "name": "London",
+      "lon": -0.067196702,
+      "lat": 51.50277778,
+      "tile": [
+        999,
+        217
+      ],
+      "factionId": "GBR",
+      "parentCountryId": "GBR",
+      "sourceId": "1730089589",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 72.64
+    },
+    {
+      "portId": "ne-port-1730089607",
+      "name": "Montego Bay",
+      "lon": -77.93545347,
+      "lat": 18.4675,
+      "tile": [
+        567,
+        397
+      ],
+      "factionId": "JAM",
+      "parentCountryId": "JAM",
+      "sourceId": "1730089607",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 9.23
+    },
+    {
+      "portId": "ne-port-1730089617",
+      "name": "Cabo San Lucas",
+      "lon": -109.9007067,
+      "lat": 22.88388889,
+      "tile": [
+        389,
+        372
+      ],
+      "factionId": "MEX-r01",
+      "parentCountryId": "MEX",
+      "sourceId": "1730089617",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 7.4
+    },
+    {
+      "portId": "ne-port-1730089621",
+      "name": "Amsterdam",
+      "lon": 4.824087161,
+      "lat": 52.41305556,
+      "tile": [
+        1025,
+        208
+      ],
+      "factionId": "NLD",
+      "parentCountryId": "NLD",
+      "sourceId": "1730089621",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 17.13
+    },
+    {
+      "portId": "ne-port-1730089623",
+      "name": "Oslo",
+      "lon": 10.73457008,
+      "lat": 59.89722222,
+      "tile": [
+        1059,
+        170
+      ],
+      "factionId": "NOR",
+      "parentCountryId": "NOR",
+      "sourceId": "1730089623",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 65.43
+    },
+    {
+      "portId": "ne-port-1730089625",
+      "name": "Auckland",
+      "lon": 174.7694935,
+      "lat": -36.83638889,
+      "tile": [
+        1971,
+        704
+      ],
+      "factionId": "NZL",
+      "parentCountryId": "NZL",
+      "sourceId": "1730089625",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 9.43
+    },
+    {
+      "portId": "ne-port-1730089627",
+      "name": "Karachi",
+      "lon": 66.9737338,
+      "lat": 24.835,
+      "tile": [
+        1372,
+        362
+      ],
+      "factionId": "PAK",
+      "parentCountryId": "PAK",
+      "sourceId": "1730089627",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 12.17
+    },
+    {
+      "portId": "ne-port-1730089631",
+      "name": "Colon",
+      "lon": -79.88510012,
+      "lat": 9.373333333,
+      "tile": [
+        556,
+        447
+      ],
+      "factionId": "PAN",
+      "parentCountryId": "PAN",
+      "sourceId": "1730089631",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 10.42
+    },
+    {
+      "portId": "ne-port-1730089633",
+      "name": "Manila",
+      "lon": 120.943404,
+      "lat": 14.52416667,
+      "tile": [
+        1670,
+        420
+      ],
+      "factionId": "PHL",
+      "parentCountryId": "PHL",
+      "sourceId": "1730089633",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 36.17
+    },
+    {
+      "portId": "ne-port-1730089635",
+      "name": "San Juan",
+      "lon": -66.09128386,
+      "lat": 18.43611111,
+      "tile": [
+        632,
+        397
+      ],
+      "factionId": "USA-r07",
+      "parentCountryId": "USA",
+      "sourceId": "1730089635",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 6.39
+    },
+    {
+      "portId": "ne-port-1730089639",
+      "name": "Taipei",
+      "lon": 121.3746172,
+      "lat": 25.15194444,
+      "tile": [
+        1674,
+        359
+      ],
+      "factionId": "TWN",
+      "parentCountryId": "TWN",
+      "sourceId": "1730089639",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 15.7
+    },
+    {
+      "portId": "ne-port-1730089641",
+      "name": "Dar es Salaam",
+      "lon": 39.293404,
+      "lat": -6.834444444,
+      "tile": [
+        1218,
+        537
+      ],
+      "factionId": "TZA",
+      "parentCountryId": "TZA",
+      "sourceId": "1730089641",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 10.18
+    },
+    {
+      "portId": "ne-port-1730089643",
+      "name": "Mobile",
+      "lon": -88.03775029,
+      "lat": 30.71138889,
+      "tile": [
+        512,
+        331
+      ],
+      "factionId": "USA-r16",
+      "parentCountryId": "USA",
+      "sourceId": "1730089643",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 50.5
+    },
+    {
+      "portId": "ne-port-1730089649",
+      "name": "San Diego",
+      "lon": -117.1572438,
+      "lat": 32.68444444,
+      "tile": [
+        348,
+        318
+      ],
+      "factionId": "USA-r12",
+      "parentCountryId": "USA",
+      "sourceId": "1730089649",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 10.7
+    },
+    {
+      "portId": "ne-port-1730089653",
+      "name": "Miami",
+      "lon": -80.16702002,
+      "lat": 25.775,
+      "tile": [
+        554,
+        356
+      ],
+      "factionId": "USA-r16",
+      "parentCountryId": "USA",
+      "sourceId": "1730089653",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 6.51
+    },
+    {
+      "portId": "ne-port-1730089655",
+      "name": "Tampa",
+      "lon": -82.43616019,
+      "lat": 27.93,
+      "tile": [
+        540,
+        344
+      ],
+      "factionId": "USA-r16",
+      "parentCountryId": "USA",
+      "sourceId": "1730089655",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 27.75
+    },
+    {
+      "portId": "ne-port-1730089657",
+      "name": "Honolulu",
+      "lon": -157.8737338,
+      "lat": 21.30944444,
+      "tile": [
+        122,
+        381
+      ],
+      "factionId": "USA-r11",
+      "parentCountryId": "USA",
+      "sourceId": "1730089657",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 8.23
+    },
+    {
+      "portId": "ne-port-1730089659",
+      "name": "Boston",
+      "lon": -71.03545347,
+      "lat": 42.36361111,
+      "tile": [
+        605,
+        264
+      ],
+      "factionId": "USA-r08",
+      "parentCountryId": "USA",
+      "sourceId": "1730089659",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 3.6
+    },
+    {
+      "portId": "ne-port-1730089661",
+      "name": "Baltimore",
+      "lon": -76.55565371,
+      "lat": 39.2325,
+      "tile": [
+        582,
+        284
+      ],
+      "factionId": "USA-r15",
+      "parentCountryId": "USA",
+      "sourceId": "1730089661",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 131.28
+    },
+    {
+      "portId": "ne-port-1730089663",
+      "name": "New York",
+      "lon": -74.02426384,
+      "lat": 40.68833333,
+      "tile": [
+        590,
+        274
+      ],
+      "factionId": "USA-r08",
+      "parentCountryId": "USA",
+      "sourceId": "1730089663",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 28.74
+    },
+    {
+      "portId": "ne-port-1730089667",
+      "name": "Galveston",
+      "lon": -94.81790342,
+      "lat": 29.30416667,
+      "tile": [
+        473,
+        337
+      ],
+      "factionId": "USA-r14",
+      "parentCountryId": "USA",
+      "sourceId": "1730089667",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 7.6
+    },
+    {
+      "portId": "ne-port-1730089669",
+      "name": "Norfolk",
+      "lon": -76.29252061,
+      "lat": 36.90194444,
+      "tile": [
+        577,
+        294
+      ],
+      "factionId": "USA-r16",
+      "parentCountryId": "USA",
+      "sourceId": "1730089669",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 23.71
+    },
+    {
+      "portId": "ne-port-1730089673",
+      "name": "Cape Town",
+      "lon": 18.4352768,
+      "lat": -33.90916667,
+      "tile": [
+        1102,
+        687
+      ],
+      "factionId": "ZAF-r02",
+      "parentCountryId": "ZAF",
+      "sourceId": "1730089673",
+      "initialLevel": 0,
+      "scaleRank": 3,
+      "snapDistanceKm": 17.71
+    }
+  ],
+  "exceptions": [
+    {
+      "factionId": "AGO-r01",
+      "parentCountryId": "AGO",
+      "areaKm2": 634938.14,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1244672.45,
+      "deviationKm2": 165061.86
+    },
+    {
+      "factionId": "AGO-r02",
+      "parentCountryId": "AGO",
+      "areaKm2": 609734.31,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1244672.45,
+      "deviationKm2": 190265.69
+    },
+    {
+      "factionId": "AUS-r07",
+      "parentCountryId": "AUS",
+      "areaKm2": 2.71,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 2.71,
+      "deviationKm2": 799997.29
+    },
+    {
+      "factionId": "AUS-r08",
+      "parentCountryId": "AUS",
+      "areaKm2": 99.99,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 99.99,
+      "deviationKm2": 799900.01
+    },
+    {
+      "factionId": "AUS-r11",
+      "parentCountryId": "AUS",
+      "areaKm2": 13.13,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 13.13,
+      "deviationKm2": 799986.87
+    },
+    {
+      "factionId": "AUS-r12",
+      "parentCountryId": "AUS",
+      "areaKm2": 129.99,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 129.99,
+      "deviationKm2": 799870.01
+    },
+    {
+      "factionId": "AUS-r13",
+      "parentCountryId": "AUS",
+      "areaKm2": 41.09,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 41.09,
+      "deviationKm2": 799958.91
+    },
+    {
+      "factionId": "DNK-r01",
+      "parentCountryId": "DNK",
+      "areaKm2": 42618.55,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 42618.55,
+      "deviationKm2": 757381.45
+    },
+    {
+      "factionId": "DNK-r02",
+      "parentCountryId": "DNK",
+      "areaKm2": 1041.46,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 1041.46,
+      "deviationKm2": 798958.54
+    },
+    {
+      "factionId": "DNK-r03",
+      "parentCountryId": "DNK",
+      "areaKm2": 1290593.46,
+      "reason": "whole administrative units and contiguity prevent an in-range partition in the bounded search; no pinned reusable lower administrative input is available for this parent",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "administrative-packing",
+      "componentAreaKm2": 2171352.33,
+      "deviationKm2": 90593.46
+    },
+    {
+      "factionId": "IDN-r01",
+      "parentCountryId": "IDN",
+      "areaKm2": 669910.48,
+      "reason": "connected component total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "component-area-arithmetic",
+      "componentAreaKm2": 1331355.74,
+      "deviationKm2": 130089.52
+    },
+    {
+      "factionId": "IDN-r02",
+      "parentCountryId": "IDN",
+      "areaKm2": 532555.56,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 532555.56,
+      "deviationKm2": 267444.44
+    },
+    {
+      "factionId": "IDN-r03",
+      "parentCountryId": "IDN",
+      "areaKm2": 661445.27,
+      "reason": "connected component total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "component-area-arithmetic",
+      "componentAreaKm2": 1331355.74,
+      "deviationKm2": 138554.73
+    },
+    {
+      "factionId": "IND-r04",
+      "parentCountryId": "IND",
+      "areaKm2": 20.97,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 20.97,
+      "deviationKm2": 799979.03
+    },
+    {
+      "factionId": "IND-r05",
+      "parentCountryId": "IND",
+      "areaKm2": 6642.91,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 6642.91,
+      "deviationKm2": 793357.09
+    },
+    {
+      "factionId": "MLI-r02",
+      "parentCountryId": "MLI",
+      "areaKm2": 429352.24,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1254119.81,
+      "deviationKm2": 370647.76
+    },
+    {
+      "factionId": "MNG-r01",
+      "parentCountryId": "MNG",
+      "areaKm2": 780995.26,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1564513.01,
+      "deviationKm2": 19004.74
+    },
+    {
+      "factionId": "MNG-r02",
+      "parentCountryId": "MNG",
+      "areaKm2": 783517.75,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1564513.01,
+      "deviationKm2": 16482.25
+    },
+    {
+      "factionId": "PER-r01",
+      "parentCountryId": "PER",
+      "areaKm2": 644796.59,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1291021.09,
+      "deviationKm2": 155203.41
+    },
+    {
+      "factionId": "PER-r02",
+      "parentCountryId": "PER",
+      "areaKm2": 646224.49,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1291021.09,
+      "deviationKm2": 153775.51
+    },
+    {
+      "factionId": "RUS-r14",
+      "parentCountryId": "RUS",
+      "areaKm2": 13515.64,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 13515.64,
+      "deviationKm2": 786484.36
+    },
+    {
+      "factionId": "TCD-r01",
+      "parentCountryId": "TCD",
+      "areaKm2": 638979.88,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1266564.23,
+      "deviationKm2": 161020.12
+    },
+    {
+      "factionId": "TCD-r02",
+      "parentCountryId": "TCD",
+      "areaKm2": 627584.36,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1266564.23,
+      "deviationKm2": 172415.64
+    },
+    {
+      "factionId": "USA-r01",
+      "parentCountryId": "USA",
+      "areaKm2": 749845.71,
+      "reason": "connected component total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "component-area-arithmetic",
+      "componentAreaKm2": 1499339.07,
+      "deviationKm2": 50154.29
+    },
+    {
+      "factionId": "USA-r02",
+      "parentCountryId": "USA",
+      "areaKm2": 749493.36,
+      "reason": "connected component total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "component-area-arithmetic",
+      "componentAreaKm2": 1499339.07,
+      "deviationKm2": 50506.64
+    },
+    {
+      "factionId": "USA-r03",
+      "parentCountryId": "USA",
+      "areaKm2": 119.96,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 119.96,
+      "deviationKm2": 799880.04
+    },
+    {
+      "factionId": "USA-r04",
+      "parentCountryId": "USA",
+      "areaKm2": 480.42,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 480.42,
+      "deviationKm2": 799519.58
+    },
+    {
+      "factionId": "USA-r05",
+      "parentCountryId": "USA",
+      "areaKm2": 264.5,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 264.5,
+      "deviationKm2": 799735.5
+    },
+    {
+      "factionId": "USA-r06",
+      "parentCountryId": "USA",
+      "areaKm2": 127.65,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 127.65,
+      "deviationKm2": 799872.35
+    },
+    {
+      "factionId": "USA-r07",
+      "parentCountryId": "USA",
+      "areaKm2": 8915.17,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 8915.17,
+      "deviationKm2": 791084.83
+    },
+    {
+      "factionId": "USA-r11",
+      "parentCountryId": "USA",
+      "areaKm2": 16239.92,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 16239.92,
+      "deviationKm2": 783760.08
+    },
+    {
+      "factionId": "USA-r17",
+      "parentCountryId": "USA",
+      "areaKm2": 314.81,
+      "reason": "isolated administrative/overseas component smaller than the minimum; no arbitrary overseas merge",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "isolated-component",
+      "componentAreaKm2": 314.81,
+      "deviationKm2": 799685.19
+    },
+    {
+      "factionId": "ZAF-r01",
+      "parentCountryId": "ZAF",
+      "areaKm2": 603312.49,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1220041.85,
+      "deviationKm2": 196687.51
+    },
+    {
+      "factionId": "ZAF-r02",
+      "parentCountryId": "ZAF",
+      "areaKm2": 616729.36,
+      "reason": "parent total cannot form two minimum-sized regions",
+      "correction": "identical N0, base income, mobilisation and starting funds; no tile-area troop bonus",
+      "category": "parent-area-arithmetic",
+      "componentAreaKm2": 1220041.85,
+      "deviationKm2": 183270.64
+    }
+  ],
+  "administrativeCoverage": [
+    {
+      "parentCountryId": "AGO",
+      "areaKm2": 1244670.87,
+      "adminCoverageKm2": 1244672.45,
+      "coastlineDifferenceKm2": -1.59,
+      "coastlineAlignmentKm2": 3501.97,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 18,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "ne:AGO-1882",
+          "b": "ne:AGO-1885",
+          "sourceAdmin0Id": "AGO",
+          "distanceKm": 36.97,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "ARG",
+      "areaKm2": 2782471.64,
+      "adminCoverageKm2": 2782462.42,
+      "coastlineDifferenceKm2": 9.22,
+      "coastlineAlignmentKm2": 7963.88,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 24,
+      "regions": 3,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "ne:ARG-1271",
+          "b": "ne:ARG-1272",
+          "sourceAdmin0Id": "ARG",
+          "distanceKm": 35.29,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "AUS",
+      "areaKm2": 7691470.68,
+      "adminCoverageKm2": 7691443.84,
+      "coastlineDifferenceKm2": 26.83,
+      "coastlineAlignmentKm2": 21085.3,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 263,
+      "regions": 13,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "gb:25037944B13244512579669",
+          "b": "gb:25037944B93306496735140",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 55.61,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B14025919363288",
+          "b": "gb:25037944B95382354250521",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 25.98,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B16759006021093",
+          "b": "gb:25037944B62285809064209",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 98.85,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B28082311396997",
+          "b": "gb:25037944B62285809064209",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 34.37,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B35622910690770",
+          "b": "gb:25037944B93306496735140",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 83.41,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B37268575436611",
+          "b": "gb:25037944B95382354250521",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 23.64,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B37494903355321",
+          "b": "gb:25037944B62285809064209",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 69.47,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B38638552543628",
+          "b": "gb:25037944B62285809064209",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 56.68,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B42158127814454",
+          "b": "gb:25037944B95382354250521",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 58.67,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B43303794043608",
+          "b": "gb:25037944B93306496735140",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 38.41,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B50083435969321",
+          "b": "gb:25037944B62285809064209",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 60.31,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B62285809064209",
+          "b": "gb:25037944B66789818675827",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 33.21,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B62285809064209",
+          "b": "gb:25037944B80188408210929",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 47.18,
+          "requiresTransport": true
+        },
+        {
+          "a": "gb:25037944B62285809064209",
+          "b": "gb:25037944B87513158470011",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 30.89,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:AUS-2656",
+          "b": "ne:AUS-2660",
+          "sourceAdmin0Id": "AUS",
+          "distanceKm": 92.92,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "BRA",
+      "areaKm2": 8467129.34,
+      "adminCoverageKm2": 8466776.63,
+      "coastlineDifferenceKm2": 352.71,
+      "coastlineAlignmentKm2": 13802.68,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 283,
+      "regions": 9,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "CAN",
+      "areaKm2": 9923056.3,
+      "adminCoverageKm2": 9923059.31,
+      "coastlineDifferenceKm2": -3.0,
+      "coastlineAlignmentKm2": 63906.96,
+      "unassignedGeometryKm2": 1e-06,
+      "administrativeUnits": 130,
+      "regions": 10,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "gb:811477B83690670726478",
+          "b": "ne:CAN-687",
+          "sourceAdmin0Id": "CAN",
+          "distanceKm": 83.39,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:CAN-684",
+          "b": "ne:CAN-687",
+          "sourceAdmin0Id": "CAN",
+          "distanceKm": 19.34,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:CAN-685",
+          "b": "ne:CAN-687",
+          "sourceAdmin0Id": "CAN",
+          "distanceKm": 23.37,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": [
+        "ne:CAN-630",
+        "ne:CAN-631"
+      ]
+    },
+    {
+      "parentCountryId": "CHN",
+      "areaKm2": 9374091.69,
+      "adminCoverageKm2": 9374088.99,
+      "coastlineDifferenceKm2": 2.7,
+      "coastlineAlignmentKm2": 19843.05,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 143,
+      "regions": 9,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "ne:CHN-1180",
+          "b": "ne:CHN-1775",
+          "sourceAdmin0Id": "CHN",
+          "distanceKm": 23.74,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "COD",
+      "areaKm2": 2324449.62,
+      "adminCoverageKm2": 2324448.32,
+      "coastlineDifferenceKm2": 1.3,
+      "coastlineAlignmentKm2": 5877.45,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 11,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "DNK",
+      "areaKm2": 2215013.81,
+      "adminCoverageKm2": 2215012.34,
+      "coastlineDifferenceKm2": 1.47,
+      "coastlineAlignmentKm2": 43826.11,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 12,
+      "regions": 4,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "ne:DNK-3416",
+          "b": "ne:DNK-3419",
+          "sourceAdmin0Id": "DNK",
+          "distanceKm": 74.44,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:DNK-3416",
+          "b": "ne:DNK-3420",
+          "sourceAdmin0Id": "DNK",
+          "distanceKm": 26.41,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:DNK-3417",
+          "b": "ne:DNK-3419",
+          "sourceAdmin0Id": "DNK",
+          "distanceKm": 76.83,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:DNK-3417",
+          "b": "ne:DNK-3420",
+          "sourceAdmin0Id": "DNK",
+          "distanceKm": 14.28,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "DZA",
+      "areaKm2": 2319293.35,
+      "adminCoverageKm2": 2319279.86,
+      "coastlineDifferenceKm2": 13.5,
+      "coastlineAlignmentKm2": 12774.96,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 48,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "IDN",
+      "areaKm2": 1863914.87,
+      "adminCoverageKm2": 1863911.3,
+      "coastlineDifferenceKm2": 3.57,
+      "coastlineAlignmentKm2": 24880.74,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 33,
+      "regions": 3,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "ne:IDN-1223",
+          "b": "ne:IDN-1229",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 95.74,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1226",
+          "b": "ne:IDN-1229",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 30.26,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1230",
+          "b": "ne:IDN-1231",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 13.03,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1231",
+          "b": "ne:IDN-1930",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 73.64,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1232",
+          "b": "ne:IDN-1233",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 6.23,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1232",
+          "b": "ne:IDN-555",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 27.29,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1235",
+          "b": "ne:IDN-554",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 78.14,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1235",
+          "b": "ne:IDN-555",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 28.88,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1796",
+          "b": "ne:IDN-1930",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 42.0,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1796",
+          "b": "ne:IDN-492",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 14.7,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1933",
+          "b": "ne:IDN-538",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 76.59,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-1933",
+          "b": "ne:IDN-554",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 96.06,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-538",
+          "b": "ne:IDN-554",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 70.55,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:IDN-538",
+          "b": "ne:IDN-557",
+          "sourceAdmin0Id": "IDN",
+          "distanceKm": 53.76,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "IND",
+      "areaKm2": 3148249.79,
+      "adminCoverageKm2": 3148259.53,
+      "coastlineDifferenceKm2": -9.74,
+      "coastlineAlignmentKm2": 11011.56,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 36,
+      "regions": 5,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "IRN",
+      "areaKm2": 1621856.13,
+      "adminCoverageKm2": 1621845.65,
+      "coastlineDifferenceKm2": 10.48,
+      "coastlineAlignmentKm2": 3295.49,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 31,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "KAZ",
+      "areaKm2": 2720709.29,
+      "adminCoverageKm2": 2720708.43,
+      "coastlineDifferenceKm2": 0.86,
+      "coastlineAlignmentKm2": 7081.44,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 17,
+      "regions": 3,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "LBY",
+      "areaKm2": 1623728.77,
+      "adminCoverageKm2": 1623724.58,
+      "coastlineDifferenceKm2": 4.19,
+      "coastlineAlignmentKm2": 1419.38,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 22,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "MEX",
+      "areaKm2": 1957877.71,
+      "adminCoverageKm2": 1957881.92,
+      "coastlineDifferenceKm2": -4.21,
+      "coastlineAlignmentKm2": 8388.82,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 32,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "MLI",
+      "areaKm2": 1254119.48,
+      "adminCoverageKm2": 1254119.81,
+      "coastlineDifferenceKm2": -0.33,
+      "coastlineAlignmentKm2": 3451.34,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 9,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "MNG",
+      "areaKm2": 1564511.1,
+      "adminCoverageKm2": 1564513.01,
+      "coastlineDifferenceKm2": -1.91,
+      "coastlineAlignmentKm2": 2072.49,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 22,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "PER",
+      "areaKm2": 1291025.66,
+      "adminCoverageKm2": 1291021.09,
+      "coastlineDifferenceKm2": 4.57,
+      "coastlineAlignmentKm2": 3932.88,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 26,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "RUS",
+      "areaKm2": 16973548.42,
+      "adminCoverageKm2": 16973516.76,
+      "coastlineDifferenceKm2": 31.66,
+      "coastlineAlignmentKm2": 47808.91,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 226,
+      "regions": 18,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "ne:RUS-2371",
+          "b": "ne:RUS-283",
+          "sourceAdmin0Id": "RUS",
+          "distanceKm": 11.64,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:RUS-2614",
+          "b": "ne:RUS-2616",
+          "sourceAdmin0Id": "RUS",
+          "distanceKm": 12.16,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:RUS-2616",
+          "b": "ne:RUS-3468",
+          "sourceAdmin0Id": "RUS",
+          "distanceKm": 23.08,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "SAU",
+      "areaKm2": 1921563.55,
+      "adminCoverageKm2": 1921566.57,
+      "coastlineDifferenceKm2": -3.01,
+      "coastlineAlignmentKm2": 2475.41,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 13,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "SDN",
+      "areaKm2": 1856670.55,
+      "adminCoverageKm2": 1856672.42,
+      "coastlineDifferenceKm2": -1.87,
+      "coastlineAlignmentKm2": 2321.38,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 17,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "TCD",
+      "areaKm2": 1266568.53,
+      "adminCoverageKm2": 1266564.23,
+      "coastlineDifferenceKm2": 4.3,
+      "coastlineAlignmentKm2": 2032.89,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 22,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "USA",
+      "areaKm2": 9465983.35,
+      "adminCoverageKm2": 9466006.74,
+      "coastlineDifferenceKm2": -23.38,
+      "coastlineAlignmentKm2": 30781.88,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 90,
+      "regions": 17,
+      "sameConstituentMaritimeEdges": [
+        {
+          "a": "gb:52423323B14067598441828",
+          "b": "gb:52423323B46246640861022",
+          "sourceAdmin0Id": "USA",
+          "distanceKm": 18.18,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:MNP-4937",
+          "b": "ne:MNP-4938",
+          "sourceAdmin0Id": "MNP",
+          "distanceKm": 90.33,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:MNP-4938",
+          "b": "ne:MNP-4939",
+          "sourceAdmin0Id": "MNP",
+          "distanceKm": 8.1,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:VIR-4868",
+          "b": "ne:VIR-4869",
+          "sourceAdmin0Id": "VIR",
+          "distanceKm": 6.18,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:VIR-4868",
+          "b": "ne:VIR-4870",
+          "sourceAdmin0Id": "VIR",
+          "distanceKm": 59.89,
+          "requiresTransport": true
+        },
+        {
+          "a": "ne:VIR-4869",
+          "b": "ne:VIR-4870",
+          "sourceAdmin0Id": "VIR",
+          "distanceKm": 59.2,
+          "requiresTransport": true
+        }
+      ],
+      "refinedAdmin1Ids": []
+    },
+    {
+      "parentCountryId": "ZAF",
+      "areaKm2": 1220060.93,
+      "adminCoverageKm2": 1220041.85,
+      "coastlineDifferenceKm2": 19.08,
+      "coastlineAlignmentKm2": 3408.27,
+      "unassignedGeometryKm2": 0,
+      "administrativeUnits": 9,
+      "regions": 2,
+      "sameConstituentMaritimeEdges": [],
+      "refinedAdmin1Ids": []
+    }
+  ],
+  "climateCoastalFallbackTiles": 5041,
+  "unrepresentedPorts": [
+    {
+      "sourceId": "1730089041",
+      "name": "Varna",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089067",
+      "name": "Quebec",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089069",
+      "name": "Victoria",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089103",
+      "name": "Larnaca",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089105",
+      "name": "Limassol",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089119",
+      "name": "Alicante",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089123",
+      "name": "Valencia",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089129",
+      "name": "Ajaccio",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089131",
+      "name": "Bastia",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089165",
+      "name": "Iraklion",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089167",
+      "name": "Thessaloniki",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089177",
+      "name": "Zadar",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089201",
+      "name": "Trieste",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089221",
+      "name": "Monaco",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089279",
+      "name": "Kaliningrad",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089283",
+      "name": "Vyborg",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089285",
+      "name": "Port Sudan",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089295",
+      "name": "Lulea",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089297",
+      "name": "Norrkoping",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089301",
+      "name": "Izmir",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089309",
+      "name": "Odessa",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089319",
+      "name": "Bellingham",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089343",
+      "name": "Hodeidah",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089345",
+      "name": "Ottawa",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089347",
+      "name": "Buffalo",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089349",
+      "name": "Cleveland",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089351",
+      "name": "Green Bay",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089353",
+      "name": "Duluth",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089375",
+      "name": "Montreal",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089397",
+      "name": "Kiel",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089403",
+      "name": "Cartagena",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089409",
+      "name": "Tallinn",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089415",
+      "name": "Saint-Tropez",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089427",
+      "name": "Canea",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089429",
+      "name": "Katakolon",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089445",
+      "name": "Haifa",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089447",
+      "name": "Livorno",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089451",
+      "name": "Ischia",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089461",
+      "name": "Beirut",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089473",
+      "name": "Szczecin",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089475",
+      "name": "Jeddah",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089483",
+      "name": "Stockholm",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089489",
+      "name": "Canakkale",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089515",
+      "name": "Port Elizabeth",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089517",
+      "name": "Detroit",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089519",
+      "name": "Port Of Memphis",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089523",
+      "name": "Tri-City Port",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089525",
+      "name": "Helsinki",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089527",
+      "name": "Sankt-Peterburg",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089551",
+      "name": "Vancouver",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089563",
+      "name": "Abidjan",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089567",
+      "name": "Rostock",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089573",
+      "name": "Port Said",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089577",
+      "name": "Barcelona",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089579",
+      "name": "Malaga",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089581",
+      "name": "Palma de Mallorca",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089583",
+      "name": "Le Havre",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089585",
+      "name": "Marseille",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089587",
+      "name": "Nice",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089591",
+      "name": "Gythion",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089595",
+      "name": "Rhodes",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089597",
+      "name": "Dubrovnik",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089599",
+      "name": "Civitavecchia",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089601",
+      "name": "Palermo",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089603",
+      "name": "Savona",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089605",
+      "name": "Marghera",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089609",
+      "name": "Osaka",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089613",
+      "name": "Yokohama",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089615",
+      "name": "Riga",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089619",
+      "name": "Marsaxlokk",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089637",
+      "name": "Istanbul",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089645",
+      "name": "Los Angeles",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089651",
+      "name": "San Francisco",
+      "reason": "same coarse terrain tile as another major port"
+    },
+    {
+      "sourceId": "1730089671",
+      "name": "Seattle",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089675",
+      "name": "Toronto",
+      "reason": "no passable coastal tile within eight tiles"
+    },
+    {
+      "sourceId": "1730089677",
+      "name": "Chicago",
+      "reason": "no passable coastal tile within eight tiles"
+    }
+  ],
+  "sourceHashes": {
+    "AUS-ADM2-metadata.json": "852412f142bd40133f4cb2e37b6a019286680642d9e82468489b132b61e1a7b2",
+    "AUS-ADM2.geojson.gz": "56c623ddb26c78d0902dc3d91c9cf2728b2f18630160957ce18fbe2ff327936f",
+    "BRA-ADM2-metadata.json": "3587a511e7b25dd28700f3311110d9fc796bcde5f5d6e10fb243c512ce2aa840",
+    "BRA-ADM2.geojson.gz": "f12aeadd93f1c062fbba4c345682e56624f810361af3be86debf3f5185992c9c",
+    "CAN-ADM2-metadata.json": "a8c5e0873407476afb7a62999336bfd5ec6c2fb21000678fa7d15211177af835",
+    "CAN-ADM2.geojson.gz": "c1998d171e1f0b9a8002e47ce6572969f971ebb6a331567fd7e16ef9b18d01b0",
+    "CAN-ADM3-metadata.json": "987f4378be33364a2b0650675f0d00907679c2b9d23592d195ed14995956c3a3",
+    "CAN-ADM3.geojson.gz": "b84c118c1542ab4a806a5a481f67ba1577df33833f9aead790928f3d92283df1",
+    "CHN-ADM2-metadata.json": "55d7a710b5b27b40fa9d57cdae3855f6fda1aaab38c6d5adf6f88148f24589b3",
+    "CHN-ADM2.geojson.gz": "605970944e06976927cd16a9cd0b89eea82c7969630b0b97d43fe4b52ce551fe",
+    "climate-extraction.json": "c6fd90a8b86d3717427b3624b57a1755c73e2d601fd45f82e5dd5886253d7a28",
+    "climate-legend.txt": "9c17d5d42c55a4dc5c4d6a07285ea36ff651daf394e14b73565ccea8fe310599",
+    "climate-metadata.json": "ede23dbd2eafb743116fbb3367b38367eeafd043faf17338620be4f2f18b0924",
+    "koppen-1991-2020-0p1.tif": "7db968672815435562b8428f0752c2e67af7e6bb235e2969eb2db28bce428361",
+    "ne-admin1-5.1.1.zip": "efc59726337323058f9446210adc96673179cd344e053666ee3d28cb58ba2b05",
+    "ne-ports-5.1.2.zip": "1824cccd897a6c2ad546abbaf1f3545d51cff4bddfbda40244a1ad1ab1e4371d",
+    "RUS-ADM2-metadata.json": "8e5009a03a3929e1f168b4bcc867fc3f5bed43ce0dbaca3c4372a08da0d400c5",
+    "RUS-ADM2.geojson.gz": "58680516a1ecb524ebe864161ec002110d8e6297428d075b3197adfc755545ca",
+    "USA-ADM2-metadata.json": "9ea474386d4091448ea03b28aba7fb303af1bbafe151789e655ab4185f46aebc",
+    "USA-ADM2.geojson.gz": "0d87d3ec174b03d18f87fcc85f91f4fb1b00408c5f2935cbd0f61b8ea8f72dc3"
+  },
+  "hash": "dc9636c7fa7200fcf9380f249f0dacae365fcb108d10bad1feac952128e0aac6"
+}

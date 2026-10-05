@@ -1,0 +1,45 @@
+{
+  "selected": ["force-1466", "force-1467"],
+  "previews": [
+    [
+      "force-1466",
+      {
+        "preview": {
+          "valid": true,
+          "reason": null,
+          "path": [
+            577705, 579705, 579706, 579707, 579708, 579709, 579710, 579711,
+            581711, 583711, 583712, 583713, 583714, 585714, 585715, 585716,
+            585717, 585718, 587718
+          ],
+          "etaTicks": 72,
+          "rangeTiles": 0,
+          "risk": "low",
+          "climateEfficiencyPermille": 1100
+        },
+        "command": "move"
+      }
+    ],
+    [
+      "force-1467",
+      {
+        "preview": {
+          "valid": true,
+          "reason": null,
+          "path": [
+            579705, 581705, 581706, 581707, 583707, 583708, 583709, 583710,
+            583711, 583712, 583713, 583714, 583715, 585715, 585716, 587716,
+            587717, 587718
+          ],
+          "etaTicks": 68,
+          "rangeTiles": 0,
+          "risk": "low",
+          "climateEfficiencyPermille": 1100
+        },
+        "command": "move"
+      }
+    ]
+  ],
+  "zoom": 8,
+  "branch": "army"
+}

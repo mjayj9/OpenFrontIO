@@ -1,0 +1,64 @@
+{
+  "tick": 48,
+  "paused": true,
+  "body": "select-none font-sans min-h-screen bg-neutral-800 transition-opacity duration-300 ease-in-out flex flex-row flex-wrap content-start in-game",
+  "save": "저장과 승리 목표 ▾",
+  "forces": [
+    {
+      "id": "force-1466",
+      "tile": 579706,
+      "phase": "moving",
+      "queue": [
+        {
+          "kind": "move",
+          "target": 583711,
+          "issuedTick": 44,
+          "previewPath": [
+            587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+            583712, 583711
+          ]
+        }
+      ],
+      "command": {
+        "kind": "move",
+        "target": 587718,
+        "issuedTick": 36
+      }
+    },
+    {
+      "id": "force-1467",
+      "tile": 581706,
+      "phase": "moving",
+      "queue": [
+        {
+          "kind": "move",
+          "target": 583711,
+          "issuedTick": 44,
+          "previewPath": [
+            587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+            583712, 583711
+          ]
+        }
+      ],
+      "command": {
+        "kind": "move",
+        "target": 587718,
+        "issuedTick": 36
+      }
+    },
+    {
+      "id": "force-1469",
+      "tile": 583705,
+      "phase": "idle",
+      "queue": [],
+      "command": null
+    },
+    {
+      "id": "force-1471",
+      "tile": 583705,
+      "phase": "idle",
+      "queue": [],
+      "command": null
+    }
+  ]
+}

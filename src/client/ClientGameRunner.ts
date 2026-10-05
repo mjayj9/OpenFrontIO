@@ -1,7 +1,7 @@
 import { Config } from "src/core/configuration/Config";
 import { ClientEnv } from "../client/ClientEnv";
 import { reloadForUpdate, translateText } from "../client/Utils";
-import { EventBus } from "../core/EventBus";
+import { EventBus, EventConstructor, GameEvent } from "../core/EventBus";
 import {
   ClientID,
   GameID,
@@ -27,6 +27,8 @@ import {
   GameUpdateViewData,
   HashUpdate,
 } from "../core/game/GameUpdates";
+import { modernFactions } from "../core/game/ModernRegions";
+import { modernWorld } from "../core/game/ModernWorld";
 import { loadTerrainMap, TerrainMapData } from "../core/game/TerrainMapLoader";
 import {
   GRAPHICS_KEY,
@@ -50,9 +52,17 @@ import {
   TickMetricsEvent,
   ToggleRenderDebugGuiEvent,
 } from "./InputHandler";
+import { mountModernCapitalOverlay } from "./ModernCapitalOverlay";
+import { mountModernCommandPanel } from "./ModernCommandPanel";
 import { pagePin } from "./PagePin";
 import { groupTokenOf, loggableStartMessage } from "./PresenceGroup";
 import { versionedPathForMismatchedGame } from "./ServerList";
+import {
+  automaticSaveId,
+  reviewGame,
+  saveBuild,
+  writeSave,
+} from "./SingleplayerSaves";
 import { reportGameError } from "./Telemetry";
 import { terrainMapFileLoader } from "./TerrainMapFileLoader";
 import { GoToPlayerEvent } from "./TransformHandler";
@@ -73,6 +83,10 @@ import { createCanvas } from "./Utils";
 import { WebGLFrameBuilder } from "./WebGLFrameBuilder";
 import { MapLayerController } from "./controllers/MapLayerController";
 import { createRenderer, GameRenderer } from "./hud/GameRenderer";
+import type { ControlPanel } from "./hud/layers/ControlPanel";
+import "./hud/layers/SavePanel";
+import { SavePanel } from "./hud/layers/SavePanel";
+import { TutorialPanel } from "./hud/layers/TutorialPanel";
 import { goldRateTracker } from "./hud/layers/lib/GoldRateTracker";
 import {
   applyGraphicsOverrides,
@@ -93,6 +107,7 @@ import { themeProvider } from "./theme/ThemeProvider";
 import { GameView, PlayerView } from "./view";
 
 export interface LobbyConfig {
+  savedGame?: import("./SingleplayerSaves").SavedGame;
   cosmetics: PlayerCosmeticRefs;
   playerName: string;
   playerClanTag: string | null;
@@ -140,12 +155,14 @@ export function joinLobby(
   const transport = new Transport(lobbyConfig, eventBus);
 
   let currentGameRunner: ClientGameRunner | null = null;
+  const lobbyAbort = new AbortController();
 
   const onconnect = async () => {
     // Drop the tag if the ownership check failed; the server re-checks anyway.
     if (lobbyConfig.clanTagCheck !== undefined) {
       lobbyConfig.playerClanTag = await lobbyConfig.clanTagCheck;
     }
+    if (lobbyAbort.signal.aborted) return;
     // Always send join - server will detect reconnection via persistentID
     console.log(`Joining game lobby ${lobbyConfig.gameID}`);
     transport.joinGame();
@@ -184,6 +201,7 @@ export function joinLobby(
       mapSize,
       terrainMapFileLoader,
       false, // Layer images loaded off the critical path after game start.
+      true, // A new game must not inherit terrain mutations from the preceding game.
     );
     terrainLoads.set(key, load);
     terrainLoad = load;
@@ -211,6 +229,7 @@ export function joinLobby(
   };
 
   const onmessage = (message: ServerMessage) => {
+    if (lobbyAbort.signal.aborted) return;
     // Before the per-type handling below: the token rides two different
     // messages and the listener does not care which one delivered it.
     const groupToken = groupTokenOf(message);
@@ -282,12 +301,18 @@ export function joinLobby(
         userSettings,
         terrainLoad,
         terrainMapFileLoader,
+        lobbyAbort.signal,
       )
         .then((r) => {
+          if (lobbyAbort.signal.aborted) {
+            r.stop();
+            return;
+          }
           currentGameRunner = r;
           r.start();
         })
         .catch((e) => {
+          if (lobbyAbort.signal.aborted) return;
           console.error("error creating client game", e);
 
           currentGameRunner = null;
@@ -427,6 +452,7 @@ export function joinLobby(
         return false;
       }
       console.log("leaving game");
+      lobbyAbort.abort();
       if (currentGameRunner) {
         currentGameRunner.stop();
         currentGameRunner = null;
@@ -600,7 +626,7 @@ function mountWebGLFrameLoop(
   // animated chevron pass at the target tile. The renderer needs the target's
   // tile x/y and the warship's owner smallID (so the chevrons use the right
   // color).
-  eventBus.on(MoveWarshipIntentEvent, (e) => {
+  const onMoveWarship = (e: MoveWarshipIntentEvent) => {
     const tile = e.tile;
     const tx = gameView.x(tile);
     const ty = gameView.y(tile);
@@ -608,7 +634,8 @@ function mountWebGLFrameLoop(
     const firstUnit = gameView.unit(e.unitIds[0]);
     if (firstUnit === undefined) return;
     view.showMoveIndicator(tx, ty, firstUnit.owner().smallID());
-  });
+  };
+  eventBus.on(MoveWarshipIntentEvent, onMoveWarship);
 
   // Self-driving RAF: syncCamera reads the latest camera state from
   // TransformHandler, pushes it to WebGL, and synchronously invokes the
@@ -632,6 +659,7 @@ function mountWebGLFrameLoop(
       rafId = null;
     }
     resizeObs.disconnect();
+    eventBus.off(MoveWarshipIntentEvent, onMoveWarship);
   };
 
   const builder = new WebGLFrameBuilder(view);
@@ -675,6 +703,7 @@ async function createClientGame(
   userSettings: UserSettings,
   terrainLoad: Promise<TerrainMapData> | null,
   mapLoader: GameMapLoader,
+  signal: AbortSignal,
 ): Promise<ClientGameRunner> {
   if (lobbyConfig.gameStartInfo === undefined) {
     throw new Error("missing gameStartInfo");
@@ -696,14 +725,35 @@ async function createClientGame(
       lobbyConfig.gameStartInfo.config.gameMapSize,
       mapLoader,
       false, // Layer images loaded off the critical path after game start.
+      true,
     );
   }
+  signal.throwIfAborted();
   // Kick off the font-atlas fetch so it overlaps with worker init; the
   // render passes need it parsed before createWebGLView runs.
   const atlasDataLoad = preloadAtlasData();
-  const worker = new WorkerClient(lobbyConfig.gameStartInfo, clientID);
-  await worker.initialize();
-  await atlasDataLoad;
+  const worker = new WorkerClient(
+    lobbyConfig.gameStartInfo,
+    clientID,
+    lobbyConfig.savedGame?.snapshot,
+  );
+  let cancelInitialization = () => {};
+  const startupCancelled = new Promise<never>((_resolve, reject) => {
+    cancelInitialization = () => reject(signal.reason);
+    signal.addEventListener("abort", cancelInitialization, { once: true });
+  });
+  try {
+    await Promise.race([
+      Promise.all([worker.initialize(), atlasDataLoad]),
+      startupCancelled,
+    ]);
+    signal.throwIfAborted();
+  } catch (error) {
+    worker.cleanup();
+    throw error;
+  } finally {
+    signal.removeEventListener("abort", cancelInitialization);
+  }
   const gameView = new GameView(
     worker,
     config,
@@ -714,6 +764,7 @@ async function createClientGame(
     lobbyConfig.gameStartInfo.gameID,
     lobbyConfig.gameStartInfo.players,
   );
+  if (worker.initialView) gameView.update(worker.initialView);
 
   // Transparent fullscreen overlay used purely as the pointer-event /
   // bounding-rect target for InputHandler + TransformHandler. The actual
@@ -734,6 +785,13 @@ async function createClientGame(
     eventBus,
     audioMixer() ?? initAudioMixer(userSettings),
   );
+  const rendererDisposers: Array<() => void> = [() => inputOverlay.remove()];
+  let rendererDisposed = false;
+  const disposeRenderer = () => {
+    if (rendererDisposed) return;
+    rendererDisposed = true;
+    for (const dispose of rendererDisposers.reverse()) dispose();
+  };
   try {
     // Resolve render settings (defaults + user overrides) up front so the
     // renderer is built with the final values — no construct-with-defaults,
@@ -750,8 +808,13 @@ async function createClientGame(
       config,
       resolveRenderSettings(),
     );
+    rendererDisposers.push(
+      () => view.dispose(),
+      () => glCanvas.remove(),
+    );
 
     const graphicsListenerAbort = new AbortController();
+    rendererDisposers.push(() => graphicsListenerAbort.abort());
 
     const mapLayerController = new MapLayerController(
       view,
@@ -824,12 +887,13 @@ async function createClientGame(
     // Two folders: "Effect Editor" and "Render Settings".
     let debugGui: { open(): void; destroy(): void } | null = null;
     let debugGuiLoading = false;
-    eventBus.on(ToggleRenderDebugGuiEvent, () => {
+    const onToggleRenderDebugGui = () => {
       if (debugGui === null) {
         if (debugGuiLoading) return;
         debugGuiLoading = true;
         import("./render/gl/debug/index")
           .then(({ createDebugGui }) => {
+            if (graphicsListenerAbort.signal.aborted) return;
             debugGui = createDebugGui(
               view.getSettings(),
               {
@@ -841,6 +905,9 @@ async function createClientGame(
             );
             debugGui.open();
           })
+          .catch((error) =>
+            console.warn("Failed to load render debug GUI", error),
+          )
           .finally(() => {
             debugGuiLoading = false;
           });
@@ -848,6 +915,12 @@ async function createClientGame(
         debugGui.destroy();
         debugGui = null;
       }
+    };
+    eventBus.on(ToggleRenderDebugGuiEvent, onToggleRenderDebugGui);
+    rendererDisposers.push(() => {
+      eventBus.off(ToggleRenderDebugGuiEvent, onToggleRenderDebugGui);
+      debugGui?.destroy();
+      debugGui = null;
     });
 
     const gameRenderer = createRenderer(
@@ -858,8 +931,31 @@ async function createClientGame(
       view,
       mapLayerController,
     );
+    rendererDisposers.push(() => gameRenderer.dispose());
 
     const metrics = new GameMetrics(lobbyConfig.gameID, clientID);
+    const disposeCapitalMarkers = config.gameConfig().modernMode
+      ? mountModernCapitalOverlay(gameView, gameRenderer.transformHandler)
+      : () => {};
+    rendererDisposers.push(disposeCapitalMarkers);
+    if (config.gameConfig().modernMode?.scenario === "modern-regions-v2") {
+      rendererDisposers.push(
+        mountModernCommandPanel(
+          gameView,
+          gameRenderer.transformHandler,
+          gameRenderer.uiState,
+          eventBus,
+          (forceId, target, command, queue) =>
+            worker.modernForcePreview(
+              gameView.myPlayer()!.id(),
+              forceId,
+              target,
+              command,
+              queue,
+            ),
+        ),
+      );
+    }
     const { builder: webglBuilder, stopFrameLoop } = mountWebGLFrameLoop(
       gameMap,
       view,
@@ -870,21 +966,12 @@ async function createClientGame(
       eventBus,
       (nowMs) => metrics.recordFrame(nowMs),
     );
+    rendererDisposers.push(stopFrameLoop);
 
     // Releases all WebGL/DOM resources this game created. Without it, stopping
     // a game (e.g. joining another without a page reload) leaks the WebGL
     // context, canvas and input overlay — a few games and mobile browsers hit
     // their WebGL context limit. Idempotent: stop() may be called more than once.
-    let rendererDisposed = false;
-    const disposeRenderer = (): void => {
-      if (rendererDisposed) return;
-      rendererDisposed = true;
-      stopFrameLoop();
-      view.dispose();
-      glCanvas.remove();
-      inputOverlay.remove();
-    };
-
     console.log(
       `creating private game got difficulty: ${lobbyConfig.gameStartInfo.config.difficulty}`,
     );
@@ -906,6 +993,8 @@ async function createClientGame(
       metrics,
     );
   } catch (err) {
+    disposeRenderer();
+    worker.cleanup();
     soundManager.dispose();
     throw err;
   }
@@ -928,6 +1017,13 @@ export class ClientGameRunner {
 
   private lastTickReceiveTime: number = 0;
   private currentTickDelay: number | undefined = undefined;
+  private savePanel: SavePanel | null = null;
+  private autosaveTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly saveRunId: string;
+  private lifecycleAbort = new AbortController();
+  private subscriptions: Array<() => void> = [];
+  private connectionCheckDelay: ReturnType<typeof setTimeout> | null = null;
+  private stopped = false;
 
   constructor(
     private lobby: LobbyConfig,
@@ -946,6 +1042,10 @@ export class ClientGameRunner {
     private metrics: GameMetrics | null = null,
   ) {
     this.lastMessageTime = Date.now();
+    this.turnsSeen = lobby.savedGame?.tick ?? 0;
+    // This UUID identifies a local save slot only; it never enters simulation
+    // decisions or changes the seeded game ID. Old saves receive a new slot.
+    this.saveRunId = lobby.savedGame?.runId ?? crypto.randomUUID();
   }
 
   /**
@@ -964,45 +1064,139 @@ export class ClientGameRunner {
   }
 
   public start() {
+    if (this.stopped || this.isActive) return;
     this.soundManager.playBackgroundMusic();
     console.log("starting client game");
 
     this.isActive = true;
     this.lastMessageTime = Date.now();
     this.metrics?.start();
-    setTimeout(() => {
+    this.connectionCheckDelay = setTimeout(() => {
+      this.connectionCheckDelay = null;
+      if (!this.isActive) return;
       this.connectionCheckInterval = setInterval(
         () => this.onConnectionCheck(),
         1000,
       );
     }, 20000);
 
-    this.eventBus.on(MouseUpEvent, this.inputEvent.bind(this));
-    this.eventBus.on(MouseMoveEvent, this.onMouseMove.bind(this));
-    this.eventBus.on(AutoUpgradeEvent, this.autoUpgradeEvent.bind(this));
-    this.eventBus.on(
-      DoBoatAttackEvent,
-      this.doBoatAttackUnderCursor.bind(this),
-    );
-    this.eventBus.on(
+    this.subscribe(MouseUpEvent, this.inputEvent.bind(this));
+    this.subscribe(MouseMoveEvent, this.onMouseMove.bind(this));
+    this.subscribe(AutoUpgradeEvent, this.autoUpgradeEvent.bind(this));
+    this.subscribe(DoBoatAttackEvent, this.doBoatAttackUnderCursor.bind(this));
+    this.subscribe(
       DoGroundAttackEvent,
       this.doGroundAttackUnderCursor.bind(this),
     );
-    this.eventBus.on(
+    this.subscribe(
       DoRetaliateAttackEvent,
       this.doRetaliateAttackMostRecent.bind(this),
     );
-    this.eventBus.on(
+    this.subscribe(
       DoRequestAllianceEvent,
       this.doRequestAllianceUnderCursor.bind(this),
     );
-    this.eventBus.on(
+    this.subscribe(
       DoBreakAllianceEvent,
       this.doBreakAllianceUnderCursor.bind(this),
     );
 
     this.renderer.initialize();
+    const savedRatio = this.lobby.savedGame?.ui?.attackRatio;
+    if (
+      typeof savedRatio === "number" &&
+      Number.isFinite(savedRatio) &&
+      savedRatio >= 0 &&
+      savedRatio <= 1
+    ) {
+      this.renderer.uiState.attackRatio = savedRatio;
+      document
+        .querySelector<ControlPanel>("control-panel")
+        ?.onAttackRatioChange(savedRatio);
+    }
+    const tutorial = document.querySelector(
+      "tutorial-panel",
+    ) as TutorialPanel | null;
+    if (this.lobby.savedGame?.education)
+      tutorial?.restoreEducationSnapshot(
+        this.lobby.savedGame.education as Parameters<
+          TutorialPanel["restoreEducationSnapshot"]
+        >[0],
+      );
+    if (this.transport.isLocal && !this.lobby.gameRecord) {
+      this.savePanel = document.createElement("save-panel") as SavePanel;
+      this.savePanel.configure({
+        save: (name, automatic) => this.save(name, automatic),
+        getProgress: () => this.progressText(),
+        restart: () =>
+          document.dispatchEvent(
+            new CustomEvent("join-lobby", {
+              detail: {
+                gameID: this.lobby.gameID,
+                gameStartInfo: this.lobby.gameStartInfo,
+                source: "singleplayer",
+              },
+              bubbles: true,
+              composed: true,
+            }),
+          ),
+        setAutosave: (enabled) => this.setAutosave(enabled),
+        autosave: true,
+        setCapitalMarkers: this.lobby.gameStartInfo?.config.modernMode
+          ? (enabled) =>
+              document.dispatchEvent(
+                new CustomEvent("modern-capitals", { detail: enabled }),
+              )
+          : undefined,
+      });
+      document.body.appendChild(this.savePanel);
+      this.setAutosave(true);
+      document.addEventListener(
+        "fork-review-game",
+        () => {
+          void this.transport
+            .withFrozenTurns(async (turns) =>
+              reviewGame(this.lobby.gameStartInfo!, turns),
+            )
+            .catch((error) => this.savePanel?.reportSaveError(error));
+        },
+        { signal: this.lifecycleAbort.signal },
+      );
+      document.addEventListener(
+        "fork-restart-game",
+        () =>
+          document.dispatchEvent(
+            new CustomEvent("join-lobby", {
+              detail: {
+                gameID: this.lobby.gameID,
+                gameStartInfo: this.lobby.gameStartInfo,
+                source: "singleplayer",
+              },
+              bubbles: true,
+              composed: true,
+            }),
+          ),
+        { signal: this.lifecycleAbort.signal },
+      );
+    }
     this.input.initialize();
+    let hasGoneToPlayer = false;
+    if (this.worker.initialView) {
+      // Restore already populated GameView before the GPU view existed. A
+      // paused match may never receive another simulation tick, so upload the
+      // initial frame (including ownership and palettes) before drawing it.
+      this.webglBuilder?.update(this.gameView);
+      this.renderer.tick();
+      const restoredPlayer = this.gameView.myPlayer();
+      if (
+        restoredPlayer?.hasSpawned() &&
+        restoredPlayer.isAlive() &&
+        this.userSettings.goToPlayer()
+      ) {
+        hasGoneToPlayer = true;
+        this.eventBus.emit(new GoToPlayerEvent(restoredPlayer, 8));
+      }
+    }
     this.worker.start((gu: GameUpdateViewData | ErrorUpdate) => {
       if (this.lobby.gameStartInfo === undefined) {
         throw new Error("missing gameStartInfo");
@@ -1022,9 +1216,17 @@ export class ClientGameRunner {
       gu.updates[GameUpdateType.Hash].forEach((hu: HashUpdate) => {
         this.eventBus.emit(new SendHashEvent(hu.tick, hu.hash));
       });
+      const wasPaused = this.gameView.isPaused();
+      const hadModernState = this.gameView.modernSystems() !== null;
       this.gameView.update(gu);
       this.webglBuilder?.update(this.gameView);
-      this.renderer.tick();
+      // The final paused update must refresh throttled HUD counters too. At
+      // modern bootstrap, replace the initial tile-based rows immediately.
+      this.renderer.tick(
+        wasPaused !== this.gameView.isPaused() ||
+          (!hadModernState && this.gameView.modernSystems() !== null),
+      );
+      this.savePanel?.tick();
       if (gu.tickExecutionDuration !== undefined) {
         this.metrics?.recordTickExecution(gu.tickExecutionDuration);
       }
@@ -1044,7 +1246,6 @@ export class ClientGameRunner {
       this.transport.rejoinGame(this.turnsSeen);
     };
 
-    let hasGoneToPlayer = false;
     const onmessage = (message: ServerMessage) => {
       this.lastMessageTime = Date.now();
       if (message.type === "start") {
@@ -1186,6 +1387,15 @@ export class ClientGameRunner {
   }
 
   public stop() {
+    for (const unsubscribe of this.subscriptions.splice(0)) unsubscribe();
+    if (this.connectionCheckDelay !== null) {
+      clearTimeout(this.connectionCheckDelay);
+      this.connectionCheckDelay = null;
+    }
+    this.lifecycleAbort.abort();
+    this.setAutosave(false);
+    this.savePanel?.remove();
+    this.savePanel = null;
     this.soundManager.dispose();
     this.graphicsListenerAbort?.abort();
     // Detach the input handler's window/canvas listeners and its EventBus
@@ -1196,7 +1406,8 @@ export class ClientGameRunner {
     // disposals around it.
     this.input.destroy();
     this.disposeRenderer?.();
-    if (!this.isActive) return;
+    if (this.stopped) return;
+    this.stopped = true;
 
     this.isActive = false;
     this.metrics?.stop();
@@ -1210,6 +1421,96 @@ export class ClientGameRunner {
       clearTimeout(this.goToPlayerTimeout);
       this.goToPlayerTimeout = null;
     }
+  }
+
+  private subscribe<T extends GameEvent>(
+    type: EventConstructor<T>,
+    handler: (event: T) => void,
+  ): void {
+    this.eventBus.on(type, handler);
+    this.subscriptions.push(() => this.eventBus.off(type, handler));
+  }
+
+  private setAutosave(enabled: boolean): void {
+    if (this.autosaveTimer) clearInterval(this.autosaveTimer);
+    this.autosaveTimer = enabled
+      ? setInterval(() => {
+          if (this.isActive)
+            void this.save(undefined, true).catch((error) => {
+              console.warn("Autosave failed; existing save retained", error);
+              this.savePanel?.reportSaveError(error);
+            });
+        }, 60000)
+      : null;
+  }
+
+  private async save(name?: string, automatic = false): Promise<void> {
+    if (!this.lobby.gameStartInfo)
+      throw new Error("Missing singleplayer setup");
+    await this.transport.withFrozenTurns(async (turns, paused) => {
+      const snapshot = await this.worker.snapshot(saveBuild);
+      const tutorial = document.querySelector(
+        "tutorial-panel",
+      ) as TutorialPanel | null;
+      await writeSave({
+        format: 1,
+        runId: this.saveRunId,
+        id: automatic
+          ? automaticSaveId(saveBuild, this.saveRunId)
+          : crypto.randomUUID(),
+        name:
+          name ?? translateText(automatic ? "saves.autosave" : "saves.manual"),
+        createdAt: Date.now(),
+        build: saveBuild,
+        tick: turns.length,
+        gameStartInfo: this.lobby.gameStartInfo!,
+        snapshot,
+        turns,
+        paused,
+        education: tutorial?.educationSnapshot(),
+        ui: { attackRatio: this.renderer.uiState.attackRatio },
+      });
+    });
+  }
+
+  private progressText(): string {
+    const mode = this.lobby.gameStartInfo?.config.modernMode,
+      player = this.gameView.myPlayer();
+    if (!mode || !player) return "";
+    const countries =
+      mode.scenario === "modern-regions-v2"
+        ? modernFactions
+        : modernWorld.countries;
+    const capitals = countries.filter(
+      (country) =>
+        this.gameView
+          .owner(this.gameView.ref(country.capital[0], country.capital[1]))
+          .id() === player.id(),
+    ).length;
+    const systems = this.gameView.modernSystems();
+    const totalArea =
+      systems?.factions.reduce(
+        (sum, faction) => sum + faction.ownedAreaUnits,
+        0,
+      ) ?? 0;
+    const ownedArea =
+      systems?.factions.find((faction) => faction.playerId === player.id())
+        ?.ownedAreaUnits ?? 0;
+    return translateText("modern.progress", {
+      territory:
+        Math.round(
+          mode.scenario === "modern-regions-v2" && totalArea > 0
+            ? (ownedArea * 1000) / totalArea
+            : (player.numTilesOwned() * 1000) / this.gameView.numLandTiles(),
+        ) / 10,
+      capitals,
+      total: countries.length,
+      requirement: ["territory", "capitals"].includes(mode.victory)
+        ? translateText("modern.threshold", { target: mode.targetPercent })
+        : "",
+      objective: translateText(`modern.${mode.victory}`),
+      minutes: this.lobby.gameStartInfo?.config.maxTimerValue ?? 30,
+    });
   }
 
   private inputEvent(event: MouseUpEvent) {
@@ -1246,6 +1547,7 @@ export class ClientGameRunner {
     this.myPlayer
       .actions(tile, [UnitType.TransportShip])
       .then((actions) => {
+        if (!this.isActive) return;
         if (actions.canAttack) {
           this.eventBus.emit(
             new SendAttackIntentEvent(
@@ -1294,6 +1596,7 @@ export class ClientGameRunner {
   private findAndUpgradeNearestBuilding(clickedTile: TileRef) {
     this.myPlayer!.actions(clickedTile, Structures.types)
       .then((actions) => {
+        if (!this.isActive) return;
         const upgradeUnits: {
           unitId: number;
           unitType: UnitType;
@@ -1388,6 +1691,7 @@ export class ClientGameRunner {
     this.myPlayer
       .buildables(tile, [UnitType.TransportShip])
       .then((buildables) => {
+        if (!this.isActive) return;
         if (this.canBoatAttack(buildables) !== false) {
           this.sendBoatAttackIntent(tile);
         } else {
@@ -1414,6 +1718,7 @@ export class ClientGameRunner {
     this.myPlayer
       .actions(tile, null)
       .then((actions) => {
+        if (!this.isActive) return;
         if (actions.canAttack) {
           this.eventBus.emit(
             new SendAttackIntentEvent(
@@ -1483,6 +1788,7 @@ export class ClientGameRunner {
     myPlayer
       .actions(tile)
       .then((actions) => {
+        if (!this.isActive) return;
         if (actions.interaction?.canSendAllianceRequest) {
           this.eventBus.emit(
             new SendAllianceRequestIntentEvent(myPlayer, recipient),
@@ -1516,6 +1822,7 @@ export class ClientGameRunner {
     myPlayer
       .actions(tile)
       .then((actions) => {
+        if (!this.isActive) return;
         if (actions.interaction?.canBreakAlliance) {
           this.eventBus.emit(
             new SendBreakAllianceIntentEvent(myPlayer, recipient),

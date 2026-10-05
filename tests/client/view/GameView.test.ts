@@ -35,6 +35,40 @@ function withPlayers(
   return gu;
 }
 
+describe("GameView pause state", () => {
+  it("retains the last authoritative GamePaused update across unrelated ticks", () => {
+    const game = makeGameView();
+    expect(game.isPaused()).toBe(false);
+    const restored = makeEmptyGu(455);
+    restored.updates[GameUpdateType.GamePaused].push({
+      type: GameUpdateType.GamePaused,
+      paused: true,
+    });
+    game.update(restored);
+    expect(game.isPaused()).toBe(true);
+    game.update(makeEmptyGu(456));
+    expect(game.isPaused()).toBe(true);
+    const resumed = makeEmptyGu(457);
+    resumed.updates[GameUpdateType.GamePaused].push({
+      type: GameUpdateType.GamePaused,
+      paused: false,
+    });
+    game.update(resumed);
+    expect(game.isPaused()).toBe(false);
+  });
+
+  it("uses the last pause transition when several arrive in one update", () => {
+    const game = makeGameView();
+    const gu = makeEmptyGu(1);
+    gu.updates[GameUpdateType.GamePaused].push(
+      { type: GameUpdateType.GamePaused, paused: true },
+      { type: GameUpdateType.GamePaused, paused: false },
+    );
+    game.update(gu);
+    expect(game.isPaused()).toBe(false);
+  });
+});
+
 describe("GameView.update — players", () => {
   it("creates a PlayerView for each player in the first tick", () => {
     const game = makeGameView();

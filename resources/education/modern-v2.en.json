@@ -1,0 +1,272 @@
+{
+  "education": {
+    "chapters": {
+      "modern_ai": "Individual AI and invitation fill",
+      "modern_air": "Real air operations",
+      "modern_climate": "Climate and adaptation",
+      "modern_commands": "Army/navy/air map commands",
+      "modern_nuclear": "Nuclear responsibility",
+      "modern_population": "Population and manpower",
+      "modern_ports": "Major-port economy",
+      "modern_regions": "Independent regions and common start"
+    },
+    "features": {
+      "modern_ai": {
+        "completion": "The core roster contains fixed AI levels. Lobby fill is validated by server/core tests; reading this lesson does not pretend to verify an online room.",
+        "description": "AI levels are independent seeded low/medium/high decisions with default 1:1:1 weights. Personality and climate adaptation are separate. Invitation AI fills empty participant slots at the start; unselected world factions have their own AI without duplicate control.",
+        "exercise": "Inspect actual AI level labels and common population, then configure participant slots and autofill before inviting another human.",
+        "prerequisites": "Modern v2 AI game or private invitation room. Online room creation uses the existing lobby service.",
+        "title": "Individual AI levels and invitation-slot fill"
+      },
+      "modern_air": {
+        "completion": "A new core base, outbound/returning/rearming transitions and actual aircraft casualties are required.",
+        "description": "Fighters contest airspace and intercept. Strike aircraft damage ground troops, facilities and ports without capturing land. Sorties use a base, radius, personnel, upkeep, real flight positions, return and resupply cooldown. SAM aircraft interception has its own cost and reload.",
+        "exercise": "Build another base, send a squadron on patrol or strike, watch its return and rearm, then observe an actual interception casualty.",
+        "prerequisites": "An operating airbase and owned aircraft. Interception exercise also needs enabled SAM or enemy fighters.",
+        "title": "Airbases, sorties and interception"
+      },
+      "modern_climate": {
+        "completion": "Both preview efficiencies plus actual ground casualties are checked; training requires its completed core counter.",
+        "description": "Historical regional climate is separate from terrain and temporary weather. Army adaptation applies at the engagement tile, with mild climates spared harsh penalties. Capture does not instantly train troops. Training costs time and gold and has two adaptation slots.",
+        "exercise": "Compare actual-route climate previews on adapted and harsh unadapted battle locations, fight, then complete a new adaptation training.",
+        "prerequisites": "Modern v2, an army group and enough gold. The overlay is an explanation of climate, not current weather.",
+        "title": "Regional climate and adaptation training"
+      },
+      "modern_commands": {
+        "completion": "Branch events and selection are checked. Move requires a completed core mission; stop requires acknowledged idle state after an active order.",
+        "description": "Army/navy/air keys select a branch; they do not launch units. Select with left click or drag, preview with right click, confirm and queue with Shift. Army uses owned ground routes or transport landings; navy needs connected sea.",
+        "exercise": "Switch all three branches, select a group, complete a move, stop an active order, produce a warship and move it.",
+        "prerequisites": "An owned unit in the selected branch. On mobile use branch and target buttons. Saved-key conflicts may leave a new action unassigned.",
+        "title": "Q/W/E and map commands"
+      },
+      "modern_nuclear": {
+        "completion": "A new acknowledged launch responsibility record and active income penalty must exist; merely opening the launch menu does not complete it.",
+        "description": "Each launch applies a timed penalty to the firing faction even if intercepted or its target disappears. MIRV is one launch, not one penalty per warhead. Repeated penalties cap income and replenishment losses and expire by game tick. Victim damage is separate.",
+        "exercise": "Inspect the launch warning, fire once, observe victim damage and your own economic penalty, then compare conventional aircraft or army.",
+        "prerequisites": "Use the nuclear training chapter with enabled weapons, a ready owned silo and enough gold.",
+        "title": "Nuclear cost and lasting responsibility"
+      },
+      "modern_population": {
+        "completion": "Equal initial ledgers are checked against N0. The loss exercise requires actual army casualties.",
+        "description": "Every human and AI starts with the same game population N0 and common budget. Civilian, available, army, navy and air personnel sum to living population. Losses and transfers conserve people; actual national population is unused.",
+        "exercise": "Open the ledger, produce a squadron, engage an opponent and inspect casualties and replenishment.",
+        "prerequisites": "Modern v2 and an owned force. Aircraft need available personnel, gold and capacity.",
+        "title": "Equal population and military accounting"
+      },
+      "modern_ports": {
+        "completion": "Completion requires real capture, finished development, increased income, an enemy-port blockade, and observing then ending an own-port blockade with recovered income.",
+        "description": "Named historical port locations have one unique portId. Initially closed, they earn a bounded bonus only for their current owner after paid development. Damage, blockade and connection change operation. General ports keep ordinary trade without copying the unique bonus.",
+        "exercise": "Capture a major port, repair damage when needed, pay for development and observe increased income. Blockade an enemy port and respond to an enemy blockade of your own.",
+        "prerequisites": "Own or capture a designated major port. Development needs gold and time; blockade needs an owned nearby fleet.",
+        "title": "Capture, develop and blockade major ports"
+      },
+      "modern_regions": {
+        "completion": "Core state contains unique faction and controller IDs; no region has two rulers.",
+        "description": "Countries exceeding 1.2M km² split along administrative boundaries, with a 0.8–1.2M km² goal. Every region has its own controller, center and adaptation; area exceptions retain reasons. Tiles are not km².",
+        "exercise": "Choose a Russian, Chinese or Indian region and inspect its area, exception and administrative center before starting.",
+        "prerequisites": "Modern regions v2. Select a country, then an independent region.",
+        "title": "Independent regions and geographic area"
+      }
+    },
+    "modern_steps": {
+      "modern_ai_levels": "Inspect the actual AI levels shown in country information. Levels are fixed by the seed and do not change the common starting population.",
+      "modern_air_intercept": "Contest hostile aircraft with a fighter or send a sortie near enabled enemy SAM. The exercise waits for an actual aircraft casualty; a flight animation is insufficient.",
+      "modern_air_launch": "Select one fighter for Patrol or one strike squadron for an enemy target within the visible radius. Preview, confirm, and watch real outbound aircraft.",
+      "modern_air_return": "Complete another short patrol. Watch the real Returning and Rearming states. More sorties wait for supplies and the cooldown.",
+      "modern_airbase": "Open the military panel and produce an additional airbase on owned land. Wait for a new operating base in the simulation.",
+      "modern_army_move": "Select Army and a group. Right click another owned ground tile (mobile: target button), review the path, confirm and wait for arrival.",
+      "modern_branches": "Use the current army {armyKey}, navy {navyKey}, air {airKey} controls or touch buttons once each. Selecting a branch does not launch a force.",
+      "modern_climate_compare": "Enable Climate overlay. Compare adapted and harsh unadapted army previews, then fight real ground exchanges in both climates. Both previews and actual losses in each climate are required.",
+      "modern_climate_train": "Choose a new adaptation in Population and train it for {cost} gold and {seconds} game seconds. Capture alone does not train troops.",
+      "modern_mobilization": "Fight a real army engagement and inspect the ledger's losses and replenishment. Producing a new branch uses existing manpower rather than creating people.",
+      "modern_navy_move": "Select Navy, produce a warship from an operating port if needed, choose connected sea, confirm Move and wait for arrival. Land is not a naval route.",
+      "modern_nuclear_penalty": "In this nuclear-only lesson, launch from a ready silo after reviewing the costs. Watch the firing faction's active economic penalty and the victim's separate damage.",
+      "modern_population": "Open Population in the military panel. All factions begin with {population} people; civilian, available and military manpower sum to living population.",
+      "modern_port_blockade": "Produce and select a warship, choose Blockade near an enemy named port and confirm. The actual port state must list your blocking faction.",
+      "modern_port_capture": "Use Army to capture the tile of a named enemy major port. Its core owner and capture count must change; aircraft alone cannot capture it.",
+      "modern_port_defend": "Observe enemy warships blockading a developed port and reducing its income. Respond with your navy, end the blockade, and verify that the port income actually recovers.",
+      "modern_port_develop": "Open an owned major port, pay for Development and wait for completion. Its level and actual income must rise together; blockade or damage may delay the income gain.",
+      "modern_regions": "Inspect the selected independent region: its controller is unique. Shared parent country does not grant an alliance. Check the region's real area and any disclosed exception.",
+      "modern_select": "Choose an owned unit marker with left click/tap or drag a selection box. The selection counter must become positive.",
+      "modern_stop": "Give a new move order, then press Stop or Cancel while it is active. Completion waits for the simulation to acknowledge an idle force."
+    }
+  },
+  "modern_v2": {
+    "adaptation": "Climate adaptation",
+    "ai_all_enhanced": "All modern AI use decision profiles; individual low/medium/high levels follow the shown weights.",
+    "ai_level": {
+      "high": "High",
+      "low": "Low",
+      "medium": "Medium"
+    },
+    "ai_plan": "Active operations {operations} · next decision in {seconds}s · target {target}",
+    "ai_weight": {
+      "high": "High AI weight",
+      "low": "Low AI weight",
+      "medium": "Medium AI weight"
+    },
+    "ai_weights_hint": "Weights assign low/medium/high AI independently by seed. Defaults 1:1:1. No difficulty adds people, income or damage. At least one weight must be positive.",
+    "area": "Geographic area: {area} km²",
+    "area_exception": "Area exception",
+    "area_exception_reason": {
+      "administrative": "This grouping preserves administrative boundaries and connected territory but falls outside the usual area range.",
+      "component_area": "The area of this disconnected landmass cannot be divided entirely into regions within the usual range.",
+      "isolated": "This island or detached territory remains independent rather than joining distant regions merely to reach the target area.",
+      "parent_area": "The country's total area cannot be divided entirely into regions within the usual range."
+    },
+    "area_source_details": "Original area report and adjustment",
+    "army_reserve": "Uncommitted army reserve: {troops}",
+    "base_choice": "Sortie base",
+    "branch": {
+      "air": "Air force",
+      "army": "Army",
+      "navy": "Navy"
+    },
+    "checking_path": "Checking the actual simulation route…",
+    "climate": {
+      "arid": "Arid",
+      "continental": "Continental",
+      "polar": "Polar",
+      "temperate": "Temperate",
+      "tropical": "Tropical"
+    },
+    "climate_legend": "Yellow arid · green tropical · blue temperate · purple continental · white polar. Historical climate distribution; terrain and temporary weather are separate.",
+    "climate_overlay": "Climate overlay",
+    "command_sent": "Order sent; watch the unit's acknowledged state.",
+    "commands": "Modern military commands",
+    "common_start": "Common start: {population} people · {gold} gold · {army} army personnel. These are game values, independent of actual national population.",
+    "confirm_preview": "Review the route and risk, then confirm. A preview is not a guaranteed victory.",
+    "country_info": "Country info / diplomacy",
+    "develop_port": "Develop: {cost} · nominal +{increase}/s",
+    "fair": "All humans and AI start with the chosen common population, money and manpower rules. Land pixels do not increase population capacity or income. Individual AI levels change decisions without resource or damage bonuses. Each region commands its own forces; shared parent country grants no automatic alliance. No gray tribes. Every objective uses the displayed time limit as a fallback.",
+    "fill_empty_slots": "Fill empty invitation slots with AI at start",
+    "goal": {
+      "air_defense": "Securing airspace and intercepting",
+      "air_support": "Providing air support",
+      "attack": "Preparing a ground offensive",
+      "blockade": "Blockading a major port",
+      "defense": "Strengthening defenses",
+      "economy": "Growing the economy",
+      "recover": "Recovering and regrouping"
+    },
+    "ground_preview": "Estimated single-tile ground exchange: attacker loss {attacker}, defender loss {defender}, defender climate {defenderClimate}%, relative climate modifier {ratio}%. Fronts and reinforcements may change the outcome.",
+    "independent_region": "Independent region",
+    "initial_population": "Common starting population N0 (every faction)",
+    "input_hint": "Left select · right preview · Shift queue · Alt+drag pan",
+    "invite": "Create an invitation room",
+    "keys": "Modern key settings",
+    "kind": {
+      "airbase": "Airbase",
+      "army": "Army group",
+      "fighter": "Fighter squadron",
+      "strike": "Strike squadron",
+      "warship": "Warship"
+    },
+    "landlocked": "No owned major port. Industry and land trade still support your economy.",
+    "ledger": "Civilian {civilian} · available {available} · army {army} · navy {navy} · air {air} · dead {dead}. Military personnel are included in total population, not additional people.",
+    "major_ports": "Major ports",
+    "map_sources": "Map sources and licenses",
+    "minimize": "Minimize or show command controls",
+    "no_target": "None",
+    "no_units": "No eligible units selected. Choose a unit marker or the unit list.",
+    "nuclear_launch_notice": "On actual launch: {seconds} game seconds of income -{economy}%, replenishment -{replenishment}%, diplomatic trust -{trust}. Interception does not remove responsibility. One MIRV launch counts once; repeated launches stack up to the caps.",
+    "nuclear_status": "Nuclear responsibility: income −{economy}%, replenishment −{replenishment}%; last penalty expires in {seconds} game seconds. One MIRV launch counts once.",
+    "operation": {
+      "air_superiority": "Air superiority",
+      "attack": "Attack",
+      "auto": "Context order",
+      "blockade": "Blockade",
+      "cancel": "Cancel / retreat",
+      "escort": "Escort",
+      "intercept": "Intercept",
+      "move": "Move",
+      "patrol": "Patrol",
+      "stop": "Stop",
+      "strike": "Ground / port strike",
+      "wait": "Wait"
+    },
+    "operation_label": "Military operation",
+    "parent_country": "Parent country",
+    "participant_slots": "Invitation participant slots",
+    "paused_commands": "The game is paused. Your preview is kept. Resume the game, then execute the command.",
+    "phase": {
+      "attacking": "Attacking",
+      "destroyed": "Destroyed",
+      "engaging": "Engaging",
+      "idle": "Idle",
+      "moving": "Moving",
+      "outbound": "Outbound",
+      "rearming": "Rearming",
+      "returning": "Returning"
+    },
+    "population": "Population",
+    "port_choice": "Owned major port",
+    "port_status": "Level {level} · income {income}/s · damage {damage}% · blockading fleets {blockades}",
+    "preview": "ETA ≈ {seconds}s · air radius {range} tiles · risk {risk} · climate efficiency {efficiency}%",
+    "preview_unavailable": "Route check failed. Wait for the worker to respond and try again.",
+    "production_hint": "Production uses the shared manpower ledger. Aircraft need an owned airbase; warships need a usable port.",
+    "production_sent": "Production order sent; personnel, gold and base capacity are checked by the simulation.",
+    "queue_preview": "This is a Shift queued order. Air routes and ETA start from the base after the previous sortie returns and rearms; actual waiting time is additional. Routes and targets are checked again when the order executes.",
+    "rearm": "Ready again in {seconds}s",
+    "reason": {
+      "airbase_unavailable": "Airbase is destroyed, captured or unavailable. Use an owned operating base.",
+      "aircraft_already_sortied": "Aircraft are already on a mission. Wait for return or cancel.",
+      "aircraft_rearming": "Aircraft are resupplying. Wait for the displayed cooldown.",
+      "army_requires_land_transport": "Army needs passable land. Use a transport landing order to cross sea.",
+      "command_queue_full": "Order queue is full. Cancel or wait for a mission to finish.",
+      "escort_target_lost": "The escorted owned transport is gone or its mission has ended. Select an active owned transport again.",
+      "fighter_cannot_ground_strike": "Fighters intercept aircraft and contest airspace. Select a strike squadron for ground targets.",
+      "friendly_or_protected_target": "Target is friendly or under protection. Move on your own land or wait for protection to end.",
+      "front_changed": "The front changed. Review a new target.",
+      "insufficient_gold": "Not enough gold. Restore income and retry.",
+      "insufficient_manpower": "Not enough available personnel. Wait for training or reassign manpower.",
+      "insufficient_upkeep": "Not enough gold for aircraft upkeep. Restore income before more sorties.",
+      "invalid_target": "Choose a valid map tile.",
+      "navy_requires_navigable_water": "Navy needs connected navigable water or a valid coast.",
+      "no_owned_land_path": "No owned land route within the search budget. Move closer or use transport.",
+      "no_personnel": "This unit has no personnel. Replace losses before ordering it.",
+      "no_reachable_landing": "No reachable landing shore near the target.",
+      "no_transport_departure": "No legal departure coast for transport.",
+      "no_water_path": "No water route. Choose a target in the connected sea.",
+      "not_force_owner": "You can command only your own forces.",
+      "out_of_map": "Target is outside the map.",
+      "outside_air_range": "Target is beyond the base's operating radius. Build a nearer base.",
+      "path_terrain_changed": "Terrain changed along the route. Review the route again.",
+      "port_unavailable": "Own and restore an eligible major port before developing it.",
+      "retreat_requested": "Retreat requested; committed troops return through the normal retreat rules.",
+      "strike_cannot_intercept": "Strike aircraft attack ground and ports. Select fighters for interception.",
+      "target_changed": "Target ownership changed; the mission was reconsidered.",
+      "training_unavailable": "Check the current training, adaptation and funds. Finish the active training before starting another.",
+      "unknown": "The order is unavailable in this state.",
+      "waiting": "Unit is waiting for new orders.",
+      "warship_unavailable": "Warship is missing, captured or inactive. Build an owned ship at a port.",
+      "water_component_disconnected": "That sea is disconnected from the fleet's water region.",
+      "wrong_branch_mission": "This mission belongs to a different branch or aircraft kind."
+    },
+    "repair_port": "Repair port · {cost} gold, {seconds}s",
+    "risk": {
+      "high": "high",
+      "low": "low",
+      "uncertain": "uncertain"
+    },
+    "role": {
+      "human": "Human commander",
+      "invited-slot": "Invitation-slot AI",
+      "world": "World AI"
+    },
+    "ruleset": "Scenario rules",
+    "ruleset_legacy": "Original modern world v1",
+    "ruleset_new": "Independent regions · equal population · army/navy/air",
+    "scope": "{count} independent factions on a {width}×{height} world. Geographic area and population rules are separate from screen tiles.",
+    "select_all": "Select this branch",
+    "select_units": "Select units with left click or drag; right click to preview a command.",
+    "selected": "{count} selected",
+    "slot_roles": "Invitation-slot AI and unselected world rulers are labeled separately. Each faction has one controller; humans reserve a faction before starting.",
+    "split_policy": "Countries above 1.2M km² are grouped along administrative boundaries, aiming for 0.8–1.2M km² per independent region. Smaller countries remain intact. Exceptions are disclosed; shared nationality gives no automatic alliance.",
+    "touch_target": "Tap target mode",
+    "train_action": "Train: {cost} gold · {seconds}s",
+    "train_climate": "Climate to train",
+    "training_remaining": "Completes in {seconds} game seconds",
+    "transport_preview": "The blue route is the transport and landing leg. Enemy warships can intercept it."
+  }
+}

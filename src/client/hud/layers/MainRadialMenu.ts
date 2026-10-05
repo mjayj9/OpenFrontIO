@@ -38,6 +38,8 @@ export class MainRadialMenu implements Controller {
   private chatIntegration: ChatIntegration;
 
   private clickedTile: TileRef | null = null;
+  private initialized = false;
+  private disposed = false;
 
   getTickIntervalMs() {
     return 500;
@@ -81,45 +83,56 @@ export class MainRadialMenu implements Controller {
   }
 
   init() {
+    if (this.initialized || this.disposed) return;
+    this.initialized = true;
     this.radialMenu.init();
-    this.eventBus.on(ContextMenuEvent, (event) => {
-      const worldCoords = this.transformHandler.screenToWorldCoordinates(
-        event.x,
-        event.y,
-      );
-      if (!this.game.isValidCoord(worldCoords.x, worldCoords.y)) {
-        return;
-      }
-      const clickedTile = this.game.ref(worldCoords.x, worldCoords.y);
-      this.clickedTile = clickedTile;
-
-      // Spectators (replay, dead, pre-spawn): skip the action radial and open
-      // the read-only PlayerPanel directly when right-clicking on a player.
-      if (this.game.isSpectator()) {
-        if (this.game.owner(clickedTile).isPlayer()) {
-          this.playerPanel.show(emptyPlayerActions(), clickedTile);
-        }
-        return;
-      }
-
-      const myPlayer = this.game.myPlayer();
-      if (myPlayer === null) return;
-      myPlayer
-        .actions(clickedTile)
-        .then((actions) => {
-          this.updatePlayerActions(
-            myPlayer,
-            actions,
-            clickedTile,
-            event.x,
-            event.y,
-          );
-        })
-        .catch((error) => {
-          console.warn("Failed to load radial menu actions:", error);
-        });
-    });
+    this.eventBus.on(ContextMenuEvent, this.onContextMenu);
   }
+
+  dispose() {
+    this.disposed = true;
+    this.eventBus.off(ContextMenuEvent, this.onContextMenu);
+    this.radialMenu.dispose();
+    this.clickedTile = null;
+  }
+
+  private readonly onContextMenu = (event: ContextMenuEvent) => {
+    const worldCoords = this.transformHandler.screenToWorldCoordinates(
+      event.x,
+      event.y,
+    );
+    if (!this.game.isValidCoord(worldCoords.x, worldCoords.y)) {
+      return;
+    }
+    const clickedTile = this.game.ref(worldCoords.x, worldCoords.y);
+    this.clickedTile = clickedTile;
+
+    // Spectators (replay, dead, pre-spawn): skip the action radial and open
+    // the read-only PlayerPanel directly when right-clicking on a player.
+    if (this.game.isSpectator()) {
+      if (this.game.owner(clickedTile).isPlayer()) {
+        this.playerPanel.show(emptyPlayerActions(), clickedTile);
+      }
+      return;
+    }
+
+    const myPlayer = this.game.myPlayer();
+    if (myPlayer === null) return;
+    myPlayer
+      .actions(clickedTile)
+      .then((actions) => {
+        this.updatePlayerActions(
+          myPlayer,
+          actions,
+          clickedTile,
+          event.x,
+          event.y,
+        );
+      })
+      .catch((error) => {
+        console.warn("Failed to load radial menu actions:", error);
+      });
+  };
 
   private async updatePlayerActions(
     myPlayer: PlayerView,
@@ -128,6 +141,7 @@ export class MainRadialMenu implements Controller {
     screenX: number | null = null,
     screenY: number | null = null,
   ) {
+    if (this.disposed) return;
     this.buildMenu.playerBuildables = actions.buildableUnits;
 
     const tileOwner = this.game.owner(tile);
@@ -175,6 +189,7 @@ export class MainRadialMenu implements Controller {
   }
 
   async tick() {
+    if (this.disposed) return;
     if (!this.radialMenu.isMenuVisible() || this.clickedTile === null) return;
     const myPlayer = this.game.myPlayer();
     if (myPlayer === null) return;

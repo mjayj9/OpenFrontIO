@@ -1,0 +1,2739 @@
+{
+  "rulesVersion": "fair-2-uniform-half-loot-cheats-disabled-shared-protection",
+  "protectionTicks": 0,
+  "method": "Equal 60000 starting troops, fair economy/combat rules, two 5000-tile halves of Plains, all structures/weapons/alliances disabled, Hard reaction difficulty, 6000-tick cap; 30 seeds x swapped starts, tribe controllers. Draws are unfinished at the cap. Losses are troop conservation (combat + retreat), not a classification of unnecessary loss. No-op means an attack execution becomes inactive on its first tick; successful immediate cancellation can also meet that definition.",
+  "controller": "tribe",
+  "node": "v24.15.0",
+  "seeds": 30,
+  "firstSeed": 30,
+  "games": 60,
+  "enhancedWins": 48,
+  "classicWins": 12,
+  "draws": 0,
+  "enhancedWinRate": 0.8,
+  "summary": {
+    "enhanced": {
+      "survivalTicks": 1796.1,
+      "lostTroops": 1642479.9726878533,
+      "netTiles": 3000,
+      "earnedGold": 179510,
+      "conquestGold": 71113.33333333333,
+      "goldAtEnd": 213340,
+      "commands": 17.333333333333332,
+      "noOpCommands": 0.03333333333333333
+    },
+    "classic": {
+      "survivalTicks": 1796.1,
+      "lostTroops": 1635679.753508898,
+      "netTiles": -3000,
+      "earnedGold": 179510,
+      "conquestGold": 18641.666666666668,
+      "goldAtEnd": 55925,
+      "commands": 12.016666666666667,
+      "noOpCommands": 0
+    }
+  },
+  "heapUsedBytesAtEnd": 104770208,
+  "rows": [
+    {
+      "seed": 30,
+      "swapped": false,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 1559,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot30_2",
+          "survivalTicks": 1559,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1470721,
+          "occupationEfficiency": 0.003399693711662469,
+          "workerGoldEarned": 155800,
+          "conquestGoldEarned": 77900,
+          "goldAtEnd": 233700,
+          "attackCommands": 14,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot30_0",
+          "survivalTicks": 1559,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1423145,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 155800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 8,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1559,
+        "totalMs": 77.51019999999937,
+        "meanMs": 0.049717896087235,
+        "p50Ms": 0.017600000000015825,
+        "p95Ms": 0.14550000000002683,
+        "p99Ms": 0.46119999999996253,
+        "maxMs": 3.679299999999955,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 30,
+      "swapped": true,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 1559,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot30_2",
+          "survivalTicks": 1559,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1470075,
+          "occupationEfficiency": 0.0034011876482157267,
+          "workerGoldEarned": 155800,
+          "conquestGoldEarned": 77900,
+          "goldAtEnd": 233700,
+          "attackCommands": 14,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot30_0",
+          "survivalTicks": 1559,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1423409,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 155800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 8,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1559,
+        "totalMs": 49.4916999999993,
+        "meanMs": 0.031745798588838546,
+        "p50Ms": 0.01290000000000191,
+        "p95Ms": 0.10449999999997317,
+        "p99Ms": 0.20029999999997017,
+        "maxMs": 0.7491999999999734,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 31,
+      "swapped": false,
+      "personality": "expansionist",
+      "winner": "enhanced",
+      "ticks": 1777,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot31_2",
+          "survivalTicks": 1777,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1628135,
+          "occupationEfficiency": 0.003070999293468979,
+          "workerGoldEarned": 177600,
+          "conquestGoldEarned": 88800,
+          "goldAtEnd": 266400,
+          "attackCommands": 18,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot31_0",
+          "survivalTicks": 1777,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1519980,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 177600,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 8,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1777,
+        "totalMs": 56.1937999999999,
+        "meanMs": 0.031622847495779344,
+        "p50Ms": 0.017500000000040927,
+        "p95Ms": 0.09849999999994452,
+        "p99Ms": 0.2194000000000642,
+        "maxMs": 1.0229000000000497,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 31,
+      "swapped": true,
+      "personality": "expansionist",
+      "winner": "enhanced",
+      "ticks": 1777,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot31_2",
+          "survivalTicks": 1777,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1628222,
+          "occupationEfficiency": 0.0030708337470463,
+          "workerGoldEarned": 177600,
+          "conquestGoldEarned": 88800,
+          "goldAtEnd": 266400,
+          "attackCommands": 18,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot31_0",
+          "survivalTicks": 1777,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1520009,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 177600,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 8,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1777,
+        "totalMs": 46.48099999999886,
+        "meanMs": 0.026157006190207572,
+        "p50Ms": 0.016200000000026193,
+        "p95Ms": 0.07740000000001146,
+        "p99Ms": 0.14260000000001583,
+        "maxMs": 0.3389000000000806,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 32,
+      "swapped": false,
+      "personality": "expansionist",
+      "winner": "classic",
+      "ticks": 1358,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot32_0",
+          "survivalTicks": 1358,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1104534,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 135700,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot32_2",
+          "survivalTicks": 1358,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1109089,
+          "occupationEfficiency": 0.004508205712939611,
+          "workerGoldEarned": 135700,
+          "conquestGoldEarned": 67850,
+          "goldAtEnd": 203550,
+          "attackCommands": 8,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1358,
+        "totalMs": 42.49410000000046,
+        "meanMs": 0.03129167893961742,
+        "p50Ms": 0.015899999999987813,
+        "p95Ms": 0.10469999999997981,
+        "p99Ms": 0.2154000000000451,
+        "maxMs": 1.009999999999991,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 32,
+      "swapped": true,
+      "personality": "expansionist",
+      "winner": "classic",
+      "ticks": 1358,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot32_0",
+          "survivalTicks": 1358,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1105466,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 135700,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot32_2",
+          "survivalTicks": 1358,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1110834,
+          "occupationEfficiency": 0.004501120934467545,
+          "workerGoldEarned": 135700,
+          "conquestGoldEarned": 67850,
+          "goldAtEnd": 203550,
+          "attackCommands": 8,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1358,
+        "totalMs": 38.12740000000292,
+        "meanMs": 0.02807614138439096,
+        "p50Ms": 0.015300000000024738,
+        "p95Ms": 0.09920000000010987,
+        "p99Ms": 0.15840000000002874,
+        "maxMs": 0.9642999999999802,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 33,
+      "swapped": false,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 1632,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot33_0",
+          "survivalTicks": 1632,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1495010,
+          "occupationEfficiency": 0.0033444593343500847,
+          "workerGoldEarned": 163100,
+          "conquestGoldEarned": 81550,
+          "goldAtEnd": 244650,
+          "attackCommands": 16,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot33_2",
+          "survivalTicks": 1632,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1500431,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 163100,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1632,
+        "totalMs": 36.05500000000234,
+        "meanMs": 0.022092524509805353,
+        "p50Ms": 0.0072000000000116415,
+        "p95Ms": 0.07519999999999527,
+        "p99Ms": 0.12020000000006803,
+        "maxMs": 0.9084000000000287,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 33,
+      "swapped": true,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 1632,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot33_0",
+          "survivalTicks": 1632,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1495472,
+          "occupationEfficiency": 0.0033434265448398295,
+          "workerGoldEarned": 163100,
+          "conquestGoldEarned": 81550,
+          "goldAtEnd": 244650,
+          "attackCommands": 16,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot33_2",
+          "survivalTicks": 1632,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1501959,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 163100,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1632,
+        "totalMs": 34.00569999999993,
+        "meanMs": 0.020836825980392115,
+        "p50Ms": 0.0072999999999865395,
+        "p95Ms": 0.07180000000005293,
+        "p99Ms": 0.11450000000002092,
+        "maxMs": 0.36980000000005475,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 34,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "classic",
+      "ticks": 2009,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot34_2",
+          "survivalTicks": 2009,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1722205,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 200800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot34_0",
+          "survivalTicks": 2009,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1880576,
+          "occupationEfficiency": 0.0026587605238238394,
+          "workerGoldEarned": 200800,
+          "conquestGoldEarned": 100400,
+          "goldAtEnd": 301200,
+          "attackCommands": 23,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2009,
+        "totalMs": 33.84159999999849,
+        "meanMs": 0.01684499751119885,
+        "p50Ms": 0.006300000000010186,
+        "p95Ms": 0.05739999999991596,
+        "p99Ms": 0.10800000000006094,
+        "maxMs": 0.8087000000000444,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 34,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "classic",
+      "ticks": 2009,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot34_2",
+          "survivalTicks": 2009,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1722205,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 200800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot34_0",
+          "survivalTicks": 2009,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1880576,
+          "occupationEfficiency": 0.0026587605238238394,
+          "workerGoldEarned": 200800,
+          "conquestGoldEarned": 100400,
+          "goldAtEnd": 301200,
+          "attackCommands": 23,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2009,
+        "totalMs": 31.071399999999244,
+        "meanMs": 0.01546610253857603,
+        "p50Ms": 0.006099999999946704,
+        "p95Ms": 0.05099999999993088,
+        "p99Ms": 0.10350000000005366,
+        "maxMs": 0.9102000000000317,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 35,
+      "swapped": false,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 2021,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot35_1",
+          "survivalTicks": 2021,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1908535,
+          "occupationEfficiency": 0.002619810860519994,
+          "workerGoldEarned": 202000,
+          "conquestGoldEarned": 101000,
+          "goldAtEnd": 303000,
+          "attackCommands": 18,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot35_0",
+          "survivalTicks": 2021,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1878820,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 202000,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 12,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2021,
+        "totalMs": 39.438799999999446,
+        "meanMs": 0.01951449777337924,
+        "p50Ms": 0.007099999999923057,
+        "p95Ms": 0.0625,
+        "p99Ms": 0.11159999999995307,
+        "maxMs": 0.8120000000000118,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 35,
+      "swapped": true,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 2026,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot35_1",
+          "survivalTicks": 2026,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1910199,
+          "occupationEfficiency": 0.002617528550344958,
+          "workerGoldEarned": 202500,
+          "conquestGoldEarned": 101250,
+          "goldAtEnd": 303750,
+          "attackCommands": 18,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot35_0",
+          "survivalTicks": 2026,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1880675,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 202500,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 12,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2026,
+        "totalMs": 36.5868000000022,
+        "meanMs": 0.018058637709774037,
+        "p50Ms": 0.005400000000008731,
+        "p95Ms": 0.0603000000000975,
+        "p99Ms": 0.10940000000005057,
+        "maxMs": 1.0276000000000067,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 36,
+      "swapped": false,
+      "personality": "naval",
+      "winner": "enhanced",
+      "ticks": 1577,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot36_0",
+          "survivalTicks": 1577,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1490922,
+          "occupationEfficiency": 0.003353630134879679,
+          "workerGoldEarned": 157600,
+          "conquestGoldEarned": 78800,
+          "goldAtEnd": 236400,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot36_2",
+          "survivalTicks": 1577,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1404370,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 157600,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 7,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1577,
+        "totalMs": 28.51499999999544,
+        "meanMs": 0.01808180088775868,
+        "p50Ms": 0.009299999999939246,
+        "p95Ms": 0.05700000000001637,
+        "p99Ms": 0.09170000000005984,
+        "maxMs": 0.24529999999992924,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 36,
+      "swapped": true,
+      "personality": "naval",
+      "winner": "enhanced",
+      "ticks": 1577,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot36_0",
+          "survivalTicks": 1577,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1491155,
+          "occupationEfficiency": 0.003353105963593766,
+          "workerGoldEarned": 157600,
+          "conquestGoldEarned": 78800,
+          "goldAtEnd": 236400,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot36_2",
+          "survivalTicks": 1577,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1404431,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 157600,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 7,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1577,
+        "totalMs": 29.954200000001947,
+        "meanMs": 0.018994419784401997,
+        "p50Ms": 0.009200000000078035,
+        "p95Ms": 0.057699999999840657,
+        "p99Ms": 0.11149999999997817,
+        "maxMs": 0.7660999999999376,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 37,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1771,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot37_2",
+          "survivalTicks": 1771,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1665676,
+          "occupationEfficiency": 0.0030017850137054507,
+          "workerGoldEarned": 177000,
+          "conquestGoldEarned": 88500,
+          "goldAtEnd": 265500,
+          "attackCommands": 16,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot37_0",
+          "survivalTicks": 1771,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1650419,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 177000,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 10,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1771,
+        "totalMs": 29.77710000000343,
+        "meanMs": 0.016813721061549085,
+        "p50Ms": 0.005200000000058935,
+        "p95Ms": 0.05989999999997053,
+        "p99Ms": 0.09040000000004511,
+        "maxMs": 0.6770999999998821,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 37,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1770,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot37_2",
+          "survivalTicks": 1770,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1665361,
+          "occupationEfficiency": 0.0030023518167044535,
+          "workerGoldEarned": 176900,
+          "conquestGoldEarned": 88450,
+          "goldAtEnd": 265350,
+          "attackCommands": 16,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot37_0",
+          "survivalTicks": 1770,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1650798,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 176900,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 10,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1770,
+        "totalMs": 28.693700000004583,
+        "meanMs": 0.016211129943505414,
+        "p50Ms": 0.004999999999881766,
+        "p95Ms": 0.05629999999996471,
+        "p99Ms": 0.09120000000007167,
+        "maxMs": 0.7869000000000597,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 38,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 2426,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot38_2",
+          "survivalTicks": 2426,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2228884,
+          "occupationEfficiency": 0.0022432753518674526,
+          "workerGoldEarned": 242500,
+          "conquestGoldEarned": 121250,
+          "goldAtEnd": 363750,
+          "attackCommands": 25,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot38_0",
+          "survivalTicks": 2426,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 2271815,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 242500,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 19,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2426,
+        "totalMs": 38.545599999997876,
+        "meanMs": 0.015888540807913385,
+        "p50Ms": 0.005099999999856664,
+        "p95Ms": 0.0624000000000251,
+        "p99Ms": 0.09360000000015134,
+        "maxMs": 0.8160000000000309,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 38,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 2429,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot38_2",
+          "survivalTicks": 2429,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2228932,
+          "occupationEfficiency": 0.0022432263734061863,
+          "workerGoldEarned": 242800,
+          "conquestGoldEarned": 121400,
+          "goldAtEnd": 364200,
+          "attackCommands": 25,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot38_0",
+          "survivalTicks": 2429,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 2272270,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 242800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 19,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2429,
+        "totalMs": 37.52040000000193,
+        "meanMs": 0.015446850555785067,
+        "p50Ms": 0.004900000000134241,
+        "p95Ms": 0.056300000000192085,
+        "p99Ms": 0.09590000000002874,
+        "maxMs": 0.8125,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 39,
+      "swapped": false,
+      "personality": "naval",
+      "winner": "enhanced",
+      "ticks": 1243,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot39_0",
+          "survivalTicks": 1243,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1160582,
+          "occupationEfficiency": 0.004308182878143393,
+          "workerGoldEarned": 124200,
+          "conquestGoldEarned": 62100,
+          "goldAtEnd": 186300,
+          "attackCommands": 11,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot39_2",
+          "survivalTicks": 1243,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1085489,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 124200,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 5,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1243,
+        "totalMs": 20.617500000000746,
+        "meanMs": 0.01658688656476327,
+        "p50Ms": 0.009000000000014552,
+        "p95Ms": 0.05209999999988213,
+        "p99Ms": 0.07650000000012369,
+        "maxMs": 0.11940000000004147,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 39,
+      "swapped": true,
+      "personality": "naval",
+      "winner": "enhanced",
+      "ticks": 1242,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot39_0",
+          "survivalTicks": 1242,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1161360,
+          "occupationEfficiency": 0.004305297496113274,
+          "workerGoldEarned": 124100,
+          "conquestGoldEarned": 62050,
+          "goldAtEnd": 186150,
+          "attackCommands": 11,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot39_2",
+          "survivalTicks": 1242,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1085560,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 124100,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 5,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1242,
+        "totalMs": 21.716099999999187,
+        "meanMs": 0.017484782608694998,
+        "p50Ms": 0.008900000000039654,
+        "p95Ms": 0.05209999999988213,
+        "p99Ms": 0.09020000000009532,
+        "maxMs": 0.7047999999999774,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 40,
+      "swapped": false,
+      "personality": "naval",
+      "winner": "enhanced",
+      "ticks": 2090,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot40_0",
+          "survivalTicks": 2090,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1918655,
+          "occupationEfficiency": 0.0026059926261310274,
+          "workerGoldEarned": 208900,
+          "conquestGoldEarned": 104450,
+          "goldAtEnd": 313350,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot40_2",
+          "survivalTicks": 2090,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1889296,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 208900,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 16,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2090,
+        "totalMs": 27.40659999999798,
+        "meanMs": 0.013113205741625828,
+        "p50Ms": 0.00479999999993197,
+        "p95Ms": 0.04719999999997526,
+        "p99Ms": 0.08159999999998035,
+        "maxMs": 0.17219999999997526,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 40,
+      "swapped": true,
+      "personality": "naval",
+      "winner": "enhanced",
+      "ticks": 2089,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot40_0",
+          "survivalTicks": 2089,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1919053,
+          "occupationEfficiency": 0.002605451430223469,
+          "workerGoldEarned": 208800,
+          "conquestGoldEarned": 104400,
+          "goldAtEnd": 313200,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot40_2",
+          "survivalTicks": 2089,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1889332,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 208800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 16,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2089,
+        "totalMs": 26.738400000000638,
+        "meanMs": 0.012799617041647027,
+        "p50Ms": 0.004599999999982174,
+        "p95Ms": 0.04610000000002401,
+        "p99Ms": 0.07979999999997744,
+        "maxMs": 0.2299000000000433,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 41,
+      "swapped": false,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 1901,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot41_3",
+          "survivalTicks": 1901,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1787199,
+          "occupationEfficiency": 0.002797673950577357,
+          "workerGoldEarned": 190000,
+          "conquestGoldEarned": 95000,
+          "goldAtEnd": 285000,
+          "attackCommands": 17,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot41_0",
+          "survivalTicks": 1901,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1736882,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 190000,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 10,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1901,
+        "totalMs": 33.012200000000576,
+        "meanMs": 0.017365702261967687,
+        "p50Ms": 0.004899999999906868,
+        "p95Ms": 0.053200000000060754,
+        "p99Ms": 0.09529999999995198,
+        "maxMs": 2.3743000000001757,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 41,
+      "swapped": true,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 1905,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot41_3",
+          "survivalTicks": 1905,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1770280,
+          "occupationEfficiency": 0.002824412035325874,
+          "workerGoldEarned": 190400,
+          "conquestGoldEarned": 95200,
+          "goldAtEnd": 285600,
+          "attackCommands": 17,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot41_0",
+          "survivalTicks": 1905,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1747373,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 190400,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 10,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1905,
+        "totalMs": 28.671000000000276,
+        "meanMs": 0.015050393700787546,
+        "p50Ms": 0.004600000000209548,
+        "p95Ms": 0.0501000000001568,
+        "p99Ms": 0.08470000000011169,
+        "maxMs": 0.4477999999999156,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 42,
+      "swapped": false,
+      "personality": "expansionist",
+      "winner": "classic",
+      "ticks": 1225,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot42_0",
+          "survivalTicks": 1225,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 940447,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 122400,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 16,
+          "noOpAttackCommands": 1
+        },
+        {
+          "id": "bot42_3",
+          "survivalTicks": 1225,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1022818,
+          "occupationEfficiency": 0.00488845382452294,
+          "workerGoldEarned": 122400,
+          "conquestGoldEarned": 61200,
+          "goldAtEnd": 183600,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1225,
+        "totalMs": 19.752100000000837,
+        "meanMs": 0.016124163265306805,
+        "p50Ms": 0.005400000000008731,
+        "p95Ms": 0.05869999999981701,
+        "p99Ms": 0.11309999999980391,
+        "maxMs": 0.24099999999998545,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 42,
+      "swapped": true,
+      "personality": "expansionist",
+      "winner": "classic",
+      "ticks": 1226,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot42_0",
+          "survivalTicks": 1226,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 942137,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 122500,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 16,
+          "noOpAttackCommands": 1
+        },
+        {
+          "id": "bot42_3",
+          "survivalTicks": 1226,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1024633,
+          "occupationEfficiency": 0.004879795769427219,
+          "workerGoldEarned": 122500,
+          "conquestGoldEarned": 61250,
+          "goldAtEnd": 183750,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1226,
+        "totalMs": 20.209300000004532,
+        "meanMs": 0.016483931484506144,
+        "p50Ms": 0.005699999999933425,
+        "p95Ms": 0.06109999999989668,
+        "p99Ms": 0.08670000000006439,
+        "maxMs": 0.6274999999998272,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 43,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1616,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot43_1",
+          "survivalTicks": 1616,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1506645,
+          "occupationEfficiency": 0.0033186319585762096,
+          "workerGoldEarned": 161500,
+          "conquestGoldEarned": 80750,
+          "goldAtEnd": 242250,
+          "attackCommands": 13,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot43_0",
+          "survivalTicks": 1616,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1492604,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 161500,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 8,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1616,
+        "totalMs": 24.546299999998155,
+        "meanMs": 0.015189542079206779,
+        "p50Ms": 0.004599999999982174,
+        "p95Ms": 0.05079999999998108,
+        "p99Ms": 0.07970000000000255,
+        "maxMs": 0.5217000000000098,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 43,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1616,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot43_1",
+          "survivalTicks": 1616,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1507043,
+          "occupationEfficiency": 0.0033177551340856396,
+          "workerGoldEarned": 161500,
+          "conquestGoldEarned": 80750,
+          "goldAtEnd": 242250,
+          "attackCommands": 13,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot43_0",
+          "survivalTicks": 1616,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1492948,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 161500,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 8,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1616,
+        "totalMs": 23.857100000005403,
+        "meanMs": 0.014763056930696412,
+        "p50Ms": 0.004599999999982174,
+        "p95Ms": 0.0523000000000593,
+        "p99Ms": 0.09259999999994761,
+        "maxMs": 0.13769999999999527,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 44,
+      "swapped": false,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 2031,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot44_0",
+          "survivalTicks": 2031,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1900765,
+          "occupationEfficiency": 0.0026305201458859716,
+          "workerGoldEarned": 203000,
+          "conquestGoldEarned": 101500,
+          "goldAtEnd": 304500,
+          "attackCommands": 18,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot44_1",
+          "survivalTicks": 2031,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1863595,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 203000,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 11,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2031,
+        "totalMs": 28.202500000004193,
+        "meanMs": 0.013886016740523975,
+        "p50Ms": 0.00430000000005748,
+        "p95Ms": 0.04780000000005202,
+        "p99Ms": 0.07580000000007203,
+        "maxMs": 0.4193000000000211,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 44,
+      "swapped": true,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 2021,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot44_0",
+          "survivalTicks": 2021,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1882665,
+          "occupationEfficiency": 0.0026558099394831426,
+          "workerGoldEarned": 202000,
+          "conquestGoldEarned": 101000,
+          "goldAtEnd": 303000,
+          "attackCommands": 18,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot44_1",
+          "survivalTicks": 2021,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1881409,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 202000,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 11,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2021,
+        "totalMs": 29.27790000000141,
+        "meanMs": 0.014486838198912126,
+        "p50Ms": 0.003500000000030923,
+        "p95Ms": 0.05099999999993088,
+        "p99Ms": 0.08629999999993743,
+        "maxMs": 0.6558999999999742,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 45,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1920,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot45_0",
+          "survivalTicks": 1920,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1803231,
+          "occupationEfficiency": 0.0027728003926566413,
+          "workerGoldEarned": 191900,
+          "conquestGoldEarned": 95950,
+          "goldAtEnd": 287850,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot45_1",
+          "survivalTicks": 1920,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1753267,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 191900,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 10,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1920,
+        "totalMs": 25.168000000003076,
+        "meanMs": 0.013108333333334936,
+        "p50Ms": 0.0036000000000058208,
+        "p95Ms": 0.048199999999951615,
+        "p99Ms": 0.07359999999994216,
+        "maxMs": 0.49689999999986867,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 45,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1920,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot45_0",
+          "survivalTicks": 1920,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1803604,
+          "occupationEfficiency": 0.002772227519804278,
+          "workerGoldEarned": 191900,
+          "conquestGoldEarned": 95950,
+          "goldAtEnd": 287850,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot45_1",
+          "survivalTicks": 1920,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1753724,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 191900,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 10,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1920,
+        "totalMs": 24.14900000000148,
+        "meanMs": 0.012577604166667438,
+        "p50Ms": 0.003400000000056025,
+        "p95Ms": 0.04690000000005057,
+        "p99Ms": 0.06999999999993634,
+        "maxMs": 0.6702000000000226,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 46,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 2109,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot46_1",
+          "survivalTicks": 2109,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1966413,
+          "occupationEfficiency": 0.0025427012174679907,
+          "workerGoldEarned": 210800,
+          "conquestGoldEarned": 105400,
+          "goldAtEnd": 316200,
+          "attackCommands": 20,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot46_0",
+          "survivalTicks": 2109,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1970674,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 210800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 14,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2109,
+        "totalMs": 29.12329999999838,
+        "meanMs": 0.013809056424845131,
+        "p50Ms": 0.004500000000007276,
+        "p95Ms": 0.04469999999992069,
+        "p99Ms": 0.07510000000002037,
+        "maxMs": 0.5157999999998992,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 46,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 2194,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot46_1",
+          "survivalTicks": 2194,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2065732,
+          "occupationEfficiency": 0.002420449447609849,
+          "workerGoldEarned": 219300,
+          "conquestGoldEarned": 109650,
+          "goldAtEnd": 328950,
+          "attackCommands": 22,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot46_0",
+          "survivalTicks": 2194,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 2057929,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 219300,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2194,
+        "totalMs": 32.666400000000294,
+        "meanMs": 0.014888969917958201,
+        "p50Ms": 0.0047000000001844455,
+        "p95Ms": 0.048800000000028376,
+        "p99Ms": 0.07709999999997308,
+        "maxMs": 0.18609999999989668,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 47,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1761,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot47_1",
+          "survivalTicks": 1761,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1655336,
+          "occupationEfficiency": 0.0030205346511552617,
+          "workerGoldEarned": 176000,
+          "conquestGoldEarned": 88000,
+          "goldAtEnd": 264000,
+          "attackCommands": 14,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot47_0",
+          "survivalTicks": 1761,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1619849,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 176000,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1761,
+        "totalMs": 27.66050000000132,
+        "meanMs": 0.015707268597388597,
+        "p50Ms": 0.005300000000033833,
+        "p95Ms": 0.0524000000000342,
+        "p99Ms": 0.09590000000002874,
+        "maxMs": 1.6156999999998334,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 47,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1762,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot47_1",
+          "survivalTicks": 1762,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1655613,
+          "occupationEfficiency": 0.003020030065868032,
+          "workerGoldEarned": 176100,
+          "conquestGoldEarned": 88050,
+          "goldAtEnd": 264150,
+          "attackCommands": 14,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot47_0",
+          "survivalTicks": 1762,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1620594,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 176100,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1762,
+        "totalMs": 26.447100000000773,
+        "meanMs": 0.015009704880817692,
+        "p50Ms": 0.005499999999983629,
+        "p95Ms": 0.051300000000082946,
+        "p99Ms": 0.07919999999990068,
+        "maxMs": 0.1853000000000975,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 48,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1799,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot48_0",
+          "survivalTicks": 1799,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1711925,
+          "occupationEfficiency": 0.002920689219737578,
+          "workerGoldEarned": 179800,
+          "conquestGoldEarned": 89900,
+          "goldAtEnd": 269700,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot48_1",
+          "survivalTicks": 1799,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1677189,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 179800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1799,
+        "totalMs": 30.63709999999378,
+        "meanMs": 0.017030072262364523,
+        "p50Ms": 0.008299999999962893,
+        "p95Ms": 0.05019999999990432,
+        "p99Ms": 0.07629999999994652,
+        "maxMs": 0.7596999999998388,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 48,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1798,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot48_0",
+          "survivalTicks": 1798,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1711019,
+          "occupationEfficiency": 0.00292223584496876,
+          "workerGoldEarned": 179700,
+          "conquestGoldEarned": 89850,
+          "goldAtEnd": 269550,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot48_1",
+          "survivalTicks": 1798,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1676152,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 179700,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1798,
+        "totalMs": 27.77599999999552,
+        "meanMs": 0.015448275862066473,
+        "p50Ms": 0.006499999999959982,
+        "p95Ms": 0.04750000000012733,
+        "p99Ms": 0.07909999999992579,
+        "maxMs": 0.16039999999998145,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 49,
+      "swapped": false,
+      "personality": "naval",
+      "winner": "classic",
+      "ticks": 1989,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot49_1",
+          "survivalTicks": 1989,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1704950,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 198800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot49_0",
+          "survivalTicks": 1989,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1807985,
+          "occupationEfficiency": 0.00276550901555805,
+          "workerGoldEarned": 198800,
+          "conquestGoldEarned": 99400,
+          "goldAtEnd": 298200,
+          "attackCommands": 17,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1989,
+        "totalMs": 30.921999999992977,
+        "meanMs": 0.015546505781796368,
+        "p50Ms": 0.0061000000000603904,
+        "p95Ms": 0.05060000000003129,
+        "p99Ms": 0.08969999999999345,
+        "maxMs": 0.2138999999999669,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 49,
+      "swapped": true,
+      "personality": "naval",
+      "winner": "classic",
+      "ticks": 1989,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot49_1",
+          "survivalTicks": 1989,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1705041,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 198800,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot49_0",
+          "survivalTicks": 1989,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1807975,
+          "occupationEfficiency": 0.0027655246533632833,
+          "workerGoldEarned": 198800,
+          "conquestGoldEarned": 99400,
+          "goldAtEnd": 298200,
+          "attackCommands": 17,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1989,
+        "totalMs": 27.51950000000238,
+        "meanMs": 0.013835847159377768,
+        "p50Ms": 0.004899999999906868,
+        "p95Ms": 0.044100000000071304,
+        "p99Ms": 0.07099999999991269,
+        "maxMs": 0.7958000000000993,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 50,
+      "swapped": false,
+      "personality": "diplomatic",
+      "winner": "classic",
+      "ticks": 2295,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot50_2",
+          "survivalTicks": 2295,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1981689,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 229400,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 25,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot50_0",
+          "survivalTicks": 2295,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2110075,
+          "occupationEfficiency": 0.00236958444928527,
+          "workerGoldEarned": 229400,
+          "conquestGoldEarned": 114700,
+          "goldAtEnd": 344100,
+          "attackCommands": 25,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2295,
+        "totalMs": 25.314999999999372,
+        "meanMs": 0.011030501089324345,
+        "p50Ms": 0.00430000000005748,
+        "p95Ms": 0.03520000000003165,
+        "p99Ms": 0.06759999999985666,
+        "maxMs": 0.16239999999993415,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 50,
+      "swapped": true,
+      "personality": "diplomatic",
+      "winner": "classic",
+      "ticks": 2294,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot50_2",
+          "survivalTicks": 2294,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1979218,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 229300,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 25,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot50_0",
+          "survivalTicks": 2294,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2108377,
+          "occupationEfficiency": 0.002371492754019624,
+          "workerGoldEarned": 229300,
+          "conquestGoldEarned": 114650,
+          "goldAtEnd": 343950,
+          "attackCommands": 25,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2294,
+        "totalMs": 25.033200000000534,
+        "meanMs": 0.010912467306015926,
+        "p50Ms": 0.004200000000082582,
+        "p95Ms": 0.03489999999987958,
+        "p99Ms": 0.05919999999991887,
+        "maxMs": 0.8180999999999585,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 51,
+      "swapped": false,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 1246,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot51_0",
+          "survivalTicks": 1246,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1165964,
+          "occupationEfficiency": 0.004288296252866498,
+          "workerGoldEarned": 124500,
+          "conquestGoldEarned": 62250,
+          "goldAtEnd": 186750,
+          "attackCommands": 11,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot51_2",
+          "survivalTicks": 1246,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1122262,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 124500,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 6,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1246,
+        "totalMs": 18.96880000000192,
+        "meanMs": 0.015223756019263178,
+        "p50Ms": 0.0053999999997813575,
+        "p95Ms": 0.05520000000001346,
+        "p99Ms": 0.08350000000018554,
+        "maxMs": 0.24519999999984066,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 51,
+      "swapped": true,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 1247,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot51_0",
+          "survivalTicks": 1247,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1165821,
+          "occupationEfficiency": 0.004288822241975995,
+          "workerGoldEarned": 124600,
+          "conquestGoldEarned": 62300,
+          "goldAtEnd": 186900,
+          "attackCommands": 11,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot51_2",
+          "survivalTicks": 1247,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1122423,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 124600,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 6,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1247,
+        "totalMs": 19.346899999994548,
+        "meanMs": 0.015514755412986806,
+        "p50Ms": 0.005400000000008731,
+        "p95Ms": 0.05559999999991305,
+        "p99Ms": 0.08349999999995816,
+        "maxMs": 0.31130000000007385,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 52,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1655,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot52_0",
+          "survivalTicks": 1655,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1540610,
+          "occupationEfficiency": 0.0032454670351457888,
+          "workerGoldEarned": 165400,
+          "conquestGoldEarned": 82700,
+          "goldAtEnd": 248100,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot52_2",
+          "survivalTicks": 1655,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1536362,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 165400,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 11,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1655,
+        "totalMs": 22.99709999999982,
+        "meanMs": 0.013895528700906235,
+        "p50Ms": 0.00430000000005748,
+        "p95Ms": 0.051899999999932334,
+        "p99Ms": 0.08960000000001855,
+        "maxMs": 0.7734000000000378,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 52,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "enhanced",
+      "ticks": 1654,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot52_0",
+          "survivalTicks": 1654,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1540460,
+          "occupationEfficiency": 0.0032457840856440373,
+          "workerGoldEarned": 165300,
+          "conquestGoldEarned": 82650,
+          "goldAtEnd": 247950,
+          "attackCommands": 15,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot52_2",
+          "survivalTicks": 1654,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1535896,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 165300,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 11,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1654,
+        "totalMs": 21.69789999999375,
+        "meanMs": 0.013118440145099003,
+        "p50Ms": 0.003500000000030923,
+        "p95Ms": 0.051400000000057844,
+        "p99Ms": 0.07679999999982101,
+        "maxMs": 0.28899999999998727,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 53,
+      "swapped": false,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 1562,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot53_2",
+          "survivalTicks": 1562,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1444785,
+          "occupationEfficiency": 0.0034607234887630164,
+          "workerGoldEarned": 156100,
+          "conquestGoldEarned": 78050,
+          "goldAtEnd": 234150,
+          "attackCommands": 16,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot53_0",
+          "survivalTicks": 1562,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1436668,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 156100,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1562,
+        "totalMs": 23.629699999993363,
+        "meanMs": 0.015127848911647479,
+        "p50Ms": 0.005000000000109139,
+        "p95Ms": 0.0544999999999618,
+        "p99Ms": 0.08310000000005857,
+        "maxMs": 0.20709999999985484,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 53,
+      "swapped": true,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 1562,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot53_2",
+          "survivalTicks": 1562,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1443294,
+          "occupationEfficiency": 0.0034642966134077807,
+          "workerGoldEarned": 156100,
+          "conquestGoldEarned": 78050,
+          "goldAtEnd": 234150,
+          "attackCommands": 16,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot53_0",
+          "survivalTicks": 1562,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1437245,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 156100,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1562,
+        "totalMs": 24.3567999999957,
+        "meanMs": 0.015593341869395455,
+        "p50Ms": 0.004599999999982174,
+        "p95Ms": 0.05289999999968131,
+        "p99Ms": 0.08390000000008513,
+        "maxMs": 0.7372000000000298,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 54,
+      "swapped": false,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 1336,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot54_0",
+          "survivalTicks": 1336,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1230453,
+          "occupationEfficiency": 0.004063543223917451,
+          "workerGoldEarned": 133500,
+          "conquestGoldEarned": 66750,
+          "goldAtEnd": 200250,
+          "attackCommands": 12,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot54_2",
+          "survivalTicks": 1336,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1186555,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 133500,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 7,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1336,
+        "totalMs": 21.968299999992723,
+        "meanMs": 0.016443338323347847,
+        "p50Ms": 0.005799999999908323,
+        "p95Ms": 0.05639999999993961,
+        "p99Ms": 0.07840000000032887,
+        "maxMs": 0.22689999999965949,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 54,
+      "swapped": true,
+      "personality": "diplomatic",
+      "winner": "enhanced",
+      "ticks": 1337,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot54_0",
+          "survivalTicks": 1337,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1230844,
+          "occupationEfficiency": 0.004062251999352667,
+          "workerGoldEarned": 133600,
+          "conquestGoldEarned": 66800,
+          "goldAtEnd": 200400,
+          "attackCommands": 12,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot54_2",
+          "survivalTicks": 1337,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1186262,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 133600,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 7,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1337,
+        "totalMs": 21.060299999990548,
+        "meanMs": 0.015751907255041546,
+        "p50Ms": 0.005000000000109139,
+        "p95Ms": 0.05349999999998545,
+        "p99Ms": 0.08919999999989159,
+        "maxMs": 0.2474000000001979,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 55,
+      "swapped": false,
+      "personality": "defensive",
+      "winner": "classic",
+      "ticks": 2315,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot55_0",
+          "survivalTicks": 2315,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1991096,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 231400,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot55_2",
+          "survivalTicks": 2315,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2125570,
+          "occupationEfficiency": 0.0023523107218122274,
+          "workerGoldEarned": 231400,
+          "conquestGoldEarned": 115700,
+          "goldAtEnd": 347100,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2315,
+        "totalMs": 25.84960000000001,
+        "meanMs": 0.011166133909287262,
+        "p50Ms": 0.003400000000056025,
+        "p95Ms": 0.03969999999981155,
+        "p99Ms": 0.07199999999966167,
+        "maxMs": 0.7681999999999789,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 55,
+      "swapped": true,
+      "personality": "defensive",
+      "winner": "classic",
+      "ticks": 2315,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot55_0",
+          "survivalTicks": 2315,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1988445,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 231400,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot55_2",
+          "survivalTicks": 2315,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2124071,
+          "occupationEfficiency": 0.0023539708219664406,
+          "workerGoldEarned": 231400,
+          "conquestGoldEarned": 115700,
+          "goldAtEnd": 347100,
+          "attackCommands": 21,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2315,
+        "totalMs": 24.53880000000254,
+        "meanMs": 0.010599913606912544,
+        "p50Ms": 0.0033000000003085006,
+        "p95Ms": 0.03850000000011278,
+        "p99Ms": 0.06779999999980646,
+        "maxMs": 0.15039999999999054,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 56,
+      "swapped": false,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 1457,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot56_2",
+          "survivalTicks": 1457,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1393186,
+          "occupationEfficiency": 0.0035888958244863424,
+          "workerGoldEarned": 145600,
+          "conquestGoldEarned": 72800,
+          "goldAtEnd": 218400,
+          "attackCommands": 13,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot56_0",
+          "survivalTicks": 1457,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1346133,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 145600,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 7,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1457,
+        "totalMs": 22.622999999982767,
+        "meanMs": 0.015527110501017684,
+        "p50Ms": 0.004899999999906868,
+        "p95Ms": 0.0522000000000844,
+        "p99Ms": 0.08559999999988577,
+        "maxMs": 0.17749999999978172,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 56,
+      "swapped": true,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 1458,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot56_2",
+          "survivalTicks": 1458,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1390900,
+          "occupationEfficiency": 0.003594795877302709,
+          "workerGoldEarned": 145700,
+          "conquestGoldEarned": 72850,
+          "goldAtEnd": 218550,
+          "attackCommands": 13,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot56_0",
+          "survivalTicks": 1458,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1346589,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 145700,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 7,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1458,
+        "totalMs": 23.48900000000185,
+        "meanMs": 0.01611042524005614,
+        "p50Ms": 0.005199999999604188,
+        "p95Ms": 0.05150000000003274,
+        "p99Ms": 0.07659999999987122,
+        "maxMs": 0.8043999999999869,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 57,
+      "swapped": false,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 2645,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot57_2",
+          "survivalTicks": 2645,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2466970,
+          "occupationEfficiency": 0.002026777733698654,
+          "workerGoldEarned": 264400,
+          "conquestGoldEarned": 132200,
+          "goldAtEnd": 396600,
+          "attackCommands": 27,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot57_0",
+          "survivalTicks": 2645,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 2502662,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 264400,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 24,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2645,
+        "totalMs": 33.10929999999644,
+        "meanMs": 0.012517693761813399,
+        "p50Ms": 0.004500000000007276,
+        "p95Ms": 0.04579999999987194,
+        "p99Ms": 0.07450000000017099,
+        "maxMs": 0.1797999999998865,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 57,
+      "swapped": true,
+      "personality": "economic",
+      "winner": "enhanced",
+      "ticks": 2642,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot57_2",
+          "survivalTicks": 2642,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 2464796,
+          "occupationEfficiency": 0.0020285656687827895,
+          "workerGoldEarned": 264100,
+          "conquestGoldEarned": 132050,
+          "goldAtEnd": 396150,
+          "attackCommands": 27,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot57_0",
+          "survivalTicks": 2642,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 2500933,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 264100,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 24,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2642,
+        "totalMs": 34.48419999999396,
+        "meanMs": 0.013052308856924285,
+        "p50Ms": 0.004399999999805004,
+        "p95Ms": 0.04859999999962383,
+        "p99Ms": 0.07690000000002328,
+        "maxMs": 0.8802000000000589,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 58,
+      "swapped": false,
+      "personality": "naval",
+      "winner": "enhanced",
+      "ticks": 1391,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot58_0",
+          "survivalTicks": 1391,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1315308,
+          "occupationEfficiency": 0.0038013902800945088,
+          "workerGoldEarned": 139000,
+          "conquestGoldEarned": 69500,
+          "goldAtEnd": 208500,
+          "attackCommands": 14,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot58_2",
+          "survivalTicks": 1391,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1235736,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 139000,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1391,
+        "totalMs": 19.373300000011113,
+        "meanMs": 0.013927606038828982,
+        "p50Ms": 0.0048000000001593435,
+        "p95Ms": 0.044200000000273576,
+        "p99Ms": 0.07640000000037617,
+        "maxMs": 0.19880000000011933,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 58,
+      "swapped": true,
+      "personality": "naval",
+      "winner": "enhanced",
+      "ticks": 1391,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot58_0",
+          "survivalTicks": 1391,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1315224,
+          "occupationEfficiency": 0.003801634464231876,
+          "workerGoldEarned": 139000,
+          "conquestGoldEarned": 69500,
+          "goldAtEnd": 208500,
+          "attackCommands": 14,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot58_2",
+          "survivalTicks": 1391,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1235542,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 139000,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 9,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 1391,
+        "totalMs": 18.575499999995827,
+        "meanMs": 0.013354061826021443,
+        "p50Ms": 0.004500000000007276,
+        "p95Ms": 0.04469999999992069,
+        "p99Ms": 0.07009999999991123,
+        "maxMs": 0.22339999999985594,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 59,
+      "swapped": false,
+      "personality": "expansionist",
+      "winner": "enhanced",
+      "ticks": 2126,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot59_0",
+          "survivalTicks": 2126,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1943853,
+          "occupationEfficiency": 0.0025722108208976456,
+          "workerGoldEarned": 212500,
+          "conquestGoldEarned": 106250,
+          "goldAtEnd": 318750,
+          "attackCommands": 26,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot59_5",
+          "survivalTicks": 2126,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1850137,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 212500,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 19,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2126,
+        "totalMs": 28.93990000000167,
+        "meanMs": 0.01361237064910709,
+        "p50Ms": 0.005799999999908323,
+        "p95Ms": 0.04239999999981592,
+        "p99Ms": 0.06889999999975771,
+        "maxMs": 0.7984999999998763,
+        "overBudget": 0,
+        "slowest": []
+      }
+    },
+    {
+      "seed": 59,
+      "swapped": true,
+      "personality": "expansionist",
+      "winner": "enhanced",
+      "ticks": 2125,
+      "stalledTicks": 1,
+      "metrics": [
+        {
+          "id": "bot59_0",
+          "survivalTicks": 2125,
+          "netTiles": 5000,
+          "combatAndRetreatTroopsLost": 1944481,
+          "occupationEfficiency": 0.0025713805242454316,
+          "workerGoldEarned": 212400,
+          "conquestGoldEarned": 106200,
+          "goldAtEnd": 318600,
+          "attackCommands": 26,
+          "noOpAttackCommands": 0
+        },
+        {
+          "id": "bot59_5",
+          "survivalTicks": 2125,
+          "netTiles": -5000,
+          "combatAndRetreatTroopsLost": 1850407,
+          "occupationEfficiency": 0,
+          "workerGoldEarned": 212400,
+          "conquestGoldEarned": 0,
+          "goldAtEnd": 0,
+          "attackCommands": 19,
+          "noOpAttackCommands": 0
+        }
+      ],
+      "tickTiming": {
+        "count": 2125,
+        "totalMs": 27.77280000000792,
+        "meanMs": 0.013069552941180198,
+        "p50Ms": 0.005200000000058935,
+        "p95Ms": 0.04250000000001819,
+        "p99Ms": 0.07289999999966312,
+        "maxMs": 0.18200000000024374,
+        "overBudget": 0,
+        "slowest": []
+      }
+    }
+  ]
+}

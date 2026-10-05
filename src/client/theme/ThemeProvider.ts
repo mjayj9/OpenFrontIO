@@ -1,7 +1,14 @@
 import { Colord, colord, LabaColor } from "colord";
+import { aiProfile } from "../../core/ai/AIProfile";
 import { ColoredTeams, PlayerType, Team } from "../../core/game/Game";
+import type { PlayerUpdate } from "../../core/game/GameUpdates";
+import {
+  modernFactionPlayerId,
+  modernFactions,
+} from "../../core/game/ModernRegions";
+import { modernPlayerId, modernWorld } from "../../core/game/ModernWorld";
 import { UserSettings } from "../../core/game/UserSettings";
-import { simpleHash } from "../../core/Util";
+import type { GameConfig } from "../../core/Schemas";
 import { PALETTE_NAMES } from "../render/gl/GraphicsOverrides";
 import {
   createThemeSettings,
@@ -9,7 +16,7 @@ import {
   ThemeSettings,
 } from "../render/gl/RenderSettings";
 import { PlayerView } from "../view";
-import { ColorAllocator } from "./ColorAllocator";
+import { ColorAllocator, ColorRegistry } from "./ColorAllocator";
 
 /**
  * The color surface consumed by PlayerView and HUD components. Built from
@@ -36,7 +43,7 @@ export interface Theme {
  */
 function generateTeamColors(baseColor: Colord): Colord[] {
   const lch = baseColor.toLch();
-  const colorCount = 64;
+  const colorCount = 400;
   const goldenAngle = 137.508;
 
   return Array.from({ length: colorCount }, (_, index) => {
@@ -85,6 +92,13 @@ export class SettingsTheme implements Theme {
   private classicBotColorAllocator: ColorAllocator;
   private teamPalettes: Map<Team, Colord[]>;
   private teamPlayerColors = new Map<string, Colord>();
+  private teamAllocators = new Map<Team, ColorAllocator>();
+  private enhancedColorAllocator: ColorAllocator;
+  private neighborIds: ReadonlyMap<string, readonly string[]> = new Map();
+
+  setNeighborIds(neighbors: ReadonlyMap<string, readonly string[]>): void {
+    this.neighborIds = neighbors;
+  }
 
   /**
    * When true, teamless tribes draw from the classic (pre-v34) bot pool
@@ -102,11 +116,27 @@ export class SettingsTheme implements Theme {
     const classicBotColors = settings.classicBotColors.map(colord);
     const fallbackColors = settings.fallbackColors.map(colord);
 
-    this.humanColorAllocator = new ColorAllocator(humanColors, fallbackColors);
-    this.nationColorAllocator = new ColorAllocator(nationColors, nationColors);
+    const registry = new ColorRegistry([colord(settings.teamColors.Bot)]);
+    this.humanColorAllocator = new ColorAllocator(
+      humanColors,
+      fallbackColors,
+      registry,
+    );
+    this.nationColorAllocator = new ColorAllocator(
+      nationColors,
+      fallbackColors,
+      registry,
+    );
+    this.enhancedColorAllocator = new ColorAllocator(
+      humanColors,
+      fallbackColors,
+      registry,
+    );
     this.classicBotColorAllocator = new ColorAllocator(
       classicBotColors,
       classicBotColors,
+      new ColorRegistry(),
+      true,
     );
     this.teamPalettes = buildTeamPalettes(settings);
 
@@ -135,13 +165,20 @@ export class SettingsTheme implements Theme {
 
   /** Stable per-player variation within a team's color set. */
   teamColorForPlayer(team: Team, playerId: string): Colord {
-    const cached = this.teamPlayerColors.get(playerId);
+    const key = team + ":" + playerId;
+    const cached = this.teamPlayerColors.get(key);
     if (cached !== undefined) {
       return cached;
     }
     const colors = this.teamColorVariations(team);
-    const color = colors[simpleHash(playerId) % colors.length];
-    this.teamPlayerColors.set(playerId, color);
+    let allocator = this.teamAllocators.get(team);
+    if (!allocator) {
+      allocator = new ColorAllocator(colors, colors, new ColorRegistry());
+      this.teamAllocators.set(team, allocator);
+    }
+    const color =
+      team === ColoredTeams.Bot ? colors[0] : allocator.assignColor(playerId);
+    this.teamPlayerColors.set(key, color);
     return color;
   }
 
@@ -152,11 +189,25 @@ export class SettingsTheme implements Theme {
    */
   territoryColor(player: PlayerView): Colord {
     const team = player.team();
-    if (team !== null) {
+    // The logical Bot team is a neutral grouping, not one human team hue.
+    // Enhanced tribes keep their Bot outline/label while receiving unique fills.
+    if (
+      team !== null &&
+      !(team === ColoredTeams.Bot && player.enhancedAI?.())
+    ) {
       return this.teamColorForPlayer(team, player.id());
     }
+    if (player.enhancedAI?.()) {
+      return this.enhancedColorAllocator.assignColor(
+        player.id(),
+        this.neighborIds.get(player.id()),
+      );
+    }
     if (player.type() === PlayerType.Human) {
-      return this.humanColorAllocator.assignColor(player.id());
+      return this.humanColorAllocator.assignColor(
+        player.id(),
+        this.neighborIds.get(player.id()),
+      );
     }
     if (player.type() === PlayerType.Bot) {
       if (this.useClassicBotColors) {
@@ -165,7 +216,10 @@ export class SettingsTheme implements Theme {
       // Tribes use the same palette in every mode: the flat Bot team color.
       return this.teamColorForPlayer(ColoredTeams.Bot, player.id());
     }
-    return this.nationColorAllocator.assignColor(player.id());
+    return this.nationColorAllocator.assignColor(
+      player.id(),
+      this.neighborIds.get(player.id()),
+    );
   }
 
   /**
@@ -181,25 +235,18 @@ export class SettingsTheme implements Theme {
     // Calculate the contrast of the two provided colors
     let contrast = this.contrast(lightLAB, darkLAB);
 
-    // Don't want excessive contrast, so incrementally increase contrast within a loop.
-    // Define target values, looping limits, and loop counter
-    const loopLimit = 10; // Switch from darkening border to lightening fill if loopLimit is reached
-    const maxIterations = 50; // maximum number of loops allowed, throw error above this limit
+    // Bound adjustment work. Holding LAB chroma can saturate the sRGB gamut,
+    // so changing only lightness cannot always reach the desired difference.
+    const loopLimit = 10; // Switch from darkening border to lightening fill
+    const maxIterations = 50;
     const contrastTarget = this.settings.structureContrastTarget;
     let loopCount = 0;
 
     // Adjust luminance by 5 in each iteration. This is a balance between speed and not overdoing contrast changes.
     const luminanceChange = 5;
 
-    while (contrast < contrastTarget) {
-      if (loopCount > maxIterations) {
-        // Prevent runaway loops
-        console.warn(`Infinite loop detected during structure color calculation.
-          Light color: ${colord(lightLAB).toRgbString()},
-          Dark color: ${colord(darkLAB).toRgbString()},
-          Contrast: ${contrast}`);
-        break;
-      } else if (loopCount > loopLimit) {
+    while (contrast < contrastTarget && loopCount < maxIterations) {
+      if (loopCount > loopLimit) {
         // Increase the light color once the loop limit is reached (probably
         // because the dark color is already as dark as it can get).
         lightLAB.l = this.clamp(lightLAB.l + luminanceChange);
@@ -213,10 +260,19 @@ export class SettingsTheme implements Theme {
       contrast = this.contrast(lightLAB, darkLAB);
       loopCount++;
     }
+    if (contrast < contrastTarget) {
+      // A neutral pair avoids gamut saturation without changing territory or
+      // border palettes. Preserve each existing alpha; this metric ignores
+      // compositing and does not establish rendered WCAG contrast.
+      return {
+        light: colord("#ffffff").alpha(lightLAB.alpha),
+        dark: colord("#000000").alpha(darkLAB.alpha),
+      };
+    }
     return { light: colord(lightLAB), dark: colord(darkLAB) };
   }
 
-  /** Perceptual (CIE76 delta-E) distance between two LAB colors. */
+  /** Normalized CIEDE2000 difference (colord.delta); alpha is ignored. */
   private contrast(first: LabaColor, second: LabaColor): number {
     return colord(first).delta(colord(second));
   }
@@ -285,6 +341,12 @@ class ThemeProvider {
     return theme;
   }
 
+  /** Preallocate new identities in stable order without changing view/map iteration. */
+  preparePlayers(players: PlayerUpdate[], config?: GameConfig): void {
+    for (const theme of Object.values(this.themes))
+      prepareThemePlayers(theme, players, config);
+  }
+
   /**
    * Recreate the themes so their colour allocators start empty. Call once per
    * game — matches the previous per-`Config` theme lifecycle and prevents
@@ -292,6 +354,65 @@ class ThemeProvider {
    */
   reset(): void {
     this.themes = createThemes();
+  }
+}
+
+// Generated neighbors come from horizontal/vertical ownership-tile edges.
+// Map ISO country identities to stable controller ids once, never scan terrain.
+const countryPlayers = new Map(
+  modernWorld.countries.map((country) => [country.id, modernPlayerId(country)]),
+);
+const modernNeighbors: ReadonlyMap<string, readonly string[]> = new Map(
+  modernWorld.countries.map((country) => [
+    modernPlayerId(country),
+    country.neighbors.map((id) => countryPlayers.get(id)!).sort(),
+  ]),
+);
+const noNeighbors: ReadonlyMap<string, readonly string[]> = new Map();
+const factionPlayers = new Map(
+  modernFactions.map((faction) => [faction.id, modernFactionPlayerId(faction)]),
+);
+const regionNeighbors: ReadonlyMap<string, readonly string[]> = new Map(
+  modernFactions.map((faction) => [
+    modernFactionPlayerId(faction),
+    faction.neighbors.map((id) => factionPlayers.get(id)!).sort(),
+  ]),
+);
+
+/** Shared live/replay initial allocation; preserves simulation dictionary order. */
+export function prepareThemePlayers(
+  theme: Theme,
+  players: readonly Pick<PlayerUpdate, "id" | "playerType" | "team">[],
+  config?: GameConfig,
+): void {
+  if (theme instanceof SettingsTheme)
+    theme.setNeighborIds(
+      config?.modernMode?.scenario === "modern-regions-v2"
+        ? regionNeighbors
+        : config?.modernMode
+          ? modernNeighbors
+          : noNeighbors,
+    );
+  // Humans/nations exist before tribes spawn. Keep the same class order
+  // when reconnect/restore presents every identity in one full update.
+  const order = (p: Pick<PlayerUpdate, "playerType">) =>
+    p.playerType === PlayerType.Human
+      ? 0
+      : p.playerType === PlayerType.Nation
+        ? 1
+        : 2;
+  const sorted = [...players].sort(
+    (a, b) => order(a) - order(b) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+  );
+  for (const p of sorted) {
+    if (p.playerType === undefined) continue;
+    theme.territoryColor({
+      id: () => p.id,
+      team: () => p.team ?? null,
+      type: () => p.playerType!,
+      enhancedAI: () =>
+        config ? aiProfile(config, p.id, p.playerType!) : null,
+    } as unknown as PlayerView);
   }
 }
 

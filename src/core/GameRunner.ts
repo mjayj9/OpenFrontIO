@@ -2,8 +2,10 @@ import { placeName, placeSpawnName } from "../client/hud/NameBoxCalculator";
 import { Config } from "./configuration/Config";
 import { DoomsdayClockExecution } from "./execution/DoomsdayClockExecution";
 import { Executor } from "./execution/ExecutionManager";
+import { ModernWorldExecution } from "./execution/ModernWorldExecution";
 import { RecomputeRailClusterExecution } from "./execution/RecomputeRailClusterExecution";
 import { SpawnTimerExecution } from "./execution/SpawnTimerExecution";
+import { TrainingExecution } from "./execution/TrainingExecution";
 import { WinCheckExecution } from "./execution/WinCheckExecution";
 import {
   AllPlayers,
@@ -22,12 +24,19 @@ import {
   PlayerType,
   UnitType,
 } from "./game/Game";
-import { createGame } from "./game/GameImpl";
+import { createGame, GameImpl } from "./game/GameImpl";
 import { TileRef } from "./game/GameMap";
 import { GameMapLoader } from "./game/GameMapLoader";
 import { ErrorUpdate, GameUpdateViewData } from "./game/GameUpdates";
+import {
+  modernEntries,
+  modernHumanCountryIds,
+  modernPlayerInfo,
+  validateModernStart,
+} from "./game/ModernWorld";
 import { createNationsForGame } from "./game/NationCreation";
 import { loadTerrainMap as loadGameMap } from "./game/TerrainMapLoader";
+import { modernAssignmentsFor } from "./modern/ModernAssignments";
 import { PseudoRandom } from "./PseudoRandom";
 import { ClientID, GameStartInfo, Turn } from "./Schemas";
 import {
@@ -44,6 +53,9 @@ export async function createGameRunner(
   callBack: (gu: GameUpdateViewData | ErrorUpdate) => void,
 ): Promise<GameRunner> {
   const config = new Config(gameStart.config, null, false, gameStart.listed);
+  validateModernStart(gameStart);
+  if (gameStart.config.modernMode?.scenario === "modern-regions-v2")
+    gameStart.modernAssignments ??= modernAssignmentsFor(gameStart);
   const gameMap = await loadGameMap(
     gameStart.config.gameMap,
     gameStart.config.gameMapSize,
@@ -52,19 +64,26 @@ export async function createGameRunner(
     true, // The game mutates its maps; never share them with another game.
   );
   const random = new PseudoRandom(simpleHash(gameStart.gameID));
+  const selectedCountries = gameStart.config.modernMode
+    ? modernHumanCountryIds(gameStart)
+    : undefined;
 
-  const humans = gameStart.players.map((p) => {
-    return new PlayerInfo(
-      p.username,
-      PlayerType.Human,
-      p.clientID,
-      random.nextID(),
-      p.isLobbyCreator ?? false,
-      p.clanTag,
-      p.friends ?? [],
-      p.teamIndex ?? null,
-    );
-  });
+  const humans = gameStart.config.modernMode
+    ? modernEntries(gameStart.config)
+        .filter((country) => selectedCountries!.has(country.id))
+        .map((country) => modernPlayerInfo(country, gameStart))
+    : gameStart.players.map((p) => {
+        return new PlayerInfo(
+          p.username,
+          PlayerType.Human,
+          p.clientID,
+          random.nextID(),
+          p.isLobbyCreator ?? false,
+          p.clanTag,
+          p.friends ?? [],
+          p.teamIndex ?? null,
+        );
+      });
 
   const nations = createNationsForGame(
     gameStart,
@@ -93,7 +112,7 @@ export async function createGameRunner(
     ),
     callBack,
   );
-  gr.init();
+  gr.init(gameStart.modernAssignments);
   return gr;
 }
 
@@ -111,6 +130,8 @@ export async function createGameRunnerFromSnapshot(
   callBack: (gu: GameUpdateViewData | ErrorUpdate) => void,
 ): Promise<GameRunner> {
   const header = readSnapshotHeader(snapshot);
+  if (header.gameConfig.modernMode)
+    validateModernStart({ ...gameStart, config: header.gameConfig });
   const gameMap = await loadGameMap(
     header.gameConfig.gameMap,
     header.gameConfig.gameMapSize,
@@ -167,17 +188,41 @@ export class GameRunner {
     });
   }
 
-  init() {
+  fullViewUpdate(): GameUpdateViewData {
+    const update = (this.game as GameImpl).fullViewUpdate();
+    const names: Record<string, NameViewData> = {};
+    for (const p of this.game.players())
+      names[p.id()] = placeName(this.game, p);
+    update.playerNameViewData = names;
+    return update;
+  }
+
+  init(assignments?: GameStartInfo["modernAssignments"]) {
+    const training = this.game.config().gameConfig().training;
+    if (training) {
+      this.game.addExecution(new TrainingExecution());
+    } else if (this.game.config().gameConfig().modernMode) {
+      this.game.addExecution(new ModernWorldExecution(assignments));
+    }
     if (this.game.config().gameConfig().gameType !== GameType.Singleplayer) {
       this.game.addExecution(new SpawnTimerExecution());
     }
-    if (this.game.config().spawnNations()) {
+    if (
+      !training &&
+      this.game.config().spawnNations() &&
+      this.game.config().gameConfig().modernMode?.scenario !==
+        "modern-regions-v2"
+    ) {
       this.game.addExecution(...this.execManager.nationExecutions());
     }
-    if (this.game.config().isRandomSpawn()) {
+    if (
+      this.game.config().isRandomSpawn() &&
+      !training &&
+      !this.game.config().gameConfig().modernMode
+    ) {
       this.game.addExecution(...this.execManager.spawnPlayers());
     }
-    if (this.game.config().bots() > 0) {
+    if (!training && this.game.config().bots() > 0) {
       this.game.addExecution(
         ...this.execManager.spawnTribes(this.game.config().bots()),
       );

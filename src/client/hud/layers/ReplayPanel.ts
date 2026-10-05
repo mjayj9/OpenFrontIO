@@ -30,25 +30,43 @@ export class ReplayPanel extends LitElement implements Controller {
 
   @property({ type: Boolean })
   isSingleplayer = false;
+  private subscribedEventBus: EventBus | null = null;
+  private readonly onShowReplayPanel = (event: ShowReplayPanelEvent) => {
+    this.visible = event.visible;
+    this.isSingleplayer = event.isSingleplayer;
+  };
+  private readonly onReplaySpeedChanged = (event: ReplaySpeedChangeEvent) => {
+    this._replaySpeedMultiplier = event.replaySpeedMultiplier;
+  };
 
   createRenderRoot() {
     return this; // Enable Tailwind CSS
   }
 
   init() {
+    this.dispose();
+    this.isSingleplayer = false;
+    this._replaySpeedMultiplier = defaultReplaySpeedMultiplier;
     if (this.eventBus) {
-      this.eventBus.on(ShowReplayPanelEvent, (event: ShowReplayPanelEvent) => {
-        this.visible = event.visible;
-        this.isSingleplayer = event.isSingleplayer;
-      });
-      this.eventBus.on(
-        ReplaySpeedChangeEvent,
-        (event: ReplaySpeedChangeEvent) => {
-          this._replaySpeedMultiplier = event.replaySpeedMultiplier;
-          this.requestUpdate();
-        },
-      );
+      this.subscribedEventBus = this.eventBus;
+      this.eventBus.on(ShowReplayPanelEvent, this.onShowReplayPanel);
+      this.eventBus.on(ReplaySpeedChangeEvent, this.onReplaySpeedChanged);
     }
+  }
+
+  dispose(): void {
+    this.subscribedEventBus?.off(ShowReplayPanelEvent, this.onShowReplayPanel);
+    this.subscribedEventBus?.off(
+      ReplaySpeedChangeEvent,
+      this.onReplaySpeedChanged,
+    );
+    this.subscribedEventBus = null;
+    this.visible = false;
+  }
+
+  disconnectedCallback() {
+    this.dispose();
+    super.disconnectedCallback();
   }
 
   getTickIntervalMs() {

@@ -70,6 +70,11 @@ export class AttackingTroopsController implements Controller {
   private alternateView = false;
   /** Reused buffer pushed to the view each frame. */
   private labelBuf: AttackTroopLabel[] = [];
+  private rafId: number | null = null;
+  private disposed = false;
+  private readonly onAlternateView = (e: AlternateViewEvent) => {
+    this.alternateView = e.alternateView;
+  };
 
   constructor(
     private readonly game: GameView,
@@ -79,15 +84,24 @@ export class AttackingTroopsController implements Controller {
   ) {}
 
   init() {
-    this.eventBus.on(AlternateViewEvent, (e) => {
-      this.alternateView = e.alternateView;
-    });
+    if (this.disposed || this.rafId !== null) return;
+    this.eventBus.on(AlternateViewEvent, this.onAlternateView);
 
     const drive = () => {
+      if (this.disposed) return;
       this.pushLabels();
-      requestAnimationFrame(drive);
+      this.rafId = requestAnimationFrame(drive);
     };
-    requestAnimationFrame(drive);
+    this.rafId = requestAnimationFrame(drive);
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    this.eventBus.off(AlternateViewEvent, this.onAlternateView);
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+    this.attacks.clear();
+    this.labelBuf = [];
   }
 
   getTickIntervalMs() {
@@ -95,6 +109,7 @@ export class AttackingTroopsController implements Controller {
   }
 
   tick() {
+    if (this.disposed) return;
     if (!this.userSettings.attackingTroopsOverlay() || this.alternateView) {
       if (this.attacks.size > 0) this.attacks.clear();
       return;
@@ -142,6 +157,7 @@ export class AttackingTroopsController implements Controller {
     void myPlayer
       .attackClusteredPositions()
       .then((attacks) => {
+        if (this.disposed) return;
         const now = performance.now();
         for (const { id, positions } of attacks) {
           const entry = this.attacks.get(id);

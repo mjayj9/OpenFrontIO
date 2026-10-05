@@ -3,6 +3,7 @@ import { base64url } from "jose";
 import { PatternDecoder } from "../../core/PatternDecoder";
 import { ClientID, PlayerCosmetics } from "../../core/Schemas";
 import { createRandomName } from "../../core/Util";
+import { aiProfile } from "../../core/ai/AIProfile";
 import {
   BuildableUnit,
   Cell,
@@ -22,11 +23,13 @@ import {
 import { TileRef } from "../../core/game/GameMap";
 import { applyStateUpdate } from "../../core/game/GameUpdateUtils";
 import {
+  AIStatusUpdate,
   AllianceView,
   AttackUpdate,
   PlayerUpdate,
 } from "../../core/game/GameUpdates";
 import { UserSettings } from "../../core/game/UserSettings";
+import { translateText } from "../Utils";
 import { PlayerState, PlayerStatic, PlayerTypeEnum } from "../render/types";
 import { themeProvider } from "../theme/ThemeProvider";
 import { type CosmeticOwner, visibleCosmetics } from "./CosmeticVisibility";
@@ -42,6 +45,18 @@ const EMBARGO_TINT_TARGET = { r: 255, g: 0, b: 0, a: 1 };
 const BORDER_TINT_RATIO = 0.35;
 
 export class PlayerView {
+  modernFaction() {
+    return this.game
+      .modernSystems()
+      ?.factions.find((faction) => faction.playerId === this.id());
+  }
+  private _aiStrategy: AIStatusUpdate | null = null;
+  aiStrategy(): Readonly<AIStatusUpdate> | null {
+    return this._aiStrategy;
+  }
+  updateAIStrategy(status: AIStatusUpdate): void {
+    this._aiStrategy = status;
+  }
   public anonymousName: string | null = null;
   private decoder?: PatternDecoder;
 
@@ -384,15 +399,24 @@ export class PlayerView {
     return this.state.smallID;
   }
 
+  enhancedAI() {
+    const config = this.game.config().gameConfig?.();
+    return config ? aiProfile(config, this.id(), this.type()) : null;
+  }
+
   name(): string {
     return this.anonymousName !== null && userSettings.anonymousNames()
       ? this.anonymousName
       : this.static.name;
   }
   displayName(): string {
-    return this.anonymousName !== null && userSettings.anonymousNames()
-      ? this.anonymousName
-      : this.static.displayName;
+    const name =
+      this.anonymousName !== null && userSettings.anonymousNames()
+        ? this.anonymousName
+        : this.static.displayName;
+    return this.enhancedAI()
+      ? `${name} [${translateText("enhanced_ai.marker")}]`
+      : name;
   }
   clanTag(): string | null {
     return this.anonymousName !== null && userSettings.anonymousNames()

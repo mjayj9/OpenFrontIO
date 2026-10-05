@@ -39,6 +39,7 @@ const NUKE_INBOUND_MESSAGES = new Set<MessageType>([
 ]);
 
 export class SoundEffectController implements Controller {
+  private registered = false;
   private lastMirvHitSoundTick = -Infinity;
   private lastNukeWarningSoundTick = -Infinity;
   private lastTrainStationSoundTick = -Infinity;
@@ -54,9 +55,18 @@ export class SoundEffectController implements Controller {
   ) {}
 
   init(): void {
+    if (this.registered) return;
+    this.registered = true;
     // On the intent, not the sim confirmation: the cue answers the player's
     // click, and re-placing the spawn should sound every time.
     this.eventBus.on(SendSpawnIntentEvent, this.onSpawnIntent);
+  }
+
+  dispose(): void {
+    if (!this.registered) return;
+    this.eventBus.off(SendSpawnIntentEvent, this.onSpawnIntent);
+    this.registered = false;
+    this.hadTrainStation.clear();
   }
 
   private onSpawnIntent = (): void => {

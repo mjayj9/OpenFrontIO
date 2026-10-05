@@ -412,13 +412,17 @@ export function compressSnapshot(bytes: Uint8Array): Promise<Uint8Array> {
   return pipeBytes(bytes, new CompressionStream("gzip"));
 }
 
-export function decompressSnapshot(bytes: Uint8Array): Promise<Uint8Array> {
-  return pipeBytes(bytes, new DecompressionStream("gzip"));
+export function decompressSnapshot(
+  bytes: Uint8Array,
+  maxBytes = Infinity,
+): Promise<Uint8Array> {
+  return pipeBytes(bytes, new DecompressionStream("gzip"), maxBytes);
 }
 
 async function pipeBytes(
   bytes: Uint8Array,
   transform: CompressionStream | DecompressionStream,
+  maxBytes = Infinity,
 ): Promise<Uint8Array> {
   const reader = new ReadableStream<BufferSource>({
     start(controller) {
@@ -433,8 +437,12 @@ async function pipeBytes(
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
-    chunks.push(value);
     length += value.length;
+    if (length > maxBytes) {
+      await reader.cancel();
+      throw new Error("Snapshot exceeds import size limit");
+    }
+    chunks.push(value);
   }
   const out = new Uint8Array(length);
   let offset = 0;

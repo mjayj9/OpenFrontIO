@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { modernFactionState } from "../modern/ModernState";
 import { PseudoRandom } from "../PseudoRandom";
 import { ClientID } from "../Schemas";
 import {
@@ -131,6 +132,9 @@ Object.freeze(EMPTY_ALLIANCE_VIEWS);
 Object.freeze(EMPTY_EMOJIS);
 
 export class PlayerImpl implements Player {
+  modernFaction() {
+    return modernFactionState(this.mg.modernSystems(), this.id());
+  }
   public _lastTileChange: number = 0;
   // Bumped on every ownership change of one of this player's tiles (several
   // can happen within one tick, so the tick alone is not a cache key).
@@ -282,7 +286,7 @@ export class PlayerImpl implements Player {
     return diffPlayerUpdate(prev, full);
   }
 
-  private toFullUpdate(): PlayerUpdate {
+  toFullUpdate(): PlayerUpdate {
     // Empty collections reuse shared singletons (EMPTY_*) so
     // diffPlayerUpdate's reference fast paths hit and nothing is allocated.
     // This runs for every player every tick; most collections are empty for
@@ -1150,6 +1154,18 @@ export class PlayerImpl implements Player {
     const removed = this.removeTroops(troops);
     if (removed === 0) return false;
     recipient.addTroops(removed);
+    const modernFrom = this.modernFaction(),
+      modernTo = recipient.modernFaction();
+    if (modernFrom && modernTo) {
+      const people = Math.min(
+        modernFrom.population.army,
+        Math.floor(removed / 10),
+      );
+      modernFrom.population.army -= people;
+      modernFrom.population.total -= people;
+      modernTo.population.army += people;
+      modernTo.population.total += people;
+    }
 
     this.sentDonations.push(new Donation(recipient, this.mg.ticks()));
     this.mg.addUpdate({
@@ -1905,6 +1921,12 @@ export class PlayerImpl implements Player {
   }
 
   public isImmune(): boolean {
+    if (
+      this.mg.config().gameConfig().enhancedAI?.fairResources ||
+      this.mg.config().gameConfig().modernMode
+    ) {
+      return this.mg.isSpawnImmunityActive();
+    }
     if (this.type() === PlayerType.Human) {
       return this.mg.isSpawnImmunityActive();
     }
@@ -1918,8 +1940,12 @@ export class PlayerImpl implements Player {
     player: Player,
     treatAFKFriendly: boolean = false,
   ): boolean {
-    if (this.type() !== PlayerType.Human) {
-      // Only human attackers respect PVP immunity
+    if (
+      this.type() !== PlayerType.Human &&
+      !this.mg.config().gameConfig().enhancedAI?.fairResources &&
+      !this.mg.config().gameConfig().modernMode
+    ) {
+      // Classic AI attackers retain the existing PVP immunity behavior.
       return !this.isFriendly(player, treatAFKFriendly);
     }
     return !player.isImmune() && !this.isFriendly(player, treatAFKFriendly);

@@ -38,7 +38,7 @@ export class ReplayAppearance {
   constructor(
     /** The replay's player dictionary. Grows as appends arrive. */
     private readonly players: readonly PlayerStatic[],
-    gameStartInfo: GameStartInfo,
+    private readonly gameStartInfo: GameStartInfo,
     private readonly userSettings: UserSettings,
     private readonly spirals: SpiralSink,
   ) {
@@ -120,6 +120,7 @@ export class ReplayAppearance {
       this.players,
       this.cosmetics,
       themeProvider.current(),
+      this.gameStartInfo.config,
     );
   }
 

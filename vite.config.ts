@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import { createHash } from "crypto";
 import fs from "fs";
 import http from "http";
 import { lookup as lookupMime } from "mrmime";
@@ -26,6 +27,25 @@ import {
 // Vite already handles these, but its good practice to define them explicitly
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+function forkBuildHash(): string {
+  const hash = createHash("sha256");
+  const walk = (dir: string): void => {
+    for (const entry of fs
+      .readdirSync(dir, { withFileTypes: true })
+      .sort((a, b) => a.name.localeCompare(b.name))) {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(file);
+      else {
+        hash.update(path.relative(__dirname, file).replace(/\\/g, "/"));
+        hash.update(fs.readFileSync(file));
+      }
+    }
+  };
+  walk(path.join(__dirname, "src"));
+  walk(path.join(__dirname, "zbin"));
+  hash.update(fs.readFileSync(path.join(__dirname, "package-lock.json")));
+  return hash.digest("hex");
+}
 
 // Dev-only: resources/public/ is served at the site root, as the build copies
 // it into static/. Vite's publicDir (resources/) would put it under /public/.
@@ -394,6 +414,7 @@ export default defineConfig(({ mode }) => {
     ],
 
     define: {
+      __FORK_BUILD__: JSON.stringify(forkBuildHash()),
       __ASSET_MANIFEST__: JSON.stringify(assetManifest),
       "process.env.WEBSOCKET_URL": JSON.stringify(
         isProduction ? "" : "localhost:3000",

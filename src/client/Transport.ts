@@ -26,6 +26,7 @@ import {
   ClientPingMessage,
   ClientRejoinMessage,
   ClientReportMessage,
+  ClientSelectCountryMessage,
   ClientSendLiveStatsMessage,
   ClientSendWinnerMessage,
   ClientSpectateMessage,
@@ -34,6 +35,7 @@ import {
   LiveStats,
   ReportReason,
   ServerMessage,
+  ServerModernLobbyStatus,
   Winner,
 } from "../core/Schemas";
 import {
@@ -224,6 +226,27 @@ export class SendToggleGameStartTimer implements GameEvent {
 export class SendSpectateEvent implements GameEvent {
   constructor(public readonly spectator: boolean) {}
 }
+export class SendSelectCountryEvent implements GameEvent {
+  constructor(public readonly countryId: string) {}
+}
+export type ModernIntent = Extract<
+  Intent,
+  {
+    type:
+      | "modern_command"
+      | "modern_produce"
+      | "modern_develop"
+      | "modern_repair"
+      | "modern_train";
+  }
+>;
+/** These commands use the same authenticated intent relay as Classic. */
+export class SendModernIntentEvent implements GameEvent {
+  constructor(public readonly intent: ModernIntent) {}
+}
+export class ModernLobbyStatusEvent implements GameEvent {
+  constructor(public readonly status: ServerModernLobbyStatus) {}
+}
 
 // One-shot marker that this lobby has already sent us to a sibling, so a
 // redirect can never become a bounce.
@@ -365,6 +388,15 @@ export class Transport {
         spectator: e.spectator,
       } satisfies ClientSpectateMessage);
     });
+    this.subscribe(SendSelectCountryEvent, (e) => {
+      this.sendMsg({
+        type: "select_country",
+        countryId: e.countryId,
+      } satisfies ClientSelectCountryMessage);
+    });
+    this.subscribe(SendModernIntentEvent, (event) =>
+      this.sendIntent(event.intent),
+    );
   }
 
   private subscribe<T extends GameEvent>(
@@ -491,6 +523,10 @@ export class Transport {
         );
         if (msg.type === "redirect") {
           this.handlePoolRedirect(msg.gameID);
+          return;
+        }
+        if (msg.type === "modern_lobby_status") {
+          this.eventBus.emit(new ModernLobbyStatusEvent(msg));
           return;
         }
         if (msg.type === "start") {
@@ -699,8 +735,23 @@ export class Transport {
       this.localServer.turnComplete();
     }
   }
+  public withFrozenTurns<T>(
+    work: (
+      turns: import("../core/Schemas").Turn[],
+      paused: boolean,
+    ) => Promise<T>,
+  ): Promise<T> {
+    if (!this.isLocal || this.lobbyConfig.gameRecord)
+      return Promise.reject(
+        new Error("Saving is available in singleplayer only"),
+      );
+    return this.localServer.withFrozenTurns(work);
+  }
 
   async joinGame() {
+    // LocalServer.start supplies the human identity and start message itself;
+    // its join message is unused. Offline practice must not need a play token.
+    if (this.isLocal) return;
     // Only the first join: the token is short-lived, and a later reconnect
     // must not present one that has since expired.
     const token = this.lobbyConfig.creatorToken ?? (await getPlayToken());
@@ -726,7 +777,7 @@ export class Transport {
       gameID: this.lobbyConfig.gameID,
       // Note: clientID is not sent - server looks it up from persistentID in token
       lastTurn: lastTurn,
-      token: await getPlayToken(),
+      token: this.isLocal ? "local" : await getPlayToken(),
       gitCommit: ClientEnv.gitCommit(),
     } satisfies ClientRejoinMessage);
   }

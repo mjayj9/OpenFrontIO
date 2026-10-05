@@ -60,9 +60,7 @@ export class HeadsUpMessage extends LitElement implements Controller {
       "show-message",
       this.handleShowMessage as EventListener,
     );
-    if (this.toastTimeout) {
-      clearTimeout(this.toastTimeout);
-    }
+    this.dispose();
   }
 
   private handleShowMessage = (event: CustomEvent) => {
@@ -88,7 +86,24 @@ export class HeadsUpMessage extends LitElement implements Controller {
   };
 
   init() {
-    this.isVisible = true;
+    this.dispose();
+    this.isPaused = this.game.isPaused();
+    this.tick();
+  }
+
+  dispose(): void {
+    if (this.toastTimeout !== null) {
+      clearTimeout(this.toastTimeout);
+      this.toastTimeout = null;
+    }
+    this.toastMessage = null;
+    this.toastColor = "green";
+    this.isVisible = false;
+    this.isPaused = false;
+    this.isImmunityActive = false;
+    this.isCatchingUp = false;
+    this.catchingUpTicks = 0;
+    this.isOvertimeNotice = false;
     this.requestUpdate();
   }
 

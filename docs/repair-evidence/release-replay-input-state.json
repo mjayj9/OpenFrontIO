@@ -1,0 +1,459 @@
+{
+  "verifiedOn": "2026-10-06",
+  "candidate": {
+    "asset": "index-BQUAIhRR.js",
+    "coreFingerprint": "84bebb823344",
+    "saveBuild": "01021f0de686da860e30a6c96f8a06a16e5771c91d10a30d2a24db95027a5a29",
+    "viewport": "820x900",
+    "entry": "public Main SaveManager import of public UI-exported repair-release-active tick48 record"
+  },
+  "mainButtonHit": {
+    "rect": {
+      "x": 16,
+      "y": 802.6666870117188,
+      "width": 788,
+      "height": 57.333335876464844
+    },
+    "hit": "저장한 싱글플레이 게임",
+    "asset": "http://127.0.0.1:19004/assets/index-BQUAIhRR.js"
+  },
+  "controls": {
+    "table": [
+      "미지정·화면 조작 사용\n                \n                축소\n                \n                  지도로 축소",
+      "미지정·화면 조작 사용\n                \n                확대\n                \n                  지도로 확대",
+      "−\n                \n                축소\n                \n                  지도로 축소",
+      "Num −\n                \n                축소\n                \n                  지도로 축소",
+      "+\n                \n                확대\n                \n                  지도로 확대",
+      "Num +\n                \n                확대\n                \n                  지도로 확대",
+      "[\n                \n                리플레이 이전 프레임\n                \n                  기록된 한 프레임 뒤로 이동합니다. 리플레이는 군사 명령을 받지 않습니다.",
+      "]\n                \n                리플레이 다음 프레임\n                \n                  기록된 한 프레임 앞으로 이동합니다.",
+      "Shift + [\n                \n                리플레이 100프레임 뒤로\n                \n                  기록된 100프레임 뒤로 이동합니다.",
+      "Shift + ]\n                \n                리플레이 100프레임 앞으로\n                \n                  기록된 100프레임 앞으로 이동합니다.",
+      "휠\n                \n                지도 확대·축소\n                \n                  휠을 굴립니다. 터치는 두 손가락으로 벌리거나 모읍니다.",
+      "두 손가락 확대\n                \n                터치 확대·축소\n                \n                  두 손가락을 모으거나 벌려 지도를 확대·축소합니다.",
+      "미지정·화면 조작 사용\n                \n                축소\n                \n                  지도로 축소",
+      "미지정·화면 조작 사용\n                \n                확대\n                \n                  지도로 확대",
+      "−\n                \n                축소\n                \n                  지도로 축소",
+      "Num −\n                \n                축소\n                \n                  지도로 축소",
+      "+\n                \n                확대\n                \n                  지도로 확대",
+      "Num +\n                \n                확대\n                \n                  지도로 확대",
+      "[\n                \n                리플레이 이전 프레임\n                \n                  기록된 한 프레임 뒤로 이동합니다. 리플레이는 군사 명령을 받지 않습니다.",
+      "]\n                \n                리플레이 다음 프레임\n                \n                  기록된 한 프레임 앞으로 이동합니다.",
+      "Shift + [\n                \n                리플레이 100프레임 뒤로\n                \n                  기록된 100프레임 뒤로 이동합니다.",
+      "Shift + ]\n                \n                리플레이 100프레임 앞으로\n                \n                  기록된 100프레임 앞으로 이동합니다.",
+      "휠\n                \n                지도 확대·축소\n                \n                  휠을 굴립니다. 터치는 두 손가락으로 벌리거나 모읍니다.",
+      "두 손가락 확대\n                \n                터치 확대·축소\n                \n                  두 손가락을 모으거나 벌려 지도를 확대·축소합니다."
+    ],
+    "entry": {
+      "frame": 0,
+      "totalFrames": 48,
+      "playing": false,
+      "speed": 1,
+      "url": "http://127.0.0.1:19004/#replay-viewer=MR000001",
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "last": {
+      "frame": 47,
+      "totalFrames": 48,
+      "playing": false,
+      "speed": 1,
+      "url": "http://127.0.0.1:19004/#replay-viewer=MR000001",
+      "mode": "modern",
+      "livePanel": false,
+      "modern": {
+        "factions": 294,
+        "forces": [
+          {
+            "id": "force-1466",
+            "tile": 579706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 36
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 44,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1467",
+            "tile": 581706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 36
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 44,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1469",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          }
+        ]
+      }
+    },
+    "previous": {
+      "frame": 46,
+      "totalFrames": 48,
+      "playing": false,
+      "speed": 1,
+      "url": "http://127.0.0.1:19004/#replay-viewer=MR000001",
+      "mode": "modern",
+      "livePanel": false,
+      "modern": {
+        "factions": 294,
+        "forces": [
+          {
+            "id": "force-1466",
+            "tile": 579706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 36
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 44,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1467",
+            "tile": 581706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 36
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 44,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1469",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          }
+        ]
+      }
+    },
+    "zero": {
+      "frame": 0,
+      "totalFrames": 48,
+      "playing": false,
+      "speed": 1,
+      "url": "http://127.0.0.1:19004/#replay-viewer=MR000001",
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "played": {
+      "frame": 2,
+      "totalFrames": 48,
+      "playing": true,
+      "speed": 1,
+      "url": "http://127.0.0.1:19004/#replay-viewer=MR000001",
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "paused": {
+      "frame": 2,
+      "totalFrames": 48,
+      "playing": false,
+      "speed": 1,
+      "url": "http://127.0.0.1:19004/#replay-viewer=MR000001",
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "final": {
+      "frame": 47,
+      "totalFrames": 48,
+      "playing": false,
+      "speed": 1,
+      "url": "http://127.0.0.1:19004/#replay-viewer=MR000001",
+      "mode": "modern",
+      "livePanel": false,
+      "modern": {
+        "factions": 294,
+        "forces": [
+          {
+            "id": "force-1466",
+            "tile": 579706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 36
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 44,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1467",
+            "tile": 581706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 36
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 44,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1469",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          }
+        ]
+      }
+    }
+  },
+  "recordedCoordinates": {
+    "last": {
+      "frame": 47,
+      "playing": false,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579706,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 36
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 44,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ]
+        },
+        {
+          "id": "force-1467",
+          "tile": 581706,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 36
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 44,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ]
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": []
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": []
+        }
+      ]
+    },
+    "beforeOrder": {
+      "frame": 33,
+      "playing": false,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 577705,
+          "phase": "idle",
+          "command": null,
+          "queue": []
+        },
+        {
+          "id": "force-1467",
+          "tile": 579705,
+          "phase": "idle",
+          "command": null,
+          "queue": []
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": []
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": []
+        }
+      ]
+    },
+    "restored": {
+      "frame": 47,
+      "playing": false,
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579706,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 36
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 44,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ]
+        },
+        {
+          "id": "force-1467",
+          "tile": 581706,
+          "phase": "moving",
+          "command": {
+            "kind": "move",
+            "target": 587718,
+            "issuedTick": 36
+          },
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 44,
+              "previewPath": [
+                587718, 585718, 585717, 585716, 585715, 585714, 585713, 583713,
+                583712, 583711
+              ]
+            }
+          ]
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": []
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "phase": "idle",
+          "command": null,
+          "queue": []
+        }
+      ]
+    }
+  },
+  "automationNote": "First Help wait on the custom element host timed out because the fixed modal content owns its visible box. Actual dialog table and keyboard input then verified successfully. No simulation state was injected."
+}

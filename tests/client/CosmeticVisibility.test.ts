@@ -11,6 +11,7 @@ import {
   makeGameView,
   makeNameViewData,
   makePlayerUpdate,
+  stubConfig,
 } from "../util/viewStubs";
 
 const EQUIPPED: PlayerCosmetics = {
@@ -161,5 +162,61 @@ describe("PlayerView cosmetics", () => {
     game.refreshPlayerCosmetics();
     expect(other.cosmetics.crown).toBeUndefined();
     expect(me.cosmetics.crown).toEqual(EQUIPPED.crown);
+  });
+});
+
+describe("modern country identity cosmetics", () => {
+  test("selected human country flag is visible while equipped cosmetics are preserved", () => {
+    const game = makeGameView({
+      myClientID: "client-me",
+      config: stubConfig({
+        gameConfig: () => ({ modernMode: { countryId: "KOR" } }) as never,
+      }),
+      humans: [
+        {
+          clientID: "client-me",
+          cosmetics: { flag: EQUIPPED.flag, crown: EQUIPPED.crown },
+        },
+      ] as never,
+    });
+    const update = makeEmptyGu(1);
+    update.updates[GameUpdateType.Player] = [
+      makePlayerUpdate({
+        id: "world095",
+        smallID: 1,
+        clientID: "client-me",
+        nationFlag: "kr",
+      }),
+    ];
+    game.update(update);
+    expect(game.player("world095").equippedCosmetics.flag).toBe(
+      "/flags/kr.svg",
+    );
+    expect(game.player("world095").equippedCosmetics.crown).toEqual(
+      EQUIPPED.crown,
+    );
+  });
+
+  test("classic human flags continue to use equipped cosmetics", () => {
+    const game = makeGameView({
+      myClientID: "client-me",
+      humans: [
+        {
+          clientID: "client-me",
+          cosmetics: { flag: EQUIPPED.flag, crown: EQUIPPED.crown },
+        },
+      ] as never,
+    });
+    const update = makeEmptyGu(1);
+    update.updates[GameUpdateType.Player] = [
+      makePlayerUpdate({
+        id: "human",
+        smallID: 1,
+        clientID: "client-me",
+        nationFlag: "kr",
+      }),
+    ];
+    game.update(update);
+    expect(game.player("human").equippedCosmetics.flag).toBe(EQUIPPED.flag);
   });
 });

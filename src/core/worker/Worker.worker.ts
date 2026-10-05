@@ -1,11 +1,21 @@
 import { assetUrl } from "../AssetUrls";
 import { FetchGameMapLoader } from "../game/FetchGameMapLoader";
-import { ErrorUpdate, GameUpdateViewData } from "../game/GameUpdates";
+import {
+  ErrorUpdate,
+  GameUpdateType,
+  GameUpdateViewData,
+} from "../game/GameUpdates";
 import {
   createGameRunner,
   createGameRunnerFromSnapshot,
   GameRunner,
 } from "../GameRunner";
+import {
+  climateCombatEfficiency,
+  climateMovementEfficiency,
+} from "../modern/ModernClimate";
+import { forcePreview } from "../modern/ModernForces";
+import { modernFactionState } from "../modern/ModernState";
 import {
   AttackClusteredPositionsResultMessage,
   InitializedMessage,
@@ -128,6 +138,8 @@ function sendGameUpdateBatch(gameUpdates: GameUpdateViewData[]): void {
     if (gu.packedNukeImpacts) {
       transfers.push(gu.packedNukeImpacts.buffer);
     }
+    for (const update of gu.updates[GameUpdateType.ModernForcesFrame] ?? [])
+      transfers.push(update.positions.buffer);
   }
 
   ctx.postMessage(
@@ -147,6 +159,52 @@ ctx.addEventListener("message", async (e: MessageEvent<MainThreadMessage>) => {
   const message = e.data;
 
   switch (message.type) {
+    case "modern_force_preview": {
+      if (!gameRunner) throw new Error("Game runner not initialized");
+      const game = (await gameRunner).game,
+        state = game.modernSystems();
+      const force = state?.forces.find(
+        (f) => f.id === message.forceId && f.playerId === message.playerId,
+      );
+      const result =
+        state && force
+          ? forcePreview(
+              game,
+              state,
+              force,
+              message.target,
+              message.command,
+              undefined,
+              {
+                reserve: () => false,
+                release: () => {},
+                casualties: () => {},
+                climateEfficiency: (id, tile) =>
+                  climateCombatEfficiency(modernFactionState(state, id), tile),
+                climateMovementEfficiency: (id, tile) =>
+                  climateMovementEfficiency(
+                    modernFactionState(state, id),
+                    tile,
+                  ),
+              },
+              message.queue ?? false,
+            )
+          : {
+              valid: false,
+              reason: "not_force_owner",
+              path: [],
+              etaTicks: 0,
+              rangeTiles: 0,
+              risk: "uncertain" as const,
+              climateEfficiencyPermille: 1000,
+            };
+      sendMessage({
+        type: "modern_force_preview_result",
+        id: message.id!,
+        result,
+      });
+      break;
+    }
     case "init":
       try {
         // Set before createGameRunner so map fetches via mapLoader pick up the
@@ -171,12 +229,30 @@ ctx.addEventListener("message", async (e: MessageEvent<MainThreadMessage>) => {
           sendMessage({
             type: "initialized",
             id: message.id,
+            ...(message.snapshot ? { initialView: gr.fullViewUpdate() } : {}),
           } as InitializedMessage);
           return gr;
         });
+        void gameRunner.catch((error) =>
+          sendMessage({
+            type: "game_error",
+            id: message.id,
+            error: {
+              errMsg: String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+            },
+          }),
+        );
       } catch (error) {
         console.error("Failed to initialize game runner:", error);
-        throw error;
+        sendMessage({
+          type: "game_error",
+          id: message.id,
+          error: {
+            errMsg: String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          },
+        });
       }
       break;
 

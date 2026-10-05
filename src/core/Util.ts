@@ -309,6 +309,7 @@ export function createPartialGameRecord(
   reports?: PlayerReport[],
   // Public lobbies only (see GameEndInfoSchema.publicGameType).
   publicGameType?: PublicGameType,
+  modernAssignments?: GameStartInfo["modernAssignments"],
 ): PartialGameRecord {
   const duration = Math.floor((end - start) / 1000);
   const num_turns = allTurns.length;
@@ -339,6 +340,7 @@ export function createPartialGameRecord(
       tribes,
       reports,
       publicGameType,
+      ...(modernAssignments ? { modernAssignments } : {}),
     },
     version: "v0.0.2",
     turns,

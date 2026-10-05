@@ -7,7 +7,7 @@
  * is valid, and pushes preview data straight to the WebGL view.
  */
 
-import { EventBus } from "../../core/EventBus";
+import { EventBus, EventConstructor, GameEvent } from "../../core/EventBus";
 import {
   listNukeBreakAlliance,
   wouldNukeBreakAlliance,
@@ -77,6 +77,9 @@ export class BuildPreviewController implements Controller {
   private readonly mousePos = { x: 0, y: 0 };
   private lastGhostQueryAt: number = 0;
   private pendingConfirm: MouseUpEvent | null = null;
+  private subscriptions: Array<() => void> = [];
+  private rafId: number | null = null;
+  private disposed = false;
 
   // Buildable validation runs on the snapped tile under the cursor, but the
   // rendered icon follows the cursor at sub-tile precision so motion is
@@ -105,9 +108,10 @@ export class BuildPreviewController implements Controller {
   ) {}
 
   init() {
-    this.eventBus.on(MouseMoveEvent, (e) => this.moveGhost(e));
-    this.eventBus.on(MouseUpEvent, (e) => this.requestConfirmStructure(e));
-    this.eventBus.on(ConfirmGhostStructureEvent, () =>
+    if (this.disposed || this.subscriptions.length > 0) return;
+    this.subscribe(MouseMoveEvent, (e) => this.moveGhost(e));
+    this.subscribe(MouseUpEvent, (e) => this.requestConfirmStructure(e));
+    this.subscribe(ConfirmGhostStructureEvent, () =>
       this.requestConfirmStructure(
         new MouseUpEvent(this.mousePos.x, this.mousePos.y),
       ),
@@ -121,6 +125,7 @@ export class BuildPreviewController implements Controller {
     // integer tile coord centers on that tile), so we subtract 0.5 here to
     // place the icon exactly under the cursor.
     const cursorLoop = () => {
+      if (this.disposed) return;
       const ghost = this.lastGhostData;
       const traj = this.nukeTrajectoryStatic;
       if (ghost !== null || traj !== null) {
@@ -171,12 +176,32 @@ export class BuildPreviewController implements Controller {
           this.view.updateNukeTrajectory(data);
         }
       }
-      requestAnimationFrame(cursorLoop);
+      this.rafId = requestAnimationFrame(cursorLoop);
     };
-    requestAnimationFrame(cursorLoop);
+    this.rafId = requestAnimationFrame(cursorLoop);
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    for (const unsubscribe of this.subscriptions.splice(0)) unsubscribe();
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+    this.pendingConfirm = null;
+    this.ghostUnit = null;
+    this.lastGhostData = null;
+    this.nukeTrajectoryStatic = null;
+  }
+
+  private subscribe<T extends GameEvent>(
+    type: EventConstructor<T>,
+    handler: (event: T) => void,
+  ): void {
+    this.eventBus.on(type, handler);
+    this.subscriptions.push(() => this.eventBus.off(type, handler));
   }
 
   tick() {
+    if (this.disposed) return;
     // Re-query buildables periodically (world state can change — tiles may
     // become buildable as troops/territory move).
     this.syncGhostState();
@@ -259,6 +284,7 @@ export class BuildPreviewController implements Controller {
       ?.myPlayer()
       ?.buildables(tileRef, [this.ghostUnit?.buildableUnit.type])
       .then((buildables) => {
+        if (this.disposed) return;
         if (!this.ghostUnit) {
           this.pendingConfirm = null;
           this.emitGhostPreview(tileRef, targetingAlly, trajectoryTileRef);

@@ -1,0 +1,12 @@
+# Preserve pinned Natural Earth input bytes and their recorded source hashes.
+map-generator/modern-world/source/*.geojson
+# Reproducible machine-generated ownership data; finalized by the map generator.
+src/core/game/ModernWorldData.json
+resources/maps/modernworld/scenario.json
+map-generator/modern-world/scenario.input.json
+# Preserve v2 source metadata bytes and reproducible generator output.
+map-generator/modern-world-v2/source/*.json
+# The generator's pinned policy bytes participate in the reproducible cache key.
+map-generator/modern-world-v2/policy.json
+src/core/game/ModernRegionsData.json
+map-generator/modern-world-v2/generated-summary.json

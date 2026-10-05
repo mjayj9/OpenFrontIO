@@ -34,3 +34,4 @@ declare module "*.webp" {
   const webpContent: string;
   export default webpContent;
 }
+declare const __FORK_BUILD__: string;

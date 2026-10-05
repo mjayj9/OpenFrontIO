@@ -1,4 +1,5 @@
 import { Config } from "../configuration/Config";
+import type { ModernFactionState, ModernState } from "../modern/ModernState";
 import { AbstractGraph } from "../pathfinding/algorithms/AbstractGraph";
 import { PathFinder } from "../pathfinding/types";
 import { AllPlayersStats, ClientID } from "../Schemas";
@@ -592,6 +593,7 @@ export interface DisconnectSnapshot {
 }
 
 export interface Player {
+  modernFaction(): ModernFactionState | undefined;
   // Basic Info
   smallID(): number;
   info(): PlayerInfo;
@@ -786,6 +788,8 @@ export interface Player {
 }
 
 export interface Game extends GameMap {
+  modernSystems(): ModernState | null;
+  setModernSystems(state: ModernState | null): void;
   // Map & Dimensions
   isOnMap(cell: Cell): boolean;
   width(): number;

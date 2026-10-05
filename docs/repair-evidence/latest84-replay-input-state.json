@@ -1,0 +1,416 @@
+{
+  "verifiedOn": "2026-10-06",
+  "candidate": {
+    "asset": "index-CYaFHMjv.js",
+    "coreFingerprint": "84bebb823344",
+    "saveBuild": "a3d45866cf4e08cc891103dd023e5e35a2dc013ee310d5556e6a40838e0a0694",
+    "viewport": "820x900",
+    "profile": "repair-accepted",
+    "entry": "public Main SaveManager file import and replay review"
+  },
+  "mobileSaveButtonAndImport": {
+    "before": {
+      "rect": {
+        "x": 16,
+        "y": 802.6666870117188,
+        "width": 788,
+        "height": 57.33331298828125
+      },
+      "hit": "저장한 싱글플레이 게임",
+      "asset": "http://127.0.0.1:19004/assets/index-CYaFHMjv.js"
+    },
+    "manager": "저장한 싱글플레이 게임\n\n여기에는 진행 중인 시뮬레이션, 자원, 영토와 AI 상태를 저장합니다. 설정·교육 진행도와 별개입니다. 불러오기는 싱글플레이를 이어가며 공개 순위에 참가하지 않습니다.\n\n저장 파일 가져오기\n목록 새로고침\n\n저장 파일을 가져왔습니다.\n\nrepair-final-fixed-active\n\nTick 47 · 2026. 10. 6. 오전 1:59:22 · 빌드 a3d45866cf4e08cc891103dd023e5e35a2dc013ee310d5556e6a40838e0a0694\n\n이어하기\n리플레이 복습\n파일 내보내기\n삭제\n\n60초마다 자동 저장\n\nTick 15068 · 2026. 10. 6. 오전 1:49:32 · 빌드 136124f0dcd95989e64ba26fe1af2b030a0798dda83230558b0b186a86ee96df\n\n이어하기\n리플레이 복습\n파일 내보내기\n삭제\n\nrepair-final-active\n\nTick 52 · 2026. 10. 6. 오전 1:26:39 · 빌드 413c5c9bf46a7b27f3d463719ddcff331c4dfc884f7f91f0e6091f2c0c3ef503\n\n이어하기\n리플레이 복습\n파일 내보내기\n삭제\n\n60초마다 자동 저장\n\nTick 74 · 2026. 10. 6. 오전 1:04:59 · 빌드 136124f0dcd95989e64ba26fe1af2b030a0798dda83230558b0b186a86ee96df\n\n이어하기\n리플레이 복습\n파일 내보내기\n삭제\n\n같은 게임 빌드에서 이어하세요. 중요한 저장은 삭제나 브라우저 데이터 정리 전에 내보내세요. 손상·버전 불일치로 읽지 못하면 파일을 보관하고 호환되는 빌드를 사용하세요. 실패한 작업은 성공으로 표시하지 않습니다."
+  },
+  "replayEntry": {
+    "url": "http://127.0.0.1:19004/#replay-viewer=MR000001",
+    "text": "#\n↓\n⚙️\nFollowing South Korea\n0:00 / 0:04",
+    "status": "ready",
+    "playback": {
+      "frame": 0,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1
+    },
+    "camera": {
+      "mapWidth": 2000,
+      "mapHeight": 1000,
+      "x": 1000,
+      "y": 500,
+      "zoom": 0.369,
+      "target": null
+    },
+    "inputMode": "modern",
+    "bodyMode": "select-none font-sans min-h-screen bg-neutral-800 transition-opacity duration-300 ease-in-out flex flex-row flex-wrap content-start in-game"
+  },
+  "keyboardPlayback": {
+    "before": {
+      "frame": 0,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.369
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "qwe": {
+      "frame": 0,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.369
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "right": {
+      "frame": 0,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1,
+      "camera": {
+        "x": 1108.4010840108401,
+        "y": 500,
+        "zoom": 0.369
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "zoomed": {
+      "frame": 0,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.40590000000000004
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "stepped": {
+      "frame": 1,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "jumpForward": {
+      "frame": 46,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": {
+        "factions": 294,
+        "forces": [
+          {
+            "id": "force-1466",
+            "tile": 579706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 35
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 43,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1467",
+            "tile": 581706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 35
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 43,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1469",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          }
+        ]
+      }
+    },
+    "steppedBack": {
+      "frame": 45,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": {
+        "factions": 294,
+        "forces": [
+          {
+            "id": "force-1466",
+            "tile": 579706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 35
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 43,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1467",
+            "tile": 581706,
+            "phase": "moving",
+            "command": {
+              "kind": "move",
+              "target": 587718,
+              "issuedTick": 35
+            },
+            "queue": [
+              {
+                "kind": "move",
+                "target": 583711,
+                "issuedTick": 43,
+                "previewPath": [
+                  587718, 585718, 585717, 585716, 585715, 585714, 585713,
+                  583713, 583712, 583711
+                ]
+              }
+            ]
+          },
+          {
+            "id": "force-1469",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          },
+          {
+            "id": "force-1471",
+            "tile": 583705,
+            "phase": "idle",
+            "command": null,
+            "queue": []
+          }
+        ]
+      }
+    },
+    "jumpBack": {
+      "frame": 0,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 1,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "slower": {
+      "frame": 0,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 0.5,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "faster": {
+      "frame": 0,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 2,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "played": {
+      "frame": 7,
+      "totalFrames": 47,
+      "playing": true,
+      "speed": 2,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "paused": {
+      "frame": 7,
+      "totalFrames": 47,
+      "playing": false,
+      "speed": 2,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "mode": "modern",
+      "livePanel": false,
+      "modern": null
+    },
+    "help": null
+  },
+  "helpKoreanFocus": {
+    "before": {
+      "frame": 7,
+      "playing": false,
+      "speed": 2,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "help": true,
+      "livePanel": false
+    },
+    "focused": {
+      "frame": 7,
+      "playing": false,
+      "speed": 2,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "help": true,
+      "livePanel": false
+    },
+    "text": "대한민국 육군qwe][p,.",
+    "closed": {
+      "frame": 7,
+      "playing": false,
+      "speed": 2,
+      "camera": {
+        "x": 1000,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "help": false,
+      "livePanel": false
+    },
+    "resumed": {
+      "frame": 7,
+      "playing": false,
+      "speed": 2,
+      "camera": {
+        "x": 1108.4010840108401,
+        "y": 500,
+        "zoom": 0.36900000000000005
+      },
+      "help": false,
+      "livePanel": false
+    },
+    "centered": {
+      "frame": 7,
+      "playing": false,
+      "speed": 2,
+      "camera": {
+        "x": 1330.976493098174,
+        "y": 352.6561499524736,
+        "zoom": 0.36900000000000005
+      },
+      "help": false,
+      "livePanel": false
+    },
+    "final": {
+      "frame": 46,
+      "playing": false,
+      "speed": 2,
+      "camera": {
+        "x": 1518.751628091346,
+        "y": 315.73112853931235,
+        "zoom": 0.36900000000000005
+      },
+      "help": false,
+      "livePanel": false
+    }
+  },
+  "limits": [
+    "Native operating-system IME was not executed. Unicode text used normal browser input.",
+    "Replay help raw bracket codes were reproduced on this candidate and fixed afterward by shared key formatting.",
+    "The earlier replay entry failed when a redeploy removed the old JS chunk; it is excluded from success evidence."
+  ]
+}

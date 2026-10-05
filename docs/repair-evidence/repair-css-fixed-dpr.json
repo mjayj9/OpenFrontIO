@@ -1,0 +1,72 @@
+{
+  "before": {
+    "rect": {
+      "x": 616,
+      "y": 66.66667175292969,
+      "width": 124.8333740234375,
+      "height": 20
+    },
+    "hit": "BUTTON",
+    "hitText": "저장과 승리 목표 ▴",
+    "expanded": "true",
+    "dpr": 2.0000000596046448
+  },
+  "data": {
+    "tick": 21,
+    "paused": true,
+    "world": {
+      "x": 1705.5,
+      "y": 288.5
+    },
+    "screen": {
+      "x": 443.4726037560058,
+      "y": 268.1072521618869
+    },
+    "back": {
+      "x": 1705,
+      "y": 288,
+      "strRepr": "Cell[1705,288]"
+    },
+    "selected": ["force-1466", "force-1467"],
+    "canvas": [
+      {
+        "width": 2000,
+        "height": 1520,
+        "css": {
+          "width": 1000,
+          "height": 760
+        }
+      },
+      {
+        "width": 2000,
+        "height": 1520,
+        "css": {
+          "width": 1000,
+          "height": 760
+        }
+      },
+      {
+        "width": 2000,
+        "height": 1520,
+        "css": {
+          "width": 1000,
+          "height": 760
+        }
+      }
+    ],
+    "expanded": "false"
+  },
+  "after": {
+    "selected": ["force-1466", "force-1467"],
+    "previews": [
+      {
+        "id": "force-1466"
+      },
+      {
+        "id": "force-1467"
+      }
+    ],
+    "menuExpanded": "false",
+    "commandPanelCount": 1
+  }
+}

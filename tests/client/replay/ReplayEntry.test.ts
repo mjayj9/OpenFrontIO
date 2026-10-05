@@ -12,7 +12,10 @@ import {
   replayViewerHref,
   versionedViewerUrl,
 } from "../../../src/client/replay/ReplayEntry";
-import { fetchReplayRecord } from "../../../src/client/replay/ReplayRecord";
+import {
+  fetchReplayRecord,
+  hasHandedOverRecord,
+} from "../../../src/client/replay/ReplayRecord";
 import { UserSettings } from "../../../src/core/game/UserSettings";
 import type { GameRecord } from "../../../src/core/Schemas";
 
@@ -49,7 +52,7 @@ beforeEach(() => {
   new UserSettings().setReplayViewer(true);
   shell.host = false;
   sessionStorage.clear();
-  window.location.hash = "";
+  window.history.replaceState(null, "", window.location.pathname);
   config("dev", "localhost");
 });
 
@@ -81,6 +84,25 @@ describe("openReplayViewer", () => {
     expect(await fetchReplayRecord("abcd1234", { fetchFn })).toEqual({
       kind: "not_found",
     });
+  });
+
+  test("explicit offline review preserves live query and consumes the handed record without fetching even with opt-in disabled", async () => {
+    window.history.replaceState(null, "", "/?live");
+    new UserSettings().setReplayViewer(false);
+    classicReplayHref("abcd1234");
+    const localRecord = record("test");
+    const fetchFn = vi.fn();
+    expect(openReplayViewer("abcd1234", localRecord, true)).toBe(true);
+    expect(window.location.pathname).toBe("/");
+    expect(window.location.search).toBe("?live");
+    expect(window.location.hash).toBe("#replay-viewer=abcd1234");
+    expect(hasHandedOverRecord("another-game")).toBe(false);
+    expect(hasHandedOverRecord("abcd1234")).toBe(true);
+    expect(hasHandedOverRecord("abcd1234")).toBe(true);
+    const result = await fetchReplayRecord("abcd1234", { fetchFn });
+    expect(result).toEqual({ kind: "record", record: localRecord });
+    expect(fetchFn).not.toHaveBeenCalled();
+    expect(hasHandedOverRecord("abcd1234")).toBe(false);
   });
 
   test("a game the viewer sent back stays on the client-side replay", () => {

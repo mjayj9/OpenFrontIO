@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TrainExecution } from "../execution/TrainExecution";
+import { modernIncome } from "../modern/ModernSystems";
 import { PseudoRandom } from "../PseudoRandom";
 import type {
   SnapshotReader,
@@ -35,13 +36,15 @@ class TradeStationStopHandler implements TrainStopHandler {
       );
     // Share revenue with the station owner if it's not the current player
     if (trainOwner !== stationOwner) {
-      stationOwner.addGold(gold, station.tile());
-      stationOwner.addTrainGold(gold);
-      mg.stats().trainExternalTrade(stationOwner, gold);
+      const income = modernIncome(mg, stationOwner, gold);
+      stationOwner.addGold(income, station.tile());
+      stationOwner.addTrainGold(income);
+      mg.stats().trainExternalTrade(stationOwner, income);
     }
-    trainOwner.addGold(gold, station.tile());
-    trainOwner.addTrainGold(gold);
-    mg.stats().trainSelfTrade(trainOwner, gold);
+    const income = modernIncome(mg, trainOwner, gold);
+    trainOwner.addGold(income, station.tile());
+    trainOwner.addTrainGold(income);
+    mg.stats().trainSelfTrade(trainOwner, income);
   }
 }
 

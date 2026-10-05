@@ -16,6 +16,7 @@ import {
   retryServerList,
   serverListSite,
   serverListUrl,
+  setDevelopmentLobbyConnection,
   setServerListInGame,
   startServerListPolling,
   stopServerListPolling,
@@ -530,6 +531,75 @@ describe("startServerListPolling", () => {
 });
 
 describe("a confirmed outage, as opposed to one missed beat", () => {
+  it.each([
+    ["local development", "dev", "127.0.0.1", "localhost", 2, true],
+    ["production", "prod", "127.0.0.1", "localhost", 2, false],
+    ["remote development page", "dev", "example.org", "localhost", 2, false],
+    ["remote cluster", "dev", "127.0.0.1", "example.org", 2, false],
+    ["invalid worker count", "dev", "127.0.0.1", "localhost", 0, false],
+  ])(
+    "preserves the API outage except for a decoded local development lobby (%s)",
+    async (_name, gameEnv, pageHost, serverHost, numWorkers, fallback) => {
+      vi.useFakeTimers();
+      setBootstrap({
+        gameEnv,
+        cluster: { a: { host: serverHost, numWorkers } },
+        serverHost: undefined,
+        siteHost: undefined,
+        jwtAudience: "localhost",
+        gitCommit: "DEV",
+      });
+      stubLocation(pageHost as string);
+      fetchMock.mockRejectedValue(new TypeError("optional account API absent"));
+      await ensureServerList();
+      await vi.advanceTimersByTimeAsync(RETRY_MS);
+      await ensureServerList();
+      expect(backendUnreachableConfirmed()).toBe(true);
+      const socket = {};
+      setDevelopmentLobbyConnection(socket, true);
+      expect(backendReachable()).toBe(false);
+      expect(backendUnreachableConfirmed()).toBe(!fallback);
+      setDevelopmentLobbyConnection(socket, false);
+      expect(backendUnreachableConfirmed()).toBe(true);
+    },
+  );
+
+  it("announces local connection loss and keeps independently connected sockets", async () => {
+    vi.useFakeTimers();
+    setBootstrap({
+      gameEnv: "dev",
+      cluster: { a: { host: "localhost", numWorkers: 2 } },
+      serverHost: undefined,
+      siteHost: undefined,
+      jwtAudience: "localhost",
+      gitCommit: "DEV",
+    });
+    stubLocation("localhost");
+    fetchMock.mockRejectedValue(new TypeError("account API absent"));
+    await ensureServerList();
+    await vi.advanceTimersByTimeAsync(RETRY_MS);
+    await ensureServerList();
+    const seen: unknown[] = [];
+    const listener = (event: Event) => seen.push((event as CustomEvent).detail);
+    document.addEventListener("backend-reachability", listener);
+    try {
+      const first = {};
+      const second = {};
+      setDevelopmentLobbyConnection(first, true);
+      setDevelopmentLobbyConnection(second, true);
+      setDevelopmentLobbyConnection(first, false);
+      expect(backendUnreachableConfirmed()).toBe(false);
+      setDevelopmentLobbyConnection(second, false);
+      expect(backendUnreachableConfirmed()).toBe(true);
+      expect(seen).toEqual([
+        { reachable: false, confirmed: false },
+        { reachable: false, confirmed: true },
+      ]);
+    } finally {
+      document.removeEventListener("backend-reachability", listener);
+    }
+  });
+
   // The gates read backendUnreachableConfirmed(), never the raw signal: the
   // heartbeat is expected to miss occasionally while the cached list carries
   // on serving, and dimming every multiplayer button for a retry interval

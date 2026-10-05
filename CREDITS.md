@@ -17,6 +17,13 @@ Licensed under ODbL
 [Natural Earth](https://www.naturalearthdata.com/)  
 Public Domain
 
+The fork's Modern World scenario uses Natural Earth vector 5.1.1, 1:50m
+admin-0 countries and populated places, pinned from
+[natural-earth-vector v5.1.1](https://github.com/nvkelso/natural-earth-vector/tree/v5.1.1/geojson).
+Original inputs, hashes, grouping policy and offline generators are preserved in
+`map-generator/modern-world/`. The raster is a gameplay approximation and is not
+a statement of recognition, current borders, or real economic/military strength.
+
 ### Bedmap3 Antarctica Dataset
 
 Pritchard, H.D., Fretwell, P.T., Fremand, A.C. et al. Bedmap3 updated ice bed, surface and thickness gridded datasets for Antarctica. _Sci Data_ 12, 109 (2025).  

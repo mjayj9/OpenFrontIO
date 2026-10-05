@@ -11,6 +11,8 @@ import { GameUpdateType } from "../../src/core/game/GameUpdates";
 const captured = vi.hoisted(() => ({
   lobbyOnConnect: undefined as (() => void) | undefined,
   lobbyOnMessage: undefined as ((msg: unknown) => void) | undefined,
+  workerInitialize: vi.fn<() => Promise<void>>(),
+  workerCleanup: vi.fn(),
 }));
 
 const envMocks = vi.hoisted(() => ({
@@ -42,6 +44,7 @@ vi.mock("../../src/client/InGameModal", () => ({
 }));
 vi.mock("../../src/client/Utils", () => ({
   translateText: (key: string) => key,
+  textDirection: () => "ltr",
   reloadForUpdate: vi.fn(),
   createCanvas: () => document.createElement("canvas"),
   homeHref: () => "/",
@@ -86,7 +89,10 @@ vi.mock("../../src/client/view", () => ({
   PlayerView: class {},
 }));
 vi.mock("../../src/core/worker/WorkerClient", () => ({
-  WorkerClient: class {},
+  WorkerClient: class {
+    initialize = captured.workerInitialize;
+    cleanup = captured.workerCleanup;
+  },
 }));
 vi.mock("../../src/client/Transport", async (importOriginal) => {
   const actual =
@@ -108,6 +114,8 @@ import {
   joinLobby,
   LobbyConfig,
 } from "../../src/client/ClientGameRunner";
+import * as SingleplayerSaves from "../../src/client/SingleplayerSaves";
+import { GoToPlayerEvent } from "../../src/client/TransformHandler";
 import { SendHashEvent } from "../../src/client/Transport";
 import { reloadForUpdate } from "../../src/client/Utils";
 import { loadTerrainMap } from "../../src/core/game/TerrainMapLoader";
@@ -130,17 +138,34 @@ function makeLobbyConfig(withStartInfo: boolean): LobbyConfig {
 // the callbacks start() handed to the transport and the worker.
 function makeStartedRunner(
   withStartInfo: boolean,
-  opts: { isLocal?: boolean; metrics?: object } = {},
+  opts: {
+    isLocal?: boolean;
+    metrics?: object;
+    initialView?: object;
+    myPlayer?: object;
+    goToPlayer?: boolean;
+    savedGame?: object;
+  } = {},
 ) {
   const eventBus = new EventBus();
   const emitSpy = vi.spyOn(eventBus, "emit");
-  const worker = { start: vi.fn(), sendTurn: vi.fn(), cleanup: vi.fn() };
+  const worker = {
+    start: vi.fn(),
+    sendTurn: vi.fn(),
+    cleanup: vi.fn(),
+    initialView: opts.initialView,
+    snapshot: vi.fn(async () => new Uint8Array([1, 2, 3])),
+  };
   const transport = {
     updateCallback: vi.fn(),
     rejoinGame: vi.fn(),
     turnComplete: vi.fn(),
     leaveGame: vi.fn(),
     isLocal: opts.isLocal ?? true,
+    withFrozenTurns: vi.fn(
+      async (work: (turns: unknown[], paused: boolean) => Promise<unknown>) =>
+        work([], true),
+    ),
   };
   const renderer = {
     initialize: vi.fn(),
@@ -151,14 +176,20 @@ function makeStartedRunner(
   const gameView = {
     config: () => ({ isRandomSpawn: () => false, isReplay: () => false }),
     inSpawnPhase: () => false,
-    myPlayer: () => null,
+    isPaused: vi.fn(() => false),
+    modernSystems: vi.fn(() => null),
+    myPlayer: () => opts.myPlayer ?? null,
     update: vi.fn(),
   };
   const soundManager = { playBackgroundMusic: vi.fn(), dispose: vi.fn() };
-  const userSettings = { goToPlayer: () => false };
+  const userSettings = { goToPlayer: () => opts.goToPlayer ?? false };
+  const webglBuilder = { update: vi.fn() };
 
   const runner = new ClientGameRunner(
-    makeLobbyConfig(withStartInfo),
+    {
+      ...makeLobbyConfig(withStartInfo),
+      ...(opts.savedGame ? { savedGame: opts.savedGame } : {}),
+    } as LobbyConfig,
     "c0000001",
     eventBus,
     renderer as never,
@@ -168,7 +199,7 @@ function makeStartedRunner(
     gameView as never,
     soundManager as never,
     userSettings as never,
-    null,
+    webglBuilder as never,
     null,
     null,
     (opts.metrics ?? null) as never,
@@ -182,6 +213,8 @@ function makeStartedRunner(
   return {
     runner,
     worker,
+    renderer,
+    webglBuilder,
     transport,
     gameView,
     emitSpy,
@@ -198,6 +231,8 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   captured.lobbyOnConnect = undefined;
   captured.lobbyOnMessage = undefined;
+  captured.workerInitialize.mockReset();
+  captured.workerCleanup.mockReset();
 });
 
 afterEach(() => {
@@ -222,6 +257,7 @@ describe("joinLobby lobby-phase messages", () => {
       "medium",
       expect.anything(),
       false,
+      true,
     );
   });
 
@@ -246,6 +282,152 @@ describe("joinLobby lobby-phase messages", () => {
 });
 
 describe("ClientGameRunner in-game messages", () => {
+  it("cancels a pending worker startup without waiting for its response", async () => {
+    let finishWorker!: () => void;
+    captured.workerInitialize.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishWorker = resolve;
+        }),
+    );
+    const result = joinLobby(new EventBus(), makeLobbyConfig(true));
+    captured.lobbyOnMessage!({
+      type: "start",
+      myClientID: "c0000001",
+      turns: [],
+      gameStartInfo: makeLobbyConfig(true).gameStartInfo,
+    });
+    await vi.waitFor(() =>
+      expect(captured.workerInitialize).toHaveBeenCalledOnce(),
+    );
+
+    result.stop(true);
+    await vi.waitFor(() =>
+      expect(captured.workerCleanup).toHaveBeenCalledOnce(),
+    );
+    expect(document.querySelector("#game-input-overlay")).toBeNull();
+    expect(document.querySelector("#error-modal")).toBeNull();
+
+    finishWorker();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(captured.workerCleanup).toHaveBeenCalledOnce();
+    expect(document.querySelector("#game-input-overlay")).toBeNull();
+  });
+
+  it("does not mount or start a lobby stopped while terrain is loading", async () => {
+    let finishTerrain!: (value: never) => void;
+    vi.mocked(loadTerrainMap).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishTerrain = resolve;
+        }),
+    );
+    const { preloadAtlasData } = await import("../../src/client/render/gl");
+    const atlasCalls = vi.mocked(preloadAtlasData).mock.calls.length;
+    const result = joinLobby(new EventBus(), makeLobbyConfig(true));
+    captured.lobbyOnMessage!({
+      type: "start",
+      myClientID: "c0000001",
+      turns: [],
+      gameStartInfo: makeLobbyConfig(true).gameStartInfo,
+    });
+    result.stop(true);
+    finishTerrain({} as never);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(vi.mocked(preloadAtlasData).mock.calls).toHaveLength(atlasCalls);
+    expect(document.querySelector("#game-input-overlay")).toBeNull();
+    expect(document.querySelector("#error-modal")).toBeNull();
+  });
+
+  it("restores the saved ratio through the control callback after renderer initialization", () => {
+    const restoreRatio = vi.fn();
+    const control = Object.assign(document.createElement("control-panel"), {
+      onAttackRatioChange: restoreRatio,
+    });
+    document.body.append(control);
+    const { renderer } = makeStartedRunner(true, {
+      savedGame: { ui: { attackRatio: 1 }, tick: 400, paused: true },
+    });
+    expect(renderer.uiState.attackRatio).toBe(1);
+    expect(restoreRatio).toHaveBeenCalledExactlyOnceWith(1);
+    expect(renderer.initialize.mock.invocationCallOrder[0]).toBeLessThan(
+      restoreRatio.mock.invocationCallOrder[0],
+    );
+  });
+
+  it("leaves the initialized preference alone for a legacy save without UI state", () => {
+    const { renderer } = makeStartedRunner(true, {
+      savedGame: { tick: 400, paused: true },
+    });
+    expect(renderer.uiState.attackRatio).toBe(0.5);
+  });
+
+  it("records the current command attack ratio in a running-game save", async () => {
+    const write = vi
+      .spyOn(SingleplayerSaves, "writeSave")
+      .mockResolvedValue(undefined);
+    const { runner, renderer } = makeStartedRunner(true);
+    renderer.uiState.attackRatio = 0.8;
+    await (runner as unknown as { save: (name: string) => Promise<void> }).save(
+      "Current ratio",
+    );
+    expect(write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Current ratio",
+        ui: { attackRatio: 0.8 },
+        snapshot: new Uint8Array([1, 2, 3]),
+        paused: true,
+      }),
+    );
+  });
+
+  it("uploads a paused restored frame and centers its player before any new turn", () => {
+    const restoredPlayer = {
+      hasSpawned: () => true,
+      isAlive: () => true,
+    };
+    const { worker, renderer, webglBuilder, gameView, emitSpy } =
+      makeStartedRunner(true, {
+        initialView: {
+          tick: 400,
+          updates: {
+            [GameUpdateType.GamePaused]: [{ paused: true }],
+          },
+        },
+        myPlayer: restoredPlayer,
+        goToPlayer: true,
+      });
+
+    expect(webglBuilder.update).toHaveBeenCalledExactlyOnceWith(gameView);
+    expect(renderer.tick).toHaveBeenCalledTimes(1);
+    expect(renderer.initialize.mock.invocationCallOrder[0]).toBeLessThan(
+      webglBuilder.update.mock.invocationCallOrder[0],
+    );
+    expect(webglBuilder.update.mock.invocationCallOrder[0]).toBeLessThan(
+      renderer.tick.mock.invocationCallOrder[0],
+    );
+    expect(renderer.tick.mock.invocationCallOrder[0]).toBeLessThan(
+      worker.start.mock.invocationCallOrder[0],
+    );
+    expect(emitSpy).toHaveBeenCalledWith(
+      new GoToPlayerEvent(restoredPlayer as never, 8),
+    );
+    expect(worker.sendTurn).not.toHaveBeenCalled();
+    expect(gameView.update).not.toHaveBeenCalled();
+  });
+
+  it("respects disabled automatic centering for a restored player", () => {
+    const { webglBuilder, emitSpy } = makeStartedRunner(true, {
+      initialView: { tick: 400 },
+      myPlayer: { hasSpawned: () => true, isAlive: () => true },
+      goToPlayer: false,
+    });
+    expect(webglBuilder.update).toHaveBeenCalledTimes(1);
+    expect(
+      emitSpy.mock.calls.some(([event]) => event instanceof GoToPlayerEvent),
+    ).toBe(false);
+  });
+
   it("forwards buffered turns to the worker on a start message", () => {
     const { worker, onmessage } = makeStartedRunner(true);
     const turns = [
@@ -333,6 +515,24 @@ describe("ClientGameRunner in-game messages", () => {
     expect(transport.turnComplete).toHaveBeenCalled();
     expect(emitSpy).toHaveBeenCalledWith(new SendHashEvent(3, 42));
     expect(gameView.update).toHaveBeenCalled();
+  });
+
+  it("refreshes throttled HUDs at pause and modern bootstrap boundaries", () => {
+    const { gameView, renderer, workerCallback } = makeStartedRunner(true);
+    gameView.update.mockImplementationOnce(() => {
+      gameView.isPaused.mockReturnValue(true);
+    });
+    workerCallback({ updates: { [GameUpdateType.Hash]: [] } });
+    expect(renderer.tick).toHaveBeenLastCalledWith(true);
+
+    gameView.update.mockImplementationOnce(() => {
+      // The interface mock only needs the transition from absent to present.
+      gameView.modernSystems.mockReturnValue({} as never);
+    });
+    workerCallback({ updates: { [GameUpdateType.Hash]: [] } });
+    expect(renderer.tick).toHaveBeenLastCalledWith(true);
+    workerCallback({ updates: { [GameUpdateType.Hash]: [] } });
+    expect(renderer.tick).toHaveBeenLastCalledWith(false);
   });
 
   it("feeds tick execution and wire tick interval to the game metrics", () => {

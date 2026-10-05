@@ -20,6 +20,41 @@ export function notableLobbySettings(
   const disabled = translateText("common.disabled");
   const pm = c.publicGameModifiers;
   const items: { label: string; value: string }[] = [];
+  if (c.modernMode) {
+    items.push({
+      label: translateText("modern.title"),
+      value: translateText(`modern.${c.modernMode.victory}`),
+    });
+    if (
+      c.modernMode.victory === "territory" ||
+      c.modernMode.victory === "capitals"
+    )
+      items.push({
+        label: translateText("modern.target"),
+        value: `${c.modernMode.targetPercent}%`,
+      });
+    items.push({
+      label: translateText("modern.balance"),
+      value: translateText(`modern.${c.modernMode.balance}`),
+    });
+    items.push({
+      label: translateText("modern.protection"),
+      value: renderDuration(c.modernMode.protectionTicks / 10),
+    });
+  }
+  if (
+    c.enhancedAI &&
+    (c.enhancedAI.tribePercent > 0 || c.enhancedAI.nationPercent > 0)
+  ) {
+    items.push({
+      label: translateText("enhanced_ai.nationPercent"),
+      value: `${c.enhancedAI.nationPercent}%`,
+    });
+    items.push({
+      label: translateText("enhanced_ai.fair_resources"),
+      value: c.enhancedAI.fairResources ? enabled : disabled,
+    });
+  }
   if (pm?.isCrowded)
     items.push({
       label: translateText("host_modal.crowded"),

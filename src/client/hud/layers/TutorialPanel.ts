@@ -2,20 +2,42 @@ import { LitElement, html, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { EventBus } from "../../../core/EventBus";
 import { PlayerType, Relation, UnitType } from "../../../core/game/Game";
+import { GameUpdateType } from "../../../core/game/GameUpdates";
 import { UserSettings } from "../../../core/game/UserSettings";
+import { climateCombatEfficiency } from "../../../core/modern/ModernClimate";
+import { MODERN_RULES } from "../../../core/modern/ModernRules";
+import { nuclearEffects } from "../../../core/modern/ModernState";
 import { Controller } from "../../Controller";
+import {
+  EducationProgressStore,
+  consumeRequestedChapter,
+  requestChapter,
+} from "../../education/EducationProgressStore";
+import { EDUCATION_FEATURES } from "../../education/FeatureRegistry";
+import { HelpModal } from "../../HelpModal";
+import { modernKeybinds } from "../../ModernInput";
 import { Platform } from "../../Platform";
 import { GoToPlayerEvent } from "../../TransformHandler";
 import { UIState } from "../../UIState";
-import { renderNumber, textDirection, translateText } from "../../Utils";
+import {
+  formatKeyForDisplay,
+  renderNumber,
+  textDirection,
+  translateText,
+} from "../../Utils";
 import { GameView } from "../../view";
 import { PlayerView } from "../../view/PlayerView";
 import {
+  ModernTutorialEvidence,
+  TUTORIAL_CHAPTERS,
+  TutorialChapterID,
   TutorialContext,
   TutorialHighlight,
   TutorialHighlightEvent,
   TutorialProgress,
+  TutorialProgressSnapshot,
   TutorialStep,
+  chapterSteps,
 } from "../Tutorial";
 
 /** How often (in ticks) to ask the worker for current build costs. */
@@ -42,8 +64,6 @@ const UNIT_NAME_KEYS: Partial<Record<UnitType, string>> = {
   [UnitType.MissileSilo]: "missile_silo",
   [UnitType.AtomBomb]: "atom_bomb",
 };
-/** Ticks the "you're ready" message stays up before the panel closes. */
-const COMPLETE_LINGER_TICKS = 50;
 
 /** How many of the nearest attack targets get a marker during the tribes step. */
 const NEARBY_TRIBE_MARK_COUNT = 3;
@@ -73,16 +93,25 @@ const TOUCH_TEXT_STEPS = new Set([
   "launch_atom",
 ]);
 
-/** Defaults shown when the player hasn't rebound the action (see UnitDisplay). */
-const HOTKEY_FALLBACKS = {
-  buildCity: "1",
-  buildFactory: "2",
-  buildPort: "3",
-  buildDefensePost: "4",
-  buildWarship: "7",
-  buildMissileSilo: "5",
-  buildAtomBomb: "8",
-} as const;
+const MODERN_TOUCH_TEXT_STEPS = new Set([
+  "modern_camera",
+  "modern_branches",
+  "modern_select",
+  "modern_box_select",
+  "modern_cursor",
+  "modern_army_move",
+  "modern_queue",
+  "modern_stop",
+  "modern_armybase",
+  "modern_army_train",
+  "modern_navybase",
+  "modern_navy_move",
+  "modern_airbase",
+  "modern_air_produce",
+  "modern_air_launch",
+  "modern_air_return",
+  "modern_air_intercept",
+]);
 
 @customElement("tutorial-panel")
 export class TutorialPanel extends LitElement implements Controller {
@@ -94,11 +123,21 @@ export class TutorialPanel extends LitElement implements Controller {
   @state() private active = false;
   @state() private confirmingClose = false;
   @state() private ctx: TutorialContext | null = null;
+  @state() private chapter: TutorialChapterID = "basic";
+  @state() private showingOptions = false;
+  @state() private guidePaused = false;
+  @state() private showingHint = false;
+  @state() private storageError = false;
 
-  private progress = new TutorialProgress();
+  private progress = new TutorialProgress(chapterSteps("basic"));
+  private progressStore = new EducationProgressStore();
+  private lastSavedProgress = "";
+  private conqueredPlayers = 0;
+  private lastConquestTick = -1;
   private started = false;
+  private chapterRequested = false;
+  private gameGeneration = 0;
   private costs = new Map<UnitType, bigint>();
-  private keybinds: Record<string, { key?: string }> | null = null;
   private mapMarksActive = false;
   /** Latched: an atom bomb of ours was seen in flight at least once. */
   private atomLaunchSeen = false;
@@ -121,9 +160,115 @@ export class TutorialPanel extends LitElement implements Controller {
   @state() private attackNations = false;
   private completeTicks: number | null = null;
   private highlight: TutorialHighlight | null = null;
+  private modernPhases = new Map<string, string>();
+  private modernAirOutbounds = 0;
+  private modernAirReturns = 0;
+  private modernAirRearms = 0;
+  private modernBlockades = new Set<string>();
+  private modernArmyLosses = new Map<string, number>();
+  private modernAdaptedBattles = 0;
+  private modernHarshBattles = 0;
+  private modernSufferedBlockades = new Set<string>();
+  private modernPortRecoveries = new Set<string>();
+  private modernNuclearTargets = new Map<number, [number, number]>();
+  private modernNuclearImpacts = new Set<number>();
+  private modernHighlightElement: HTMLElement | null = null;
+  private modernQueuedOrderIds = new Set<string>();
+  private guideHome: { parent: Node; next: ChildNode | null } | null = null;
 
   createRenderRoot() {
     return this;
+  }
+
+  /** The DOM panel is reused across matches; game evidence is not. */
+  init(): void {
+    // The original bottom HUD forms a z=200 stacking context. Modern practice
+    // sits near the top of the map and must remain clickable above z=900
+    // leaderboards; preserve the original DOM placement for Classic.
+    const modern = this.game.config().gameConfig().modernMode?.version === 2;
+    if (modern && this.parentNode && this.parentNode !== document.body) {
+      this.guideHome ??= { parent: this.parentNode, next: this.nextSibling };
+      document.body.append(this);
+    } else if (!modern && this.guideHome) {
+      const { parent, next } = this.guideHome;
+      if (parent.isConnected)
+        parent.insertBefore(this, next?.parentNode === parent ? next : null);
+      this.guideHome = null;
+    }
+    for (const name of [
+      "fixed",
+      "inset-x-0",
+      "top-0",
+      "z-[960]",
+      "pointer-events-none",
+    ])
+      this.classList.toggle(name, modern);
+    this.modernHighlightElement?.classList.remove("ring-2", "ring-yellow-300");
+    this.modernHighlightElement = null;
+    this.modernQueuedOrderIds.clear();
+    this.gameGeneration++;
+    this.active = false;
+    this.classList.add("hidden");
+    this.started = false;
+    this.showingOptions = false;
+    this.chapterRequested = false;
+    this.progress = new TutorialProgress(chapterSteps("basic"));
+    this.chapter = "basic";
+    this.ctx = null;
+    this.completeTicks = null;
+    this.guidePaused = false;
+    this.showingHint = false;
+    this.confirmingClose = false;
+    this.storageError = false;
+    this.lastSavedProgress = "";
+    this.conqueredPlayers = 0;
+    this.lastConquestTick = -1;
+    this.costs.clear();
+    this.mapMarksActive = false;
+    this.atomLaunchSeen = false;
+    this.boatSeen = false;
+    this.lastAttackRatio = null;
+    this.nationRelations.clear();
+    this.borderingIds = null;
+    this.hasCoast = null;
+    this.borderFetch = null;
+    this.attackNations = false;
+    this.highlight = null;
+    this.modernPhases.clear();
+    this.modernAirOutbounds = this.modernAirReturns = this.modernAirRearms = 0;
+    this.modernBlockades.clear();
+    this.modernArmyLosses.clear();
+    this.modernAdaptedBattles = this.modernHarshBattles = 0;
+    this.modernSufferedBlockades.clear();
+    this.modernPortRecoveries.clear();
+    this.modernNuclearTargets.clear();
+    this.modernNuclearImpacts.clear();
+    this.uiState.modernCameraMoves = 0;
+    this.uiState.modernZoomChanges = 0;
+    this.uiState.modernBoxSelections = 0;
+    this.uiState.modernAdditionalSelections = 0;
+    this.uiState.modernCursorPreviewCount = 0;
+    this.uiState.modernQueuedOrders = 0;
+  }
+
+  dispose(): void {
+    this.gameGeneration++;
+    this.setActive(false);
+    this.modernHighlightElement?.classList.remove("ring-2", "ring-yellow-300");
+    this.modernHighlightElement = null;
+    if (this.guideHome) {
+      const { parent, next } = this.guideHome;
+      if (parent.isConnected)
+        parent.insertBefore(this, next?.parentNode === parent ? next : null);
+      this.guideHome = null;
+    }
+    this.classList.remove(
+      "fixed",
+      "inset-x-0",
+      "top-0",
+      "z-[960]",
+      "pointer-events-none",
+    );
   }
 
   tick() {
@@ -131,7 +276,15 @@ export class TutorialPanel extends LitElement implements Controller {
     // subscribed to TutorialStateEvent.
     if (!this.started) {
       this.started = true;
-      this.setActive(!this.userSettings.tutorialDismissed());
+      const requested = consumeRequestedChapter();
+      if (requested) this.startChapter(requested);
+      // Fully occupied scenarios cannot teach the Classic wilderness course
+      // automatically. Explicit practice/resume remains available.
+      this.setActive(
+        this.chapterRequested ||
+          (!this.game.config().gameConfig().modernMode &&
+            !this.userSettings.tutorialDismissed()),
+      );
     }
     if (!this.active) return;
 
@@ -145,20 +298,38 @@ export class TutorialPanel extends LitElement implements Controller {
       return;
     }
 
+    // The renderer's first tick can precede the worker's scenario bootstrap.
+    // Missing initial state is loading, not an unavailable practice feature.
+    if (
+      this.game.config().gameConfig().modernMode?.scenario ===
+        "modern-regions-v2" &&
+      !this.game
+        .modernSystems()
+        ?.factions.some((faction) => faction.playerId === player.id())
+    )
+      return;
+
     if (this.completeTicks !== null) {
-      if (++this.completeTicks >= COMPLETE_LINGER_TICKS) this.dismissForever();
       return;
     }
 
     if (this.game.ticks() % COST_POLL_TICKS === 0) {
-      player.buildables(undefined, COST_POLL_TYPES).then((buildables) => {
-        this.costs = new Map(buildables.map((b) => [b.type, b.cost]));
-      });
+      const generation = this.gameGeneration;
+      player
+        .buildables(undefined, COST_POLL_TYPES)
+        .then((buildables) => {
+          if (generation !== this.gameGeneration) return;
+          this.costs = new Map(buildables.map((b) => [b.type, b.cost]));
+        })
+        .catch(() => {
+          /* Retain unknown costs until the current worker responds. */
+        });
     }
 
     const ctx = this.buildContext(player);
-    this.progress.update(ctx);
+    if (!this.guidePaused) this.progress.update(ctx);
     this.ctx = ctx;
+    this.saveProgress();
 
     if (this.progress.finished()) {
       this.completeTicks = 0;
@@ -170,9 +341,12 @@ export class TutorialPanel extends LitElement implements Controller {
       this.refreshBordering(player);
     }
     const target =
-      step && !this.progress.stepDone() ? (step.highlight ?? null) : null;
+      step && !this.progress.stepDone() && !this.guidePaused
+        ? (step.highlight ?? null)
+        : null;
     this.setHighlight(target);
     this.syncMapMarkers(target);
+    this.syncModernHighlight(step?.id ?? null);
     this.game.setOwnSpawnRing(target === "territory");
   }
 
@@ -277,21 +451,28 @@ export class TutorialPanel extends LitElement implements Controller {
       this.borderFetch !== null
     )
       return;
-    this.borderFetch = player.borderTiles().then((bt) => {
-      this.borderFetch = null;
-      const myID = player.smallID();
-      const ids = new Set<number>();
-      let coast = false;
-      for (const tile of bt.borderTiles) {
-        if (this.game.isShore(tile)) coast = true;
-        for (const n of this.game.neighbors(tile)) {
-          const owner = this.game.ownerID(n);
-          if (owner !== 0 && owner !== myID) ids.add(owner);
+    const generation = this.gameGeneration;
+    this.borderFetch = player
+      .borderTiles()
+      .then((bt) => {
+        if (generation !== this.gameGeneration) return;
+        this.borderFetch = null;
+        const myID = player.smallID();
+        const ids = new Set<number>();
+        let coast = false;
+        for (const tile of bt.borderTiles) {
+          if (this.game.isShore(tile)) coast = true;
+          for (const n of this.game.neighbors(tile)) {
+            const owner = this.game.ownerID(n);
+            if (owner !== 0 && owner !== myID) ids.add(owner);
+          }
         }
-      }
-      this.borderingIds = ids;
-      this.hasCoast = coast;
-    });
+        this.borderingIds = ids;
+        this.hasCoast = coast;
+      })
+      .catch(() => {
+        if (generation === this.gameGeneration) this.borderFetch = null;
+      });
   }
 
   /**
@@ -312,15 +493,22 @@ export class TutorialPanel extends LitElement implements Controller {
     if (this.game.ticks() % 20 !== 0) return;
     const me = this.game.myPlayer();
     if (me === null) return;
+    const generation = this.gameGeneration;
     for (const id of ids) {
       const nation = this.game.playerBySmallID(id);
       if (!nation.isPlayer()) continue;
-      (nation as PlayerView).profile().then((profile) => {
-        this.nationRelations.set(
-          id,
-          profile.relations[me.smallID()] ?? Relation.Neutral,
-        );
-      });
+      (nation as PlayerView)
+        .profile()
+        .then((profile) => {
+          if (generation !== this.gameGeneration) return;
+          this.nationRelations.set(
+            id,
+            profile.relations[me.smallID()] ?? Relation.Neutral,
+          );
+        })
+        .catch(() => {
+          /* Unknown relations remain neutral while reconnecting. */
+        });
     }
   }
 
@@ -330,10 +518,26 @@ export class TutorialPanel extends LitElement implements Controller {
     const attackRatioMoved =
       this.lastAttackRatio !== null && attackRatio !== this.lastAttackRatio;
     this.lastAttackRatio = attackRatio;
+    // Only a real conquest event validates defeating an opponent. Neither
+    // issuing an attack nor banking gold counts as completing this practice.
+    if (this.lastConquestTick !== this.game.ticks()) {
+      this.lastConquestTick = this.game.ticks();
+      this.conqueredPlayers += (
+        this.game.updatesSinceLastTick()?.[GameUpdateType.ConquestEvent] ?? []
+      ).filter((c) => c.conquerorId === player.id()).length;
+    }
+    const completed = (type: UnitType) =>
+      player
+        .units(type)
+        .filter((unit) => unit.isActive() && !unit.isUnderConstruction())
+        .length;
     return {
+      modern: this.buildModernEvidence(player),
       hasSpawned: player.hasSpawned(),
       inSpawnPhase: this.game.inSpawnPhase(),
       attacking: attacks.length > 0,
+      tilesOwned: player.numTilesOwned(),
+      conqueredPlayers: this.conqueredPlayers,
       attackRatioMoved,
       boatsDisabled: this.game.config().isUnitDisabled(UnitType.TransportShip),
       boatSent: (this.boatSeen ||=
@@ -349,19 +553,19 @@ export class TutorialPanel extends LitElement implements Controller {
       gold: player.gold(),
       cityCost: this.costs.get(UnitType.City) ?? null,
       cityDisabled: this.game.config().isUnitDisabled(UnitType.City),
-      cities: player.units(UnitType.City).length,
+      cities: completed(UnitType.City),
       portDisabled: this.game.config().isUnitDisabled(UnitType.Port),
-      ports: player.units(UnitType.Port).length,
+      ports: completed(UnitType.Port),
       defensePostDisabled: this.game
         .config()
         .isUnitDisabled(UnitType.DefensePost),
-      defensePosts: player.units(UnitType.DefensePost).length,
+      defensePosts: completed(UnitType.DefensePost),
       factoryDisabled: this.game.config().isUnitDisabled(UnitType.Factory),
-      factories: player.units(UnitType.Factory).length,
+      factories: completed(UnitType.Factory),
       warshipDisabled: this.game.config().isUnitDisabled(UnitType.Warship),
-      warships: player.units(UnitType.Warship).length,
+      warships: completed(UnitType.Warship),
       siloDisabled: this.game.config().isUnitDisabled(UnitType.MissileSilo),
-      silos: player.units(UnitType.MissileSilo).length,
+      silos: completed(UnitType.MissileSilo),
       atomDisabled: this.game.config().isUnitDisabled(UnitType.AtomBomb),
       // Mirrors PlayerImpl.nukeSpawn's ready-silo filter.
       siloReady: player
@@ -379,16 +583,557 @@ export class TutorialPanel extends LitElement implements Controller {
     };
   }
 
+  private buildModernEvidence(
+    player: PlayerView,
+  ): ModernTutorialEvidence | undefined {
+    const systems = this.game.modernSystems?.();
+    if (!systems) return undefined;
+    const own = systems.factions.find(
+      (faction) => faction.playerId === player.id(),
+    );
+    if (!own) return undefined;
+    const nukeTypes = [
+      UnitType.AtomBomb,
+      UnitType.HydrogenBomb,
+      UnitType.MIRVWarhead,
+    ];
+    for (const unit of player.units(...nukeTypes)) {
+      const target = unit.targetTile();
+      if (
+        target !== undefined &&
+        !this.modernNuclearTargets.has(unit.id()) &&
+        this.modernNuclearTargets.size < 64
+      )
+        this.modernNuclearTargets.set(unit.id(), [
+          target,
+          this.game.ownerID(target),
+        ]);
+    }
+    const impacted = new Set(this.game.recentlyNukedTiles?.() ?? []);
+    for (const update of this.game.updatesSinceLastTick()?.[
+      GameUpdateType.Unit
+    ] ?? []) {
+      const target = this.modernNuclearTargets.get(update.id);
+      if (
+        target &&
+        update.ownerID === player.smallID() &&
+        nukeTypes.includes(update.unitType) &&
+        update.reachedTarget &&
+        target[1] !== 0 &&
+        target[1] !== player.smallID() &&
+        impacted.has(target[0])
+      )
+        this.modernNuclearImpacts.add(update.id);
+    }
+    const forces = systems.forces.filter(
+      (force) => force.playerId === player.id(),
+    );
+    for (const force of forces) {
+      // A submitted Intent is not success. Count only orders acknowledged in
+      // the worker's actual queue, and keep identities across save/resume.
+      for (const order of force.queue ?? []) {
+        const id = `${force.id}:${order.issuedTick}:${order.kind}:${order.target}`;
+        if (
+          !this.modernQueuedOrderIds.has(id) &&
+          this.modernQueuedOrderIds.size < 1024
+        ) {
+          this.modernQueuedOrderIds.add(id);
+          this.uiState.modernQueuedOrders =
+            (this.uiState.modernQueuedOrders ?? 0) + 1;
+        }
+      }
+      const previous = this.modernPhases.get(force.id);
+      if (force.branch === "air" && previous !== force.phase) {
+        if (force.phase === "outbound") this.modernAirOutbounds++;
+        if (force.phase === "returning") this.modernAirReturns++;
+        if (force.phase === "rearming") {
+          this.modernAirRearms++;
+          // Modern state is sent every ten ticks. A short return flight can
+          // finish between updates; a completed sortie rearming at its real
+          // base still proves the return. New production has no such mission.
+          if (
+            previous !== "returning" &&
+            force.completedMissions > 0 &&
+            systems.bases.some(
+              (base) =>
+                base.id === force.baseId &&
+                base.playerId === player.id() &&
+                base.tile === force.tile,
+            )
+          )
+            this.modernAirReturns++;
+        }
+      }
+      this.modernPhases.set(force.id, force.phase);
+      if (force.branch === "army") {
+        const previousLoss = this.modernArmyLosses.get(force.id);
+        if (previousLoss !== undefined && force.casualties > previousLoss) {
+          const efficiency = climateCombatEfficiency(
+            own,
+            force.command?.target ?? force.tile,
+          );
+          if (efficiency > 1000) this.modernAdaptedBattles++;
+          if (efficiency < 1000) this.modernHarshBattles++;
+        }
+        this.modernArmyLosses.set(force.id, force.casualties);
+      }
+    }
+    const ports = systems.ports.filter((port) => port.ownerId === player.id());
+    for (const port of ports) {
+      if (port.blockadedBy.length > 0)
+        this.modernSufferedBlockades.add(port.portId);
+      else if (
+        port.incomePerSecond > 0 &&
+        this.modernSufferedBlockades.has(port.portId)
+      )
+        this.modernPortRecoveries.add(port.portId);
+    }
+    for (const port of systems.ports) {
+      if (port.blockadedBy.includes(player.id()))
+        this.modernBlockades.add(port.portId);
+    }
+    const total =
+      this.game.config().gameConfig().modernMode?.initialPopulation ??
+      MODERN_RULES.initialPopulation;
+    return {
+      independent:
+        new Set(systems.factions.map((faction) => faction.playerId)).size ===
+          systems.factions.length &&
+        new Set(systems.factions.map((faction) => faction.factionId)).size ===
+          systems.factions.length,
+      equalPopulation: systems.factions.every(
+        (faction) =>
+          faction.population.total + faction.population.dead === total &&
+          faction.population.total ===
+            faction.population.civilian +
+              faction.population.available +
+              faction.population.army +
+              faction.population.navy +
+              faction.population.air,
+      ),
+      branchesUsed: [...(this.uiState.modernBranchesUsed ?? [])],
+      cameraMoves: this.uiState.modernCameraMoves ?? 0,
+      zoomChanges: this.uiState.modernZoomChanges ?? 0,
+      cursorPreviews: this.uiState.modernCursorPreviewCount ?? 0,
+      boxSelections: this.uiState.modernBoxSelections ?? 0,
+      additionalSelections: this.uiState.modernAdditionalSelections ?? 0,
+      queuedOrders: this.uiState.modernQueuedOrders ?? 0,
+      armyBasesCompleted: (systems.completedProduction ?? [])
+        .filter(
+          (entry) =>
+            entry.playerId === player.id() && entry.kind === "armybase",
+        )
+        .reduce((n, entry) => n + entry.count, 0),
+      armyTrained: (systems.completedProduction ?? [])
+        .filter(
+          (entry) => entry.playerId === player.id() && entry.kind === "army",
+        )
+        .reduce((n, entry) => n + entry.count, 0),
+      navalBasesCompleted: (systems.completedProduction ?? [])
+        .filter(
+          (entry) =>
+            entry.playerId === player.id() && entry.kind === "navybase",
+        )
+        .reduce((n, entry) => n + entry.count, 0),
+      aircraftProduced: (systems.completedProduction ?? [])
+        .filter(
+          (entry) =>
+            entry.playerId === player.id() &&
+            ["fighter", "strike"].includes(entry.kind),
+        )
+        .reduce((n, entry) => n + entry.count, 0),
+      selectionCount: this.uiState.modernSelectedForceIds?.length ?? 0,
+      armyMissions: forces
+        .filter((force) => force.branch === "army")
+        .reduce((sum, force) => sum + force.completedMissions, 0),
+      navyMissions: forces
+        .filter((force) => force.branch === "navy")
+        .reduce((sum, force) => sum + force.completedMissions, 0),
+      airMissions: forces
+        .filter((force) => force.branch === "air")
+        .reduce((sum, force) => sum + force.completedMissions, 0),
+      airOutbounds: this.modernAirOutbounds,
+      airReturns: this.modernAirReturns,
+      airRearms: this.modernAirRearms,
+      airCasualties: forces
+        .filter((force) => force.branch === "air")
+        .reduce((sum, force) => sum + force.casualties, 0),
+      armyCasualties: forces
+        .filter((force) => force.branch === "army")
+        .reduce((sum, force) => sum + force.casualties, 0),
+      airBases: systems.bases.filter(
+        (base) =>
+          base.playerId === player.id() &&
+          (base.branch ?? "air") === "air" &&
+          base.health > 0 &&
+          (base.completesTick ?? 0) <= this.game.ticks(),
+      ).length,
+      completedTraining: own.completedTraining,
+      portCaptures: ports.reduce((sum, port) => sum + port.captureCount, 0),
+      portLevels: ports.reduce((sum, port) => sum + port.level, 0),
+      portIncome: ports.reduce((sum, port) => sum + port.incomePerSecond, 0),
+      blockadesSeen: this.modernBlockades.size,
+      blockadesSuffered: this.modernSufferedBlockades.size,
+      portRecoveries: this.modernPortRecoveries.size,
+      nuclearLaunches: own.nuclearStrikes.length,
+      nuclearIncomeLoss: nuclearEffects(own, this.game.ticks())
+        .incomeLossPermille,
+      nuclearImpacts: this.modernNuclearImpacts.size,
+      completedStops: this.uiState.modernCompletedStops ?? 0,
+      climatePreviewAdapted: Boolean(this.uiState.modernClimatePreviewAdapted),
+      climatePreviewHarsh: Boolean(this.uiState.modernClimatePreviewHarsh),
+      climateAdaptedBattles: this.modernAdaptedBattles,
+      climateHarshBattles: this.modernHarshBattles,
+      aiLevelsVisible: Boolean(this.uiState.modernAIInfoInspected),
+    };
+  }
+
   private hotkeyFor(step: TutorialStep): string {
     if (!step.hotkey) return "";
-    this.keybinds ??= this.userSettings.parsedUserKeybinds();
-    return this.keybinds[step.hotkey]?.key ?? HOTKEY_FALLBACKS[step.hotkey];
+    const binding = this.userSettings.effectiveKeybinds(
+      this.game.config().gameConfig().modernMode?.version === 2
+        ? "modern"
+        : "classic",
+      Platform.isMac,
+    )[step.hotkey];
+    return binding
+      ? binding
+          .split("+")
+          .map((key) => key.replace(/^Key|^Digit/, ""))
+          .join(" + ")
+      : translateText("education.unbound");
+  }
+
+  public startChapter(id: TutorialChapterID, resume = false): void {
+    this.chapterRequested = true;
+    this.chapter = id;
+    this.progress = new TutorialProgress(chapterSteps(id));
+    if (!resume) {
+      this.conqueredPlayers = 0;
+      this.modernSufferedBlockades.clear();
+      this.modernPortRecoveries.clear();
+      this.uiState.modernAIInfoInspected = false;
+      // An update already delivered before this chapter began is old evidence.
+      this.lastConquestTick = this.game.ticks();
+    }
+    if (resume) {
+      const saved = this.progressStore.load(id);
+      if (saved) this.progress.restore(saved);
+    }
+    this.completeTicks = null;
+    this.confirmingClose = false;
+    this.guidePaused = false;
+    this.showingHint = false;
+    this.lastSavedProgress = "";
+    this.userSettings?.setTutorialDismissed(false);
+    this.setActive(true);
+  }
+
+  private chooseChapter(id: TutorialChapterID, restart = false): void {
+    const mode = this.game.config().gameConfig().modernMode;
+    if (
+      id.startsWith("modern_") &&
+      (restart ||
+        mode?.scenario !== "modern-regions-v2" ||
+        mode.trainingLesson !== id.slice(7))
+    ) {
+      requestChapter(id);
+      document.dispatchEvent(
+        new CustomEvent("start-tutorial", { detail: { chapter: id } }),
+      );
+      return;
+    }
+    this.startChapter(id);
+  }
+
+  public educationSnapshot() {
+    return {
+      panelVersion: 1 as const,
+      active: this.active,
+      guidePaused: this.guidePaused,
+      chapter: this.chapter,
+      progress: this.progress.snapshot(),
+      evidence: {
+        conqueredPlayers: this.conqueredPlayers,
+        atomLaunchSeen: this.atomLaunchSeen,
+        boatSeen: this.boatSeen,
+        modern: {
+          phases: [...this.modernPhases],
+          outbounds: this.modernAirOutbounds,
+          returns: this.modernAirReturns,
+          rearms: this.modernAirRearms,
+          blockades: [...this.modernBlockades],
+          branches: this.uiState.modernBranchesUsed ?? [],
+          completedStops: this.uiState.modernCompletedStops ?? 0,
+          cameraMoves: this.uiState.modernCameraMoves ?? 0,
+          zoomChanges: this.uiState.modernZoomChanges ?? 0,
+          boxSelections: this.uiState.modernBoxSelections ?? 0,
+          additionalSelections: this.uiState.modernAdditionalSelections ?? 0,
+          cursorPreviews: this.uiState.modernCursorPreviewCount ?? 0,
+          queuedOrders: this.uiState.modernQueuedOrders ?? 0,
+          queuedOrderIds: [...this.modernQueuedOrderIds],
+          climatePreviewAdapted:
+            this.uiState.modernClimatePreviewAdapted ?? false,
+          climatePreviewHarsh: this.uiState.modernClimatePreviewHarsh ?? false,
+          aiInfoInspected: this.uiState.modernAIInfoInspected ?? false,
+          armyLosses: [...this.modernArmyLosses],
+          adaptedBattles: this.modernAdaptedBattles,
+          harshBattles: this.modernHarshBattles,
+          sufferedBlockades: [...this.modernSufferedBlockades],
+          portRecoveries: [...this.modernPortRecoveries],
+          nuclearTargets: [...this.modernNuclearTargets].map(
+            ([id, [tile, owner]]) =>
+              [id, tile, owner] as [number, number, number],
+          ),
+          nuclearImpacts: [...this.modernNuclearImpacts],
+        },
+      },
+    };
+  }
+
+  public restoreEducationSnapshot(saved: {
+    panelVersion?: 1;
+    active?: boolean;
+    guidePaused?: boolean;
+    chapter: TutorialChapterID;
+    progress: TutorialProgressSnapshot;
+    evidence?: {
+      conqueredPlayers: number;
+      atomLaunchSeen: boolean;
+      boatSeen: boolean;
+      modern?: {
+        phases: [string, string][];
+        outbounds: number;
+        returns: number;
+        rearms: number;
+        blockades: string[];
+        branches: string[];
+        completedStops: number;
+        cameraMoves?: number;
+        zoomChanges?: number;
+        boxSelections?: number;
+        additionalSelections?: number;
+        cursorPreviews?: number;
+        queuedOrders?: number;
+        queuedOrderIds?: string[];
+        climatePreviewAdapted: boolean;
+        climatePreviewHarsh: boolean;
+        aiInfoInspected?: boolean;
+        armyLosses?: [string, number][];
+        adaptedBattles?: number;
+        harshBattles?: number;
+        sufferedBlockades?: string[];
+        portRecoveries?: string[];
+        nuclearTargets?: [number, number, number][];
+        nuclearImpacts?: number[];
+      };
+    };
+  }): boolean {
+    if (!TUTORIAL_CHAPTERS.some((c) => c.id === saved.chapter)) return false;
+    if (
+      (saved.panelVersion !== undefined && saved.panelVersion !== 1) ||
+      (saved.active !== undefined && typeof saved.active !== "boolean") ||
+      (saved.guidePaused !== undefined &&
+        typeof saved.guidePaused !== "boolean")
+    )
+      return false;
+    const progress = new TutorialProgress(chapterSteps(saved.chapter));
+    if (!progress.restore(saved.progress)) return false;
+    const evidence = saved.evidence;
+    if (
+      evidence &&
+      (!Number.isSafeInteger(evidence.conqueredPlayers) ||
+        evidence.conqueredPlayers < 0 ||
+        typeof evidence.atomLaunchSeen !== "boolean" ||
+        typeof evidence.boatSeen !== "boolean")
+    )
+      return false;
+    const modernEvidence = evidence?.modern;
+    if (
+      modernEvidence &&
+      (!Array.isArray(modernEvidence.queuedOrderIds ?? []) ||
+        (modernEvidence.queuedOrderIds ?? []).length > 1024 ||
+        !(modernEvidence.queuedOrderIds ?? []).every(
+          (id) => typeof id === "string" && id.length <= 256,
+        ))
+    )
+      return false;
+    if (
+      modernEvidence &&
+      (!Array.isArray(modernEvidence.nuclearTargets ?? []) ||
+        (modernEvidence.nuclearTargets ?? []).length > 64 ||
+        !(modernEvidence.nuclearTargets ?? []).every(
+          (entry) =>
+            Array.isArray(entry) &&
+            entry.length === 3 &&
+            entry.every((value) => Number.isSafeInteger(value) && value >= 0),
+        ) ||
+        !Array.isArray(modernEvidence.nuclearImpacts ?? []) ||
+        (modernEvidence.nuclearImpacts ?? []).length > 64 ||
+        !(modernEvidence.nuclearImpacts ?? []).every(
+          (value) => Number.isSafeInteger(value) && value >= 0,
+        ))
+    )
+      return false;
+    if (
+      modernEvidence &&
+      (![
+        modernEvidence.outbounds,
+        modernEvidence.returns,
+        modernEvidence.rearms,
+        modernEvidence.completedStops,
+        modernEvidence.cameraMoves ?? 0,
+        modernEvidence.zoomChanges ?? 0,
+        modernEvidence.boxSelections ?? 0,
+        modernEvidence.additionalSelections ?? 0,
+        modernEvidence.cursorPreviews ?? 0,
+        modernEvidence.queuedOrders ?? 0,
+        modernEvidence.adaptedBattles ?? 0,
+        modernEvidence.harshBattles ?? 0,
+      ].every((value) => Number.isSafeInteger(value) && value >= 0) ||
+        ![
+          modernEvidence.climatePreviewAdapted,
+          modernEvidence.climatePreviewHarsh,
+          modernEvidence.aiInfoInspected ?? false,
+        ].every((value) => typeof value === "boolean") ||
+        !Array.isArray(modernEvidence.phases) ||
+        !modernEvidence.phases.every(
+          (entry) =>
+            Array.isArray(entry) &&
+            entry.length === 2 &&
+            entry.every((value) => typeof value === "string"),
+        ) ||
+        !Array.isArray(modernEvidence.branches) ||
+        !modernEvidence.branches.every((branch) =>
+          ["army", "navy", "air"].includes(branch),
+        ) ||
+        !Array.isArray(modernEvidence.blockades) ||
+        !modernEvidence.blockades.every((id) => typeof id === "string") ||
+        ![
+          modernEvidence.sufferedBlockades ?? [],
+          modernEvidence.portRecoveries ?? [],
+        ].every(
+          (entries) =>
+            Array.isArray(entries) &&
+            entries.every((id) => typeof id === "string"),
+        ) ||
+        (modernEvidence.armyLosses !== undefined &&
+          (!Array.isArray(modernEvidence.armyLosses) ||
+            !modernEvidence.armyLosses.every(
+              (entry) =>
+                Array.isArray(entry) &&
+                entry.length === 2 &&
+                typeof entry[0] === "string" &&
+                Number.isSafeInteger(entry[1]) &&
+                entry[1] >= 0,
+            ))))
+    )
+      return false;
+    this.chapter = saved.chapter;
+    this.progress = progress;
+    // Previous saves captured a basic cursor even when the panel was hidden.
+    // Missing visibility must never turn that cursor into a Modern lesson.
+    const active =
+      saved.active ??
+      (!this.game.config().gameConfig().modernMode &&
+        !this.userSettings.tutorialDismissed());
+    this.started = true;
+    this.chapterRequested = active;
+    this.guidePaused = saved.guidePaused ?? false;
+    this.completeTicks = progress.finished() ? 0 : null;
+    this.confirmingClose = false;
+    this.showingHint = false;
+    this.lastSavedProgress = "";
+    if (saved.evidence) {
+      this.conqueredPlayers = saved.evidence.conqueredPlayers;
+      this.atomLaunchSeen = saved.evidence.atomLaunchSeen;
+      this.boatSeen = saved.evidence.boatSeen;
+      if (saved.evidence.modern) {
+        const modern = saved.evidence.modern;
+        this.modernQueuedOrderIds = new Set(modern.queuedOrderIds ?? []);
+        this.modernPhases = new Map(modern.phases);
+        this.modernAirOutbounds = modern.outbounds;
+        this.modernAirReturns = modern.returns;
+        this.modernAirRearms = modern.rearms;
+        this.modernBlockades = new Set(modern.blockades);
+        this.uiState.modernBranchesUsed = [...modern.branches];
+        this.uiState.modernCompletedStops = modern.completedStops;
+        this.uiState.modernCameraMoves = modern.cameraMoves ?? 0;
+        this.uiState.modernZoomChanges = modern.zoomChanges ?? 0;
+        this.uiState.modernBoxSelections = modern.boxSelections ?? 0;
+        this.uiState.modernAdditionalSelections =
+          modern.additionalSelections ?? 0;
+        this.uiState.modernCursorPreviewCount = modern.cursorPreviews ?? 0;
+        this.uiState.modernQueuedOrders = modern.queuedOrders ?? 0;
+        this.uiState.modernClimatePreviewAdapted = modern.climatePreviewAdapted;
+        this.uiState.modernClimatePreviewHarsh = modern.climatePreviewHarsh;
+        this.uiState.modernAIInfoInspected = modern.aiInfoInspected ?? false;
+        this.modernArmyLosses = new Map(modern.armyLosses ?? []);
+        this.modernAdaptedBattles = modern.adaptedBattles ?? 0;
+        this.modernHarshBattles = modern.harshBattles ?? 0;
+        this.modernSufferedBlockades = new Set(modern.sufferedBlockades ?? []);
+        this.modernPortRecoveries = new Set(modern.portRecoveries ?? []);
+        this.modernNuclearTargets = new Map(
+          (modern.nuclearTargets ?? []).map(([id, tile, owner]) => [
+            id,
+            [tile, owner],
+          ]),
+        );
+        this.modernNuclearImpacts = new Set(modern.nuclearImpacts ?? []);
+      }
+    }
+    this.lastConquestTick = this.game.ticks();
+    this.setActive(active);
+    return true;
+  }
+
+  private saveProgress(): void {
+    const snapshot = this.progress.snapshot();
+    const serialized = JSON.stringify(snapshot);
+    if (serialized === this.lastSavedProgress) return;
+    this.storageError = !this.progressStore.save(this.chapter, snapshot);
+    if (!this.storageError) this.lastSavedProgress = serialized;
   }
 
   private setHighlight(target: TutorialHighlight | null) {
     if (this.highlight === target) return;
     this.highlight = target;
     this.eventBus.emit(new TutorialHighlightEvent(target));
+  }
+  private syncModernHighlight(stepId: string | null): void {
+    const targets: Record<string, string> = {
+      modern_branches: "army",
+      modern_select: "selection",
+      modern_box_select: "selection",
+      modern_cursor: "selection",
+      modern_army_move: "selection",
+      modern_queue: "selection",
+      modern_stop: "stop",
+      modern_armybase: "armybase",
+      modern_army_train: "army",
+      modern_navybase: "navybase",
+      modern_navy_move: "navy",
+      modern_airbase: "airbase",
+      modern_air_produce: "fighter",
+      modern_air_launch: "air",
+      modern_population: "production",
+      modern_mobilization: "production",
+    };
+    const target = stepId ? targets[stepId] : undefined;
+    const panel = document.querySelector("modern-command-panel");
+    const element = target
+      ? (panel?.querySelector<HTMLElement>(
+          `[data-modern-highlight="${target}"]`,
+        ) ??
+        panel?.querySelector<HTMLElement>(
+          '[data-modern-highlight="production"]',
+        ) ??
+        null)
+      : null;
+    if (element === this.modernHighlightElement) return;
+    this.modernHighlightElement?.classList.remove("ring-2", "ring-yellow-300");
+    this.modernHighlightElement = element ?? null;
+    this.modernHighlightElement?.classList.add("ring-2", "ring-yellow-300");
   }
 
   private setActive(active: boolean) {
@@ -398,6 +1143,7 @@ export class TutorialPanel extends LitElement implements Controller {
     // the flow when hidden so it doesn't add a gap there.
     this.classList.toggle("hidden", !active);
     if (!active) {
+      this.syncModernHighlight(null);
       this.setHighlight(null);
       this.syncMapMarkers(null);
       this.game.setOwnSpawnRing(false);
@@ -411,17 +1157,43 @@ export class TutorialPanel extends LitElement implements Controller {
 
   render() {
     if (!this.active) return nothing;
+    const modernGuide = this.ctx?.modern !== undefined;
     return html`
       <div
+        data-modern-guide=${modernGuide ? "true" : "false"}
         dir=${textDirection()}
-        class="pointer-events-auto w-full sm:rounded-lg bg-gray-800/92 backdrop-blur-sm shadow-lg text-white text-base p-2 sm:mb-1"
+        class="pointer-events-auto ${modernGuide
+          ? "fixed top-16 left-1/2 -translate-x-1/2 w-[min(500px,calc(100vw-1rem))] max-h-[35vh] overflow-y-auto"
+          : "w-full"} sm:rounded-lg bg-gray-800/92 backdrop-blur-sm shadow-lg text-white text-base p-2 sm:mb-1"
         @contextmenu=${(e: MouseEvent) => e.preventDefault()}
       >
         <div class="flex items-center justify-between gap-2 mb-1">
-          <span
-            class="font-bold text-cyber-yellow uppercase tracking-wide text-sm"
-            >${translateText("tutorial.title")}</span
-          >
+          <span class="flex items-center gap-2">
+            <span
+              class="font-bold text-cyber-yellow uppercase tracking-wide text-sm"
+              >${translateText("tutorial.title")}</span
+            >
+            ${modernGuide
+              ? html`
+                  <button
+                    class="text-xs underline font-normal"
+                    @click=${() => (this.showingOptions = !this.showingOptions)}
+                    aria-expanded=${this.showingOptions}
+                  >
+                    ${translateText("education.chapter")}
+                  </button>
+                  <button
+                    class="text-xs underline font-normal"
+                    @click=${() =>
+                      document
+                        .querySelector<HelpModal>("help-modal")
+                        ?.openControls()}
+                  >
+                    ${translateText("repair.open_controls")}
+                  </button>
+                `
+              : nothing}
+          </span>
           <span class="flex items-center gap-2 text-sm text-gray-300">
             ${this.confirmingClose ? nothing : this.renderHeaderActions()}
             ${this.ctx && !this.progress.finished()
@@ -440,7 +1212,96 @@ export class TutorialPanel extends LitElement implements Controller {
             </button>
           </span>
         </div>
+        ${!modernGuide || this.showingOptions
+          ? html`<div class="flex flex-wrap items-center gap-2 mb-1 text-xs">
+              <label>
+                ${translateText("education.chapter")}
+                <select
+                  class="bg-gray-900 border border-gray-500 rounded px-1 py-0.5"
+                  .value=${this.chapter}
+                  @change=${(event: Event) =>
+                    this.chooseChapter(
+                      (event.target as HTMLSelectElement)
+                        .value as TutorialChapterID,
+                    )}
+                >
+                  ${TUTORIAL_CHAPTERS.map(
+                    (chapter) =>
+                      html`<option
+                        value=${chapter.id}
+                        ?selected=${chapter.id === this.chapter}
+                      >
+                        ${translateText(`education.chapters.${chapter.id}`)}
+                      </option>`,
+                  )}
+                </select>
+              </label>
+              <button
+                class="underline"
+                @click=${() => this.chooseChapter(this.chapter, true)}
+              >
+                ${translateText("education.repeat")}
+              </button>
+              <button
+                class="underline"
+                @click=${() => this.startChapter(this.chapter, true)}
+              >
+                ${translateText("education.resume")}
+              </button>
+              <button
+                class="underline"
+                @click=${() => (this.guidePaused = !this.guidePaused)}
+              >
+                ${translateText(
+                  this.guidePaused
+                    ? "education.resume_guide"
+                    : "education.pause_guide",
+                )}
+              </button>
+              <button
+                class="underline"
+                @click=${() => (this.showingHint = !this.showingHint)}
+              >
+                ${translateText("education.hint")}
+              </button>
+              <button
+                class="underline"
+                @click=${() => {
+                  const stepId = this.progress.current()?.id;
+                  const feature = EDUCATION_FEATURES.find((feature) =>
+                    feature.tutorialSteps.includes(stepId ?? ""),
+                  );
+                  const help = document.querySelector(
+                    "help-modal",
+                  ) as HelpModal | null;
+                  if (feature && help) help.openFeature(feature.featureId);
+                }}
+              >
+                ${translateText("main.help")}
+              </button>
+            </div>`
+          : nothing}
+        ${this.game.config().gameConfig().training &&
+        (!modernGuide || this.showingOptions)
+          ? html`<p class="text-xs text-blue-200 mb-1">
+              <strong>${translateText("education.trainee")}:</strong>
+              ${translateText("education.training_rules")}
+            </p>`
+          : nothing}
         ${this.confirmingClose ? this.renderCloseChoice() : this.renderStep()}
+        ${this.showingHint
+          ? html`<p class="text-xs text-blue-200 mt-1">${this.hintText()}</p>`
+          : nothing}
+        ${this.guidePaused
+          ? html`<p class="text-xs text-yellow-200">
+              ${translateText("education.guide_paused")}
+            </p>`
+          : nothing}
+        ${this.storageError
+          ? html`<p role="status" class="text-xs text-yellow-200">
+              ${translateText("education.storage_error")}
+            </p>`
+          : nothing}
       </div>
     `;
   }
@@ -502,7 +1363,15 @@ export class TutorialPanel extends LitElement implements Controller {
 
   private renderStep() {
     if (this.completeTicks !== null) {
-      return html`<p>${translateText("tutorial.complete")}</p>`;
+      const outcomes = Object.values(this.progress.result());
+      return html`<p>
+        ${translateText("education.chapter_complete", {
+          practiced: outcomes.filter((outcome) => outcome === "practiced")
+            .length,
+          read: outcomes.filter((outcome) => outcome === "read").length,
+          skipped: outcomes.filter((outcome) => outcome === "skipped").length,
+        })}
+      </p>`;
     }
     const step = this.progress.current();
     if (step === null) return nothing;
@@ -525,11 +1394,44 @@ export class TutorialPanel extends LitElement implements Controller {
               )}
             </ul>`
           : html`<span dir="auto">${this.stepText(step, done)}</span>`}
+        ${done
+          ? html`<span class="block text-xs text-green-200 mt-1"
+              >${translateText(
+                step.manual
+                  ? "education.read_confirmed"
+                  : "education.practice_confirmed",
+              )}</span
+            >`
+          : nothing}
       </p>
     `;
   }
 
   private stepText(step: TutorialStep, done: boolean): string {
+    if (step.id.startsWith("modern_")) {
+      const key =
+        Platform.isTouch && MODERN_TOUCH_TEXT_STEPS.has(step.id)
+          ? `education.modern_touch_steps.${step.id}`
+          : `education.modern_steps.${step.id}`;
+      return translateText(key, {
+        population:
+          this.game.config().gameConfig().modernMode?.initialPopulation ??
+          MODERN_RULES.initialPopulation,
+        armyKey: this.modernKey("modernArmy"),
+        navyKey: this.modernKey("modernNavy"),
+        airKey: this.modernKey("modernAir"),
+        stopKey: this.modernKey("modernStop"),
+        selectKey: this.modernKey("modernSelectVisible"),
+        cancelKey: this.modernKey("cancel"),
+        cameraKey: this.modernKey("centerCamera"),
+        zoomInKey: this.modernKey("zoomInEqual"),
+        zoomOutKey: this.modernKey("zoomOutMinus"),
+        cost: MODERN_RULES.climateTrainingGold,
+        seconds: MODERN_RULES.climateTrainingTicks / 10,
+      });
+    }
+    if (step.id === "spawn" && this.game.config().gameConfig().training)
+      return translateText("education.training_spawn");
     // Multiplayer: the spot is picked but the spawn timer is still running,
     // so don't keep asking the player to pick one.
     if (!done && step.id === "spawn" && this.ctx?.hasSpawned) {
@@ -562,11 +1464,42 @@ export class TutorialPanel extends LitElement implements Controller {
       !done && step.id === "capture_tribes" && this.attackNations
         ? "attack_nations"
         : step.id;
+    if (
+      id === "attack_wilderness" ||
+      id === "capture_tribes" ||
+      id === "attack_nations"
+    ) {
+      return translateText(`education.practice.${id}`);
+    }
     const block =
       Platform.isTouch && TOUCH_TEXT_STEPS.has(id) ? "step_touch" : "step";
     return translateText(`tutorial.${block}.${id}`, {
       cost: renderNumber(this.costs.get(UnitType.City) ?? 0n),
       key: this.hotkeyFor(step),
     });
+  }
+  private modernKey(action: string): string {
+    const key = modernKeybinds(this.userSettings, Platform.isMac)[action];
+    return key ? formatKeyForDisplay(key) : translateText("education.unbound");
+  }
+
+  private hintText(): string {
+    const id = this.progress.current()?.id;
+    const modernHints = new Set([
+      "modern_camera",
+      "modern_box_select",
+      "modern_cursor",
+      "modern_queue",
+      "modern_armybase",
+      "modern_army_train",
+      "modern_navybase",
+      "modern_air_produce",
+    ]);
+    const general = translateText(
+      Platform.isTouch ? "education.touch_hint" : "education.practice_hint",
+    );
+    return id && modernHints.has(id)
+      ? `${translateText(`education.modern_hints.${id}`)} ${general}`
+      : general;
   }
 }

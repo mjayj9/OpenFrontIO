@@ -1,4 +1,4 @@
-import { EventBus, GameEvent } from "../core/EventBus";
+import { EventBus, EventConstructor, GameEvent } from "../core/EventBus";
 import { Cell } from "../core/game/Game";
 import {
   CenterCameraEvent,
@@ -41,6 +41,7 @@ export class TransformHandler {
   private targetScale: number | null = null;
   private intervalID: NodeJS.Timeout | null = null;
   private changed = false;
+  private subscriptions: Array<() => void> = [];
 
   constructor(
     private game: GameView,
@@ -48,12 +49,25 @@ export class TransformHandler {
     private canvas: HTMLElement,
   ) {
     this._boundingRect = this.canvas.getBoundingClientRect();
-    this.eventBus.on(ZoomEvent, (e) => this.onZoom(e));
-    this.eventBus.on(DragEvent, (e) => this.onMove(e));
-    this.eventBus.on(GoToPlayerEvent, (e) => this.onGoToPlayer(e));
-    this.eventBus.on(GoToPositionEvent, (e) => this.onGoToPosition(e));
-    this.eventBus.on(GoToUnitEvent, (e) => this.onGoToUnit(e));
-    this.eventBus.on(CenterCameraEvent, () => this.centerCamera());
+    this.subscribe(ZoomEvent, (e) => this.onZoom(e));
+    this.subscribe(DragEvent, (e) => this.onMove(e));
+    this.subscribe(GoToPlayerEvent, (e) => this.onGoToPlayer(e));
+    this.subscribe(GoToPositionEvent, (e) => this.onGoToPosition(e));
+    this.subscribe(GoToUnitEvent, (e) => this.onGoToUnit(e));
+    this.subscribe(CenterCameraEvent, () => this.centerCamera());
+  }
+
+  dispose(): void {
+    for (const unsubscribe of this.subscriptions.splice(0)) unsubscribe();
+    this.clearTarget();
+  }
+
+  private subscribe<T extends GameEvent>(
+    type: EventConstructor<T>,
+    handler: (event: T) => void,
+  ): void {
+    this.eventBus.on(type, handler);
+    this.subscriptions.push(() => this.eventBus.off(type, handler));
   }
 
   public updateCanvasBoundingRect() {

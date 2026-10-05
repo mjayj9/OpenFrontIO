@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceVersion": "Natural Earth 5.1.1, 50m admin-0 countries and populated places",
+  "width": 2000,
+  "height": 1000,
+  "projection": "Plate Carree, longitude -180..180, latitude 90..-90",
+  "excluded": ["ATA", "ATF", "HMD", "SGS"],
+  "sovereignControllers": {
+    "US1": "USA",
+    "GB1": "GBR",
+    "FR1": "FRA",
+    "NZ1": "NZL",
+    "NL1": "NLD",
+    "FI1": "FIN",
+    "DN1": "DNK",
+    "CH1": "CHN",
+    "AU1": "AUS",
+    "CU1": "CUB",
+    "KA1": "KAZ"
+  },
+  "overrides": { "SAH": "MAR", "SOL": "SOM", "CYN": "CYP" },
+  "notes": "Scenario policy, not a statement of recognition. Dependencies use the listed sovereign controller. Palestine and Taiwan retain distinct controllers. Somaliland, Northern Cyprus and Western Sahara use the explicit overrides. Antarctic territories are excluded. Overseas polygons remain with their controller. Countries below nine raster tiles receive a labelled 3x3 game representation at their source label point."
+}

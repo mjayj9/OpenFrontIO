@@ -157,6 +157,8 @@ export const DERIVED_FIELDS = new Set<string>([
   // executions: basic
   "nbuf", // PlayerExecution scratch neighbor buffers
   "nbuf8",
+  "forceFrame", // ModernSystemsExecution: presentation deltas, never decisions
+  "forceRoutes",
   // executions: structures and missiles
   "tilesToDestroyCache", // NukeExecution: filled and read in the detonation tick only
   // executions: attacks, ships and trains

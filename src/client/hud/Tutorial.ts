@@ -28,11 +28,16 @@ export class TutorialHighlightEvent implements GameEvent {
 
 /** Snapshot of the player's state that the steps are evaluated against. */
 export interface TutorialContext {
+  modern?: ModernTutorialEvidence;
   hasSpawned: boolean;
   /** Multiplayer: the spawn timer is still running, so attacking is blocked. */
   inSpawnPhase: boolean;
   /** Any outgoing attack, wilderness or player. */
   attacking: boolean;
+  /** Actual owned land; an attack command alone is not a successful conquest. */
+  tilesOwned: number;
+  /** Opponents actually conquered since this guide began. */
+  conqueredPlayers: number;
   /** The attack ratio changed this tick (slider drag or hotkey). */
   attackRatioMoved: boolean;
   boatsDisabled: boolean;
@@ -67,6 +72,106 @@ export interface TutorialContext {
   mirvDisabled: boolean;
   samDisabled: boolean;
 }
+/** Derived only from acknowledged core state and actual military UI events. */
+export interface ModernTutorialEvidence {
+  cameraMoves?: number;
+  zoomChanges?: number;
+  cursorPreviews?: number;
+  boxSelections?: number;
+  additionalSelections?: number;
+  queuedOrders?: number;
+  armyBasesCompleted?: number;
+  armyTrained?: number;
+  navalBasesCompleted?: number;
+  aircraftProduced?: number;
+  independent: boolean;
+  equalPopulation: boolean;
+  branchesUsed: string[];
+  selectionCount: number;
+  armyMissions: number;
+  navyMissions: number;
+  airMissions: number;
+  airOutbounds: number;
+  airReturns: number;
+  airRearms: number;
+  airCasualties: number;
+  airBases: number;
+  completedTraining: number;
+  armyCasualties: number;
+  portCaptures: number;
+  portLevels: number;
+  portIncome: number;
+  blockadesSeen: number;
+  blockadesSuffered?: number;
+  portRecoveries?: number;
+  nuclearLaunches: number;
+  nuclearIncomeLoss: number;
+  nuclearImpacts?: number;
+  completedStops: number;
+  climatePreviewAdapted: boolean;
+  climatePreviewHarsh: boolean;
+  climateAdaptedBattles?: number;
+  climateHarshBattles?: number;
+  aiLevelsVisible: boolean;
+}
+function validModernEvidence(evidence: ModernTutorialEvidence): boolean {
+  if (!evidence || typeof evidence !== "object" || Array.isArray(evidence))
+    return false;
+  const numbers = [
+    "selectionCount",
+    "armyMissions",
+    "navyMissions",
+    "airMissions",
+    "airOutbounds",
+    "airReturns",
+    "airRearms",
+    "airCasualties",
+    "airBases",
+    "completedTraining",
+    "armyCasualties",
+    "portCaptures",
+    "portLevels",
+    "portIncome",
+    "blockadesSeen",
+    "nuclearLaunches",
+    "nuclearIncomeLoss",
+    "completedStops",
+  ] as const;
+  const booleans = [
+    "independent",
+    "equalPopulation",
+    "climatePreviewAdapted",
+    "climatePreviewHarsh",
+    "aiLevelsVisible",
+  ] as const;
+  return (
+    numbers.every(
+      (key) => Number.isSafeInteger(evidence[key]) && evidence[key] >= 0,
+    ) &&
+    booleans.every((key) => typeof evidence[key] === "boolean") &&
+    Array.isArray(evidence.branchesUsed) &&
+    evidence.branchesUsed.every((branch) =>
+      ["army", "navy", "air"].includes(branch),
+    ) &&
+    [
+      evidence.cameraMoves ?? 0,
+      evidence.zoomChanges ?? 0,
+      evidence.cursorPreviews ?? 0,
+      evidence.boxSelections ?? 0,
+      evidence.additionalSelections ?? 0,
+      evidence.queuedOrders ?? 0,
+      evidence.armyBasesCompleted ?? 0,
+      evidence.armyTrained ?? 0,
+      evidence.navalBasesCompleted ?? 0,
+      evidence.aircraftProduced ?? 0,
+      evidence.climateAdaptedBattles ?? 0,
+      evidence.climateHarshBattles ?? 0,
+      evidence.blockadesSuffered ?? 0,
+      evidence.portRecoveries ?? 0,
+      evidence.nuclearImpacts ?? 0,
+    ].every((value) => Number.isSafeInteger(value) && value >= 0)
+  );
+}
 
 export interface TutorialStep {
   id: string;
@@ -94,7 +199,7 @@ export interface TutorialStep {
   applies?: (ctx: TutorialContext) => boolean;
   /** Informational steps complete when the player clicks "Got it". */
   manual?: true;
-  isDone?: (ctx: TutorialContext) => boolean;
+  isDone?: (ctx: TutorialContext, baseline: TutorialContext) => boolean;
 }
 
 export const TUTORIAL_STEPS: readonly TutorialStep[] = [
@@ -106,7 +211,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
   {
     id: "attack_wilderness",
     highlight: "territory",
-    isDone: (c) => c.attacking,
+    isDone: (c, baseline) => c.tilesOwned > baseline.tilesOwned,
   },
   { id: "troops", highlight: "troops", manual: true },
   { id: "troop_rate", highlight: "troop_rate", manual: true },
@@ -115,14 +220,13 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     highlight: "attack_ratio",
     isDone: (c) => c.attackRatioMoved,
   },
-  // Long-running: stays up (with the nearest tribes marked with the target
-  // crosshair) until the player has banked enough gold for the City step.
+  // A conquest anywhere in this chapter counts, including a tribe defeated
+  // during the earlier expansion exercise. The panel latches actual events.
   {
     id: "capture_tribes",
     highlight: "tribes",
-    applies: (c) => c.botsExist && !c.cityDisabled,
-    isDone: (c) =>
-      c.cities > 0 || (c.cityCost !== null && c.gold >= c.cityCost),
+    applies: (c) => c.botsExist || c.conqueredPlayers > 0,
+    isDone: (c) => c.conqueredPlayers > 0,
   },
   {
     id: "buy_city",
@@ -130,7 +234,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.City,
     hotkey: "buildCity",
     applies: (c) => !c.cityDisabled,
-    isDone: (c) => c.cities > 0,
+    isDone: (c, baseline) => c.cities > baseline.cities,
   },
   // Marks the nearest nation with the target crosshair; done once the
   // nation accepts (nations may decline — Skip is the way past that).
@@ -152,7 +256,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.Factory,
     hotkey: "buildFactory",
     applies: (c) => !c.factoryDisabled,
-    isDone: (c) => c.factories > 0,
+    isDone: (c, baseline) => c.factories > baseline.factories,
   },
   {
     id: "factory_info",
@@ -171,7 +275,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.Port,
     hotkey: "buildPort",
     applies: (c) => !c.portDisabled,
-    isDone: (c) => c.ports > 0,
+    isDone: (c, baseline) => c.ports > baseline.ports,
   },
   {
     id: "port_info",
@@ -185,7 +289,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.DefensePost,
     hotkey: "buildDefensePost",
     applies: (c) => !c.defensePostDisabled,
-    isDone: (c) => c.defensePosts > 0,
+    isDone: (c, baseline) => c.defensePosts > baseline.defensePosts,
   },
   // Warships are built from ports, so this step needs one.
   {
@@ -194,7 +298,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.Warship,
     hotkey: "buildWarship",
     applies: (c) => !c.warshipDisabled && !c.portDisabled,
-    isDone: (c) => c.warships > 0,
+    isDone: (c, baseline) => c.warships > baseline.warships,
   },
   {
     id: "buy_silo",
@@ -202,7 +306,7 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     unit: UnitType.MissileSilo,
     hotkey: "buildMissileSilo",
     applies: (c) => !c.siloDisabled,
-    isDone: (c) => c.silos > 0,
+    isDone: (c, baseline) => c.silos > baseline.silos,
   },
   // Waits (via the earn-gold text) until the bomb is affordable, then asks
   // for a launch; done as soon as one of ours is in flight.
@@ -239,10 +343,303 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
     applies: (c) => !c.samDisabled,
     manual: true,
   },
+  {
+    id: "modern_regions",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c) => Boolean(c.modern?.independent),
+  },
+  {
+    id: "modern_population",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c) => Boolean(c.modern?.equalPopulation),
+  },
+  {
+    id: "modern_branches",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c) =>
+      ["army", "navy", "air"].every((branch) =>
+        c.modern?.branchesUsed.includes(branch),
+      ),
+  },
+  {
+    id: "modern_camera",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.cameraMoves ?? 0) > (b.modern?.cameraMoves ?? 0) &&
+      (c.modern?.zoomChanges ?? 0) > (b.modern?.zoomChanges ?? 0),
+  },
+  {
+    id: "modern_box_select",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.boxSelections ?? 0) > (b.modern?.boxSelections ?? 0) &&
+      (c.modern?.additionalSelections ?? 0) >
+        (b.modern?.additionalSelections ?? 0),
+  },
+  {
+    id: "modern_cursor",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.cursorPreviews ?? 0) > (b.modern?.cursorPreviews ?? 0),
+  },
+  {
+    id: "modern_queue",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.queuedOrders ?? 0) > (b.modern?.queuedOrders ?? 0) &&
+      (c.modern?.armyMissions ?? 0) > (b.modern?.armyMissions ?? 0),
+  },
+  {
+    id: "modern_armybase",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.armyBasesCompleted ?? 0) > (b.modern?.armyBasesCompleted ?? 0),
+  },
+  {
+    id: "modern_army_train",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.armyTrained ?? 0) > (b.modern?.armyTrained ?? 0),
+  },
+  {
+    id: "modern_navybase",
+    applies: (c) => Boolean(c.modern) && !c.portDisabled,
+    isDone: (c, b) =>
+      (c.modern?.navalBasesCompleted ?? 0) >
+      (b.modern?.navalBasesCompleted ?? 0),
+  },
+  {
+    id: "modern_air_produce",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.aircraftProduced ?? 0) > (b.modern?.aircraftProduced ?? 0),
+  },
+  {
+    id: "modern_select",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c) => (c.modern?.selectionCount ?? 0) > 0,
+  },
+  {
+    id: "modern_army_move",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.armyMissions ?? 0) > (b.modern?.armyMissions ?? 0),
+  },
+  {
+    id: "modern_stop",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.completedStops ?? 0) > (b.modern?.completedStops ?? 0),
+  },
+  {
+    id: "modern_navy_move",
+    applies: (c) => Boolean(c.modern) && !c.portDisabled,
+    isDone: (c, b) =>
+      (c.modern?.navyMissions ?? 0) > (b.modern?.navyMissions ?? 0),
+  },
+  {
+    id: "modern_airbase",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) => (c.modern?.airBases ?? 0) > (b.modern?.airBases ?? 0),
+  },
+  {
+    id: "modern_air_launch",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.airOutbounds ?? 0) > (b.modern?.airOutbounds ?? 0),
+  },
+  {
+    id: "modern_air_return",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.airReturns ?? 0) > (b.modern?.airReturns ?? 0) &&
+      (c.modern?.airRearms ?? 0) > (b.modern?.airRearms ?? 0),
+  },
+  {
+    id: "modern_air_intercept",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.airCasualties ?? 0) > (b.modern?.airCasualties ?? 0),
+  },
+  {
+    id: "modern_climate_compare",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      Boolean(
+        c.modern?.climatePreviewAdapted && c.modern?.climatePreviewHarsh,
+      ) &&
+      (c.modern?.climateAdaptedBattles ?? 0) >
+        (b.modern?.climateAdaptedBattles ?? 0) &&
+      (c.modern?.climateHarshBattles ?? 0) >
+        (b.modern?.climateHarshBattles ?? 0),
+  },
+  {
+    id: "modern_climate_train",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.completedTraining ?? 0) > (b.modern?.completedTraining ?? 0),
+  },
+  {
+    id: "modern_mobilization",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c, b) =>
+      (c.modern?.armyCasualties ?? 0) > (b.modern?.armyCasualties ?? 0),
+  },
+  {
+    id: "modern_port_capture",
+    applies: (c) => Boolean(c.modern) && !c.portDisabled,
+    isDone: (c, b) =>
+      (c.modern?.portCaptures ?? 0) > (b.modern?.portCaptures ?? 0),
+  },
+  {
+    id: "modern_port_develop",
+    applies: (c) => Boolean(c.modern) && !c.portDisabled,
+    isDone: (c, b) =>
+      (c.modern?.portLevels ?? 0) > (b.modern?.portLevels ?? 0) &&
+      (c.modern?.portIncome ?? 0) > (b.modern?.portIncome ?? 0),
+  },
+  {
+    id: "modern_port_blockade",
+    applies: (c) => Boolean(c.modern) && !c.portDisabled && !c.warshipDisabled,
+    isDone: (c, b) =>
+      (c.modern?.blockadesSeen ?? 0) > (b.modern?.blockadesSeen ?? 0),
+  },
+  {
+    id: "modern_port_defend",
+    applies: (c) => Boolean(c.modern) && !c.portDisabled && !c.warshipDisabled,
+    isDone: (c) =>
+      (c.modern?.blockadesSuffered ?? 0) > 0 &&
+      (c.modern?.portRecoveries ?? 0) > 0,
+  },
+  {
+    id: "modern_nuclear_penalty",
+    applies: (c) => Boolean(c.modern) && !c.atomDisabled,
+    isDone: (c, b) =>
+      (c.modern?.nuclearLaunches ?? 0) > (b.modern?.nuclearLaunches ?? 0) &&
+      (c.modern?.nuclearIncomeLoss ?? 0) > 0 &&
+      (c.modern?.nuclearImpacts ?? 0) > (b.modern?.nuclearImpacts ?? 0),
+  },
+  {
+    id: "modern_ai_levels",
+    applies: (c) => Boolean(c.modern),
+    isDone: (c) => Boolean(c.modern?.aiLevelsVisible),
+  },
 ];
 
 /** Ticks a completed step stays on screen (with its checkmark) before advancing. */
 export const STEP_DONE_LINGER_TICKS = 15;
+
+export const EDUCATION_VERSION = 4;
+export const TUTORIAL_CHAPTERS = [
+  {
+    id: "basic",
+    stepIds: [
+      "spawn",
+      "attack_wilderness",
+      "troops",
+      "troop_rate",
+      "attack_ratio",
+      "capture_tribes",
+      "buy_city",
+    ],
+  },
+  {
+    id: "economy",
+    stepIds: ["buy_city", "buy_factory", "factory_info", "buy_defense_post"],
+  },
+  {
+    id: "naval",
+    stepIds: ["send_boat", "buy_port", "port_info", "buy_warship"],
+  },
+  { id: "diplomacy", stepIds: ["propose_alliance", "alliance_info"] },
+  {
+    id: "weapons",
+    stepIds: [
+      "buy_silo",
+      "launch_atom",
+      "atom_info",
+      "hydrogen_info",
+      "mirv_info",
+      "sam_info",
+    ],
+  },
+  { id: "modern_regions", stepIds: ["modern_regions", "modern_population"] },
+  {
+    id: "modern_population",
+    stepIds: ["modern_population", "modern_mobilization"],
+  },
+  {
+    id: "modern_commands",
+    stepIds: [
+      "modern_camera",
+      "modern_branches",
+      "modern_select",
+      "modern_box_select",
+      "modern_cursor",
+      "modern_army_move",
+      "modern_queue",
+      "modern_stop",
+      "modern_armybase",
+      "modern_army_train",
+      "modern_navybase",
+      "modern_navy_move",
+    ],
+  },
+  {
+    id: "modern_air",
+    stepIds: [
+      "modern_airbase",
+      "modern_air_produce",
+      "modern_air_launch",
+      "modern_air_return",
+      "modern_air_intercept",
+    ],
+  },
+  {
+    id: "modern_climate",
+    stepIds: ["modern_climate_compare", "modern_climate_train"],
+  },
+  {
+    id: "modern_ports",
+    stepIds: [
+      "modern_port_capture",
+      "modern_port_develop",
+      "modern_port_blockade",
+      "modern_port_defend",
+    ],
+  },
+  { id: "modern_nuclear", stepIds: ["modern_nuclear_penalty"] },
+  { id: "modern_ai", stepIds: ["modern_ai_levels"] },
+  { id: "full", stepIds: TUTORIAL_STEPS.map((step) => step.id) },
+] as const;
+export type TutorialChapterID = (typeof TUTORIAL_CHAPTERS)[number]["id"];
+export type TutorialOutcome = "practiced" | "read" | "skipped" | "unavailable";
+export interface TutorialProgressSnapshot {
+  version: number;
+  stepId: string | null;
+  outcomes: Record<string, TutorialOutcome>;
+  doneTicks?: number | null;
+  baseline?: TutorialEvidence;
+}
+type TutorialEvidence = Pick<
+  TutorialContext,
+  | "tilesOwned"
+  | "conqueredPlayers"
+  | "cities"
+  | "factories"
+  | "ports"
+  | "defensePosts"
+  | "warships"
+  | "silos"
+  | "modern"
+>;
+
+export function chapterSteps(id: TutorialChapterID): readonly TutorialStep[] {
+  const chapter = TUTORIAL_CHAPTERS.find((c) => c.id === id)!;
+  return chapter.stepIds.map(
+    (stepId) => TUTORIAL_STEPS.find((s) => s.id === stepId)!,
+  );
+}
 
 /**
  * Cursor over the step list. Pure: feed it a context once per tick and read
@@ -261,6 +658,9 @@ export class TutorialProgress {
    * isDone) always uses the live context.
    */
   private countCtx: TutorialContext | null = null;
+  private baseline: TutorialContext | null = null;
+  private restoredBaseline: TutorialEvidence | null = null;
+  private outcomes: Record<string, TutorialOutcome> = {};
 
   constructor(
     private readonly steps: readonly TutorialStep[] = TUTORIAL_STEPS,
@@ -278,6 +678,89 @@ export class TutorialProgress {
     return this.doneTicks !== null;
   }
 
+  result(): Readonly<Record<string, TutorialOutcome>> {
+    return this.outcomes;
+  }
+
+  snapshot(): TutorialProgressSnapshot {
+    const baseline = this.baseline;
+    return {
+      version: EDUCATION_VERSION,
+      stepId: this.current()?.id ?? null,
+      outcomes: { ...this.outcomes },
+      doneTicks: this.doneTicks,
+      baseline: baseline
+        ? {
+            tilesOwned: baseline.tilesOwned,
+            conqueredPlayers: baseline.conqueredPlayers,
+            cities: baseline.cities,
+            factories: baseline.factories,
+            ports: baseline.ports,
+            defensePosts: baseline.defensePosts,
+            warships: baseline.warships,
+            silos: baseline.silos,
+            modern: baseline.modern,
+          }
+        : undefined,
+    };
+  }
+
+  /** Reject a different course version; the caller can retain the original file. */
+  restore(snapshot: TutorialProgressSnapshot): boolean {
+    if (
+      !snapshot ||
+      ![EDUCATION_VERSION, 3, 2].includes(snapshot.version) ||
+      !snapshot.outcomes ||
+      typeof snapshot.outcomes !== "object" ||
+      Array.isArray(snapshot.outcomes)
+    )
+      return false;
+    if (
+      snapshot.baseline &&
+      Object.values(snapshot.baseline).some(
+        (value) =>
+          typeof value === "number" &&
+          (!Number.isSafeInteger(value) || value < 0),
+      )
+    )
+      return false;
+    if (
+      snapshot.baseline?.modern &&
+      !validModernEvidence(snapshot.baseline.modern)
+    )
+      return false;
+    let index =
+      snapshot.stepId === null
+        ? this.steps.length
+        : this.steps.findIndex((s) => s.id === snapshot.stepId);
+    if (index < 0) return false;
+    if (snapshot.version < EDUCATION_VERSION) {
+      const newStep = this.steps.findIndex(
+        (step) => snapshot.outcomes[step.id] === undefined,
+      );
+      if (newStep >= 0) index = Math.min(index, newStep);
+    }
+    this.index = index;
+    this.outcomes = Object.fromEntries(
+      Object.entries(snapshot.outcomes).filter(
+        ([id, outcome]) =>
+          this.steps.some((s) => s.id === id) &&
+          ["practiced", "read", "skipped", "unavailable"].includes(outcome),
+      ),
+    );
+    this.doneTicks =
+      this.outcomes[this.current()?.id ?? ""] === "practiced" ||
+      this.outcomes[this.current()?.id ?? ""] === "read"
+        ? 0
+        : null;
+    this.baseline = null;
+    this.restoredBaseline =
+      this.current()?.id === snapshot.stepId
+        ? (snapshot.baseline ?? null)
+        : null;
+    return true;
+  }
+
   /** 1-based position of the current step among the steps that apply. */
   position(ctx: TutorialContext): number {
     return this.applicable(this.countCtx ?? ctx, this.index) + 1;
@@ -292,14 +775,19 @@ export class TutorialProgress {
     const step = this.current();
     if (step?.manual && this.doneTicks === null) {
       this.doneTicks = 0;
+      this.outcomes[step.id] = "read";
     }
   }
 
   /** Moves past the current step without completing it. */
   skip(): void {
     if (this.finished()) return;
+    this.outcomes[this.current()!.id] =
+      this.doneTicks === null ? "skipped" : this.outcomes[this.current()!.id];
     this.index++;
     this.doneTicks = null;
+    this.baseline = null;
+    this.restoredBaseline = null;
   }
 
   update(ctx: TutorialContext): void {
@@ -309,13 +797,20 @@ export class TutorialProgress {
       if (this.doneTicks < STEP_DONE_LINGER_TICKS) return;
       this.index++;
       this.doneTicks = null;
+      this.baseline = null;
+      this.restoredBaseline = null;
     }
     while (!this.finished() && !this.stepApplies(this.index, ctx)) {
+      this.outcomes[this.current()!.id] = "unavailable";
       this.index++;
+      this.baseline = null;
+      this.restoredBaseline = null;
     }
     const step = this.current();
-    if (step?.isDone?.(ctx)) {
+    this.baseline ??= { ...ctx, ...this.restoredBaseline };
+    if (step?.isDone?.(ctx, this.baseline)) {
       this.doneTicks = 0;
+      this.outcomes[step.id] = "practiced";
     }
   }
 

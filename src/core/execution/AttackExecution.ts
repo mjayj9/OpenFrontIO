@@ -15,6 +15,9 @@ import {
   UnitType,
 } from "../game/Game";
 import { GameMap, TileRef } from "../game/GameMap";
+import { climateCombatInput } from "../modern/ModernClimate";
+import { isModernV2 } from "../modern/ModernRules";
+import { modernSystemsFor } from "../modern/ModernSystems";
 import { PseudoRandom } from "../PseudoRandom";
 import { execSnapshotType } from "../snapshot/ExecutionSnapshot";
 import type {
@@ -144,6 +147,8 @@ export class AttackExecution implements Execution {
       this.sourceTile,
       new Set<TileRef>(),
     );
+    const modernForces = modernSystemsFor(mg)?.forces;
+    modernForces?.armyAttackStarted(this.attack);
 
     if (this.sourceTile !== null) {
       this.addNeighbors(this.sourceTile);
@@ -159,11 +164,18 @@ export class AttackExecution implements Execution {
         // Target has opposing attack, cancel them out
         if (incoming.troops() > this.attack.troops()) {
           incoming.setTroops(incoming.troops() - this.attack.troops());
+          modernForces?.armyAttackRemaining(incoming.id(), incoming.troops());
+          modernForces?.armyAttackRemaining(this.attack.id(), 0, true);
           this.attack.delete();
           this.active = false;
           return;
         } else {
           this.attack.setTroops(this.attack.troops() - incoming.troops());
+          modernForces?.armyAttackRemaining(
+            this.attack.id(),
+            this.attack.troops(),
+          );
+          modernForces?.armyAttackRemaining(incoming.id(), 0, true);
           incoming.delete();
         }
       }
@@ -173,7 +185,8 @@ export class AttackExecution implements Execution {
         outgoing !== this.attack &&
         outgoing.target() === this.attack.target() &&
         // Boat attacks (sourceTile is not null) are not combined with other attacks
-        this.attack.sourceTile() === null
+        this.attack.sourceTile() === null &&
+        !modernForces?.hasArmyAttack(outgoing.id())
       ) {
         this.attack.setTroops(this.attack.troops() + outgoing.troops());
         outgoing.delete();
@@ -245,6 +258,11 @@ export class AttackExecution implements Execution {
 
     const survivors = this.attack.troops() - deaths;
     this._owner.addTroops(survivors);
+    modernSystemsFor(this.mg)?.forces.armyAttackRemaining(
+      this.attack.id(),
+      survivors,
+      true,
+    );
     this.attack.delete();
     this.active = false;
 
@@ -258,6 +276,19 @@ export class AttackExecution implements Execution {
   tick(ticks: number) {
     if (this.attack === null) {
       throw new Error("Attack not initialized");
+    }
+    if (
+      isModernV2(this.mg.config().gameConfig()) &&
+      this._owner.modernFaction()?.populationTransferredTo
+    ) {
+      modernSystemsFor(this.mg)?.forces.armyAttackRemaining(
+        this.attack.id(),
+        0,
+        true,
+      );
+      this.attack.delete();
+      this.active = false;
+      return;
     }
     let troopCount = this.attack.troops(); // cache troop count
     const targetIsPlayer = this.target.isPlayer(); // cache target type
@@ -294,6 +325,11 @@ export class AttackExecution implements Execution {
 
     while (tickBudget > 0) {
       if (troopCount < 1) {
+        modernSystemsFor(this.mg)?.forces.armyAttackRemaining(
+          this.attack.id(),
+          0,
+          true,
+        );
         this.attack.delete();
         this.active = false;
         return;
@@ -338,8 +374,16 @@ export class AttackExecution implements Execution {
         targetPlayer.removeTroops(defenderTroopLoss);
       }
       this._owner.conquer(tileToConquer);
+      modernSystemsFor(this.mg)?.forces.armyAttackProgress(
+        this.attack.id(),
+        tileToConquer,
+      );
       this.handleDeadDefender();
     }
+    modernSystemsFor(this.mg)?.forces.armyAttackRemaining(
+      this.attack.id(),
+      this.attack.troops(),
+    );
   }
 
   private attackLogicInput(
@@ -383,6 +427,12 @@ export class AttackExecution implements Execution {
         ? this.mg.numTilesWithFallout() / this.mg.numLandTiles()
         : null,
       borderSize,
+      modernClimate: climateCombatInput(
+        this.mg,
+        this._owner.id(),
+        defender?.id(),
+        tile,
+      ),
     };
   }
 
@@ -449,7 +499,8 @@ export class AttackExecution implements Execution {
     if (!(this.target.isPlayer() && this.target.numTilesOwned() < 100)) return;
     const target: Player = this.target;
 
-    this.mg.conquerPlayer(this._owner, target);
+    const modern = isModernV2(this.mg.config().gameConfig());
+    if (!modern) this.mg.conquerPlayer(this._owner, target);
 
     const MAX_PASSES = 100;
     for (let pass = 0; pass < MAX_PASSES; pass++) {
@@ -479,6 +530,8 @@ export class AttackExecution implements Execution {
       }
       if (!progressed) break;
     }
+    if (modern && target.numTilesOwned() === 0)
+      this.mg.conquerPlayer(this._owner, target);
   }
 
   owner(): Player {

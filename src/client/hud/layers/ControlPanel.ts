@@ -337,6 +337,7 @@ export class ControlPanel extends LitElement implements Controller {
     // Before that (the hidden slider on the lobby page) this.attackRatio holds
     // the value, and init() reloads it from UserSettings anyway.
     if (this.uiState === undefined) return;
+    this.attackRatio = newRatio;
     this.uiState.attackRatio = newRatio;
   }
 

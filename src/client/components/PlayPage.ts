@@ -1,12 +1,18 @@
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { assetUrl } from "../../core/AssetUrls";
+import "../ModernWorldModal";
+import { ModernWorldModal } from "../ModernWorldModal";
+import "../SaveManager";
+import { SaveManager } from "../SaveManager";
+import { translateText } from "../Utils";
 import "./CosmeticBackground";
 import "./NavAccountMenu";
 import "./NavUtilityIcons";
 import "./NewsBox";
 import "./SteamWishlist";
 import "./StreamingNow";
+import { actionButton } from "./ui/ActionButton";
 
 @customElement("play-page")
 export class PlayPage extends LitElement {
@@ -118,6 +124,24 @@ export class PlayPage extends LitElement {
         </div>
 
         <game-mode-selector></game-mode-selector>
+        ${actionButton({
+          icon: assetUrl("images/ClaimIcon.svg"),
+          iconAlt: translateText("modern.title"),
+          title: translateText("modern.title"),
+          label: translateText("modern.title"),
+          onClick: () =>
+            this.querySelector<ModernWorldModal>("modern-world-modal")?.open(),
+        })}
+        <modern-world-modal></modern-world-modal>
+        ${actionButton({
+          icon: assetUrl("images/ReplayRegularIconWhite.svg"),
+          iconAlt: translateText("saves.title"),
+          title: translateText("saves.title"),
+          label: translateText("saves.title"),
+          onClick: () =>
+            this.querySelector<SaveManager>("save-manager")?.open(),
+        })}
+        <save-manager></save-manager>
 
         <!-- Desktop gets the compact footer button instead. -->
         <steam-wishlist

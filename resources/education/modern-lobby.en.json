@@ -1,0 +1,20 @@
+{
+  "modern_lobby": {
+    "preset": "Modern country room (private)",
+    "title": "Reserve your country",
+    "instructions": "Preview a country using the map, search or list, then reserve it. Each playing participant needs a different country. Unselected countries are controlled by AI.",
+    "rules": "Normal 2000×1000 Modern World, free for all, all countries, no gray tribes. Treasury and troop grants follow the selected balance. These settings are shared by every participant.",
+    "reserve": "Reserve this country",
+    "pending": "Waiting for server confirmation…",
+    "reserved": "Your reserved country: {country}",
+    "held_by": "Reserved by {player}",
+    "available": "Available",
+    "unselected": "Country not selected",
+    "taken": "Another participant reserved this country. Choose an available country and try again.",
+    "unsupported": "This country is not supported by the room's scenario.",
+    "not_player": "Spectators do not reserve countries. Switch to playing to choose one.",
+    "closed": "Country selection is closed or this room is not in modern mode.",
+    "not_ready": "Every playing participant must reserve a country before the match starts.",
+    "invalid_rules": "The room's modern rules or country reservations are invalid. Restore the modern preset and select distinct countries."
+  }
+}

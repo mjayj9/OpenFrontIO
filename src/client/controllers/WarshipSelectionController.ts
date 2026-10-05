@@ -1,5 +1,5 @@
 import { Cell } from "src/core/game/Game";
-import { EventBus } from "../../core/EventBus";
+import { EventBus, EventConstructor, GameEvent } from "../../core/EventBus";
 import { UnitType } from "../../core/game/Game";
 import { TileRef } from "../../core/game/GameMap";
 import { Controller } from "../Controller";
@@ -43,6 +43,7 @@ export class WarshipSelectionController implements Controller {
   // Drag rectangle (shift+drag warship selection box) — a screen-space DOM
   // overlay positioned via inline style.
   private dragRectEl: HTMLDivElement | null = null;
+  private subscriptions: Array<() => void> = [];
 
   constructor(
     private game: GameView,
@@ -61,24 +62,41 @@ export class WarshipSelectionController implements Controller {
   }
 
   init() {
-    this.eventBus.on(UnitSelectionEvent, (e) => this.onUnitSelection(e));
+    if (this.subscriptions.length > 0) return;
+    this.subscribe(UnitSelectionEvent, (e) => this.onUnitSelection(e));
 
     this.ensureDragRectEl();
-    this.eventBus.on(WarshipSelectionBoxUpdateEvent, (e) => {
+    this.subscribe(WarshipSelectionBoxUpdateEvent, (e) => {
       this.updateDragRect(e.startX, e.startY, e.endX, e.endY);
     });
     const clearBox = () => this.hideDragRect();
-    this.eventBus.on(WarshipSelectionBoxCompleteEvent, clearBox);
-    this.eventBus.on(WarshipSelectionBoxCancelEvent, clearBox);
-    this.eventBus.on(CloseViewEvent, clearBox);
+    this.subscribe(WarshipSelectionBoxCompleteEvent, clearBox);
+    this.subscribe(WarshipSelectionBoxCancelEvent, clearBox);
+    this.subscribe(CloseViewEvent, clearBox);
 
     // Warship select/move click flow (previously in the deleted UnitLayer).
-    this.eventBus.on(MouseUpEvent, (e) => this.onMouseUp(e));
-    this.eventBus.on(TouchEvent, (e) => this.onTouch(e));
-    this.eventBus.on(WarshipSelectionBoxCompleteEvent, (e) =>
+    this.subscribe(MouseUpEvent, (e) => this.onMouseUp(e));
+    this.subscribe(TouchEvent, (e) => this.onTouch(e));
+    this.subscribe(WarshipSelectionBoxCompleteEvent, (e) =>
       this.onSelectionBoxComplete(e),
     );
-    this.eventBus.on(SelectAllWarshipsEvent, () => this.onSelectAllWarships());
+    this.subscribe(SelectAllWarshipsEvent, () => this.onSelectAllWarships());
+  }
+
+  dispose(): void {
+    for (const unsubscribe of this.subscriptions.splice(0)) unsubscribe();
+    this.dragRectEl?.remove();
+    this.dragRectEl = null;
+    this.selectedUnit = null;
+    this.multiSelectedWarships = [];
+  }
+
+  private subscribe<T extends GameEvent>(
+    type: EventConstructor<T>,
+    handler: (event: T) => void,
+  ): void {
+    this.eventBus.on(type, handler);
+    this.subscriptions.push(() => this.eventBus.off(type, handler));
   }
 
   /**

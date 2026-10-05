@@ -20,6 +20,11 @@ import {
   UnitType,
 } from "../game/Game";
 import { UserSettings } from "../game/UserSettings";
+import {
+  isModernV2,
+  MODERN_RULES,
+  modernStockpileGrowth,
+} from "../modern/ModernRules";
 import { GameConfig, TeamCountConfig } from "../Schemas";
 import { NukeType } from "../StatsSchemas";
 import { assertNever, sigmoid, toInt, within } from "../Util";
@@ -89,6 +94,11 @@ export function parseGameEnv(value: string | undefined): GameEnv {
 }
 
 export interface AttackLogicInput {
+  modernClimate?: {
+    attackerPermille: number;
+    defenderPermille: number;
+    movementPermille: number;
+  };
   terrain: TerrainType;
   attackTroops: number;
   attacker: { type: PlayerType; numTiles: number };
@@ -333,11 +343,18 @@ export class Config {
     };
   }
   spawnImmunityDuration(): Tick {
+    if (this._gameConfig.modernMode)
+      return this._gameConfig.modernMode.protectionTicks;
     return (
       this._gameConfig.spawnImmunityDuration ?? DEFAULT_SPAWN_IMMUNITY_TICKS
     );
   }
   nationSpawnImmunityDuration(): Tick {
+    if (this._gameConfig.enhancedAI?.fairResources) {
+      return this.spawnImmunityDuration();
+    }
+    if (this._gameConfig.modernMode)
+      return this._gameConfig.modernMode.protectionTicks;
     return DEFAULT_SPAWN_IMMUNITY_TICKS;
   }
   hasExtendedSpawnImmunity(): boolean {
@@ -422,13 +439,21 @@ export class Config {
     return this._gameConfig.randomSpawn;
   }
   infiniteGold(): boolean {
-    return this._gameConfig.infiniteGold;
+    return (
+      !isModernV2(this._gameConfig) &&
+      !this._gameConfig.enhancedAI?.fairResources &&
+      this._gameConfig.infiniteGold
+    );
   }
   donateGold(): boolean {
     return this._gameConfig.donateGold;
   }
   infiniteTroops(): boolean {
-    return this._gameConfig.infiniteTroops;
+    return (
+      !isModernV2(this._gameConfig) &&
+      !this._gameConfig.enhancedAI?.fairResources &&
+      this._gameConfig.infiniteTroops
+    );
   }
   donateTroops(): boolean {
     return this._gameConfig.donateTroops;
@@ -437,7 +462,10 @@ export class Config {
     return this._gameConfig.goldMultiplier ?? 1;
   }
   startingGold(playerInfo: PlayerInfo): Gold {
-    if (playerInfo.playerType === PlayerType.Bot) {
+    if (
+      playerInfo.playerType === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       return 0n;
     }
     return this.startingGoldFor(playerInfo);
@@ -576,10 +604,13 @@ export class Config {
         break;
       case UnitType.Warship:
         info = {
-          cost: this.costWrapper(
-            (numUnits: number) => Math.min(1_000_000, (numUnits + 1) * 250_000),
-            UnitType.Warship,
-          ),
+          cost: isModernV2(this._gameConfig)
+            ? () => BigInt(MODERN_RULES.forces.warshipCost)
+            : this.costWrapper(
+                (numUnits: number) =>
+                  Math.min(1_000_000, (numUnits + 1) * 250_000),
+                UnitType.Warship,
+              ),
           maxHealth: 1000,
         };
         break;
@@ -701,16 +732,23 @@ export class Config {
     return info;
   }
 
+  private activeHostCheats(): GameConfig["hostCheats"] {
+    return this._gameConfig.enhancedAI?.fairResources ||
+      isModernV2(this._gameConfig)
+      ? undefined
+      : this._gameConfig.hostCheats;
+  }
+
   private hasInfiniteGoldFor(player: Player | PlayerView): boolean {
     if (this.infiniteGold()) return true;
-    const hc = this._gameConfig.hostCheats;
+    const hc = this.activeHostCheats();
     return (hc?.infiniteGold ?? false) && player.isLobbyCreator();
   }
 
   private hasInfiniteTroopsFor(player: Player | PlayerView): boolean {
     if (this.infiniteTroops()) return true;
     return (
-      (this._gameConfig.hostCheats?.infiniteTroops ?? false) &&
+      (this.activeHostCheats()?.infiniteTroops ?? false) &&
       player.isLobbyCreator()
     );
   }
@@ -718,14 +756,14 @@ export class Config {
   private hasInfiniteTroopsForInfo(playerInfo: PlayerInfo): boolean {
     if (this.infiniteTroops()) return true;
     return (
-      (this._gameConfig.hostCheats?.infiniteTroops ?? false) &&
+      (this.activeHostCheats()?.infiniteTroops ?? false) &&
       playerInfo.isLobbyCreator
     );
   }
 
   private goldMultiplierFor(player: Player | PlayerView): number {
     const base = this.goldMultiplier();
-    const hc = this._gameConfig.hostCheats;
+    const hc = this.activeHostCheats();
     if (hc?.goldMultiplier && player.isLobbyCreator()) {
       return hc.goldMultiplier;
     }
@@ -733,6 +771,11 @@ export class Config {
   }
 
   public conquerGoldAmount(captured: Player): Gold {
+    if (
+      this._gameConfig.enhancedAI?.fairResources ||
+      isModernV2(this._gameConfig)
+    )
+      return captured.gold() / 2n;
     if (
       captured.type() === PlayerType.Bot ||
       captured.type() === PlayerType.Nation
@@ -745,7 +788,7 @@ export class Config {
 
   private startingGoldFor(playerInfo: PlayerInfo): Gold {
     const base = BigInt(this._gameConfig.startingGold ?? 0);
-    const hc = this._gameConfig.hostCheats;
+    const hc = this.activeHostCheats();
     if (hc?.startingGold && playerInfo.isLobbyCreator) {
       return base + BigInt(hc.startingGold);
     }
@@ -825,6 +868,8 @@ export class Config {
   }
 
   percentageTilesOwnedToWin(elapsedGameSeconds: number): number {
+    if (this._gameConfig.modernMode)
+      return this._gameConfig.modernMode.targetPercent;
     const base = PERCENT_TILES_OWNED_TO_WIN;
     const sd = this.overtimeConfig();
     if (!sd.enabled) {
@@ -880,7 +925,19 @@ export class Config {
    * attack is. The result reports that as a fraction of the tick.
    */
   attackLogic(input: AttackLogicInput): AttackLogicResult {
-    const { attackTroops, attacker, defender } = input;
+    const { attackTroops } = input;
+    // Neutralize image projection and tile count in modern population combat.
+    // Terrain and defense posts retain their existing independent rules.
+    const modern = isModernV2(this._gameConfig);
+    const attacker = modern
+      ? { ...input.attacker, numTiles: 10_000 }
+      : input.attacker;
+    const defender =
+      input.defender === null
+        ? null
+        : modern
+          ? { ...input.defender, numTiles: 10_000 }
+          : input.defender;
     let { mag, tileCost } = terrainAttackBase(input.terrain);
 
     if (defender !== null && input.defenderHasDefensePost) {
@@ -896,7 +953,12 @@ export class Config {
     if (defender === null) {
       const tickBudget = input.borderSize * 2;
       return {
-        attackerTroopLoss: mag / (attacker.type === PlayerType.Bot ? 10 : 5),
+        attackerTroopLoss:
+          mag /
+          (attacker.type === PlayerType.Bot &&
+          !this._gameConfig.enhancedAI?.fairResources
+            ? 10
+            : 5),
         defenderTroopLoss: 0,
         tickFraction:
           within(
@@ -914,7 +976,8 @@ export class Config {
     if (
       (attacker.type === PlayerType.Human ||
         attacker.type === PlayerType.Nation) &&
-      defender.type === PlayerType.Bot
+      defender.type === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
     ) {
       mag *= BOT_DEFENDER_LOSS_MULT;
     }
@@ -959,16 +1022,28 @@ export class Config {
       attacker.numTiles,
       LARGE_ATTACKER_SPEED_DEPTH,
     );
+    const climate = input.modernClimate;
+    const ratio = climate
+      ? within(
+          Math.floor(
+            (climate.attackerPermille * 1000) / climate.defenderPermille,
+          ),
+          MODERN_RULES.climateRatioMinPermille,
+          MODERN_RULES.climateRatioMaxPermille,
+        )
+      : 1000;
     return {
-      attackerTroopLoss,
-      defenderTroopLoss,
+      attackerTroopLoss: (attackerTroopLoss * 1000) / ratio,
+      defenderTroopLoss: (defenderTroopLoss * ratio) / 1000,
       tickFraction:
-        (speedCost *
+        (((speedCost *
           tileCost *
           largeAttackerSpeedBonus *
           largeDefenderBonus *
           traitorCostMod) /
-        input.borderSize,
+          input.borderSize) *
+          1000) /
+        (climate?.movementPermille ?? 1000),
     };
   }
 
@@ -993,7 +1068,10 @@ export class Config {
   }
 
   attackAmount(attacker: Player, defender: Player | TerraNullius) {
-    if (attacker.type() === PlayerType.Bot) {
+    if (
+      attacker.type() === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       return attacker.troops() / 20;
     } else {
       return attacker.troops() / 5;
@@ -1001,6 +1079,20 @@ export class Config {
   }
 
   startManpower(playerInfo: PlayerInfo): number {
+    if (isModernV2(this._gameConfig))
+      return (
+        Math.floor(
+          ((this._gameConfig.modernMode?.initialPopulation ??
+            MODERN_RULES.initialPopulation) *
+            MODERN_RULES.initialArmyPermille) /
+            1000,
+        ) * MODERN_RULES.rawTroopsPerPerson
+      );
+    if (
+      this._gameConfig.enhancedAI?.fairResources &&
+      playerInfo.playerType !== PlayerType.Human
+    )
+      return 25_000;
     if (playerInfo.playerType === PlayerType.Bot) {
       return 10_000;
     }
@@ -1022,6 +1114,23 @@ export class Config {
   }
 
   maxTroops(player: Player | PlayerView): number {
+    if (isModernV2(this._gameConfig)) {
+      const p = player.modernFaction?.()?.population;
+      return (
+        Math.max(
+          0,
+          Math.floor(
+            ((p?.total ??
+              this._gameConfig.modernMode?.initialPopulation ??
+              MODERN_RULES.initialPopulation) *
+              MODERN_RULES.mobilizationPermille) /
+              1000,
+          ) -
+            (p?.navy ?? 0) -
+            (p?.air ?? 0),
+        ) * MODERN_RULES.rawTroopsPerPerson
+      );
+    }
     const maxTroops =
       player.type() === PlayerType.Human && this.hasInfiniteTroopsFor(player)
         ? 1_000_000_000
@@ -1033,6 +1142,7 @@ export class Config {
             .reduce((a, b) => a + b, 0) *
             this.cityTroopIncrease();
 
+    if (this._gameConfig.enhancedAI?.fairResources) return maxTroops;
     if (player.type() === PlayerType.Bot) {
       return maxTroops / 3;
     }
@@ -1056,6 +1166,23 @@ export class Config {
   }
 
   troopIncreaseRate(player: Player | PlayerView): number {
+    if (isModernV2(this._gameConfig)) {
+      const f = player.modernFaction?.();
+      // Old saved games retain their declared fixed replenishment model.
+      if (f?.growthModel !== "stockpile-v1")
+        return Math.min(
+          MODERN_RULES.replenishmentPerTick * MODERN_RULES.rawTroopsPerPerson,
+          Math.max(0, this.maxTroops(player) - player.troops()),
+        );
+      const committed = Math.max(
+        0,
+        f.population.army * MODERN_RULES.rawTroopsPerPerson - player.troops(),
+      );
+      return modernStockpileGrowth(
+        player.troops(),
+        Math.max(0, this.maxTroops(player) - committed),
+      );
+    }
     const max = this.maxTroops(player);
 
     let toAdd = 10 + pow(player.troops(), 0.73) / 4;
@@ -1063,11 +1190,17 @@ export class Config {
     const ratio = 1 - player.troops() / max;
     toAdd *= ratio;
 
-    if (player.type() === PlayerType.Bot) {
+    if (
+      player.type() === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       toAdd *= 0.5;
     }
 
-    if (player.type() === PlayerType.Nation) {
+    if (
+      player.type() === PlayerType.Nation &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       switch (this._gameConfig.difficulty) {
         case Difficulty.Easy:
           toAdd *= 0.9;
@@ -1090,9 +1223,17 @@ export class Config {
   }
 
   goldAdditionRate(player: Player | PlayerView): Gold {
+    if (isModernV2(this._gameConfig))
+      return BigInt(
+        player.modernFaction()?.workerIncomePerTick ??
+          MODERN_RULES.workerGoldPerTick,
+      );
     const multiplier = this.goldMultiplierFor(player);
     let baseRate: bigint;
-    if (player.type() === PlayerType.Bot) {
+    if (
+      player.type() === PlayerType.Bot &&
+      !this._gameConfig.enhancedAI?.fairResources
+    ) {
       baseRate = 50n;
     } else {
       baseRate = 100n;

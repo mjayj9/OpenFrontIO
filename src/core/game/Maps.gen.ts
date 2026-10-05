@@ -88,6 +88,7 @@ export enum GameMapType {
   MiddleEast = "Middle East", // map-generator/assets/maps/middleeast/info.json
   MilkyWay = "MilkyWay", // map-generator/assets/maps/milkyway/info.json
   MississippiRiver = "Mississippi River", // map-generator/assets/maps/mississippiriver/info.json
+  ModernWorld = "Modern World", // map-generator/assets/maps/modernworld/info.json
   Montreal = "Montreal", // map-generator/assets/maps/montreal/info.json
   MoreThanLuck = "More Than Luck", // map-generator/assets/maps/morethanluck/info.json
   NewYorkCity = "New York City", // map-generator/assets/maps/newyorkcity/info.json
@@ -1933,6 +1934,17 @@ export const maps: readonly MapInfo[] = [
     specialFrequency: -1,
     defaultNationCount: 11,
     themes: ["north_america"],
+  },
+  {
+    id: "ModernWorld",
+    type: GameMapType.ModernWorld,
+    translationKey: "map.modernworld",
+    categories: ["world"],
+    multiplayerFrequency: 0,
+    ffaFrequency: -1,
+    teamFrequency: -1,
+    specialFrequency: -1,
+    defaultNationCount: 198,
   },
   {
     id: "Montreal",

@@ -10,6 +10,38 @@
 
 This is a fork/rewrite of WarFront.io. Credit to https://github.com/WarFrontIO.
 
+This personal fork adds opt-in deterministic enhanced AI, searchable English/Korean
+education and prepared training, modern country ownership, and real singleplayer
+snapshot saves. See [Enhanced AI](docs/EnhancedAI.md), [education](docs/Education.md),
+[Modern World](docs/ModernWorld.md), and [private modern rooms](docs/ModernLobby.md).
+Modern v2 adds independent administrative regions, equal starting population,
+army/navy/air commands, finite aircraft, local climate, major-port development
+and nuclear responsibility. See [controls and training](docs/ModernClient.md),
+[region data and exceptions](docs/ModernRegions.md),
+[military rules](docs/modern-forces.md), and
+[verification and limitations](docs/ModernV2Verification.md).
+The source and asset licenses and existing copyright notices are retained.
+
+For modern singleplayer or training without the separate account/ranked API:
+
+```bash
+npm run inst
+npm run build-prod
+npm run preview:fork
+```
+
+Open `http://127.0.0.1:9002`. Choose **Modern countries** or **Tutorial** on the
+main page. The **Saved singleplayer games** button manages complete running-game
+saves; the in-game **Saves and victory objective** menu saves and restarts a match.
+Modern v2 uses 294 independent factions from 198 parent-country controllers at
+2000×1000. Large countries require a regional selection; all factions start with
+the same configurable game population (default 1,000,000). Modern World v1
+remains a separate rule choice. Tiny-territory and dependency/dispute policies
+and the 34 administrative area exceptions are documented in the region report.
+This preview does not provide public
+matchmaking, accounts, or private room hosting; those use the existing deployment.
+Classic stays available and enhanced AI remains an explicit setting.
+
 ![CI](https://github.com/openfrontio/OpenFrontIO/actions/workflows/ci.yml/badge.svg)
 [![Crowdin](https://badges.crowdin.net/openfront-mls/localized.svg)](https://crowdin.com/project/openfront-mls)
 [![CLA assistant](https://cla-assistant.io/readme/badge/openfrontio/OpenFrontIO)](https://cla-assistant.io/openfrontio/OpenFrontIO)
@@ -83,7 +115,7 @@ npm run dev
 
 This will:
 
-- Start the webpack dev server for the client
+- Start the Vite dev server for the client
 - Launch the game server with development settings
 - Open the game in your default browser (to disable this behavior, set `SKIP_BROWSER_OPEN=true` in your environment)
 

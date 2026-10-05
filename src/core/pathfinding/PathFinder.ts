@@ -180,7 +180,13 @@ export class PathFinding {
 
   static Rail(game: Game): SteppingPathFinder<TileRef> {
     const miniMap = game.miniMap();
-    const pf = new AStarRail(miniMap);
+    // Modern worlds begin with hundreds of stations, including disconnected
+    // islands. Bound unsuccessful searches by work rather than wall time.
+    // The 110-tile station range normally fits well within this mini-map cap.
+    const pf = new AStarRail(
+      miniMap,
+      game.config().gameConfig().modernMode ? 4096 : undefined,
+    );
 
     return PathFinderBuilder.create(pf)
       .wrap((pf) => new MiniMapTransformer(pf, game.map(), miniMap))

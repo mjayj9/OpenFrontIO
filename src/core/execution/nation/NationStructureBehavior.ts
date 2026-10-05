@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AI_WEIGHTS, aiProfile } from "../../ai/AIProfile";
 import {
   Attack,
   Difficulty,
@@ -534,12 +535,42 @@ export class NationStructureBehavior {
     }
 
     // Build order for non-city structures (priority order)
-    const buildOrder: UnitType[] = [
+    let buildOrder: UnitType[] = [
       UnitType.Port,
       UnitType.Factory,
       UnitType.SAMLauncher,
       UnitType.MissileSilo,
     ];
+    const profile =
+      config.gameConfig().enhancedAI === undefined
+        ? null
+        : aiProfile(config.gameConfig(), this.player.id(), this.player.type());
+    if (profile !== null) {
+      // Reuse the same safe tile selection, spacing, upgrade and cost rules.
+      buildOrder = [
+        ...new Set([
+          ...AI_WEIGHTS[profile.personality].buildings.filter(
+            (type) => type !== UnitType.City,
+          ),
+          ...buildOrder,
+        ]),
+      ];
+      if (
+        profile.personality === "naval" &&
+        hasCoastalTiles &&
+        this.player.unitCount(UnitType.Port) === 0 &&
+        !config.isUnitDisabled(UnitType.Port) &&
+        this.maybeSpawnStructure(UnitType.Port)
+      )
+        return true;
+      if (
+        profile.personality === "economic" &&
+        this.player.unitCount(UnitType.Factory) === 0 &&
+        !config.isUnitDisabled(UnitType.Factory) &&
+        this.maybeSpawnStructure(UnitType.Factory)
+      )
+        return true;
+    }
 
     const nukesEnabled =
       !config.isUnitDisabled(UnitType.AtomBomb) ||
@@ -636,6 +667,20 @@ export class NationStructureBehavior {
     }
 
     let ratio = config.ratioPerCity;
+    const profile =
+      gameConfig.gameConfig().enhancedAI === undefined
+        ? null
+        : aiProfile(
+            gameConfig.gameConfig(),
+            this.player.id(),
+            this.player.type(),
+          );
+    if (profile?.personality === "naval" && type === UnitType.Port)
+      ratio *= 1.5;
+    if (profile?.personality === "economic" && type === UnitType.Factory)
+      ratio *= 1.5;
+    if (profile?.personality === "defensive" && type === UnitType.SAMLauncher)
+      ratio *= 1.5;
 
     // Heavily reduce factory spawning if we have coastal tiles
     if (

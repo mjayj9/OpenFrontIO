@@ -1,6 +1,6 @@
 import { ClientEnv } from "src/client/ClientEnv";
 import { z } from "zod";
-import { EventBus } from "../core/EventBus";
+import { EventBus, EventConstructor, GameEvent } from "../core/EventBus";
 import {
   AllPlayersStats,
   ClientID,
@@ -54,6 +54,7 @@ export class LocalServer {
   private startedAt: number;
 
   private paused = false;
+  private saving = false;
   private replaySpeedMultiplier = defaultReplaySpeedMultiplier;
 
   private clientID: ClientID | undefined;
@@ -71,6 +72,7 @@ export class LocalServer {
   private stopHeartbeat: (() => void) | null = null;
   private clientConnect: () => void;
   private clientMessage: (message: ServerMessage) => void;
+  private subscriptions: Array<() => void> = [];
 
   constructor(
     private lobbyConfig: LobbyConfig,
@@ -101,6 +103,7 @@ export class LocalServer {
         backlog === 0 || (maxBacklog > 0 && backlog < maxBacklog);
       if (
         canQueueNextTurn &&
+        !this.saving &&
         Date.now() > this.turnStartTime + turnIntervalMs
       ) {
         this.turnStartTime = Date.now();
@@ -109,12 +112,12 @@ export class LocalServer {
       }
     }, 5);
 
-    this.eventBus.on(ReplaySpeedChangeEvent, (event) => {
+    this.subscribe(ReplaySpeedChangeEvent, (event) => {
       this.replaySpeedMultiplier = event.replaySpeedMultiplier;
     });
 
     if (!this.isReplay) {
-      this.eventBus.on(GameSpeedUpIntentEvent, () => {
+      this.subscribe(GameSpeedUpIntentEvent, () => {
         const idx = SPEED_ORDER.indexOf(this.replaySpeedMultiplier);
         if (idx < 0 || idx >= SPEED_ORDER.length - 1) return;
         this.replaySpeedMultiplier = SPEED_ORDER[idx + 1];
@@ -123,7 +126,7 @@ export class LocalServer {
         );
       });
 
-      this.eventBus.on(GameSpeedDownIntentEvent, () => {
+      this.subscribe(GameSpeedDownIntentEvent, () => {
         const idx = SPEED_ORDER.indexOf(this.replaySpeedMultiplier);
         if (idx <= 0) return;
         this.replaySpeedMultiplier = SPEED_ORDER[idx - 1];
@@ -134,6 +137,11 @@ export class LocalServer {
     }
 
     this.startedAt = Date.now();
+    if (this.lobbyConfig.savedGame) {
+      this.turns = this.lobbyConfig.savedGame.turns.slice();
+      this.turnsExecuted = this.turns.length;
+      this.paused = this.lobbyConfig.savedGame.paused;
+    }
     this.clientConnect();
     if (this.lobbyConfig.gameRecord) {
       this.replayTurns = decompressGameRecord(
@@ -156,7 +164,12 @@ export class LocalServer {
       myClientID: this.lobbyConfig.gameRecord ? undefined : this.clientID,
     } satisfies ServerStartGameMessage);
     // Last, so a start() that throws above leaves no interval behind.
-    if (!this.isReplay) {
+    if (
+      !this.isReplay &&
+      !this.lobbyConfig.savedGame &&
+      !this.lobbyConfig.gameStartInfo.config.modernMode &&
+      !this.lobbyConfig.gameStartInfo.config.training
+    ) {
       this.stopHeartbeat = startSingleplayerHeartbeat(
         this.lobbyConfig.gameStartInfo.gameID,
       );
@@ -253,6 +266,23 @@ export class LocalServer {
   }
 
   // This is so the client can tell us when it finished processing the turn.
+  public async withFrozenTurns<T>(
+    work: (turns: Turn[], paused: boolean) => Promise<T>,
+  ): Promise<T> {
+    if (this.saving) throw new Error("Save already in progress");
+    this.saving = true;
+    try {
+      const deadline = Date.now() + 10000;
+      while (this.turnsExecuted < this.turns.length) {
+        if (Date.now() > deadline)
+          throw new Error("Waiting for game tick timed out; try saving again");
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+      return await work(this.turns.slice(), this.paused);
+    } finally {
+      this.saving = false;
+    }
+  }
   public turnComplete() {
     this.turnsExecuted++;
   }
@@ -285,6 +315,7 @@ export class LocalServer {
   public endGame() {
     console.log("local server ending game");
     clearInterval(this.turnCheckInterval);
+    for (const unsubscribe of this.subscriptions.splice(0)) unsubscribe();
     this.stopHeartbeat?.();
     this.stopHeartbeat = null;
     if (this.isReplay) {
@@ -295,7 +326,21 @@ export class LocalServer {
     this.archiveGameRecord(true);
   }
 
+  private subscribe<T extends GameEvent>(
+    type: EventConstructor<T>,
+    handler: (event: T) => void,
+  ): void {
+    this.eventBus.on(type, handler);
+    this.subscriptions.push(() => this.eventBus.off(type, handler));
+  }
+
   private archiveGameRecord(unloading: boolean) {
+    if (
+      this.lobbyConfig.savedGame ||
+      this.lobbyConfig.gameStartInfo?.config.modernMode ||
+      this.lobbyConfig.gameStartInfo?.config.training
+    )
+      return;
     if (this.archived || this.archiveInFlight) {
       return;
     }

@@ -28,7 +28,9 @@
  *               updates carry the terrain byte in bits 16-23.
  */
 
+import type { ModernState } from "../../../../core/modern/ModernState";
 import type { NameEntry, PlayerState, UnitState } from "../../../render/types";
+import { applyModernForcesFrame } from "../../../view/ModernForcesFrame";
 import { BinaryWriter } from "../BinaryWriter";
 import {
   PLAYER_FIELDS,
@@ -53,6 +55,38 @@ export const SEC_UNITS_REMOVED = 1 << 5;
 export const SEC_TERRAIN = 1 << 6;
 
 export class FrameEncoder {
+  private modernSystems: Record<string, unknown> | null = null;
+  private modernForcesTick = -1;
+  private applyModernSystems(misc: MiscUpdates | null): void {
+    for (const raw of misc?.ModernSystems ?? []) {
+      const baseline = raw as { state: ModernState };
+      if (baseline.state.tick < this.modernForcesTick) continue;
+      this.modernSystems = baseline;
+      this.modernForcesTick = baseline.state.tick;
+    }
+    for (const raw of misc?.ModernForcesFrame ?? []) {
+      const motion = raw as { tick: number; positions: number[] };
+      if (!this.modernSystems || motion.tick <= this.modernForcesTick) continue;
+      const state = applyModernForcesFrame(
+        this.modernSystems.state as ModernState,
+        motion,
+        this.modernForcesTick,
+        this.tileState.length,
+      );
+      this.modernForcesTick = motion.tick;
+      // Carry motion into each seekable keyframe; its economy baseline tick is
+      // unchanged, so preserve the separate ordering clock as codec metadata.
+      this.modernSystems = { state, forceTick: this.modernForcesTick };
+    }
+  }
+  private aiStrategies = new Map<string, Record<string, unknown>>();
+  private applyAIStrategies(misc: MiscUpdates | null): void {
+    for (const raw of misc?.AIStatus ?? []) {
+      const status = raw as Record<string, unknown>;
+      if (typeof status.playerID === "string")
+        this.aiStrategies.set(status.playerID, status);
+    }
+  }
   /** Tile state for the whole game so far. */
   readonly tileState: Uint16Array;
   /** Player state as last encoded in the current chunk. */
@@ -90,6 +124,8 @@ export class FrameEncoder {
     frame: NormalizedFrame,
     ctx: EncodeCtx,
   ): void {
+    this.applyAIStrategies(frame.misc);
+    this.applyModernSystems(frame.misc);
     this.applyTiles(frame.tiles);
     this.applyTerrain(frame.tiles);
 
@@ -113,12 +149,29 @@ export class FrameEncoder {
     this.prevNames = new Map(frame.names);
     writeNames(w, [...frame.names.values()]);
 
-    writeMisc(w, frame.misc);
+    // Goals are persistent metadata: every seekable chunk needs the complete
+    // current set, while deltas carry only thought-tick changes.
+    writeMisc(
+      w,
+      this.aiStrategies.size === 0 && this.modernSystems === null
+        ? frame.misc
+        : {
+            ...frame.misc,
+            ...(this.aiStrategies.size
+              ? { AIStatus: [...this.aiStrategies.values()] }
+              : {}),
+            ...(this.modernSystems
+              ? { ModernSystems: [this.modernSystems] }
+              : {}),
+          },
+    );
 
     writeTerrain(w, [...this.terrainOverrides.keys()], this.terrain);
   }
 
   encodeDelta(w: BinaryWriter, frame: NormalizedFrame, ctx: EncodeCtx): void {
+    this.applyAIStrategies(frame.misc);
+    this.applyModernSystems(frame.misc);
     const tiles = this.applyTiles(frame.tiles);
     const terrain = this.applyTerrain(frame.tiles);
 

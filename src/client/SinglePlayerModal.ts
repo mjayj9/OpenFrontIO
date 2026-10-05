@@ -14,12 +14,13 @@ import {
   UnitType,
 } from "../core/game/Game";
 import { UserSettings } from "../core/game/UserSettings";
-import { PlayerCosmetics, TeamCountConfig } from "../core/Schemas";
+import { GameConfig, PlayerCosmetics, TeamCountConfig } from "../core/Schemas";
 import { generateID } from "../core/Util";
 import { responseHasLinkedIdentity } from "./AccountIdentity";
 import "./components/baseComponents/Button";
 import "./components/baseComponents/Modal";
 import { BaseModal } from "./components/BaseModal";
+import "./components/EnhancedAISettings";
 import "./components/GameConfigSettings";
 import { MEDAL_ORDER, medalIcon } from "./components/map/Medals";
 import "./components/ToggleInputCard";
@@ -214,6 +215,7 @@ export class SinglePlayerModal extends BaseModal {
   // nothing visible until every await in startGame() settles, which reads as
   // a hang rather than as loading whenever the network is slow or absent.
   @state() private starting: boolean = false;
+  @state() private enhancedAI: GameConfig["enhancedAI"];
   // Identifies the current start attempt. Bumped on every start and on every
   // close, so an attempt that outlives its modal can tell it has been retired.
   private startAttempt: number = 0;
@@ -528,10 +530,12 @@ export class SinglePlayerModal extends BaseModal {
                   {
                     labelKey: "game_settings.infinite_gold",
                     checked: this.infiniteGold,
+                    hidden: this.enhancedAI?.fairResources,
                   },
                   {
                     labelKey: "game_settings.infinite_troops",
                     checked: this.infiniteTroops,
+                    hidden: this.enhancedAI?.fairResources,
                   },
                   {
                     labelKey: "game_settings.compact_map",
@@ -566,6 +570,10 @@ export class SinglePlayerModal extends BaseModal {
             @option-toggle-changed=${this.handleConfigOptionToggleChanged}
             @unit-toggle-changed=${this.handleConfigUnitToggleChanged}
           ></game-config-settings>
+          <enhanced-ai-settings
+            .value=${this.enhancedAI}
+            @enhanced-ai-change=${this.handleEnhancedAIChange}
+          ></enhanced-ai-settings>
         </div>
 
         <!-- Footer Action -->
@@ -596,6 +604,7 @@ export class SinglePlayerModal extends BaseModal {
   // Check if any options other than map and difficulty have been changed from defaults
   private hasOptionsChanged(): boolean {
     return (
+      Boolean(this.enhancedAI) ||
       this.nations !== this.defaultNationCount ||
       this.bots !== DEFAULT_OPTIONS.bots ||
       this.infiniteGold !== DEFAULT_OPTIONS.infiniteGold ||
@@ -647,14 +656,52 @@ export class SinglePlayerModal extends BaseModal {
    * card for new players).
    */
   public async startTutorial(): Promise<void> {
-    // The modal never opens on this path, so onOpen's prewarm never runs.
-    // Overlap it with the manifest load below.
-    void prewarmCosmetics();
-    this.resetOptions();
-    // A nation count of 0 means "nations disabled"; wait for the real one.
-    await this.loadNationCount();
     new UserSettings().setTutorialDismissed(false);
-    await this.startGame();
+    const gameID = generateID(),
+      clientID = generateID();
+    this.dispatchEvent(
+      new CustomEvent("join-lobby", {
+        detail: {
+          gameID,
+          source: "singleplayer",
+          gameStartInfo: {
+            gameID,
+            lobbyCreatedAt: Date.now(),
+            players: [
+              {
+                clientID,
+                // Core names must stay within the wire/save renderer charset.
+                // The training guide provides the localized role caption.
+                username: "Training Player",
+                clanTag: null,
+                cosmetics: {},
+              },
+            ],
+            config: {
+              training: true,
+              gameMap: GameMapType.FourIslands,
+              gameMapSize: GameMapSize.Normal,
+              gameType: GameType.Singleplayer,
+              gameMode: GameMode.FFA,
+              difficulty: Difficulty.Easy,
+              bots: 1,
+              nations: 1,
+              infiniteGold: false,
+              infiniteTroops: false,
+              instantBuild: false,
+              randomSpawn: false,
+              startingGold: 10000000,
+              donateGold: true,
+              donateTroops: true,
+              disabledUnits: [],
+              customAllianceDuration: 5,
+            },
+          },
+        } satisfies JoinLobbyEvent,
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   // Reset all transient form state to ensure clean slate
@@ -663,6 +710,7 @@ export class SinglePlayerModal extends BaseModal {
     // the modal must always give the player a live Start button back, whatever
     // left the previous attempt in flight.
     this.starting = false;
+    this.enhancedAI = undefined;
     this.selectedMap = DEFAULT_OPTIONS.selectedMap;
     this.selectedDifficulty = DEFAULT_OPTIONS.selectedDifficulty;
     this.gameMode = DEFAULT_OPTIONS.gameMode;
@@ -758,6 +806,19 @@ export class SinglePlayerModal extends BaseModal {
     );
   }
 
+  private clearFairResourceCheats(): void {
+    if (!this.enhancedAI?.fairResources) return;
+    this.infiniteGold = false;
+    this.infiniteTroops = false;
+  }
+
+  private handleEnhancedAIChange = (
+    event: CustomEvent<GameConfig["enhancedAI"]>,
+  ) => {
+    this.enhancedAI = event.detail;
+    this.clearFairResourceCheats();
+  };
+
   private handleConfigOptionToggleChanged = (e: Event) => {
     const customEvent = e as CustomEvent<{
       labelKey: string;
@@ -773,10 +834,10 @@ export class SinglePlayerModal extends BaseModal {
         this.randomSpawn = checked;
         break;
       case "game_settings.infinite_gold":
-        this.infiniteGold = checked;
+        this.infiniteGold = checked && !this.enhancedAI?.fairResources;
         break;
       case "game_settings.infinite_troops":
-        this.infiniteTroops = checked;
+        this.infiniteTroops = checked && !this.enhancedAI?.fairResources;
         break;
       case "game_settings.compact_map":
         this.handleCompactMapChange(checked);
@@ -1036,6 +1097,7 @@ export class SinglePlayerModal extends BaseModal {
   }
 
   private async startGame() {
+    this.clearFairResourceCheats();
     // A second click while the first is still resolving would dispatch a
     // second join-lobby for a different gameID.
     if (this.starting) return;
@@ -1139,6 +1201,7 @@ export class SinglePlayerModal extends BaseModal {
                 gameMode: this.gameMode,
                 playerTeams: this.teamCount,
                 difficulty: this.selectedDifficulty,
+                enhancedAI: this.enhancedAI,
                 maxTimerValue: finalMaxTimerValue,
                 bots: this.bots,
                 infiniteGold: this.infiniteGold,

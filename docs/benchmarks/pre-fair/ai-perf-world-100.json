@@ -1,0 +1,313 @@
+{
+  "options": {
+    "map": "World",
+    "ticks": 1200,
+    "bots": 200,
+    "nations": 60,
+    "seed": "AIPERF24",
+    "top": 30,
+    "window": 1000,
+    "cpuProfile": false,
+    "execProfile": true,
+    "gcProfile": false,
+    "allocProfile": false,
+    "footprint": false,
+    "snapshotAt": [],
+    "waterNukes": false,
+    "enhancedPercent": 100,
+    "fairResources": false,
+    "reportJSON": "..\\ai-perf-world-100.json"
+  },
+  "node": "v24.15.0",
+  "tickTiming": {
+    "count": 1200,
+    "totalMs": 3480.9629000000064,
+    "meanMs": 2.900802416666672,
+    "p50Ms": 2.397400000000289,
+    "p95Ms": 5.793700000000172,
+    "p99Ms": 8.60690000000011,
+    "maxMs": 12.730199999999968,
+    "overBudget": 0,
+    "slowest": [
+      {
+        "tick": 1139,
+        "ms": 12.730199999999968
+      },
+      {
+        "tick": 238,
+        "ms": 12.089899999999943
+      },
+      {
+        "tick": 239,
+        "ms": 11.341100000000097
+      },
+      {
+        "tick": 1199,
+        "ms": 11.29910000000018
+      },
+      {
+        "tick": 1169,
+        "ms": 11.232600000000275
+      },
+      {
+        "tick": 202,
+        "ms": 10.962499999999977
+      },
+      {
+        "tick": 1229,
+        "ms": 10.462300000000141
+      },
+      {
+        "tick": 1379,
+        "ms": 9.606900000000223
+      },
+      {
+        "tick": 1230,
+        "ms": 9.477000000000317
+      },
+      {
+        "tick": 1319,
+        "ms": 9.36830000000009
+      }
+    ]
+  },
+  "startupMs": 156.83890000000002,
+  "spawnPhaseMs": 107.70089999999999,
+  "spawnTickTiming": {
+    "count": 202,
+    "totalMs": 107.29090000000093,
+    "meanMs": 0.5311430693069353,
+    "p50Ms": 0.22859999999991487,
+    "p95Ms": 1.1397000000000048,
+    "p99Ms": 5.275499999999965,
+    "maxMs": 22.77199999999999,
+    "overBudget": 0,
+    "slowest": [
+      {
+        "tick": 1,
+        "ms": 22.77199999999999
+      },
+      {
+        "tick": 201,
+        "ms": 7.973700000000008
+      },
+      {
+        "tick": 29,
+        "ms": 5.275499999999965
+      },
+      {
+        "tick": 2,
+        "ms": 4.956999999999994
+      },
+      {
+        "tick": 89,
+        "ms": 4.004099999999994
+      },
+      {
+        "tick": 119,
+        "ms": 3.6376000000000204
+      },
+      {
+        "tick": 59,
+        "ms": 2.775800000000004
+      },
+      {
+        "tick": 179,
+        "ms": 2.0885999999999285
+      },
+      {
+        "tick": 149,
+        "ms": 1.9325000000000045
+      },
+      {
+        "tick": 0,
+        "ms": 1.4200999999999908
+      }
+    ]
+  },
+  "startupPathQueries": 0,
+  "gamePathQueries": 15,
+  "heapPeakBytes": 119945056,
+  "waterPathQueries": 15,
+  "railPathQueries": 11,
+  "units": 75,
+  "alive": 152,
+  "stateHash": {
+    "type": 13,
+    "tick": 1400,
+    "hash": 14453465166866804
+  },
+  "executionProfile": [
+    {
+      "name": "AttackExecution",
+      "instances": 2729,
+      "initCalls": 2729,
+      "initMs": 74.03570000000298,
+      "tickCalls": 104995,
+      "tickMs": 1451.673899999978,
+      "totalMs": 1525.709599999981
+    },
+    {
+      "name": "PlayerExecution",
+      "instances": 260,
+      "initCalls": 260,
+      "initMs": 0.13639999999975316,
+      "tickCalls": 234970,
+      "tickMs": 525.4953999999892,
+      "totalMs": 525.631799999989
+    },
+    {
+      "name": "NationExecution",
+      "instances": 60,
+      "initCalls": 60,
+      "initMs": 0.140199999999993,
+      "tickCalls": 76929,
+      "tickMs": 465.11089999999325,
+      "totalMs": 465.25109999999324
+    },
+    {
+      "name": "TribeExecution",
+      "instances": 200,
+      "initCalls": 200,
+      "initMs": 0.3223000000000411,
+      "tickCalls": 173202,
+      "tickMs": 211.14509999997722,
+      "totalMs": 211.46739999997726
+    },
+    {
+      "name": "TransportShipExecution",
+      "instances": 66,
+      "initCalls": 66,
+      "initMs": 39.07760000000064,
+      "tickCalls": 6817,
+      "tickMs": 21.533099999989872,
+      "totalMs": 60.610699999990516
+    },
+    {
+      "name": "SpawnExecution",
+      "instances": 454,
+      "initCalls": 454,
+      "initMs": 0.09909999999945285,
+      "tickCalls": 454,
+      "tickMs": 29.330800000000522,
+      "totalMs": 29.429899999999975
+    },
+    {
+      "name": "TrainStationExecution",
+      "instances": 17,
+      "initCalls": 17,
+      "initMs": 0.10759999999936554,
+      "tickCalls": 4332,
+      "tickMs": 19.279700000003686,
+      "totalMs": 19.38730000000305
+    },
+    {
+      "name": "ConstructionExecution",
+      "instances": 56,
+      "initCalls": 56,
+      "initMs": 0.21090000000185682,
+      "tickCalls": 1578,
+      "tickMs": 15.298599999993712,
+      "totalMs": 15.509499999995569
+    },
+    {
+      "name": "TradeShipExecution",
+      "instances": 15,
+      "initCalls": 15,
+      "initMs": 0.4057000000007065,
+      "tickCalls": 2252,
+      "tickMs": 13.836700000008477,
+      "totalMs": 14.242400000009184
+    },
+    {
+      "name": "PortExecution",
+      "instances": 6,
+      "initCalls": 6,
+      "initMs": 0.10060000000066793,
+      "tickCalls": 1817,
+      "tickMs": 9.252400000017133,
+      "totalMs": 9.3530000000178
+    },
+    {
+      "name": "WinCheckExecution",
+      "instances": 1,
+      "initCalls": 1,
+      "initMs": 0.028999999999996362,
+      "tickCalls": 1200,
+      "tickMs": 6.746700000004807,
+      "totalMs": 6.775700000004804
+    },
+    {
+      "name": "TrainExecution",
+      "instances": 4,
+      "initCalls": 4,
+      "initMs": 1.2286000000003696,
+      "tickCalls": 193,
+      "tickMs": 2.4546999999970467,
+      "totalMs": 3.6832999999974163
+    },
+    {
+      "name": "CityExecution",
+      "instances": 26,
+      "initCalls": 26,
+      "initMs": 0.029599999999391002,
+      "tickCalls": 7573,
+      "tickMs": 2.2589000000043598,
+      "totalMs": 2.2885000000037508
+    },
+    {
+      "name": "AllianceRequestExecution",
+      "instances": 16,
+      "initCalls": 16,
+      "initMs": 0.5397000000002663,
+      "tickCalls": 515,
+      "tickMs": 0.942600000000084,
+      "totalMs": 1.4823000000003503
+    },
+    {
+      "name": "RecomputeRailClusterExecution",
+      "instances": 1,
+      "initCalls": 1,
+      "initMs": 0.007499999999936335,
+      "tickCalls": 1200,
+      "tickMs": 1.3411000000053264,
+      "totalMs": 1.3486000000052627
+    },
+    {
+      "name": "FactoryExecution",
+      "instances": 8,
+      "initCalls": 8,
+      "initMs": 0.022800000000188447,
+      "tickCalls": 2722,
+      "tickMs": 1.2943000000082066,
+      "totalMs": 1.317100000008395
+    },
+    {
+      "name": "DefensePostExecution",
+      "instances": 6,
+      "initCalls": 6,
+      "initMs": 0.03099999999994907,
+      "tickCalls": 618,
+      "tickMs": 0.5313000000041939,
+      "totalMs": 0.5623000000041429
+    },
+    {
+      "name": "SpawnTimerExecution",
+      "instances": 1,
+      "initCalls": 1,
+      "initMs": 0.005899999999996908,
+      "tickCalls": 201,
+      "tickMs": 0.2523999999991702,
+      "totalMs": 0.2582999999991671
+    },
+    {
+      "name": "EmojiExecution",
+      "instances": 1,
+      "initCalls": 1,
+      "initMs": 0.04860000000007858,
+      "tickCalls": 1,
+      "tickMs": 0.1412000000000262,
+      "totalMs": 0.18980000000010477
+    }
+  ]
+}

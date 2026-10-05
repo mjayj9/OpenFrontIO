@@ -9,6 +9,7 @@ import {
   UnitType,
 } from "../game/Game";
 import { TileRef } from "../game/GameMap";
+import { modernSystemsFor } from "../modern/ModernSystems";
 import { WaterPathFinder } from "../pathfinding/PathFinder";
 import { PathStatus } from "../pathfinding/types";
 import { PseudoRandom } from "../PseudoRandom";
@@ -143,6 +144,22 @@ export class WarshipExecution implements Execution {
 
     // Priority 3: Hunt trade ship only if not healing and no enemy warship
     if (this.warship.targetUnit()?.type() === UnitType.TradeShip) {
+      const modernOrder = this.mg.modernSystems()
+        ? modernSystemsFor(this.mg)?.forces.navyOrder(this.warship.id())
+        : undefined;
+      if (modernOrder && modernOrder.command?.kind !== "patrol") {
+        // Moving, holding, escorting and blockading fleets keep their order.
+        // A merchant already within capture distance remains a valid prize.
+        const target = this.warship.targetUnit()!;
+        if (this.mg.manhattanDist(this.warship.tile(), target.tile()) <= 5) {
+          this.warship.owner().captureUnit(target);
+          this.warship.recordTradeCapture();
+          this.warship.setTargetUnit(undefined);
+          this.warship.touch();
+        }
+        this.patrol();
+        return;
+      }
       this.huntDownTradeShip();
       return;
     }

@@ -31,6 +31,8 @@
     "tests/**/*",
     "src/scripts",
     "scripts/replay",
+    "scripts/forkPreview.ts",
+    "scripts/mergeModernTranslations.ts",
     "vite.config.ts"
   ],
   "exclude": ["node_modules"]

@@ -15,47 +15,54 @@ import {
 import { isDesktopShell } from "../../client/DesktopShell";
 import { Cosmetics } from "../CosmeticSchemas";
 import { PlayerPattern } from "../Schemas";
+import {
+  inputDefaults,
+  inputKeyConflicts,
+  InputMode,
+} from "./KeybindingRegistry";
 
 export function getDefaultKeybinds(isMac: boolean): Record<string, string> {
-  return {
-    toggleView: "Space",
-    coordinateGrid: "KeyM",
-    buildCity: "Digit1",
-    buildFactory: "Digit2",
-    buildPort: "Digit3",
-    buildDefensePost: "Digit4",
-    buildMissileSilo: "Digit5",
-    buildSamLauncher: "Digit6",
-    buildWarship: "Digit7",
-    buildAtomBomb: "Digit8",
-    buildHydrogenBomb: "Digit9",
-    buildMIRV: "Digit0",
-    attackRatioDown: "KeyT",
-    attackRatioUp: "KeyY",
-    boatAttack: "KeyB",
-    groundAttack: "KeyG",
-    retaliateAttack: "Shift+KeyR",
-    requestAlliance: "KeyK",
-    breakAlliance: "KeyL",
-    swapDirection: "KeyU",
-    zoomOut: "KeyQ",
-    zoomIn: "KeyE",
-    centerCamera: "KeyC",
-    moveUp: "KeyW",
-    moveLeft: "KeyA",
-    moveDown: "KeyS",
-    moveRight: "KeyD",
-    buildMenuModifier: isMac ? "MetaLeft" : "ControlLeft",
-    emojiMenuModifier: "AltLeft",
-    boxSelectWarships: "ShiftLeft",
-    shiftKey: "ShiftLeft",
-    resetGfx: "KeyR",
-    selectAllWarships: "KeyF",
-    pauseGame: "KeyP",
-    gameSpeedUp: "Period",
-    gameSpeedDown: "Comma",
-    altKey: "AltLeft",
+  return inputDefaults("classic", isMac);
+}
+
+/** Saved choices own their keys; newly introduced defaults remain unbound on conflict. */
+export function normalizeKeybind(value: string): string {
+  const parts = value.split("+");
+  const code = parts.pop() ?? "";
+  return [
+    ...["Ctrl", "Alt", "Shift", "Meta"].filter((m) => parts.includes(m)),
+    code,
+  ].join("+");
+}
+
+export function mergeKeybinds(
+  defaults: Record<string, string>,
+  saved: Record<string, string>,
+): Record<string, string> {
+  const result: Record<string, string> = {};
+  const owners = new Map<string, string[]>();
+  const canShare = (a: string, b: string, key: string) =>
+    (key.startsWith("Alt") &&
+      [a, b].every((v) => ["altKey", "emojiMenuModifier"].includes(v))) ||
+    (key.startsWith("Shift") &&
+      [a, b].every((v) => ["shiftKey", "boxSelectWarships"].includes(v)));
+  const assign = (action: string, value: string) => {
+    if (value === "Null" || value === "") return;
+    const key = normalizeKeybind(value);
+    const occupied = owners.get(key) ?? [];
+    if (occupied.some((other) => !canShare(action, other, key))) return;
+    result[action] = key;
+    owners.set(key, [...occupied, action]);
   };
+  for (const [action, value] of Object.entries(saved)) {
+    if (Object.prototype.hasOwnProperty.call(defaults, action))
+      assign(action, value);
+  }
+  for (const [action, value] of Object.entries(defaults)) {
+    if (!Object.prototype.hasOwnProperty.call(saved, action))
+      assign(action, value);
+  }
+  return result;
 }
 
 export const USER_SETTINGS_CHANGED_EVENT = "event:user-settings-changed";
@@ -176,6 +183,20 @@ export const CROWN_KEY = "crown";
 export const COLOR_KEY = "settings.territoryColor";
 export const PERFORMANCE_OVERLAY_KEY = "settings.performanceOverlay";
 export const KEYBINDS_KEY = "settings.keybinds";
+export const INPUT_PROFILE_KEY = "settings.input.v2";
+export const INPUT_PROFILE_BACKUP_KEY = "settings.input.backup.v1";
+export const INPUT_PROFILE_CHANGED_EVENT = "input-profile-changed";
+export interface InputMigrationNotice {
+  action: string;
+  previous: string;
+  replacement: string;
+  reason: "legacy-default" | "conflict";
+}
+interface InputProfiles {
+  version: 2;
+  modern: Record<string, string>;
+  notices: InputMigrationNotice[];
+}
 export const GRAPHICS_KEY = "settings.graphics";
 export const GRAPHICS_PRESETS_KEY = "settings.graphicsPresets";
 export const EFFECTS_KEY = "settings.effects";
@@ -1102,20 +1123,281 @@ export class UserSettings {
   }
 
   keybinds(isMac: boolean): Record<string, string> {
-    const merged = {
-      ...getDefaultKeybinds(isMac),
-      ...this.normalizedUserKeybinds(),
-    };
-    // Actually unbind key: if Unbind is clicked in UserSettingsModal, eg. for Attack Ratio Up,
-    // keybind is "Null". Even if it is in default kindbinds (Y), it should not work anymore.
-    // The key (Y) can now be bound to another action like Boat Attack, and no two actions listen to the same key.
-    for (const k in merged) {
-      if (merged[k] === "Null") {
-        delete merged[k];
-      }
-    }
+    return mergeKeybinds(
+      getDefaultKeybinds(isMac),
+      this.normalizedUserKeybinds(),
+    );
+  }
 
-    return merged;
+  /** Classic remains the user's existing profile. Modern is migrated once,
+   * backed up before writing, and never reads the old modern override again. */
+  effectiveKeybinds(mode: InputMode, isMac: boolean): Record<string, string> {
+    if (mode === "classic") return this.keybinds(isMac);
+    const profile = this.inputProfile(isMac);
+    return mergeKeybinds(inputDefaults("modern", isMac), profile.modern);
+  }
+
+  private inputProfile(isMac: boolean): InputProfiles {
+    try {
+      const parsed = JSON.parse(
+        localStorage.getItem(INPUT_PROFILE_KEY) ?? "null",
+      );
+      if (
+        parsed?.version === 2 &&
+        parsed.modern &&
+        typeof parsed.modern === "object" &&
+        !Array.isArray(parsed.modern) &&
+        Object.values(parsed.modern).every((v) => typeof v === "string") &&
+        Array.isArray(parsed.notices)
+      )
+        return this.resolveInputConflicts(parsed as InputProfiles, isMac);
+    } catch {
+      /* invalid optional settings get a recoverable default */
+    }
+    const defaults = inputDefaults("modern", isMac);
+    const classicDefaults = inputDefaults("classic", isMac);
+    const old = this.normalizedUserKeybinds();
+    const notices: InputMigrationNotice[] = [];
+    const modern: Record<string, string> = {};
+    const reserved = new Map(
+      Object.entries(defaults)
+        .filter(([id]) =>
+          [
+            "modernArmy",
+            "modernNavy",
+            "modernAir",
+            "modernStop",
+            "modernSelectVisible",
+            "buildMenu",
+            "cancel",
+            "centerCamera",
+            "help",
+            "pauseGame",
+            "gameSpeedUp",
+            "gameSpeedDown",
+          ].includes(id),
+        )
+        .map(([id, key]) => [normalizeKeybind(key), id]),
+    );
+    for (const [id, raw] of Object.entries(old)) {
+      if (!(id in defaults)) continue;
+      const value = raw === "Null" ? "" : normalizeKeybind(raw);
+      // Legacy stores often contain the entire default map, not only edits.
+      // A changed default must follow the new mode while genuine other edits survive.
+      if (value === classicDefaults[id] && value !== defaults[id]) {
+        notices.push({
+          action: id,
+          previous: value,
+          replacement: defaults[id],
+          reason: "legacy-default",
+        });
+        continue;
+      }
+      if (value && reserved.has(value) && reserved.get(value) !== id) {
+        modern[id] = "";
+        notices.push({
+          action: id,
+          previous: value,
+          replacement: "",
+          reason: "conflict",
+        });
+      } else modern[id] = value;
+    }
+    // Preserve a genuine former branch rebind as a visible secondary action,
+    // while restoring the required Q/W/E primary controls. It is registered
+    // and editable in the same table, never an invisible legacy dispatcher.
+    try {
+      const legacy: unknown = JSON.parse(
+        localStorage.getItem("settings.modernKeybinds.v1") ?? "{}",
+      );
+      if (legacy && typeof legacy === "object" && !Array.isArray(legacy)) {
+        for (const id of ["modernArmy", "modernNavy", "modernAir"]) {
+          const raw = (legacy as Record<string, unknown>)[id];
+          if (typeof raw !== "string") continue;
+          const value = raw === "Null" ? "" : normalizeKeybind(raw);
+          if (value === defaults[id]) continue;
+          const secondary = `${id}Alternate`;
+          if (
+            value &&
+            !reserved.has(value) &&
+            !Object.values(modern).includes(value)
+          )
+            modern[secondary] = value;
+          else
+            notices.push({
+              action: id,
+              previous: value,
+              replacement: defaults[id],
+              reason: "conflict",
+            });
+        }
+      }
+    } catch {
+      /* malformed legacy value is retained verbatim in the backup */
+    }
+    const resolved = mergeKeybinds(defaults, modern);
+    for (const [id, value] of Object.entries(modern)) {
+      if (value && resolved[id] !== value)
+        notices.push({
+          action: id,
+          previous: value,
+          replacement: "",
+          reason: "conflict",
+        });
+    }
+    const profile: InputProfiles = {
+      version: 2,
+      modern: Object.fromEntries(
+        Object.keys(defaults).map((id) => [id, resolved[id] ?? ""]),
+      ),
+      notices,
+    };
+    try {
+      if (localStorage.getItem(INPUT_PROFILE_BACKUP_KEY) === null)
+        localStorage.setItem(
+          INPUT_PROFILE_BACKUP_KEY,
+          JSON.stringify({
+            version: 1,
+            classic: localStorage.getItem(KEYBINDS_KEY),
+            modern: localStorage.getItem("settings.modernKeybinds.v1"),
+          }),
+        );
+      localStorage.setItem(INPUT_PROFILE_KEY, JSON.stringify(profile));
+    } catch {
+      /* A quota failure cannot disable the new mode's defaults. */
+    }
+    return this.resolveInputConflicts(profile, isMac);
+  }
+
+  private resolveInputConflicts(
+    profile: InputProfiles,
+    isMac: boolean,
+  ): InputProfiles {
+    const conflicts = inputKeyConflicts(
+      "modern",
+      mergeKeybinds(inputDefaults("modern", isMac), profile.modern),
+    );
+    if (conflicts.length === 0) return profile;
+    const repaired: InputProfiles = {
+      ...profile,
+      modern: { ...profile.modern },
+      notices: [...profile.notices],
+    };
+    for (const { action, binding } of conflicts) {
+      if (repaired.modern[action] === "") continue;
+      repaired.modern[action] = "";
+      repaired.notices.push({
+        action,
+        previous: binding,
+        replacement: "",
+        reason: "conflict",
+      });
+    }
+    try {
+      const backup = `${INPUT_PROFILE_KEY}.before-effective-conflicts`;
+      if (localStorage.getItem(backup) === null)
+        localStorage.setItem(backup, JSON.stringify(profile));
+      localStorage.setItem(INPUT_PROFILE_KEY, JSON.stringify(repaired));
+    } catch {
+      // Keep the usable in-memory profile when browser storage is full.
+    }
+    return repaired;
+  }
+
+  inputMigrationNotices(isMac: boolean): readonly InputMigrationNotice[] {
+    return this.inputProfile(isMac).notices;
+  }
+
+  setInputBinding(
+    mode: InputMode,
+    action: string,
+    value: string,
+    isMac: boolean,
+  ): boolean {
+    const defaults = inputDefaults(mode, isMac);
+    if (!(action in defaults)) return false;
+    const normalized = value === "Null" ? "" : normalizeKeybind(value);
+    const current = this.effectiveKeybinds(mode, isMac);
+    if (
+      normalized &&
+      Object.entries(current).some(
+        ([other, binding]) =>
+          other !== action &&
+          binding === normalized &&
+          !(
+            (normalized.startsWith("Alt") &&
+              [other, action].every((id) =>
+                ["altKey", "emojiMenuModifier"].includes(id),
+              )) ||
+            (normalized.startsWith("Shift") &&
+              [other, action].every((id) =>
+                ["shiftKey", "boxSelectWarships"].includes(id),
+              ))
+          ),
+      )
+    )
+      return false;
+    const candidate = mergeKeybinds(defaults, {
+      ...Object.fromEntries(
+        Object.keys(defaults).map((id) => [id, current[id] ?? ""]),
+      ),
+      [action]: normalized,
+    });
+    if (normalized && candidate[action] !== normalized) return false;
+    if (inputKeyConflicts(mode, candidate).length > 0) return false;
+    try {
+      if (mode === "classic")
+        this.setKeybinds({
+          ...this.parsedUserKeybinds(),
+          [action]: normalized,
+        });
+      else {
+        const profile = this.inputProfile(isMac);
+        localStorage.setItem(
+          INPUT_PROFILE_KEY,
+          JSON.stringify({
+            ...profile,
+            modern: {
+              ...profile.modern,
+              [action]: normalized,
+            },
+          }),
+        );
+      }
+      globalThis.dispatchEvent(new Event(INPUT_PROFILE_CHANGED_EVENT));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  resetInputBindings(mode: InputMode, isMac: boolean): boolean {
+    try {
+      if (mode === "classic") this.setKeybinds({});
+      else
+        localStorage.setItem(
+          INPUT_PROFILE_KEY,
+          JSON.stringify({
+            version: 2,
+            modern: inputDefaults(mode, isMac),
+            notices: [],
+          } satisfies InputProfiles),
+        );
+      globalThis.dispatchEvent(new Event(INPUT_PROFILE_CHANGED_EVENT));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  mobileControlsSide(): "left" | "right" {
+    return this.getString("settings.mobileControlsSide") === "right"
+      ? "right"
+      : "left";
+  }
+
+  setMobileControlsSide(side: "left" | "right"): void {
+    this.setString("settings.mobileControlsSide", side);
   }
 
   setKeybinds(value: string | Record<string, any>): void {

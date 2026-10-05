@@ -42,6 +42,16 @@ export class PortExecution implements Execution {
     if (this.port.isUnderConstruction()) {
       return;
     }
+    const major = this.mg
+      .modernSystems()
+      ?.ports.find((p) => p.tile === this.port.tile());
+    if (
+      major &&
+      (major.level === 0 ||
+        major.damage >= 1000 ||
+        major.blockadedBy.length > 0)
+    )
+      return;
 
     if (!this.port.hasTrainStation()) {
       this.createStation();
@@ -115,6 +125,17 @@ export class PortExecution implements Execution {
       .players()
       .filter((p) => p !== this.port!.owner() && p.canTrade(this.port!.owner()))
       .flatMap((p) => p.units(UnitType.Port))
+      .filter((p) => {
+        const major = this.mg
+          .modernSystems()
+          ?.ports.find((port) => port.tile === p.tile());
+        return (
+          !major ||
+          (major.level > 0 &&
+            major.damage < 1000 &&
+            major.blockadedBy.length === 0)
+        );
+      })
       .filter((p) => {
         for (const comp of sourceComponents) {
           if (this.mg.hasWaterComponent(p.tile(), comp)) return true;

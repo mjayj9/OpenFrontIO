@@ -1,0 +1,1991 @@
+{
+  "samples": [
+    {
+      "tick": 930,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579714,
+          "x": 1714,
+          "y": 289,
+          "phase": "moving",
+          "missions": 1,
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 904,
+              "previewPath": [
+                577705, 579705, 579706, 579707, 579708, 579709, 579710, 579711,
+                581711, 583711
+              ]
+            }
+          ],
+          "command": {
+            "kind": "move",
+            "target": 577705,
+            "issuedTick": 895
+          }
+        },
+        {
+          "id": "force-1467",
+          "tile": 579714,
+          "x": 1714,
+          "y": 289,
+          "phase": "moving",
+          "missions": 1,
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 904,
+              "previewPath": [
+                577705, 579705, 579706, 579707, 579708, 579709, 579710, 579711,
+                581711, 583711
+              ]
+            }
+          ],
+          "command": {
+            "kind": "move",
+            "target": 577705,
+            "issuedTick": 895
+          }
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 942,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579711,
+          "x": 1711,
+          "y": 289,
+          "phase": "moving",
+          "missions": 1,
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 904,
+              "previewPath": [
+                577705, 579705, 579706, 579707, 579708, 579709, 579710, 579711,
+                581711, 583711
+              ]
+            }
+          ],
+          "command": {
+            "kind": "move",
+            "target": 577705,
+            "issuedTick": 895
+          }
+        },
+        {
+          "id": "force-1467",
+          "tile": 579711,
+          "x": 1711,
+          "y": 289,
+          "phase": "moving",
+          "missions": 1,
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 904,
+              "previewPath": [
+                577705, 579705, 579706, 579707, 579708, 579709, 579710, 579711,
+                581711, 583711
+              ]
+            }
+          ],
+          "command": {
+            "kind": "move",
+            "target": 577705,
+            "issuedTick": 895
+          }
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 960,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579706,
+          "x": 1706,
+          "y": 289,
+          "phase": "moving",
+          "missions": 1,
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 904,
+              "previewPath": [
+                577705, 579705, 579706, 579707, 579708, 579709, 579710, 579711,
+                581711, 583711
+              ]
+            }
+          ],
+          "command": {
+            "kind": "move",
+            "target": 577705,
+            "issuedTick": 895
+          }
+        },
+        {
+          "id": "force-1467",
+          "tile": 579706,
+          "x": 1706,
+          "y": 289,
+          "phase": "moving",
+          "missions": 1,
+          "queue": [
+            {
+              "kind": "move",
+              "target": 583711,
+              "issuedTick": 904,
+              "previewPath": [
+                577705, 579705, 579706, 579707, 579708, 579709, 579710, 579711,
+                581711, 583711
+              ]
+            }
+          ],
+          "command": {
+            "kind": "move",
+            "target": 577705,
+            "issuedTick": 895
+          }
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 975,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579705,
+          "x": 1705,
+          "y": 289,
+          "phase": "moving",
+          "missions": 2,
+          "queue": [],
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 967
+          }
+        },
+        {
+          "id": "force-1467",
+          "tile": 579705,
+          "x": 1705,
+          "y": 289,
+          "phase": "moving",
+          "missions": 2,
+          "queue": [],
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 967
+          }
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 991,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 579709,
+          "x": 1709,
+          "y": 289,
+          "phase": "moving",
+          "missions": 2,
+          "queue": [],
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 967
+          }
+        },
+        {
+          "id": "force-1467",
+          "tile": 579709,
+          "x": 1709,
+          "y": 289,
+          "phase": "moving",
+          "missions": 2,
+          "queue": [],
+          "command": {
+            "kind": "move",
+            "target": 583711,
+            "issuedTick": 967
+          }
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 1008,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 2,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 2,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 1025,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 1034,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 1049,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 1070,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": false
+        }
+      ]
+    },
+    {
+      "tick": 1092,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        }
+      ]
+    },
+    {
+      "tick": 1115,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        }
+      ]
+    },
+    {
+      "tick": 1130,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        }
+      ]
+    },
+    {
+      "tick": 1148,
+      "paused": false,
+      "selected": ["force-1466", "force-1467"],
+      "forces": [
+        {
+          "id": "force-1466",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1467",
+          "tile": 583711,
+          "x": 1711,
+          "y": 291,
+          "phase": "idle",
+          "missions": 3,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1469",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        },
+        {
+          "id": "force-1471",
+          "tile": 583705,
+          "x": 1705,
+          "y": 291,
+          "phase": "idle",
+          "missions": 0,
+          "queue": [],
+          "command": null
+        }
+      ],
+      "bases": [
+        {
+          "id": "base-1463",
+          "playerId": "region0149",
+          "tile": 583705,
+          "capacity": 24,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "air",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1464",
+          "playerId": "region0149",
+          "tile": 577705,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1472",
+          "playerId": "region0149",
+          "tile": 601703,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 589,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1473",
+          "playerId": "region0149",
+          "tile": 597718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 590,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-1474",
+          "playerId": "region0149",
+          "tile": 605718,
+          "capacity": 4,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "navy",
+          "completesTick": 0,
+          "repairUntilTick": null,
+          "unitId": 591,
+          "constructionCounted": true
+        },
+        {
+          "id": "base-2868",
+          "playerId": "region0149",
+          "tile": 581709,
+          "capacity": 8000,
+          "health": 1000,
+          "maxHealth": 1000,
+          "branch": "army",
+          "completesTick": 1086,
+          "repairUntilTick": null,
+          "unitId": null,
+          "constructionCounted": true
+        }
+      ]
+    }
+  ],
+  "education": {
+    "panelVersion": 1,
+    "active": true,
+    "guidePaused": false,
+    "chapter": "modern_commands",
+    "progress": {
+      "version": 4,
+      "stepId": "modern_box_select",
+      "outcomes": {
+        "modern_camera": "practiced",
+        "modern_branches": "practiced",
+        "modern_select": "practiced"
+      },
+      "doneTicks": null,
+      "baseline": {
+        "tilesOwned": 352,
+        "conqueredPlayers": 0,
+        "cities": 1,
+        "factories": 1,
+        "ports": 3,
+        "defensePosts": 0,
+        "warships": 0,
+        "silos": 0,
+        "modern": {
+          "independent": true,
+          "equalPopulation": true,
+          "branchesUsed": ["army", "navy", "air"],
+          "cameraMoves": 47,
+          "zoomChanges": 1,
+          "cursorPreviews": 2,
+          "boxSelections": 1,
+          "additionalSelections": 1,
+          "queuedOrders": 0,
+          "armyBasesCompleted": 0,
+          "armyTrained": 0,
+          "navalBasesCompleted": 0,
+          "aircraftProduced": 0,
+          "selectionCount": 2,
+          "armyMissions": 0,
+          "navyMissions": 0,
+          "airMissions": 0,
+          "airOutbounds": 0,
+          "airReturns": 0,
+          "airRearms": 0,
+          "airCasualties": 0,
+          "armyCasualties": 0,
+          "airBases": 1,
+          "completedTraining": 0,
+          "portCaptures": 0,
+          "portLevels": 0,
+          "portIncome": 0,
+          "blockadesSeen": 0,
+          "blockadesSuffered": 0,
+          "portRecoveries": 0,
+          "nuclearLaunches": 0,
+          "nuclearIncomeLoss": 0,
+          "nuclearImpacts": 0,
+          "completedStops": 0,
+          "climatePreviewAdapted": true,
+          "climatePreviewHarsh": false,
+          "climateAdaptedBattles": 0,
+          "climateHarshBattles": 0,
+          "aiLevelsVisible": false
+        }
+      }
+    },
+    "evidence": {
+      "conqueredPlayers": 0,
+      "atomLaunchSeen": false,
+      "boatSeen": false,
+      "modern": {
+        "phases": [
+          ["force-1466", "idle"],
+          ["force-1467", "idle"],
+          ["force-1469", "idle"],
+          ["force-1471", "idle"]
+        ],
+        "outbounds": 0,
+        "returns": 0,
+        "rearms": 0,
+        "blockades": [],
+        "branches": ["army", "navy", "air"],
+        "completedStops": 0,
+        "cameraMoves": 47,
+        "zoomChanges": 1,
+        "boxSelections": 1,
+        "additionalSelections": 1,
+        "cursorPreviews": 4,
+        "queuedOrders": 2,
+        "queuedOrderIds": [
+          "force-1466:904:move:583711",
+          "force-1467:904:move:583711"
+        ],
+        "climatePreviewAdapted": true,
+        "climatePreviewHarsh": false,
+        "aiInfoInspected": false,
+        "armyLosses": [
+          ["force-1466", 0],
+          ["force-1467", 0]
+        ],
+        "adaptedBattles": 0,
+        "harshBattles": 0,
+        "sufferedBlockades": [],
+        "portRecoveries": [],
+        "nuclearTargets": [],
+        "nuclearImpacts": []
+      }
+    }
+  }
+}

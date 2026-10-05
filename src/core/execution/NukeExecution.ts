@@ -13,6 +13,7 @@ import {
   UnitType,
 } from "../game/Game";
 import { TileRef } from "../game/GameMap";
+import { registerModernNuclearLaunch } from "../modern/ModernSystems";
 import { UniversalPathFinding } from "../pathfinding/PathFinder";
 import { ParabolaUniversalPathFinder } from "../pathfinding/PathFinder.Parabola";
 import { PathStatus } from "../pathfinding/types";
@@ -228,6 +229,8 @@ export class NukeExecution implements Execution {
         trajectory: this.getTrajectory(this.dst),
       });
       this.nuke.updateNukeState({ waitTicks: this.waitTicks });
+      if (this.nukeType !== UnitType.MIRVWarhead)
+        registerModernNuclearLaunch(this.mg, this.player, this.nuke.id());
       this.recordMotionPlan(ticks);
       if (this.nuke.type() !== UnitType.MIRVWarhead) {
         this.maybeBreakAlliances();

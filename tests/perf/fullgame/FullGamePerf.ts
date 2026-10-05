@@ -47,9 +47,17 @@ import {
 } from "../../../src/core/game/Game";
 import { createGame } from "../../../src/core/game/GameImpl";
 import { GameUpdateType, HashUpdate } from "../../../src/core/game/GameUpdates";
+import {
+  modernCountry,
+  modernPlayerInfo,
+  modernWorld,
+  validateModernStart,
+} from "../../../src/core/game/ModernWorld";
 import { createNationsForGame } from "../../../src/core/game/NationCreation";
 import { loadTerrainMap } from "../../../src/core/game/TerrainMapLoader";
 import { GameRunner } from "../../../src/core/GameRunner";
+import { AStarRail } from "../../../src/core/pathfinding/algorithms/AStar.Rail";
+import { WaterPathMemo } from "../../../src/core/pathfinding/PathFinder";
 import { PseudoRandom } from "../../../src/core/PseudoRandom";
 import { GameConfig, GameStartInfo } from "../../../src/core/Schemas";
 import { simpleHash } from "../../../src/core/Util";
@@ -94,11 +102,18 @@ interface Options {
   footprint: boolean;
   snapshotAt: number[];
   waterNukes: boolean;
+  enhancedPercent: number;
+  fairResources: boolean;
+  reportJSON?: string;
+  modernCountry?: string;
 }
 
 function resolveMap(name: string): GameMapType {
   const key = Object.keys(GameMapType).find(
-    (k) => k.toLowerCase() === name.toLowerCase(),
+    (k) =>
+      k.toLowerCase() === name.toLowerCase() ||
+      GameMapType[k as keyof typeof GameMapType].toLowerCase() ===
+        name.toLowerCase(),
   );
   if (key === undefined) {
     const available = Object.keys(GameMapType)
@@ -125,6 +140,8 @@ function parseArgs(argv: string[]): Options {
     footprint: false,
     snapshotAt: [],
     waterNukes: false,
+    enhancedPercent: 0,
+    fairResources: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -181,10 +198,33 @@ function parseArgs(argv: string[]): Options {
       case "--water-nukes":
         opts.waterNukes = true;
         break;
+      case "--enhanced-percent":
+        opts.enhancedPercent = parseInt(next(), 10);
+        if (
+          !Number.isInteger(opts.enhancedPercent) ||
+          opts.enhancedPercent < 0 ||
+          opts.enhancedPercent > 100
+        )
+          throw new Error("enhanced percent must be 0..100");
+        break;
+      case "--fair-resources":
+        opts.fairResources = true;
+        break;
+      case "--report-json":
+        opts.reportJSON = next();
+        break;
+      case "--modern-country":
+        opts.modernCountry = next().toUpperCase();
+        opts.map = GameMapType.ModernWorld;
+        opts.nations = "default";
+        opts.bots = 0;
+        break;
       default:
         throw new Error(`unknown argument: ${arg}`);
     }
   }
+  if (opts.modernCountry && (opts.bots !== 0 || opts.nations !== "default"))
+    throw new Error("modern scenario requires no tribes and all countries");
   return opts;
 }
 
@@ -214,13 +254,26 @@ function table(headers: string[], rows: string[][]): string {
 
 async function main(): Promise<void> {
   const opts = parseArgs(process.argv.slice(2));
+  const startupStart = performance.now();
+  let waterPathQueries = 0;
+  let railPathQueries = 0;
+  const originalRailPath = AStarRail.prototype.findPath;
+  AStarRail.prototype.findPath = function (from, to) {
+    railPathQueries++;
+    return originalRailPath.call(this, from, to);
+  };
+  const originalWaterPath = WaterPathMemo.prototype.findPath;
+  WaterPathMemo.prototype.findPath = function (from, to) {
+    waterPathQueries++;
+    return originalWaterPath.call(this, from, to);
+  };
   console.debug = () => {}; // silence per-tick debug logging
 
   const gameConfig: GameConfig = {
     gameMap: opts.map,
     gameMapSize: GameMapSize.Normal,
     gameMode: GameMode.FFA,
-    gameType: GameType.Public,
+    gameType: opts.modernCountry ? GameType.Singleplayer : GameType.Public,
     difficulty: Difficulty.Medium,
     nations: opts.nations,
     donateGold: false,
@@ -231,13 +284,39 @@ async function main(): Promise<void> {
     instantBuild: false,
     randomSpawn: false,
     waterNukes: opts.waterNukes ? true : undefined,
+    modernMode: opts.modernCountry
+      ? {
+          scenario: "modern-world-v1",
+          version: 1,
+          dataHash: modernWorld.hash,
+          countryId: opts.modernCountry,
+          balance: "balanced",
+          victory: "territory",
+          targetPercent: 60,
+          protectionTicks: 300,
+          capitalElimination: false,
+        }
+      : undefined,
+    enhancedAI:
+      opts.enhancedPercent > 0 || opts.fairResources
+        ? {
+            tribePercent: opts.enhancedPercent,
+            nationPercent: opts.enhancedPercent,
+            fairResources: opts.fairResources,
+            personality: "mixed",
+            seed: simpleHash(opts.seed) >>> 0,
+          }
+        : undefined,
   };
   const gameStart: GameStartInfo = {
     gameID: opts.seed,
     lobbyCreatedAt: 0,
     config: gameConfig,
-    players: [],
+    players: opts.modernCountry
+      ? [{ clientID: "PERFHUM1", username: "perf", clanTag: null }]
+      : [],
   };
+  validateModernStart(gameStart);
 
   console.log(
     `Loading map "${opts.map}" (bots=${opts.bots}, nations=${opts.nations}, ` +
@@ -264,8 +343,11 @@ async function main(): Promise<void> {
     0,
     random,
   );
+  const humans = opts.modernCountry
+    ? [modernPlayerInfo(modernCountry(opts.modernCountry), gameStart)]
+    : [];
   const game = createGame(
-    [],
+    humans,
     nations,
     terrain.gameMap,
     terrain.miniGameMap,
@@ -345,6 +427,9 @@ async function main(): Promise<void> {
     }
   }
   const spawnTurns = turnNumber;
+  const startupMs = performance.now() - startupStart;
+  const spawnPhaseMs = performance.now() - spawnStart;
+  const startupPathQueries = waterPathQueries;
   console.log(
     `Spawn phase done: ${spawnTurns} turns in ` +
       `${fmtMs(performance.now() - spawnStart)}ms, ` +
@@ -398,6 +483,35 @@ async function main(): Promise<void> {
   const budgetMs = config.msPerTick();
   const summary = gameStats.summarize(budgetMs);
   const alive = game.players().filter((p) => p.isAlive());
+  if (opts.reportJSON)
+    fs.writeFileSync(
+      opts.reportJSON,
+      JSON.stringify(
+        {
+          options: opts,
+          rulesVersion:
+            "fair-2-uniform-half-loot-cheats-disabled-shared-protection",
+          node: process.version,
+          tickTiming: summary,
+          startupMs,
+          spawnPhaseMs,
+          spawnTickTiming: spawnStats.summarize(config.msPerTick()),
+          startupPathQueries,
+          gamePathQueries: waterPathQueries - startupPathQueries,
+          heapPeakBytes: heapPeak,
+          waterPathQueries,
+          railPathQueries,
+          units: game.units().length,
+          alive: alive.length,
+          stateHash: lastHash,
+          executionProfile: opts.execProfile
+            ? execProfiler.report()
+            : undefined,
+        },
+        null,
+        2,
+      ),
+    );
 
   console.log(`\n${"=".repeat(72)}`);
   console.log(`Full game perf: ${opts.map}, ${summary.count} game ticks`);

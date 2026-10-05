@@ -1,0 +1,4841 @@
+{
+  "version": 1,
+  "id": "modern-world-v1",
+  "width": 2000,
+  "height": 1000,
+  "source": "Natural Earth 5.1.1, 50m admin-0 countries and populated places",
+  "policy": {
+    "version": 1,
+    "sourceVersion": "Natural Earth 5.1.1, 50m admin-0 countries and populated places",
+    "width": 2000,
+    "height": 1000,
+    "projection": "Plate Carree, longitude -180..180, latitude 90..-90",
+    "excluded": [
+      "ATA",
+      "ATF",
+      "HMD",
+      "SGS"
+    ],
+    "sovereignControllers": {
+      "US1": "USA",
+      "GB1": "GBR",
+      "FR1": "FRA",
+      "NZ1": "NZL",
+      "NL1": "NLD",
+      "FI1": "FIN",
+      "DN1": "DNK",
+      "CH1": "CHN",
+      "AU1": "AUS",
+      "CU1": "CUB",
+      "KA1": "KAZ"
+    },
+    "overrides": {
+      "SAH": "MAR",
+      "SOL": "SOM",
+      "CYN": "CYP"
+    },
+    "notes": "Scenario policy, not a statement of recognition. Dependencies use the listed sovereign controller. Palestine and Taiwan retain distinct controllers. Somaliland, Northern Cyprus and Western Sahara use the explicit overrides. Antarctic territories are excluded. Overseas polygons remain with their controller. Countries below nine raster tiles receive a labelled 3x3 game representation at their source label point."
+  },
+  "sourceHashes": {
+    "capitals.geojson": "8e70756b39fae9bcdc1e332bfc510c024c5edd3a13203ffd20092ee37b61d978",
+    "countries.geojson": "3e458fc036ad0a66411f2c1e6cac49c5d7bfb81cb1123bc513b22511a2b7fdeb"
+  },
+  "countries": [
+    {
+      "id": "AFG",
+      "name": "Afghanistan",
+      "sourceName": "Afghanistan",
+      "nameKo": "아프가니스탄",
+      "flag": "af",
+      "capitalName": "Kabul",
+      "sourceCapital": [
+        1384,
+        308
+      ],
+      "capital": [
+        1384,
+        308
+      ],
+      "index": 1,
+      "represented": false,
+      "tiles": 1801,
+      "neighbors": [
+        "CHN",
+        "IRN",
+        "PAK",
+        "TJK",
+        "TKM",
+        "UZB"
+      ]
+    },
+    {
+      "id": "AGO",
+      "name": "Angola",
+      "sourceName": "Angola",
+      "nameKo": "앙골라",
+      "flag": "ao",
+      "capitalName": "Luanda",
+      "sourceCapital": [
+        1073,
+        549
+      ],
+      "capital": [
+        1073,
+        549
+      ],
+      "index": 2,
+      "represented": false,
+      "tiles": 3128,
+      "neighbors": [
+        "COD",
+        "COG",
+        "NAM",
+        "ZMB"
+      ]
+    },
+    {
+      "id": "ALB",
+      "name": "Albania",
+      "sourceName": "Albania",
+      "nameKo": "알바니아",
+      "flag": "al",
+      "capitalName": "Tirana",
+      "sourceCapital": [
+        1110,
+        270
+      ],
+      "capital": [
+        1110,
+        270
+      ],
+      "index": 3,
+      "represented": false,
+      "tiles": 83,
+      "neighbors": [
+        "GRC",
+        "KOS",
+        "MKD",
+        "MNE"
+      ]
+    },
+    {
+      "id": "AND",
+      "name": "Andorra",
+      "sourceName": "Andorra",
+      "nameKo": "안도라",
+      "flag": "ad",
+      "capitalName": "Andorra",
+      "sourceCapital": [
+        1008,
+        263
+      ],
+      "capital": [
+        1008,
+        263
+      ],
+      "index": 4,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": [
+        "ESP",
+        "FRA"
+      ]
+    },
+    {
+      "id": "ARE",
+      "name": "United Arab Emirates",
+      "sourceName": "United Arab Emirates",
+      "nameKo": "아랍에미리트",
+      "flag": "ae",
+      "capitalName": "Abu Dhabi",
+      "sourceCapital": [
+        1302,
+        364
+      ],
+      "capital": [
+        1302,
+        364
+      ],
+      "index": 5,
+      "represented": false,
+      "tiles": 191,
+      "neighbors": [
+        "OMN",
+        "SAU"
+      ]
+    },
+    {
+      "id": "ARG",
+      "name": "Argentina",
+      "sourceName": "Argentina",
+      "nameKo": "아르헨티나",
+      "flag": "ar",
+      "capitalName": "Buenos Aires",
+      "sourceCapital": [
+        675,
+        692
+      ],
+      "capital": [
+        675,
+        692
+      ],
+      "index": 6,
+      "represented": false,
+      "tiles": 8512,
+      "neighbors": [
+        "BOL",
+        "BRA",
+        "CHL",
+        "PRY",
+        "URY"
+      ]
+    },
+    {
+      "id": "ARM",
+      "name": "Armenia",
+      "sourceName": "Armenia",
+      "nameKo": "아르메니아",
+      "flag": "am",
+      "capitalName": "Yerevan",
+      "sourceCapital": [
+        1247,
+        276
+      ],
+      "capital": [
+        1247,
+        276
+      ],
+      "index": 7,
+      "represented": false,
+      "tiles": 67,
+      "neighbors": [
+        "AZE",
+        "GEO",
+        "IRN",
+        "TUR"
+      ]
+    },
+    {
+      "id": "ATG",
+      "name": "Antigua and Barbuda",
+      "sourceName": "Antigua and Barbuda",
+      "nameKo": "앤티가 바부다",
+      "flag": "ag",
+      "capitalName": "Saint John's",
+      "sourceCapital": [
+        656,
+        404
+      ],
+      "capital": [
+        656,
+        404
+      ],
+      "index": 8,
+      "represented": true,
+      "tiles": 11,
+      "neighbors": []
+    },
+    {
+      "id": "AUS",
+      "name": "Australia",
+      "sourceName": "Australia",
+      "nameKo": "오스트레일리아",
+      "flag": "au",
+      "capitalName": "Canberra",
+      "sourceCapital": [
+        1828,
+        696
+      ],
+      "capital": [
+        1828,
+        696
+      ],
+      "index": 9,
+      "represented": false,
+      "tiles": 22071,
+      "neighbors": []
+    },
+    {
+      "id": "AUT",
+      "name": "Austria",
+      "sourceName": "Austria",
+      "nameKo": "오스트리아",
+      "flag": "at",
+      "capitalName": "Vienna",
+      "sourceCapital": [
+        1090,
+        232
+      ],
+      "capital": [
+        1090,
+        232
+      ],
+      "index": 10,
+      "represented": false,
+      "tiles": 242,
+      "neighbors": [
+        "CHE",
+        "CZE",
+        "DEU",
+        "HUN",
+        "ITA",
+        "LIE",
+        "SVK",
+        "SVN"
+      ]
+    },
+    {
+      "id": "AZE",
+      "name": "Azerbaijan",
+      "sourceName": "Azerbaijan",
+      "nameKo": "아제르바이잔",
+      "flag": "az",
+      "capitalName": "Baku",
+      "sourceCapital": [
+        1277,
+        275
+      ],
+      "capital": [
+        1277,
+        275
+      ],
+      "index": 11,
+      "represented": false,
+      "tiles": 278,
+      "neighbors": [
+        "ARM",
+        "GEO",
+        "IRN",
+        "RUS"
+      ]
+    },
+    {
+      "id": "BDI",
+      "name": "Burundi",
+      "sourceName": "Burundi",
+      "nameKo": "부룬디",
+      "flag": "bi",
+      "capitalName": "Bujumbura",
+      "sourceCapital": [
+        1163,
+        518
+      ],
+      "capital": [
+        1163,
+        518
+      ],
+      "index": 12,
+      "represented": false,
+      "tiles": 49,
+      "neighbors": [
+        "COD",
+        "RWA",
+        "TZA"
+      ]
+    },
+    {
+      "id": "BEL",
+      "name": "Belgium",
+      "sourceName": "Belgium",
+      "nameKo": "벨기에",
+      "flag": "be",
+      "capitalName": "Brussels",
+      "sourceCapital": [
+        1024,
+        217
+      ],
+      "capital": [
+        1024,
+        217
+      ],
+      "index": 13,
+      "represented": false,
+      "tiles": 84,
+      "neighbors": [
+        "DEU",
+        "FRA",
+        "LUX",
+        "NLD"
+      ]
+    },
+    {
+      "id": "BEN",
+      "name": "Benin",
+      "sourceName": "Benin",
+      "nameKo": "베냉",
+      "flag": "bj",
+      "capitalName": "Cotonou",
+      "sourceCapital": [
+        1013,
+        464
+      ],
+      "capital": [
+        1013,
+        464
+      ],
+      "index": 14,
+      "represented": false,
+      "tiles": 257,
+      "neighbors": [
+        "BFA",
+        "NER",
+        "NGA",
+        "TGO"
+      ]
+    },
+    {
+      "id": "BFA",
+      "name": "Burkina Faso",
+      "sourceName": "Burkina Faso",
+      "nameKo": "부르키나파소",
+      "flag": "bf",
+      "capitalName": "Ouagadougou",
+      "sourceCapital": [
+        991,
+        431
+      ],
+      "capital": [
+        991,
+        431
+      ],
+      "index": 15,
+      "represented": false,
+      "tiles": 640,
+      "neighbors": [
+        "BEN",
+        "CIV",
+        "GHA",
+        "MLI",
+        "NER",
+        "TGO"
+      ]
+    },
+    {
+      "id": "BGD",
+      "name": "Bangladesh",
+      "sourceName": "Bangladesh",
+      "nameKo": "방글라데시",
+      "flag": "bd",
+      "capitalName": "Dhaka",
+      "sourceCapital": [
+        1502,
+        368
+      ],
+      "capital": [
+        1502,
+        368
+      ],
+      "index": 16,
+      "represented": false,
+      "tiles": 342,
+      "neighbors": [
+        "IND",
+        "MMR"
+      ]
+    },
+    {
+      "id": "BGR",
+      "name": "Bulgaria",
+      "sourceName": "Bulgaria",
+      "nameKo": "불가리아",
+      "flag": "bg",
+      "capitalName": "Sofia",
+      "sourceCapital": [
+        1129,
+        262
+      ],
+      "capital": [
+        1129,
+        262
+      ],
+      "index": 17,
+      "represented": false,
+      "tiles": 343,
+      "neighbors": [
+        "GRC",
+        "MKD",
+        "ROU",
+        "SRB",
+        "TUR"
+      ]
+    },
+    {
+      "id": "BHR",
+      "name": "Bahrain",
+      "sourceName": "Bahrain",
+      "nameKo": "바레인",
+      "flag": "bh",
+      "capitalName": "Manama",
+      "sourceCapital": [
+        1281,
+        354
+      ],
+      "capital": [
+        1281,
+        354
+      ],
+      "index": 18,
+      "represented": true,
+      "tiles": 11,
+      "neighbors": [
+        "QAT"
+      ]
+    },
+    {
+      "id": "BHS",
+      "name": "The Bahamas",
+      "sourceName": "The Bahamas",
+      "nameKo": "바하마",
+      "flag": "bs",
+      "capitalName": "Nassau",
+      "sourceCapital": [
+        570,
+        360
+      ],
+      "capital": [
+        570,
+        360
+      ],
+      "index": 19,
+      "represented": false,
+      "tiles": 116,
+      "neighbors": []
+    },
+    {
+      "id": "BIH",
+      "name": "Bosnia and Herzegovina",
+      "sourceName": "Bosnia and Herzegovina",
+      "nameKo": "보스니아 헤르체고비나",
+      "flag": "ba",
+      "capitalName": "Sarajevo",
+      "sourceCapital": [
+        1102,
+        256
+      ],
+      "capital": [
+        1102,
+        256
+      ],
+      "index": 20,
+      "represented": false,
+      "tiles": 149,
+      "neighbors": [
+        "HRV",
+        "MNE",
+        "SRB"
+      ]
+    },
+    {
+      "id": "BLR",
+      "name": "Belarus",
+      "sourceName": "Belarus",
+      "nameKo": "벨라루스",
+      "flag": "by",
+      "capitalName": "Minsk",
+      "sourceCapital": [
+        1153,
+        200
+      ],
+      "capital": [
+        1153,
+        200
+      ],
+      "index": 21,
+      "represented": false,
+      "tiles": 785,
+      "neighbors": [
+        "LTU",
+        "LVA",
+        "POL",
+        "RUS",
+        "UKR"
+      ]
+    },
+    {
+      "id": "BLZ",
+      "name": "Belize",
+      "sourceName": "Belize",
+      "nameKo": "벨리즈",
+      "flag": "bz",
+      "capitalName": "Belmopan",
+      "sourceCapital": [
+        506,
+        404
+      ],
+      "capital": [
+        506,
+        404
+      ],
+      "index": 22,
+      "represented": false,
+      "tiles": 59,
+      "neighbors": [
+        "GTM",
+        "MEX"
+      ]
+    },
+    {
+      "id": "BOL",
+      "name": "Bolivia",
+      "sourceName": "Bolivia",
+      "nameKo": "볼리비아",
+      "flag": "bo",
+      "capitalName": "Sucre",
+      "sourceCapital": [
+        637,
+        605
+      ],
+      "capital": [
+        637,
+        605
+      ],
+      "index": 23,
+      "represented": false,
+      "tiles": 2744,
+      "neighbors": [
+        "ARG",
+        "BRA",
+        "CHL",
+        "PER",
+        "PRY"
+      ]
+    },
+    {
+      "id": "BRA",
+      "name": "Brazil",
+      "sourceName": "Brazil",
+      "nameKo": "브라질",
+      "flag": "br",
+      "capitalName": "Brasília",
+      "sourceCapital": [
+        733,
+        587
+      ],
+      "capital": [
+        733,
+        587
+      ],
+      "index": 24,
+      "represented": false,
+      "tiles": 21932,
+      "neighbors": [
+        "ARG",
+        "BOL",
+        "COL",
+        "FRA",
+        "GUY",
+        "PER",
+        "PRY",
+        "SUR",
+        "URY",
+        "VEN"
+      ]
+    },
+    {
+      "id": "BRB",
+      "name": "Barbados",
+      "sourceName": "Barbados",
+      "nameKo": "바베이도스",
+      "flag": "bb",
+      "capitalName": "Bridgetown",
+      "sourceCapital": [
+        668,
+        427
+      ],
+      "capital": [
+        668,
+        427
+      ],
+      "index": 25,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "BRN",
+      "name": "Brunei",
+      "sourceName": "Brunei",
+      "nameKo": "브루나이",
+      "flag": "bn",
+      "capitalName": "Bandar Seri Begawan",
+      "sourceCapital": [
+        1638,
+        472
+      ],
+      "capital": [
+        1638,
+        472
+      ],
+      "index": 26,
+      "represented": true,
+      "tiles": 15,
+      "neighbors": [
+        "MYS"
+      ]
+    },
+    {
+      "id": "BTN",
+      "name": "Bhutan",
+      "sourceName": "Bhutan",
+      "nameKo": "부탄",
+      "flag": "bt",
+      "capitalName": "Thimphu",
+      "sourceCapital": [
+        1497,
+        347
+      ],
+      "capital": [
+        1497,
+        347
+      ],
+      "index": 27,
+      "represented": false,
+      "tiles": 88,
+      "neighbors": [
+        "CHN",
+        "IND"
+      ]
+    },
+    {
+      "id": "BWA",
+      "name": "Botswana",
+      "sourceName": "Botswana",
+      "nameKo": "보츠와나",
+      "flag": "bw",
+      "capitalName": "Gaborone",
+      "sourceCapital": [
+        1143,
+        636
+      ],
+      "capital": [
+        1143,
+        636
+      ],
+      "index": 28,
+      "represented": false,
+      "tiles": 1484,
+      "neighbors": [
+        "NAM",
+        "ZAF",
+        "ZWE"
+      ]
+    },
+    {
+      "id": "CAF",
+      "name": "Central African Republic",
+      "sourceName": "Central African Republic",
+      "nameKo": "중앙아프리카 공화국",
+      "flag": "cf",
+      "capitalName": "Bangui",
+      "sourceCapital": [
+        1103,
+        475
+      ],
+      "capital": [
+        1103,
+        474
+      ],
+      "index": 29,
+      "represented": false,
+      "tiles": 1455,
+      "neighbors": [
+        "CMR",
+        "COD",
+        "COG",
+        "SDN",
+        "SDS",
+        "TCD"
+      ]
+    },
+    {
+      "id": "CAN",
+      "name": "Canada",
+      "sourceName": "Canada",
+      "nameKo": "캐나다",
+      "flag": "ca",
+      "capitalName": "Ottawa",
+      "sourceCapital": [
+        579,
+        247
+      ],
+      "capital": [
+        579,
+        247
+      ],
+      "index": 30,
+      "represented": false,
+      "tiles": 55278,
+      "neighbors": [
+        "FRA",
+        "USA"
+      ]
+    },
+    {
+      "id": "CHE",
+      "name": "Switzerland",
+      "sourceName": "Switzerland",
+      "nameKo": "스위스",
+      "flag": "ch",
+      "capitalName": "Bern",
+      "sourceCapital": [
+        1041,
+        239
+      ],
+      "capital": [
+        1041,
+        239
+      ],
+      "index": 31,
+      "represented": false,
+      "tiles": 111,
+      "neighbors": [
+        "AUT",
+        "DEU",
+        "FRA",
+        "ITA",
+        "LIE"
+      ]
+    },
+    {
+      "id": "CHL",
+      "name": "Chile",
+      "sourceName": "Chile",
+      "nameKo": "칠레",
+      "flag": "cl",
+      "capitalName": "Santiago",
+      "sourceCapital": [
+        607,
+        685
+      ],
+      "capital": [
+        607,
+        685
+      ],
+      "index": 32,
+      "represented": false,
+      "tiles": 2931,
+      "neighbors": [
+        "ARG",
+        "BOL",
+        "PER"
+      ]
+    },
+    {
+      "id": "CHN",
+      "name": "People's Republic of China",
+      "sourceName": "People's Republic of China",
+      "nameKo": "중화인민공화국",
+      "flag": "cn",
+      "capitalName": "Beijing",
+      "sourceCapital": [
+        1646,
+        278
+      ],
+      "capital": [
+        1646,
+        278
+      ],
+      "index": 33,
+      "represented": false,
+      "tiles": 29078,
+      "neighbors": [
+        "AFG",
+        "BTN",
+        "IND",
+        "KAS",
+        "KAZ",
+        "KGZ",
+        "LAO",
+        "MMR",
+        "MNG",
+        "NPL",
+        "PAK",
+        "PRK",
+        "RUS",
+        "TJK",
+        "TWN",
+        "VNM"
+      ]
+    },
+    {
+      "id": "CIV",
+      "name": "Ivory Coast",
+      "sourceName": "Ivory Coast",
+      "nameKo": "코트디부아르",
+      "flag": "ci",
+      "capitalName": "Yamoussoukro",
+      "sourceCapital": [
+        970,
+        462
+      ],
+      "capital": [
+        970,
+        462
+      ],
+      "index": 34,
+      "represented": false,
+      "tiles": 783,
+      "neighbors": [
+        "BFA",
+        "GHA",
+        "GIN",
+        "LBR",
+        "MLI"
+      ]
+    },
+    {
+      "id": "CMR",
+      "name": "Cameroon",
+      "sourceName": "Cameroon",
+      "nameKo": "카메룬",
+      "flag": "cm",
+      "capitalName": "Yaoundé",
+      "sourceCapital": [
+        1063,
+        478
+      ],
+      "capital": [
+        1063,
+        478
+      ],
+      "index": 35,
+      "represented": false,
+      "tiles": 1121,
+      "neighbors": [
+        "CAF",
+        "COG",
+        "GAB",
+        "GNQ",
+        "NGA",
+        "TCD"
+      ]
+    },
+    {
+      "id": "COD",
+      "name": "DR Congo",
+      "sourceName": "Democratic Republic of the Congo",
+      "nameKo": "콩고 민주 공화국",
+      "flag": "cd",
+      "capitalName": "Kinshasa",
+      "sourceCapital": [
+        1085,
+        524
+      ],
+      "capital": [
+        1085,
+        524
+      ],
+      "index": 36,
+      "represented": false,
+      "tiles": 5814,
+      "neighbors": [
+        "AGO",
+        "BDI",
+        "CAF",
+        "COG",
+        "RWA",
+        "SDS",
+        "TZA",
+        "UGA",
+        "ZMB"
+      ]
+    },
+    {
+      "id": "COG",
+      "name": "Republic of the Congo",
+      "sourceName": "Republic of the Congo",
+      "nameKo": "콩고 공화국",
+      "flag": "cg",
+      "capitalName": "Brazzaville",
+      "sourceCapital": [
+        1084,
+        523
+      ],
+      "capital": [
+        1084,
+        523
+      ],
+      "index": 37,
+      "represented": false,
+      "tiles": 881,
+      "neighbors": [
+        "AGO",
+        "CAF",
+        "CMR",
+        "COD",
+        "GAB"
+      ]
+    },
+    {
+      "id": "COL",
+      "name": "Colombia",
+      "sourceName": "Colombia",
+      "nameKo": "콜롬비아",
+      "flag": "co",
+      "capitalName": "Bogota",
+      "sourceCapital": [
+        588,
+        474
+      ],
+      "capital": [
+        588,
+        474
+      ],
+      "index": 38,
+      "represented": false,
+      "tiles": 2843,
+      "neighbors": [
+        "BRA",
+        "ECU",
+        "PAN",
+        "PER",
+        "VEN"
+      ]
+    },
+    {
+      "id": "COM",
+      "name": "Comoros",
+      "sourceName": "Comoros",
+      "nameKo": "코모로",
+      "flag": "km",
+      "capitalName": "Moroni",
+      "sourceCapital": [
+        1240,
+        565
+      ],
+      "capital": [
+        1240,
+        565
+      ],
+      "index": 39,
+      "represented": false,
+      "tiles": 13,
+      "neighbors": []
+    },
+    {
+      "id": "CPV",
+      "name": "Cape Verde",
+      "sourceName": "Cape Verde",
+      "nameKo": "카보베르데",
+      "flag": "cv",
+      "capitalName": "Praia",
+      "sourceCapital": [
+        869,
+        417
+      ],
+      "capital": [
+        869,
+        417
+      ],
+      "index": 40,
+      "represented": false,
+      "tiles": 35,
+      "neighbors": []
+    },
+    {
+      "id": "CRI",
+      "name": "Costa Rica",
+      "sourceName": "Costa Rica",
+      "nameKo": "코스타리카",
+      "flag": "cr",
+      "capitalName": "San José",
+      "sourceCapital": [
+        532,
+        444
+      ],
+      "capital": [
+        532,
+        444
+      ],
+      "index": 41,
+      "represented": false,
+      "tiles": 139,
+      "neighbors": [
+        "NIC",
+        "PAN"
+      ]
+    },
+    {
+      "id": "CUB",
+      "name": "Cuba",
+      "sourceName": "Cuba",
+      "nameKo": "쿠바",
+      "flag": "cu",
+      "capitalName": "Havana",
+      "sourceCapital": [
+        542,
+        371
+      ],
+      "capital": [
+        542,
+        371
+      ],
+      "index": 42,
+      "represented": false,
+      "tiles": 383,
+      "neighbors": []
+    },
+    {
+      "id": "CYP",
+      "name": "Cyprus",
+      "sourceName": "Cyprus",
+      "nameKo": "키프로스",
+      "flag": "cy",
+      "capitalName": "Nicosia",
+      "sourceCapital": [
+        1185,
+        304
+      ],
+      "capital": [
+        1185,
+        304
+      ],
+      "index": 43,
+      "represented": false,
+      "tiles": 42,
+      "neighbors": []
+    },
+    {
+      "id": "CZE",
+      "name": "Czech Republic",
+      "sourceName": "Czech Republic",
+      "nameKo": "체코",
+      "flag": "cz",
+      "capitalName": "Prague",
+      "sourceCapital": [
+        1080,
+        221
+      ],
+      "capital": [
+        1080,
+        221
+      ],
+      "index": 44,
+      "represented": false,
+      "tiles": 277,
+      "neighbors": [
+        "AUT",
+        "DEU",
+        "POL",
+        "SVK"
+      ]
+    },
+    {
+      "id": "DEU",
+      "name": "Germany",
+      "sourceName": "Germany",
+      "nameKo": "독일",
+      "flag": "de",
+      "capitalName": "Berlin",
+      "sourceCapital": [
+        1074,
+        208
+      ],
+      "capital": [
+        1074,
+        208
+      ],
+      "index": 45,
+      "represented": false,
+      "tiles": 1451,
+      "neighbors": [
+        "AUT",
+        "BEL",
+        "CHE",
+        "CZE",
+        "DNK",
+        "FRA",
+        "LUX",
+        "NLD",
+        "POL"
+      ]
+    },
+    {
+      "id": "DJI",
+      "name": "Djibouti",
+      "sourceName": "Djibouti",
+      "nameKo": "지부티",
+      "flag": "dj",
+      "capitalName": "Djibouti",
+      "sourceCapital": [
+        1239,
+        435
+      ],
+      "capital": [
+        1239,
+        435
+      ],
+      "index": 46,
+      "represented": false,
+      "tiles": 48,
+      "neighbors": [
+        "ERI",
+        "ETH",
+        "SOM"
+      ]
+    },
+    {
+      "id": "DMA",
+      "name": "Dominica",
+      "sourceName": "Dominica",
+      "nameKo": "도미니카 연방",
+      "flag": "dm",
+      "capitalName": "Roseau",
+      "sourceCapital": [
+        658,
+        414
+      ],
+      "capital": [
+        658,
+        414
+      ],
+      "index": 47,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "DNK",
+      "name": "Denmark",
+      "sourceName": "Denmark",
+      "nameKo": "덴마크",
+      "flag": "dk",
+      "capitalName": "København",
+      "sourceCapital": [
+        1069,
+        190
+      ],
+      "capital": [
+        1069,
+        190
+      ],
+      "index": 48,
+      "represented": false,
+      "tiles": 21716,
+      "neighbors": [
+        "DEU",
+        "SWE"
+      ]
+    },
+    {
+      "id": "DOM",
+      "name": "Dominican Republic",
+      "sourceName": "Dominican Republic",
+      "nameKo": "도미니카 공화국",
+      "flag": "do",
+      "capitalName": "Santo Domingo",
+      "sourceCapital": [
+        611,
+        397
+      ],
+      "capital": [
+        611,
+        397
+      ],
+      "index": 49,
+      "represented": false,
+      "tiles": 151,
+      "neighbors": [
+        "HTI"
+      ]
+    },
+    {
+      "id": "DZA",
+      "name": "Algeria",
+      "sourceName": "Algeria",
+      "nameKo": "알제리",
+      "flag": "dz",
+      "capitalName": "Algiers",
+      "sourceCapital": [
+        1016,
+        295
+      ],
+      "capital": [
+        1016,
+        295
+      ],
+      "index": 50,
+      "represented": false,
+      "tiles": 6500,
+      "neighbors": [
+        "LBY",
+        "MAR",
+        "MLI",
+        "MRT",
+        "NER",
+        "TUN"
+      ]
+    },
+    {
+      "id": "ECU",
+      "name": "Ecuador",
+      "sourceName": "Ecuador",
+      "nameKo": "에콰도르",
+      "flag": "ec",
+      "capitalName": "Quito",
+      "sourceCapital": [
+        563,
+        501
+      ],
+      "capital": [
+        563,
+        501
+      ],
+      "index": 51,
+      "represented": false,
+      "tiles": 668,
+      "neighbors": [
+        "COL",
+        "PER"
+      ]
+    },
+    {
+      "id": "EGY",
+      "name": "Egypt",
+      "sourceName": "Egypt",
+      "nameKo": "이집트",
+      "flag": "eg",
+      "capitalName": "Cairo",
+      "sourceCapital": [
+        1173,
+        333
+      ],
+      "capital": [
+        1173,
+        333
+      ],
+      "index": 52,
+      "represented": false,
+      "tiles": 2789,
+      "neighbors": [
+        "ISR",
+        "LBY",
+        "PSX",
+        "SAU",
+        "SDN"
+      ]
+    },
+    {
+      "id": "ERI",
+      "name": "Eritrea",
+      "sourceName": "Eritrea",
+      "nameKo": "에리트레아",
+      "flag": "er",
+      "capitalName": "Asmara",
+      "sourceCapital": [
+        1216,
+        414
+      ],
+      "capital": [
+        1216,
+        414
+      ],
+      "index": 53,
+      "represented": false,
+      "tiles": 311,
+      "neighbors": [
+        "DJI",
+        "ETH",
+        "SDN"
+      ]
+    },
+    {
+      "id": "ESP",
+      "name": "Spain",
+      "sourceName": "Spain",
+      "nameKo": "스페인",
+      "flag": "es",
+      "capitalName": "Madrid",
+      "sourceCapital": [
+        979,
+        275
+      ],
+      "capital": [
+        979,
+        275
+      ],
+      "index": 54,
+      "represented": false,
+      "tiles": 1730,
+      "neighbors": [
+        "AND",
+        "FRA",
+        "MAR",
+        "PRT"
+      ]
+    },
+    {
+      "id": "EST",
+      "name": "Estonia",
+      "sourceName": "Estonia",
+      "nameKo": "에스토니아",
+      "flag": "ee",
+      "capitalName": "Tallinn",
+      "sourceCapital": [
+        1137,
+        169
+      ],
+      "capital": [
+        1137,
+        169
+      ],
+      "index": 55,
+      "represented": false,
+      "tiles": 241,
+      "neighbors": [
+        "LVA",
+        "RUS"
+      ]
+    },
+    {
+      "id": "ETH",
+      "name": "Ethiopia",
+      "sourceName": "Ethiopia",
+      "nameKo": "에티오피아",
+      "flag": "et",
+      "capitalName": "Addis Ababa",
+      "sourceCapital": [
+        1214,
+        449
+      ],
+      "capital": [
+        1214,
+        449
+      ],
+      "index": 56,
+      "represented": false,
+      "tiles": 2794,
+      "neighbors": [
+        "DJI",
+        "ERI",
+        "KEN",
+        "SDN",
+        "SDS",
+        "SOM"
+      ]
+    },
+    {
+      "id": "FIN",
+      "name": "Finland",
+      "sourceName": "Finland",
+      "nameKo": "핀란드",
+      "flag": "fi",
+      "capitalName": "Helsinki",
+      "sourceCapital": [
+        1138,
+        165
+      ],
+      "capital": [
+        1138,
+        165
+      ],
+      "index": 57,
+      "represented": false,
+      "tiles": 1911,
+      "neighbors": [
+        "NOR",
+        "RUS",
+        "SWE"
+      ]
+    },
+    {
+      "id": "FJI",
+      "name": "Fiji",
+      "sourceName": "Fiji",
+      "nameKo": "피지",
+      "flag": "fj",
+      "capitalName": "Suva",
+      "sourceCapital": [
+        1991,
+        600
+      ],
+      "capital": [
+        1991,
+        600
+      ],
+      "index": 58,
+      "represented": false,
+      "tiles": 108,
+      "neighbors": []
+    },
+    {
+      "id": "FRA",
+      "name": "France",
+      "sourceName": "France",
+      "nameKo": "프랑스",
+      "flag": "fr",
+      "capitalName": "Paris",
+      "sourceCapital": [
+        1013,
+        228
+      ],
+      "capital": [
+        1013,
+        228
+      ],
+      "index": 59,
+      "represented": false,
+      "tiles": 2520,
+      "neighbors": [
+        "AND",
+        "BEL",
+        "BRA",
+        "CAN",
+        "CHE",
+        "DEU",
+        "ESP",
+        "ITA",
+        "LUX",
+        "MCO",
+        "SUR"
+      ]
+    },
+    {
+      "id": "FSM",
+      "name": "Micronesia",
+      "sourceName": "Federated States of Micronesia",
+      "nameKo": "미크로네시아 연방",
+      "flag": "fm",
+      "capitalName": "Palikir",
+      "sourceCapital": [
+        1878,
+        461
+      ],
+      "capital": [
+        1878,
+        461
+      ],
+      "index": 60,
+      "represented": false,
+      "tiles": 10,
+      "neighbors": []
+    },
+    {
+      "id": "GAB",
+      "name": "Gabon",
+      "sourceName": "Gabon",
+      "nameKo": "가봉",
+      "flag": "ga",
+      "capitalName": "Libreville",
+      "sourceCapital": [
+        1052,
+        497
+      ],
+      "capital": [
+        1052,
+        497
+      ],
+      "index": 61,
+      "represented": false,
+      "tiles": 711,
+      "neighbors": [
+        "CMR",
+        "COG",
+        "GNQ"
+      ]
+    },
+    {
+      "id": "GBR",
+      "name": "United Kingdom",
+      "sourceName": "United Kingdom",
+      "nameKo": "영국",
+      "flag": "gb",
+      "capitalName": "London",
+      "sourceCapital": [
+        999,
+        213
+      ],
+      "capital": [
+        999,
+        213
+      ],
+      "index": 62,
+      "represented": false,
+      "tiles": 1372,
+      "neighbors": [
+        "IRL",
+        "NLD",
+        "USA"
+      ]
+    },
+    {
+      "id": "GEO",
+      "name": "Georgia",
+      "sourceName": "Georgia",
+      "nameKo": "조지아",
+      "flag": "ge",
+      "capitalName": "Tbilisi",
+      "sourceCapital": [
+        1248,
+        268
+      ],
+      "capital": [
+        1248,
+        268
+      ],
+      "index": 63,
+      "represented": false,
+      "tiles": 228,
+      "neighbors": [
+        "ARM",
+        "AZE",
+        "RUS",
+        "TUR"
+      ]
+    },
+    {
+      "id": "GHA",
+      "name": "Ghana",
+      "sourceName": "Ghana",
+      "nameKo": "가나",
+      "flag": "gh",
+      "capitalName": "Accra",
+      "sourceCapital": [
+        998,
+        469
+      ],
+      "capital": [
+        998,
+        469
+      ],
+      "index": 64,
+      "represented": false,
+      "tiles": 634,
+      "neighbors": [
+        "BFA",
+        "CIV",
+        "TGO"
+      ]
+    },
+    {
+      "id": "GIN",
+      "name": "Guinea",
+      "sourceName": "Guinea",
+      "nameKo": "기니",
+      "flag": "gn",
+      "capitalName": "Conakry",
+      "sourceCapital": [
+        923,
+        447
+      ],
+      "capital": [
+        923,
+        447
+      ],
+      "index": 65,
+      "represented": false,
+      "tiles": 582,
+      "neighbors": [
+        "CIV",
+        "GNB",
+        "LBR",
+        "MLI",
+        "SEN",
+        "SLE"
+      ]
+    },
+    {
+      "id": "GMB",
+      "name": "The Gambia",
+      "sourceName": "The Gambia",
+      "nameKo": "감비아",
+      "flag": "gm",
+      "capitalName": "Banjul",
+      "sourceCapital": [
+        907,
+        425
+      ],
+      "capital": [
+        907,
+        425
+      ],
+      "index": 66,
+      "represented": false,
+      "tiles": 11,
+      "neighbors": [
+        "SEN"
+      ]
+    },
+    {
+      "id": "GNB",
+      "name": "Guinea-Bissau",
+      "sourceName": "Guinea-Bissau",
+      "nameKo": "기니비사우",
+      "flag": "gw",
+      "capitalName": "Bissau",
+      "sourceCapital": [
+        913,
+        434
+      ],
+      "capital": [
+        913,
+        434
+      ],
+      "index": 67,
+      "represented": false,
+      "tiles": 101,
+      "neighbors": [
+        "GIN",
+        "SEN"
+      ]
+    },
+    {
+      "id": "GNQ",
+      "name": "Equatorial Guinea",
+      "sourceName": "Equatorial Guinea",
+      "nameKo": "적도 기니",
+      "flag": "gq",
+      "capitalName": "Malabo",
+      "sourceCapital": [
+        1048,
+        479
+      ],
+      "capital": [
+        1048,
+        479
+      ],
+      "index": 68,
+      "represented": false,
+      "tiles": 89,
+      "neighbors": [
+        "CMR",
+        "GAB"
+      ]
+    },
+    {
+      "id": "GRC",
+      "name": "Greece",
+      "sourceName": "Greece",
+      "nameKo": "그리스",
+      "flag": "gr",
+      "capitalName": "Athens",
+      "sourceCapital": [
+        1131,
+        288
+      ],
+      "capital": [
+        1131,
+        288
+      ],
+      "index": 69,
+      "represented": false,
+      "tiles": 631,
+      "neighbors": [
+        "ALB",
+        "BGR",
+        "MKD",
+        "TUR"
+      ]
+    },
+    {
+      "id": "GRD",
+      "name": "Grenada",
+      "sourceName": "Grenada",
+      "nameKo": "그레나다",
+      "flag": "gd",
+      "capitalName": "Saint George's",
+      "sourceCapital": [
+        656,
+        433
+      ],
+      "capital": [
+        656,
+        433
+      ],
+      "index": 70,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "GTM",
+      "name": "Guatemala",
+      "sourceName": "Guatemala",
+      "nameKo": "과테말라",
+      "flag": "gt",
+      "capitalName": "Guatemala City",
+      "sourceCapital": [
+        497,
+        418
+      ],
+      "capital": [
+        497,
+        418
+      ],
+      "index": 71,
+      "represented": false,
+      "tiles": 261,
+      "neighbors": [
+        "BLZ",
+        "HND",
+        "MEX",
+        "SLV"
+      ]
+    },
+    {
+      "id": "GUY",
+      "name": "Guyana",
+      "sourceName": "Guyana",
+      "nameKo": "가이아나",
+      "flag": "gy",
+      "capitalName": "Georgetown",
+      "sourceCapital": [
+        676,
+        462
+      ],
+      "capital": [
+        676,
+        462
+      ],
+      "index": 72,
+      "represented": false,
+      "tiles": 533,
+      "neighbors": [
+        "BRA",
+        "SUR",
+        "VEN"
+      ]
+    },
+    {
+      "id": "HND",
+      "name": "Honduras",
+      "sourceName": "Honduras",
+      "nameKo": "온두라스",
+      "flag": "hn",
+      "capitalName": "Tegucigalpa",
+      "sourceCapital": [
+        515,
+        421
+      ],
+      "capital": [
+        515,
+        421
+      ],
+      "index": 73,
+      "represented": false,
+      "tiles": 293,
+      "neighbors": [
+        "GTM",
+        "NIC",
+        "SLV"
+      ]
+    },
+    {
+      "id": "HRV",
+      "name": "Croatia",
+      "sourceName": "Croatia",
+      "nameKo": "크로아티아",
+      "flag": "hr",
+      "capitalName": "Zagreb",
+      "sourceCapital": [
+        1088,
+        245
+      ],
+      "capital": [
+        1088,
+        245
+      ],
+      "index": 74,
+      "represented": false,
+      "tiles": 228,
+      "neighbors": [
+        "BIH",
+        "HUN",
+        "MNE",
+        "SRB",
+        "SVN"
+      ]
+    },
+    {
+      "id": "HTI",
+      "name": "Haiti",
+      "sourceName": "Haiti",
+      "nameKo": "아이티",
+      "flag": "ht",
+      "capitalName": "Port-au-Prince",
+      "sourceCapital": [
+        598,
+        396
+      ],
+      "capital": [
+        598,
+        396
+      ],
+      "index": 75,
+      "represented": false,
+      "tiles": 109,
+      "neighbors": [
+        "DOM"
+      ]
+    },
+    {
+      "id": "HUN",
+      "name": "Hungary",
+      "sourceName": "Hungary",
+      "nameKo": "헝가리",
+      "flag": "hu",
+      "capitalName": "Budapest",
+      "sourceCapital": [
+        1106,
+        236
+      ],
+      "capital": [
+        1106,
+        236
+      ],
+      "index": 76,
+      "represented": false,
+      "tiles": 319,
+      "neighbors": [
+        "AUT",
+        "HRV",
+        "ROU",
+        "SRB",
+        "SVK",
+        "SVN",
+        "UKR"
+      ]
+    },
+    {
+      "id": "IDN",
+      "name": "Indonesia",
+      "sourceName": "Indonesia",
+      "nameKo": "인도네시아",
+      "flag": "id",
+      "capitalName": "Jakarta",
+      "sourceCapital": [
+        1593,
+        534
+      ],
+      "capital": [
+        1593,
+        534
+      ],
+      "index": 77,
+      "represented": false,
+      "tiles": 5634,
+      "neighbors": [
+        "MYS",
+        "PNG",
+        "SGP",
+        "TLS"
+      ]
+    },
+    {
+      "id": "IND",
+      "name": "India",
+      "sourceName": "India",
+      "nameKo": "인도",
+      "flag": "in",
+      "capitalName": "New Delhi",
+      "sourceCapital": [
+        1428,
+        341
+      ],
+      "capital": [
+        1428,
+        341
+      ],
+      "index": 78,
+      "represented": false,
+      "tiles": 8755,
+      "neighbors": [
+        "BGD",
+        "BTN",
+        "CHN",
+        "KAS",
+        "MMR",
+        "NPL",
+        "PAK"
+      ]
+    },
+    {
+      "id": "IRL",
+      "name": "Ireland",
+      "sourceName": "Ireland",
+      "nameKo": "아일랜드",
+      "flag": "ie",
+      "capitalName": "Dublin",
+      "sourceCapital": [
+        965,
+        203
+      ],
+      "capital": [
+        965,
+        203
+      ],
+      "index": 79,
+      "represented": false,
+      "tiles": 364,
+      "neighbors": [
+        "GBR"
+      ]
+    },
+    {
+      "id": "IRN",
+      "name": "Iran",
+      "sourceName": "Iran",
+      "nameKo": "이란",
+      "flag": "ir",
+      "capitalName": "Tehran",
+      "sourceCapital": [
+        1285,
+        301
+      ],
+      "capital": [
+        1285,
+        301
+      ],
+      "index": 80,
+      "represented": false,
+      "tiles": 4834,
+      "neighbors": [
+        "AFG",
+        "ARM",
+        "AZE",
+        "IRQ",
+        "PAK",
+        "TKM",
+        "TUR"
+      ]
+    },
+    {
+      "id": "IRQ",
+      "name": "Iraq",
+      "sourceName": "Iraq",
+      "nameKo": "이라크",
+      "flag": "iq",
+      "capitalName": "Baghdad",
+      "sourceCapital": [
+        1246,
+        314
+      ],
+      "capital": [
+        1246,
+        314
+      ],
+      "index": 81,
+      "represented": false,
+      "tiles": 1285,
+      "neighbors": [
+        "IRN",
+        "JOR",
+        "KWT",
+        "SAU",
+        "SYR",
+        "TUR"
+      ]
+    },
+    {
+      "id": "ISL",
+      "name": "Iceland",
+      "sourceName": "Iceland",
+      "nameKo": "아이슬란드",
+      "flag": "is",
+      "capitalName": "Reykjavík",
+      "sourceCapital": [
+        878,
+        143
+      ],
+      "capital": [
+        878,
+        143
+      ],
+      "index": 82,
+      "represented": false,
+      "tiles": 714,
+      "neighbors": []
+    },
+    {
+      "id": "ISR",
+      "name": "Israel",
+      "sourceName": "Israel",
+      "nameKo": "이스라엘",
+      "flag": "il",
+      "capitalName": "Jerusalem",
+      "sourceCapital": [
+        1195,
+        323
+      ],
+      "capital": [
+        1193,
+        323
+      ],
+      "index": 83,
+      "represented": false,
+      "tiles": 54,
+      "neighbors": [
+        "EGY",
+        "JOR",
+        "LBN",
+        "PSX",
+        "SAU",
+        "SYR"
+      ]
+    },
+    {
+      "id": "ITA",
+      "name": "Italy",
+      "sourceName": "Italy",
+      "nameKo": "이탈리아",
+      "flag": "it",
+      "capitalName": "Rome",
+      "sourceCapital": [
+        1069,
+        267
+      ],
+      "capital": [
+        1069,
+        265
+      ],
+      "index": 84,
+      "represented": false,
+      "tiles": 1168,
+      "neighbors": [
+        "AUT",
+        "CHE",
+        "FRA",
+        "MCO",
+        "SMR",
+        "SVN",
+        "VAT"
+      ]
+    },
+    {
+      "id": "JAM",
+      "name": "Jamaica",
+      "sourceName": "Jamaica",
+      "nameKo": "자메이카",
+      "flag": "jm",
+      "capitalName": "Kingston",
+      "sourceCapital": [
+        573,
+        400
+      ],
+      "capital": [
+        573,
+        400
+      ],
+      "index": 85,
+      "represented": false,
+      "tiles": 40,
+      "neighbors": []
+    },
+    {
+      "id": "JOR",
+      "name": "Jordan",
+      "sourceName": "Jordan",
+      "nameKo": "요르단",
+      "flag": "jo",
+      "capitalName": "Amman",
+      "sourceCapital": [
+        1199,
+        322
+      ],
+      "capital": [
+        1199,
+        322
+      ],
+      "index": 86,
+      "represented": false,
+      "tiles": 242,
+      "neighbors": [
+        "IRQ",
+        "ISR",
+        "PSX",
+        "SAU",
+        "SYR"
+      ]
+    },
+    {
+      "id": "JPN",
+      "name": "Japan",
+      "sourceName": "Japan",
+      "nameKo": "일본",
+      "flag": "jp",
+      "capitalName": "Tokyo",
+      "sourceCapital": [
+        1776,
+        301
+      ],
+      "capital": [
+        1776,
+        301
+      ],
+      "index": 87,
+      "represented": false,
+      "tiles": 1502,
+      "neighbors": [
+        "RUS"
+      ]
+    },
+    {
+      "id": "KAS",
+      "name": "Siachen Glacier",
+      "sourceName": "Siachen Glacier",
+      "nameKo": "시아첸 빙하",
+      "flag": "",
+      "capitalName": "Siachen Glacier",
+      "sourceCapital": [
+        1428,
+        303
+      ],
+      "capital": [
+        1428,
+        303
+      ],
+      "index": 88,
+      "represented": false,
+      "tiles": 11,
+      "neighbors": [
+        "CHN",
+        "IND",
+        "PAK"
+      ]
+    },
+    {
+      "id": "KAZ",
+      "name": "Kazakhstan",
+      "sourceName": "Kazakhstan",
+      "nameKo": "카자흐스탄",
+      "flag": "kz",
+      "capitalName": "Nur-Sultan",
+      "sourceCapital": [
+        1396,
+        215
+      ],
+      "capital": [
+        1396,
+        215
+      ],
+      "index": 89,
+      "represented": false,
+      "tiles": 9961,
+      "neighbors": [
+        "CHN",
+        "KGZ",
+        "RUS",
+        "TKM",
+        "UZB"
+      ]
+    },
+    {
+      "id": "KEN",
+      "name": "Kenya",
+      "sourceName": "Kenya",
+      "nameKo": "케냐",
+      "flag": "ke",
+      "capitalName": "Nairobi",
+      "sourceCapital": [
+        1204,
+        507
+      ],
+      "capital": [
+        1204,
+        507
+      ],
+      "index": 90,
+      "represented": false,
+      "tiles": 1464,
+      "neighbors": [
+        "ETH",
+        "SDS",
+        "SOM",
+        "TZA",
+        "UGA"
+      ]
+    },
+    {
+      "id": "KGZ",
+      "name": "Kyrgyzstan",
+      "sourceName": "Kyrgyzstan",
+      "nameKo": "키르기스스탄",
+      "flag": "kg",
+      "capitalName": "Bishkek",
+      "sourceCapital": [
+        1414,
+        261
+      ],
+      "capital": [
+        1414,
+        261
+      ],
+      "index": 91,
+      "represented": false,
+      "tiles": 667,
+      "neighbors": [
+        "CHN",
+        "KAZ",
+        "TJK",
+        "UZB"
+      ]
+    },
+    {
+      "id": "KHM",
+      "name": "Cambodia",
+      "sourceName": "Cambodia",
+      "nameKo": "캄보디아",
+      "flag": "kh",
+      "capitalName": "Phnom Penh",
+      "sourceCapital": [
+        1582,
+        435
+      ],
+      "capital": [
+        1582,
+        435
+      ],
+      "index": 92,
+      "represented": false,
+      "tiles": 429,
+      "neighbors": [
+        "LAO",
+        "THA",
+        "VNM"
+      ]
+    },
+    {
+      "id": "KIR",
+      "name": "Kiribati",
+      "sourceName": "Kiribati",
+      "nameKo": "키리바시",
+      "flag": "ki",
+      "capitalName": "Tarawa",
+      "sourceCapital": [
+        1961,
+        492
+      ],
+      "capital": [
+        1961,
+        492
+      ],
+      "index": 93,
+      "represented": false,
+      "tiles": 37,
+      "neighbors": []
+    },
+    {
+      "id": "KNA",
+      "name": "Saint Kitts and Nevis",
+      "sourceName": "Saint Kitts and Nevis",
+      "nameKo": "세인트키츠 네비스",
+      "flag": "kn",
+      "capitalName": "Basseterre",
+      "sourceCapital": [
+        651,
+        403
+      ],
+      "capital": [
+        651,
+        403
+      ],
+      "index": 94,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "KOR",
+      "name": "South Korea",
+      "sourceName": "South Korea",
+      "nameKo": "대한민국",
+      "flag": "kr",
+      "capitalName": "Seoul",
+      "sourceCapital": [
+        1705,
+        291
+      ],
+      "capital": [
+        1705,
+        291
+      ],
+      "index": 95,
+      "represented": false,
+      "tiles": 352,
+      "neighbors": [
+        "PRK"
+      ]
+    },
+    {
+      "id": "KOS",
+      "name": "Kosovo",
+      "sourceName": "Kosovo",
+      "nameKo": "코소보",
+      "flag": "xk",
+      "capitalName": "Pristina",
+      "sourceCapital": [
+        1117,
+        262
+      ],
+      "capital": [
+        1117,
+        262
+      ],
+      "index": 96,
+      "represented": false,
+      "tiles": 26,
+      "neighbors": [
+        "ALB",
+        "MKD",
+        "MNE",
+        "SRB"
+      ]
+    },
+    {
+      "id": "KWT",
+      "name": "Kuwait",
+      "sourceName": "Kuwait",
+      "nameKo": "쿠웨이트",
+      "flag": "kw",
+      "capitalName": "Kuwait City",
+      "sourceCapital": [
+        1266,
+        336
+      ],
+      "capital": [
+        1266,
+        336
+      ],
+      "index": 97,
+      "represented": false,
+      "tiles": 57,
+      "neighbors": [
+        "IRQ",
+        "SAU"
+      ]
+    },
+    {
+      "id": "LAO",
+      "name": "Laos",
+      "sourceName": "Laos",
+      "nameKo": "라오스",
+      "flag": "la",
+      "capitalName": "Vientiane",
+      "sourceCapital": [
+        1569,
+        400
+      ],
+      "capital": [
+        1569,
+        399
+      ],
+      "index": 98,
+      "represented": false,
+      "tiles": 540,
+      "neighbors": [
+        "CHN",
+        "KHM",
+        "MMR",
+        "THA",
+        "VNM"
+      ]
+    },
+    {
+      "id": "LBN",
+      "name": "Lebanon",
+      "sourceName": "Lebanon",
+      "nameKo": "레바논",
+      "flag": "lb",
+      "capitalName": "Beirut",
+      "sourceCapital": [
+        1197,
+        311
+      ],
+      "capital": [
+        1197,
+        311
+      ],
+      "index": 99,
+      "represented": false,
+      "tiles": 31,
+      "neighbors": [
+        "ISR",
+        "SYR"
+      ]
+    },
+    {
+      "id": "LBR",
+      "name": "Liberia",
+      "sourceName": "Liberia",
+      "nameKo": "라이베리아",
+      "flag": "lr",
+      "capitalName": "Monrovia",
+      "sourceCapital": [
+        940,
+        464
+      ],
+      "capital": [
+        940,
+        464
+      ],
+      "index": 100,
+      "represented": false,
+      "tiles": 261,
+      "neighbors": [
+        "CIV",
+        "GIN",
+        "SLE"
+      ]
+    },
+    {
+      "id": "LBY",
+      "name": "Libya",
+      "sourceName": "Libya",
+      "nameKo": "리비아",
+      "flag": "ly",
+      "capitalName": "Tripoli",
+      "sourceCapital": [
+        1073,
+        317
+      ],
+      "capital": [
+        1073,
+        317
+      ],
+      "index": 101,
+      "represented": false,
+      "tiles": 4593,
+      "neighbors": [
+        "DZA",
+        "EGY",
+        "NER",
+        "SDN",
+        "TCD",
+        "TUN"
+      ]
+    },
+    {
+      "id": "LCA",
+      "name": "Saint Lucia",
+      "sourceName": "Saint Lucia",
+      "nameKo": "세인트루시아",
+      "flag": "lc",
+      "capitalName": "Castries",
+      "sourceCapital": [
+        661,
+        422
+      ],
+      "capital": [
+        661,
+        422
+      ],
+      "index": 102,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "LIE",
+      "name": "Liechtenstein",
+      "sourceName": "Liechtenstein",
+      "nameKo": "리히텐슈타인",
+      "flag": "li",
+      "capitalName": "Vaduz",
+      "sourceCapital": [
+        1052,
+        238
+      ],
+      "capital": [
+        1052,
+        238
+      ],
+      "index": 103,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": [
+        "AUT",
+        "CHE"
+      ]
+    },
+    {
+      "id": "LKA",
+      "name": "Sri Lanka",
+      "sourceName": "Sri Lanka",
+      "nameKo": "스리랑카",
+      "flag": "lk",
+      "capitalName": "Colombo",
+      "sourceCapital": [
+        1443,
+        461
+      ],
+      "capital": [
+        1443,
+        461
+      ],
+      "index": 104,
+      "represented": false,
+      "tiles": 197,
+      "neighbors": []
+    },
+    {
+      "id": "LSO",
+      "name": "Lesotho",
+      "sourceName": "Lesotho",
+      "nameKo": "레소토",
+      "flag": "ls",
+      "capitalName": "Maseru",
+      "sourceCapital": [
+        1152,
+        662
+      ],
+      "capital": [
+        1152,
+        662
+      ],
+      "index": 105,
+      "represented": false,
+      "tiles": 107,
+      "neighbors": [
+        "ZAF"
+      ]
+    },
+    {
+      "id": "LTU",
+      "name": "Lithuania",
+      "sourceName": "Lithuania",
+      "nameKo": "리투아니아",
+      "flag": "lt",
+      "capitalName": "Vilnius",
+      "sourceCapital": [
+        1140,
+        196
+      ],
+      "capital": [
+        1140,
+        196
+      ],
+      "index": 106,
+      "represented": false,
+      "tiles": 280,
+      "neighbors": [
+        "BLR",
+        "LVA",
+        "POL",
+        "RUS"
+      ]
+    },
+    {
+      "id": "LUX",
+      "name": "Luxembourg",
+      "sourceName": "Luxembourg",
+      "nameKo": "룩셈부르크",
+      "flag": "lu",
+      "capitalName": "Luxembourg",
+      "sourceCapital": [
+        1034,
+        224
+      ],
+      "capital": [
+        1034,
+        224
+      ],
+      "index": 107,
+      "represented": false,
+      "tiles": 20,
+      "neighbors": [
+        "BEL",
+        "DEU",
+        "FRA"
+      ]
+    },
+    {
+      "id": "LVA",
+      "name": "Latvia",
+      "sourceName": "Latvia",
+      "nameKo": "라트비아",
+      "flag": "lv",
+      "capitalName": "Riga",
+      "sourceCapital": [
+        1133,
+        183
+      ],
+      "capital": [
+        1133,
+        183
+      ],
+      "index": 108,
+      "represented": false,
+      "tiles": 323,
+      "neighbors": [
+        "BLR",
+        "EST",
+        "LTU",
+        "RUS"
+      ]
+    },
+    {
+      "id": "MAR",
+      "name": "Morocco",
+      "sourceName": "Morocco",
+      "nameKo": "모로코",
+      "flag": "ma",
+      "capitalName": "Rabat",
+      "sourceCapital": [
+        962,
+        310
+      ],
+      "capital": [
+        962,
+        310
+      ],
+      "index": 109,
+      "represented": false,
+      "tiles": 1984,
+      "neighbors": [
+        "DZA",
+        "ESP",
+        "MRT"
+      ]
+    },
+    {
+      "id": "MCO",
+      "name": "Monaco",
+      "sourceName": "Monaco",
+      "nameKo": "모나코",
+      "flag": "mc",
+      "capitalName": "Monaco",
+      "sourceCapital": [
+        1041,
+        257
+      ],
+      "capital": [
+        1041,
+        257
+      ],
+      "index": 110,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": [
+        "FRA",
+        "ITA"
+      ]
+    },
+    {
+      "id": "MDA",
+      "name": "Moldova",
+      "sourceName": "Moldova",
+      "nameKo": "몰도바",
+      "flag": "md",
+      "capitalName": "Chișinău",
+      "sourceCapital": [
+        1160,
+        238
+      ],
+      "capital": [
+        1160,
+        238
+      ],
+      "index": 111,
+      "represented": false,
+      "tiles": 86,
+      "neighbors": [
+        "ROU",
+        "UKR"
+      ]
+    },
+    {
+      "id": "MDG",
+      "name": "Madagascar",
+      "sourceName": "Madagascar",
+      "nameKo": "마다가스카르",
+      "flag": "mg",
+      "capitalName": "Antananarivo",
+      "sourceCapital": [
+        1263,
+        605
+      ],
+      "capital": [
+        1263,
+        605
+      ],
+      "index": 112,
+      "represented": false,
+      "tiles": 1678,
+      "neighbors": []
+    },
+    {
+      "id": "MDV",
+      "name": "Maldives",
+      "sourceName": "Maldives",
+      "nameKo": "몰디브",
+      "flag": "mv",
+      "capitalName": "Malé",
+      "sourceCapital": [
+        1408,
+        476
+      ],
+      "capital": [
+        1408,
+        476
+      ],
+      "index": 113,
+      "represented": true,
+      "tiles": 12,
+      "neighbors": []
+    },
+    {
+      "id": "MEX",
+      "name": "Mexico",
+      "sourceName": "Mexico",
+      "nameKo": "멕시코",
+      "flag": "mx",
+      "capitalName": "Mexico City",
+      "sourceCapital": [
+        449,
+        391
+      ],
+      "capital": [
+        449,
+        391
+      ],
+      "index": 114,
+      "represented": false,
+      "tiles": 5620,
+      "neighbors": [
+        "BLZ",
+        "GTM",
+        "USA"
+      ]
+    },
+    {
+      "id": "MHL",
+      "name": "Marshall Islands",
+      "sourceName": "Marshall Islands",
+      "nameKo": "마셜 제도",
+      "flag": "mh",
+      "capitalName": "Majuro",
+      "sourceCapital": [
+        1952,
+        460
+      ],
+      "capital": [
+        1952,
+        460
+      ],
+      "index": 115,
+      "represented": false,
+      "tiles": 13,
+      "neighbors": []
+    },
+    {
+      "id": "MKD",
+      "name": "North Macedonia",
+      "sourceName": "North Macedonia",
+      "nameKo": "북마케도니아",
+      "flag": "mk",
+      "capitalName": "Skopje",
+      "sourceCapital": [
+        1119,
+        266
+      ],
+      "capital": [
+        1119,
+        266
+      ],
+      "index": 116,
+      "represented": false,
+      "tiles": 99,
+      "neighbors": [
+        "ALB",
+        "BGR",
+        "GRC",
+        "KOS",
+        "SRB"
+      ]
+    },
+    {
+      "id": "MLI",
+      "name": "Mali",
+      "sourceName": "Mali",
+      "nameKo": "말리",
+      "flag": "ml",
+      "capitalName": "Bamako",
+      "sourceCapital": [
+        955,
+        429
+      ],
+      "capital": [
+        955,
+        429
+      ],
+      "index": 117,
+      "represented": false,
+      "tiles": 3298,
+      "neighbors": [
+        "BFA",
+        "CIV",
+        "DZA",
+        "GIN",
+        "MRT",
+        "NER",
+        "SEN"
+      ]
+    },
+    {
+      "id": "MLT",
+      "name": "Malta",
+      "sourceName": "Malta",
+      "nameKo": "몰타",
+      "flag": "mt",
+      "capitalName": "Valletta",
+      "sourceCapital": [
+        1080,
+        300
+      ],
+      "capital": [
+        1080,
+        300
+      ],
+      "index": 118,
+      "represented": true,
+      "tiles": 10,
+      "neighbors": []
+    },
+    {
+      "id": "MMR",
+      "name": "Myanmar",
+      "sourceName": "Myanmar",
+      "nameKo": "미얀마",
+      "flag": "mm",
+      "capitalName": "Naypyidaw",
+      "sourceCapital": [
+        1533,
+        390
+      ],
+      "capital": [
+        1533,
+        390
+      ],
+      "index": 119,
+      "represented": false,
+      "tiles": 1912,
+      "neighbors": [
+        "BGD",
+        "CHN",
+        "IND",
+        "LAO",
+        "THA"
+      ]
+    },
+    {
+      "id": "MNE",
+      "name": "Montenegro",
+      "sourceName": "Montenegro",
+      "nameKo": "몬테네그로",
+      "flag": "me",
+      "capitalName": "Podgorica",
+      "sourceCapital": [
+        1107,
+        264
+      ],
+      "capital": [
+        1107,
+        264
+      ],
+      "index": 120,
+      "represented": false,
+      "tiles": 56,
+      "neighbors": [
+        "ALB",
+        "BIH",
+        "HRV",
+        "KOS",
+        "SRB"
+      ]
+    },
+    {
+      "id": "MNG",
+      "name": "Mongolia",
+      "sourceName": "Mongolia",
+      "nameKo": "몽골",
+      "flag": "mn",
+      "capitalName": "Ulaanbaatar",
+      "sourceCapital": [
+        1593,
+        233
+      ],
+      "capital": [
+        1593,
+        233
+      ],
+      "index": 121,
+      "represented": false,
+      "tiles": 5734,
+      "neighbors": [
+        "CHN",
+        "RUS"
+      ]
+    },
+    {
+      "id": "MOZ",
+      "name": "Mozambique",
+      "sourceName": "Mozambique",
+      "nameKo": "모잠비크",
+      "flag": "mz",
+      "capitalName": "Maputo",
+      "sourceCapital": [
+        1181,
+        644
+      ],
+      "capital": [
+        1181,
+        644
+      ],
+      "index": 122,
+      "represented": false,
+      "tiles": 2027,
+      "neighbors": [
+        "MWI",
+        "SWZ",
+        "TZA",
+        "ZAF",
+        "ZMB",
+        "ZWE"
+      ]
+    },
+    {
+      "id": "MRT",
+      "name": "Mauritania",
+      "sourceName": "Mauritania",
+      "nameKo": "모리타니",
+      "flag": "mr",
+      "capitalName": "Nouakchott",
+      "sourceCapital": [
+        911,
+        399
+      ],
+      "capital": [
+        911,
+        399
+      ],
+      "index": 123,
+      "represented": false,
+      "tiles": 2862,
+      "neighbors": [
+        "DZA",
+        "MAR",
+        "MLI",
+        "SEN"
+      ]
+    },
+    {
+      "id": "MUS",
+      "name": "Mauritius",
+      "sourceName": "Mauritius",
+      "nameKo": "모리셔스",
+      "flag": "mu",
+      "capitalName": "Port Louis",
+      "sourceCapital": [
+        1319,
+        612
+      ],
+      "capital": [
+        1319,
+        612
+      ],
+      "index": 124,
+      "represented": false,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "MWI",
+      "name": "Malawi",
+      "sourceName": "Malawi",
+      "nameKo": "말라위",
+      "flag": "mw",
+      "capitalName": "Lilongwe",
+      "sourceCapital": [
+        1187,
+        577
+      ],
+      "capital": [
+        1187,
+        577
+      ],
+      "index": 125,
+      "represented": false,
+      "tiles": 314,
+      "neighbors": [
+        "MOZ",
+        "TZA",
+        "ZMB"
+      ]
+    },
+    {
+      "id": "MYS",
+      "name": "Malaysia",
+      "sourceName": "Malaysia",
+      "nameKo": "말레이시아",
+      "flag": "my",
+      "capitalName": "Kuala Lumpur",
+      "sourceCapital": [
+        1564,
+        482
+      ],
+      "capital": [
+        1564,
+        482
+      ],
+      "index": 126,
+      "represented": false,
+      "tiles": 937,
+      "neighbors": [
+        "BRN",
+        "IDN",
+        "SGP",
+        "THA"
+      ]
+    },
+    {
+      "id": "NAM",
+      "name": "Namibia",
+      "sourceName": "Namibia",
+      "nameKo": "나미비아",
+      "flag": "na",
+      "capitalName": "Windhoek",
+      "sourceCapital": [
+        1094,
+        625
+      ],
+      "capital": [
+        1094,
+        625
+      ],
+      "index": 127,
+      "represented": false,
+      "tiles": 2301,
+      "neighbors": [
+        "AGO",
+        "BWA",
+        "ZAF",
+        "ZMB",
+        "ZWE"
+      ]
+    },
+    {
+      "id": "NER",
+      "name": "Niger",
+      "sourceName": "Niger",
+      "nameKo": "니제르",
+      "flag": "ne",
+      "capitalName": "Niamey",
+      "sourceCapital": [
+        1011,
+        424
+      ],
+      "capital": [
+        1011,
+        424
+      ],
+      "index": 128,
+      "represented": false,
+      "tiles": 3101,
+      "neighbors": [
+        "BEN",
+        "BFA",
+        "DZA",
+        "LBY",
+        "MLI",
+        "NGA",
+        "TCD"
+      ]
+    },
+    {
+      "id": "NGA",
+      "name": "Nigeria",
+      "sourceName": "Nigeria",
+      "nameKo": "나이지리아",
+      "flag": "ng",
+      "capitalName": "Abuja",
+      "sourceCapital": [
+        1041,
+        449
+      ],
+      "capital": [
+        1041,
+        449
+      ],
+      "index": 129,
+      "represented": false,
+      "tiles": 2408,
+      "neighbors": [
+        "BEN",
+        "CMR",
+        "NER",
+        "TCD"
+      ]
+    },
+    {
+      "id": "NIC",
+      "name": "Nicaragua",
+      "sourceName": "Nicaragua",
+      "nameKo": "니카라과",
+      "flag": "ni",
+      "capitalName": "Managua",
+      "sourceCapital": [
+        520,
+        432
+      ],
+      "capital": [
+        520,
+        432
+      ],
+      "index": 130,
+      "represented": false,
+      "tiles": 385,
+      "neighbors": [
+        "CRI",
+        "HND",
+        "SLV"
+      ]
+    },
+    {
+      "id": "NLD",
+      "name": "Netherlands",
+      "sourceName": "Netherlands",
+      "nameKo": "네덜란드",
+      "flag": "nl",
+      "capitalName": "Amsterdam",
+      "sourceCapital": [
+        1027,
+        209
+      ],
+      "capital": [
+        1027,
+        209
+      ],
+      "index": 131,
+      "represented": false,
+      "tiles": 222,
+      "neighbors": [
+        "BEL",
+        "DEU",
+        "GBR"
+      ]
+    },
+    {
+      "id": "NOR",
+      "name": "Norway",
+      "sourceName": "Norway",
+      "nameKo": "노르웨이",
+      "flag": "no",
+      "capitalName": "Oslo",
+      "sourceCapital": [
+        1059,
+        167
+      ],
+      "capital": [
+        1059,
+        167
+      ],
+      "index": 132,
+      "represented": false,
+      "tiles": 3195,
+      "neighbors": [
+        "FIN",
+        "RUS",
+        "SWE"
+      ]
+    },
+    {
+      "id": "NPL",
+      "name": "Nepal",
+      "sourceName": "Nepal",
+      "nameKo": "네팔",
+      "flag": "np",
+      "capitalName": "Kathmandu",
+      "sourceCapital": [
+        1473,
+        346
+      ],
+      "capital": [
+        1473,
+        346
+      ],
+      "index": 133,
+      "represented": false,
+      "tiles": 484,
+      "neighbors": [
+        "CHN",
+        "IND"
+      ]
+    },
+    {
+      "id": "NRU",
+      "name": "Nauru",
+      "sourceName": "Nauru",
+      "nameKo": "나우루",
+      "flag": "nr",
+      "capitalName": "Nauru",
+      "sourceCapital": [
+        1927,
+        502
+      ],
+      "capital": [
+        1927,
+        502
+      ],
+      "index": 134,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "NZL",
+      "name": "New Zealand",
+      "sourceName": "New Zealand",
+      "nameKo": "뉴질랜드",
+      "flag": "nz",
+      "capitalName": "Wellington",
+      "sourceCapital": [
+        1970,
+        729
+      ],
+      "capital": [
+        1970,
+        729
+      ],
+      "index": 135,
+      "represented": false,
+      "tiles": 1084,
+      "neighbors": []
+    },
+    {
+      "id": "OMN",
+      "name": "Oman",
+      "sourceName": "Oman",
+      "nameKo": "오만",
+      "flag": "om",
+      "capitalName": "Muscat",
+      "sourceCapital": [
+        1324,
+        368
+      ],
+      "capital": [
+        1324,
+        368
+      ],
+      "index": 136,
+      "represented": false,
+      "tiles": 873,
+      "neighbors": [
+        "ARE",
+        "SAU",
+        "YEM"
+      ]
+    },
+    {
+      "id": "PAK",
+      "name": "Pakistan",
+      "sourceName": "Pakistan",
+      "nameKo": "파키스탄",
+      "flag": "pk",
+      "capitalName": "Islamabad",
+      "sourceCapital": [
+        1406,
+        312
+      ],
+      "capital": [
+        1406,
+        312
+      ],
+      "index": 137,
+      "represented": false,
+      "tiles": 2700,
+      "neighbors": [
+        "AFG",
+        "CHN",
+        "IND",
+        "IRN",
+        "KAS",
+        "TJK"
+      ]
+    },
+    {
+      "id": "PAN",
+      "name": "Panama",
+      "sourceName": "Panama",
+      "nameKo": "파나마",
+      "flag": "pa",
+      "capitalName": "Panama City",
+      "sourceCapital": [
+        558,
+        450
+      ],
+      "capital": [
+        558,
+        450
+      ],
+      "index": 138,
+      "represented": false,
+      "tiles": 257,
+      "neighbors": [
+        "COL",
+        "CRI"
+      ]
+    },
+    {
+      "id": "PER",
+      "name": "Peru",
+      "sourceName": "Peru",
+      "nameKo": "페루",
+      "flag": "pe",
+      "capitalName": "Lima",
+      "sourceCapital": [
+        571,
+        566
+      ],
+      "capital": [
+        571,
+        566
+      ],
+      "index": 139,
+      "represented": false,
+      "tiles": 3468,
+      "neighbors": [
+        "BOL",
+        "BRA",
+        "CHL",
+        "COL",
+        "ECU"
+      ]
+    },
+    {
+      "id": "PHL",
+      "name": "Philippines",
+      "sourceName": "Philippines",
+      "nameKo": "필리핀",
+      "flag": "ph",
+      "capitalName": "Manila",
+      "sourceCapital": [
+        1672,
+        418
+      ],
+      "capital": [
+        1672,
+        418
+      ],
+      "index": 140,
+      "represented": false,
+      "tiles": 1109,
+      "neighbors": []
+    },
+    {
+      "id": "PLW",
+      "name": "Palau",
+      "sourceName": "Palau",
+      "nameKo": "팔라우",
+      "flag": "pw",
+      "capitalName": "Melekeok",
+      "sourceCapital": [
+        1747,
+        458
+      ],
+      "capital": [
+        1747,
+        458
+      ],
+      "index": 141,
+      "represented": true,
+      "tiles": 11,
+      "neighbors": []
+    },
+    {
+      "id": "PNG",
+      "name": "Papua New Guinea",
+      "sourceName": "Papua New Guinea",
+      "nameKo": "파푸아뉴기니",
+      "flag": "pg",
+      "capitalName": "Port Moresby",
+      "sourceCapital": [
+        1817,
+        552
+      ],
+      "capital": [
+        1817,
+        552
+      ],
+      "index": 142,
+      "represented": false,
+      "tiles": 1395,
+      "neighbors": [
+        "IDN",
+        "SLB"
+      ]
+    },
+    {
+      "id": "POL",
+      "name": "Poland",
+      "sourceName": "Poland",
+      "nameKo": "폴란드",
+      "flag": "pl",
+      "capitalName": "Warsaw",
+      "sourceCapital": [
+        1116,
+        209
+      ],
+      "capital": [
+        1116,
+        209
+      ],
+      "index": 143,
+      "represented": false,
+      "tiles": 1297,
+      "neighbors": [
+        "BLR",
+        "CZE",
+        "DEU",
+        "LTU",
+        "RUS",
+        "SVK",
+        "UKR"
+      ]
+    },
+    {
+      "id": "PRK",
+      "name": "North Korea",
+      "sourceName": "North Korea",
+      "nameKo": "조선민주주의인민공화국",
+      "flag": "kp",
+      "capitalName": "Pyongyang",
+      "sourceCapital": [
+        1698,
+        283
+      ],
+      "capital": [
+        1698,
+        283
+      ],
+      "index": 144,
+      "represented": false,
+      "tiles": 471,
+      "neighbors": [
+        "CHN",
+        "KOR",
+        "RUS"
+      ]
+    },
+    {
+      "id": "PRT",
+      "name": "Portugal",
+      "sourceName": "Portugal",
+      "nameKo": "포르투갈",
+      "flag": "pt",
+      "capitalName": "Lisbon",
+      "sourceCapital": [
+        949,
+        284
+      ],
+      "capital": [
+        949,
+        284
+      ],
+      "index": 145,
+      "represented": false,
+      "tiles": 378,
+      "neighbors": [
+        "ESP"
+      ]
+    },
+    {
+      "id": "PRY",
+      "name": "Paraguay",
+      "sourceName": "Paraguay",
+      "nameKo": "파라과이",
+      "flag": "py",
+      "capitalName": "Asunción",
+      "sourceCapital": [
+        679,
+        640
+      ],
+      "capital": [
+        679,
+        640
+      ],
+      "index": 146,
+      "represented": false,
+      "tiles": 1163,
+      "neighbors": [
+        "ARG",
+        "BOL",
+        "BRA"
+      ]
+    },
+    {
+      "id": "PSX",
+      "name": "Palestine",
+      "sourceName": "Palestine",
+      "nameKo": "팔레스타인",
+      "flag": "ps",
+      "capitalName": "Palestine",
+      "sourceCapital": [
+        1196,
+        321
+      ],
+      "capital": [
+        1196,
+        321
+      ],
+      "index": 147,
+      "represented": false,
+      "tiles": 33,
+      "neighbors": [
+        "EGY",
+        "ISR",
+        "JOR"
+      ]
+    },
+    {
+      "id": "QAT",
+      "name": "Qatar",
+      "sourceName": "Qatar",
+      "nameKo": "카타르",
+      "flag": "qa",
+      "capitalName": "Doha",
+      "sourceCapital": [
+        1286,
+        359
+      ],
+      "capital": [
+        1286,
+        359
+      ],
+      "index": 148,
+      "represented": false,
+      "tiles": 37,
+      "neighbors": [
+        "BHR",
+        "SAU"
+      ]
+    },
+    {
+      "id": "ROU",
+      "name": "Romania",
+      "sourceName": "Romania",
+      "nameKo": "루마니아",
+      "flag": "ro",
+      "capitalName": "Bucharest",
+      "sourceCapital": [
+        1144,
+        253
+      ],
+      "capital": [
+        1144,
+        253
+      ],
+      "index": 149,
+      "represented": false,
+      "tiles": 857,
+      "neighbors": [
+        "BGR",
+        "HUN",
+        "MDA",
+        "SRB",
+        "UKR"
+      ]
+    },
+    {
+      "id": "RUS",
+      "name": "Russia",
+      "sourceName": "Russia",
+      "nameKo": "러시아",
+      "flag": "ru",
+      "capitalName": "Moscow",
+      "sourceCapital": [
+        1208,
+        190
+      ],
+      "capital": [
+        1208,
+        190
+      ],
+      "index": 150,
+      "represented": false,
+      "tiles": 93131,
+      "neighbors": [
+        "AZE",
+        "BLR",
+        "CHN",
+        "EST",
+        "FIN",
+        "GEO",
+        "JPN",
+        "KAZ",
+        "LTU",
+        "LVA",
+        "MNG",
+        "NOR",
+        "POL",
+        "PRK",
+        "UKR"
+      ]
+    },
+    {
+      "id": "RWA",
+      "name": "Rwanda",
+      "sourceName": "Rwanda",
+      "nameKo": "르완다",
+      "flag": "rw",
+      "capitalName": "Kigali",
+      "sourceCapital": [
+        1166,
+        510
+      ],
+      "capital": [
+        1166,
+        510
+      ],
+      "index": 151,
+      "represented": false,
+      "tiles": 67,
+      "neighbors": [
+        "BDI",
+        "COD",
+        "TZA",
+        "UGA"
+      ]
+    },
+    {
+      "id": "SAU",
+      "name": "Saudi Arabia",
+      "sourceName": "Saudi Arabia",
+      "nameKo": "사우디아라비아",
+      "flag": "sa",
+      "capitalName": "Riyadh",
+      "sourceCapital": [
+        1259,
+        363
+      ],
+      "capital": [
+        1259,
+        363
+      ],
+      "index": 152,
+      "represented": false,
+      "tiles": 5383,
+      "neighbors": [
+        "ARE",
+        "EGY",
+        "IRQ",
+        "ISR",
+        "JOR",
+        "KWT",
+        "OMN",
+        "QAT",
+        "YEM"
+      ]
+    },
+    {
+      "id": "SDN",
+      "name": "Sudan",
+      "sourceName": "Sudan",
+      "nameKo": "수단",
+      "flag": "sd",
+      "capitalName": "Khartoum",
+      "sourceCapital": [
+        1180,
+        413
+      ],
+      "capital": [
+        1180,
+        413
+      ],
+      "index": 153,
+      "represented": false,
+      "tiles": 4880,
+      "neighbors": [
+        "CAF",
+        "EGY",
+        "ERI",
+        "ETH",
+        "LBY",
+        "SDS",
+        "TCD"
+      ]
+    },
+    {
+      "id": "SDS",
+      "name": "South Sudan",
+      "sourceName": "South Sudan",
+      "nameKo": "남수단",
+      "flag": "ss",
+      "capitalName": "South Sudan",
+      "sourceCapital": [
+        1168,
+        459
+      ],
+      "capital": [
+        1168,
+        459
+      ],
+      "index": 154,
+      "represented": false,
+      "tiles": 1651,
+      "neighbors": [
+        "CAF",
+        "COD",
+        "ETH",
+        "KEN",
+        "SDN",
+        "UGA"
+      ]
+    },
+    {
+      "id": "SEN",
+      "name": "Senegal",
+      "sourceName": "Senegal",
+      "nameKo": "세네갈",
+      "flag": "sn",
+      "capitalName": "Dakar",
+      "sourceCapital": [
+        902,
+        418
+      ],
+      "capital": [
+        902,
+        418
+      ],
+      "index": 155,
+      "represented": false,
+      "tiles": 584,
+      "neighbors": [
+        "GIN",
+        "GMB",
+        "GNB",
+        "MLI",
+        "MRT"
+      ]
+    },
+    {
+      "id": "SGP",
+      "name": "Singapore",
+      "sourceName": "Singapore",
+      "nameKo": "싱가포르",
+      "flag": "sg",
+      "capitalName": "Singapore",
+      "sourceCapital": [
+        1576,
+        492
+      ],
+      "capital": [
+        1576,
+        492
+      ],
+      "index": 156,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": [
+        "IDN",
+        "MYS"
+      ]
+    },
+    {
+      "id": "SLB",
+      "name": "Solomon Islands",
+      "sourceName": "Solomon Islands",
+      "nameKo": "솔로몬 제도",
+      "flag": "sb",
+      "capitalName": "Honiara",
+      "sourceCapital": [
+        1888,
+        552
+      ],
+      "capital": [
+        1888,
+        552
+      ],
+      "index": 157,
+      "represented": false,
+      "tiles": 161,
+      "neighbors": [
+        "PNG"
+      ]
+    },
+    {
+      "id": "SLE",
+      "name": "Sierra Leone",
+      "sourceName": "Sierra Leone",
+      "nameKo": "시에라리온",
+      "flag": "sl",
+      "capitalName": "Freetown",
+      "sourceCapital": [
+        926,
+        452
+      ],
+      "capital": [
+        926,
+        452
+      ],
+      "index": 158,
+      "represented": false,
+      "tiles": 214,
+      "neighbors": [
+        "GIN",
+        "LBR"
+      ]
+    },
+    {
+      "id": "SLV",
+      "name": "El Salvador",
+      "sourceName": "El Salvador",
+      "nameKo": "엘살바도르",
+      "flag": "sv",
+      "capitalName": "San Salvador",
+      "sourceCapital": [
+        504,
+        423
+      ],
+      "capital": [
+        504,
+        423
+      ],
+      "index": 159,
+      "represented": false,
+      "tiles": 69,
+      "neighbors": [
+        "GTM",
+        "HND",
+        "NIC"
+      ]
+    },
+    {
+      "id": "SMR",
+      "name": "San Marino",
+      "sourceName": "San Marino",
+      "nameKo": "산마리노",
+      "flag": "sm",
+      "capitalName": "San Marino",
+      "sourceCapital": [
+        1069,
+        255
+      ],
+      "capital": [
+        1069,
+        255
+      ],
+      "index": 160,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": [
+        "ITA"
+      ]
+    },
+    {
+      "id": "SOM",
+      "name": "Somalia",
+      "sourceName": "Somalia",
+      "nameKo": "소말리아",
+      "flag": "so",
+      "capitalName": "Mogadishu",
+      "sourceCapital": [
+        1252,
+        488
+      ],
+      "capital": [
+        1252,
+        487
+      ],
+      "index": 161,
+      "represented": false,
+      "tiles": 1718,
+      "neighbors": [
+        "DJI",
+        "ETH",
+        "KEN"
+      ]
+    },
+    {
+      "id": "SRB",
+      "name": "Serbia",
+      "sourceName": "Serbia",
+      "nameKo": "세르비아",
+      "flag": "rs",
+      "capitalName": "Belgrade",
+      "sourceCapital": [
+        1113,
+        250
+      ],
+      "capital": [
+        1113,
+        250
+      ],
+      "index": 162,
+      "represented": false,
+      "tiles": 325,
+      "neighbors": [
+        "BGR",
+        "BIH",
+        "HRV",
+        "HUN",
+        "KOS",
+        "MKD",
+        "MNE",
+        "ROU"
+      ]
+    },
+    {
+      "id": "STP",
+      "name": "São Tomé and Príncipe",
+      "sourceName": "São Tomé and Príncipe",
+      "nameKo": "상투메 프린시페",
+      "flag": "st",
+      "capitalName": "São Tomé",
+      "sourceCapital": [
+        1037,
+        498
+      ],
+      "capital": [
+        1037,
+        498
+      ],
+      "index": 163,
+      "represented": false,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "SUR",
+      "name": "Suriname",
+      "sourceName": "Suriname",
+      "nameKo": "수리남",
+      "flag": "sr",
+      "capitalName": "Paramaribo",
+      "sourceCapital": [
+        693,
+        467
+      ],
+      "capital": [
+        693,
+        467
+      ],
+      "index": 164,
+      "represented": false,
+      "tiles": 411,
+      "neighbors": [
+        "BRA",
+        "FRA",
+        "GUY"
+      ]
+    },
+    {
+      "id": "SVK",
+      "name": "Slovakia",
+      "sourceName": "Slovakia",
+      "nameKo": "슬로바키아",
+      "flag": "sk",
+      "capitalName": "Bratislava",
+      "sourceCapital": [
+        1095,
+        232
+      ],
+      "capital": [
+        1095,
+        232
+      ],
+      "index": 165,
+      "represented": false,
+      "tiles": 220,
+      "neighbors": [
+        "AUT",
+        "CZE",
+        "HUN",
+        "POL",
+        "UKR"
+      ]
+    },
+    {
+      "id": "SVN",
+      "name": "Slovenia",
+      "sourceName": "Slovenia",
+      "nameKo": "슬로베니아",
+      "flag": "si",
+      "capitalName": "Ljubljana",
+      "sourceCapital": [
+        1080,
+        244
+      ],
+      "capital": [
+        1080,
+        244
+      ],
+      "index": 166,
+      "represented": false,
+      "tiles": 107,
+      "neighbors": [
+        "AUT",
+        "HRV",
+        "HUN",
+        "ITA"
+      ]
+    },
+    {
+      "id": "SWE",
+      "name": "Sweden",
+      "sourceName": "Sweden",
+      "nameKo": "스웨덴",
+      "flag": "se",
+      "capitalName": "Stockholm",
+      "sourceCapital": [
+        1100,
+        170
+      ],
+      "capital": [
+        1100,
+        170
+      ],
+      "index": 167,
+      "represented": false,
+      "tiles": 2603,
+      "neighbors": [
+        "DNK",
+        "FIN",
+        "NOR"
+      ]
+    },
+    {
+      "id": "SWZ",
+      "name": "Eswatini",
+      "sourceName": "Eswatini",
+      "nameKo": "에스와티니",
+      "flag": "sz",
+      "capitalName": "Mbabane",
+      "sourceCapital": [
+        1172,
+        646
+      ],
+      "capital": [
+        1172,
+        646
+      ],
+      "index": 168,
+      "represented": false,
+      "tiles": 41,
+      "neighbors": [
+        "MOZ",
+        "ZAF"
+      ]
+    },
+    {
+      "id": "SYC",
+      "name": "Seychelles",
+      "sourceName": "Seychelles",
+      "nameKo": "세이셸",
+      "flag": "sc",
+      "capitalName": "Victoria",
+      "sourceCapital": [
+        1308,
+        525
+      ],
+      "capital": [
+        1308,
+        525
+      ],
+      "index": 169,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "SYR",
+      "name": "Syria",
+      "sourceName": "Syria",
+      "nameKo": "시리아",
+      "flag": "sy",
+      "capitalName": "Damascus",
+      "sourceCapital": [
+        1201,
+        313
+      ],
+      "capital": [
+        1201,
+        313
+      ],
+      "index": 170,
+      "represented": false,
+      "tiles": 580,
+      "neighbors": [
+        "IRQ",
+        "ISR",
+        "JOR",
+        "LBN",
+        "TUR"
+      ]
+    },
+    {
+      "id": "TCD",
+      "name": "Chad",
+      "sourceName": "Chad",
+      "nameKo": "차드",
+      "flag": "td",
+      "capitalName": "N'Djamena",
+      "sourceCapital": [
+        1083,
+        432
+      ],
+      "capital": [
+        1083,
+        432
+      ],
+      "index": 171,
+      "represented": false,
+      "tiles": 3432,
+      "neighbors": [
+        "CAF",
+        "CMR",
+        "LBY",
+        "NER",
+        "NGA",
+        "SDN"
+      ]
+    },
+    {
+      "id": "TGO",
+      "name": "Togo",
+      "sourceName": "Togo",
+      "nameKo": "토고",
+      "flag": "tg",
+      "capitalName": "Lomé",
+      "sourceCapital": [
+        1006,
+        465
+      ],
+      "capital": [
+        1006,
+        465
+      ],
+      "index": 172,
+      "represented": false,
+      "tiles": 184,
+      "neighbors": [
+        "BEN",
+        "BFA",
+        "GHA"
+      ]
+    },
+    {
+      "id": "THA",
+      "name": "Thailand",
+      "sourceName": "Thailand",
+      "nameKo": "태국",
+      "flag": "th",
+      "capitalName": "Bangkok",
+      "sourceCapital": [
+        1558,
+        423
+      ],
+      "capital": [
+        1558,
+        423
+      ],
+      "index": 173,
+      "represented": false,
+      "tiles": 1505,
+      "neighbors": [
+        "KHM",
+        "LAO",
+        "MMR",
+        "MYS"
+      ]
+    },
+    {
+      "id": "TJK",
+      "name": "Tajikistan",
+      "sourceName": "Tajikistan",
+      "nameKo": "타지키스탄",
+      "flag": "tj",
+      "capitalName": "Dushanbe",
+      "sourceCapital": [
+        1382,
+        285
+      ],
+      "capital": [
+        1382,
+        285
+      ],
+      "index": 174,
+      "represented": false,
+      "tiles": 488,
+      "neighbors": [
+        "AFG",
+        "CHN",
+        "KGZ",
+        "PAK",
+        "UZB"
+      ]
+    },
+    {
+      "id": "TKM",
+      "name": "Turkmenistan",
+      "sourceName": "Turkmenistan",
+      "nameKo": "투르크메니스탄",
+      "flag": "tm",
+      "capitalName": "Ashgabat",
+      "sourceCapital": [
+        1324,
+        289
+      ],
+      "capital": [
+        1324,
+        289
+      ],
+      "index": 175,
+      "represented": false,
+      "tiles": 1573,
+      "neighbors": [
+        "AFG",
+        "IRN",
+        "KAZ",
+        "UZB"
+      ]
+    },
+    {
+      "id": "TLS",
+      "name": "East Timor",
+      "sourceName": "East Timor",
+      "nameKo": "동티모르",
+      "flag": "tl",
+      "capitalName": "Dili",
+      "sourceCapital": [
+        1697,
+        547
+      ],
+      "capital": [
+        1697,
+        547
+      ],
+      "index": 176,
+      "represented": false,
+      "tiles": 58,
+      "neighbors": [
+        "IDN"
+      ]
+    },
+    {
+      "id": "TON",
+      "name": "Tonga",
+      "sourceName": "Tonga",
+      "nameKo": "통가",
+      "flag": "to",
+      "capitalName": "Nuku'alofa",
+      "sourceCapital": [
+        26,
+        617
+      ],
+      "capital": [
+        26,
+        617
+      ],
+      "index": 177,
+      "represented": false,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "TTO",
+      "name": "Trinidad and Tobago",
+      "sourceName": "Trinidad and Tobago",
+      "nameKo": "트리니다드 토바고",
+      "flag": "tt",
+      "capitalName": "Port-of-Spain",
+      "sourceCapital": [
+        658,
+        440
+      ],
+      "capital": [
+        658,
+        440
+      ],
+      "index": 178,
+      "represented": false,
+      "tiles": 28,
+      "neighbors": [
+        "VEN"
+      ]
+    },
+    {
+      "id": "TUN",
+      "name": "Tunisia",
+      "sourceName": "Tunisia",
+      "nameKo": "튀니지",
+      "flag": "tn",
+      "capitalName": "Tunis",
+      "sourceCapital": [
+        1056,
+        295
+      ],
+      "capital": [
+        1056,
+        295
+      ],
+      "index": 179,
+      "represented": false,
+      "tiles": 535,
+      "neighbors": [
+        "DZA",
+        "LBY"
+      ]
+    },
+    {
+      "id": "TUR",
+      "name": "Turkey",
+      "sourceName": "Turkey",
+      "nameKo": "터키",
+      "flag": "tr",
+      "capitalName": "Ankara",
+      "sourceCapital": [
+        1182,
+        278
+      ],
+      "capital": [
+        1182,
+        278
+      ],
+      "index": 180,
+      "represented": false,
+      "tiles": 2691,
+      "neighbors": [
+        "ARM",
+        "BGR",
+        "GEO",
+        "GRC",
+        "IRN",
+        "IRQ",
+        "SYR"
+      ]
+    },
+    {
+      "id": "TUV",
+      "name": "Tuvalu",
+      "sourceName": "Tuvalu",
+      "nameKo": "투발루",
+      "flag": "tv",
+      "capitalName": "Funafuti",
+      "sourceCapital": [
+        1995,
+        547
+      ],
+      "capital": [
+        1995,
+        547
+      ],
+      "index": 181,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": []
+    },
+    {
+      "id": "TWN",
+      "name": "Taiwan",
+      "sourceName": "Taiwan",
+      "nameKo": "중화민국",
+      "flag": "tw",
+      "capitalName": "Taipei",
+      "sourceCapital": [
+        1675,
+        360
+      ],
+      "capital": [
+        1675,
+        360
+      ],
+      "index": 182,
+      "represented": false,
+      "tiles": 122,
+      "neighbors": [
+        "CHN"
+      ]
+    },
+    {
+      "id": "TZA",
+      "name": "Tanzania",
+      "sourceName": "Tanzania",
+      "nameKo": "탄자니아",
+      "flag": "tz",
+      "capitalName": "Dar es Salaam",
+      "sourceCapital": [
+        1218,
+        537
+      ],
+      "capital": [
+        1218,
+        537
+      ],
+      "index": 183,
+      "represented": false,
+      "tiles": 2464,
+      "neighbors": [
+        "BDI",
+        "COD",
+        "KEN",
+        "MOZ",
+        "MWI",
+        "RWA",
+        "UGA",
+        "ZMB"
+      ]
+    },
+    {
+      "id": "UGA",
+      "name": "Uganda",
+      "sourceName": "Uganda",
+      "nameKo": "우간다",
+      "flag": "ug",
+      "capitalName": "Kampala",
+      "sourceCapital": [
+        1181,
+        498
+      ],
+      "capital": [
+        1181,
+        498
+      ],
+      "index": 184,
+      "represented": false,
+      "tiles": 664,
+      "neighbors": [
+        "COD",
+        "KEN",
+        "RWA",
+        "SDS",
+        "TZA"
+      ]
+    },
+    {
+      "id": "UKR",
+      "name": "Ukraine",
+      "sourceName": "Ukraine",
+      "nameKo": "우크라이나",
+      "flag": "ua",
+      "capitalName": "Kyiv",
+      "sourceCapital": [
+        1169,
+        219
+      ],
+      "capital": [
+        1169,
+        219
+      ],
+      "index": 185,
+      "represented": false,
+      "tiles": 2342,
+      "neighbors": [
+        "BLR",
+        "HUN",
+        "MDA",
+        "POL",
+        "ROU",
+        "RUS",
+        "SVK"
+      ]
+    },
+    {
+      "id": "URY",
+      "name": "Uruguay",
+      "sourceName": "Uruguay",
+      "nameKo": "우루과이",
+      "flag": "uy",
+      "capitalName": "Montevideo",
+      "sourceCapital": [
+        687,
+        693
+      ],
+      "capital": [
+        687,
+        693
+      ],
+      "index": 186,
+      "represented": false,
+      "tiles": 570,
+      "neighbors": [
+        "ARG",
+        "BRA"
+      ]
+    },
+    {
+      "id": "USA",
+      "name": "United States of America",
+      "sourceName": "United States of America",
+      "nameKo": "미국",
+      "flag": "us",
+      "capitalName": "Washington,  D.C.",
+      "sourceCapital": [
+        572,
+        283
+      ],
+      "capital": [
+        572,
+        283
+      ],
+      "index": 187,
+      "represented": false,
+      "tiles": 36067,
+      "neighbors": [
+        "CAN",
+        "GBR",
+        "MEX"
+      ]
+    },
+    {
+      "id": "UZB",
+      "name": "Uzbekistan",
+      "sourceName": "Uzbekistan",
+      "nameKo": "우즈베키스탄",
+      "flag": "uz",
+      "capitalName": "Tashkent",
+      "sourceCapital": [
+        1384,
+        270
+      ],
+      "capital": [
+        1384,
+        270
+      ],
+      "index": 188,
+      "represented": false,
+      "tiles": 1672,
+      "neighbors": [
+        "AFG",
+        "KAZ",
+        "KGZ",
+        "TJK",
+        "TKM"
+      ]
+    },
+    {
+      "id": "VAT",
+      "name": "Vatican City",
+      "sourceName": "Vatican City",
+      "nameKo": "바티칸 시국",
+      "flag": "va",
+      "capitalName": "Vatican City",
+      "sourceCapital": [
+        1069,
+        267
+      ],
+      "capital": [
+        1069,
+        267
+      ],
+      "index": 189,
+      "represented": true,
+      "tiles": 9,
+      "neighbors": [
+        "ITA"
+      ]
+    },
+    {
+      "id": "VCT",
+      "name": "St Vincent & Grenadines",
+      "sourceName": "Saint Vincent and the Grenadines",
+      "nameKo": "세인트빈센트 그레나딘",
+      "flag": "vc",
+      "capitalName": "Kingstown",
+      "sourceCapital": [
+        659,
+        426
+      ],
+      "capital": [
+        659,
+        426
+      ],
+      "index": 190,
+      "represented": true,
+      "tiles": 10,
+      "neighbors": []
+    },
+    {
+      "id": "VEN",
+      "name": "Venezuela",
+      "sourceName": "Venezuela",
+      "nameKo": "베네수엘라",
+      "flag": "ve",
+      "capitalName": "Caracas",
+      "sourceCapital": [
+        628,
+        441
+      ],
+      "capital": [
+        628,
+        441
+      ],
+      "index": 191,
+      "represented": false,
+      "tiles": 2485,
+      "neighbors": [
+        "BRA",
+        "COL",
+        "GUY",
+        "TTO"
+      ]
+    },
+    {
+      "id": "VNM",
+      "name": "Vietnam",
+      "sourceName": "Vietnam",
+      "nameKo": "베트남",
+      "flag": "vn",
+      "capitalName": "Hanoi",
+      "sourceCapital": [
+        1588,
+        383
+      ],
+      "capital": [
+        1588,
+        383
+      ],
+      "index": 192,
+      "represented": false,
+      "tiles": 1012,
+      "neighbors": [
+        "CHN",
+        "KHM",
+        "LAO"
+      ]
+    },
+    {
+      "id": "VUT",
+      "name": "Vanuatu",
+      "sourceName": "Vanuatu",
+      "nameKo": "바누아투",
+      "flag": "vu",
+      "capitalName": "Port Vila",
+      "sourceCapital": [
+        1935,
+        598
+      ],
+      "capital": [
+        1935,
+        598
+      ],
+      "index": 193,
+      "represented": false,
+      "tiles": 79,
+      "neighbors": []
+    },
+    {
+      "id": "WSM",
+      "name": "Samoa",
+      "sourceName": "Samoa",
+      "nameKo": "사모아",
+      "flag": "ws",
+      "capitalName": "Apia",
+      "sourceCapital": [
+        45,
+        576
+      ],
+      "capital": [
+        45,
+        576
+      ],
+      "index": 194,
+      "represented": false,
+      "tiles": 18,
+      "neighbors": []
+    },
+    {
+      "id": "YEM",
+      "name": "Yemen",
+      "sourceName": "Yemen",
+      "nameKo": "예멘",
+      "flag": "ye",
+      "capitalName": "Sanaa",
+      "sourceCapital": [
+        1245,
+        414
+      ],
+      "capital": [
+        1245,
+        414
+      ],
+      "index": 195,
+      "represented": false,
+      "tiles": 1260,
+      "neighbors": [
+        "OMN",
+        "SAU"
+      ]
+    },
+    {
+      "id": "ZAF",
+      "name": "South Africa",
+      "sourceName": "South Africa",
+      "nameKo": "남아프리카 공화국",
+      "flag": "za",
+      "capitalName": "Bloemfontein",
+      "sourceCapital": [
+        1145,
+        661
+      ],
+      "capital": [
+        1145,
+        661
+      ],
+      "index": 196,
+      "represented": false,
+      "tiles": 3603,
+      "neighbors": [
+        "BWA",
+        "LSO",
+        "MOZ",
+        "NAM",
+        "SWZ",
+        "ZWE"
+      ]
+    },
+    {
+      "id": "ZMB",
+      "name": "Zambia",
+      "sourceName": "Zambia",
+      "nameKo": "잠비아",
+      "flag": "zm",
+      "capitalName": "Lusaka",
+      "sourceCapital": [
+        1157,
+        585
+      ],
+      "capital": [
+        1157,
+        585
+      ],
+      "index": 197,
+      "represented": false,
+      "tiles": 2028,
+      "neighbors": [
+        "AGO",
+        "COD",
+        "MOZ",
+        "MWI",
+        "NAM",
+        "TZA",
+        "ZWE"
+      ]
+    },
+    {
+      "id": "ZWE",
+      "name": "Zimbabwe",
+      "sourceName": "Zimbabwe",
+      "nameKo": "짐바브웨",
+      "flag": "zw",
+      "capitalName": "Harare",
+      "sourceCapital": [
+        1172,
+        598
+      ],
+      "capital": [
+        1172,
+        598
+      ],
+      "index": 198,
+      "represented": false,
+      "tiles": 1098,
+      "neighbors": [
+        "BWA",
+        "MOZ",
+        "NAM",
+        "ZAF",
+        "ZMB"
+      ]
+    }
+  ]
+}

@@ -18,8 +18,14 @@
  * inflate function is synchronous, as it is in tests and Node.
  */
 
+import {
+  GameUpdateType,
+  type AIStatusUpdate,
+} from "../../../../core/game/GameUpdates";
+import type { ModernState } from "../../../../core/modern/ModernState";
 import { FALLOUT_BIT } from "../../../render/gl/utils/TileCodec";
 import type { NameEntry, PlayerState, UnitState } from "../../../render/types";
+import { applyModernForcesFrame } from "../../../view/ModernForcesFrame";
 import { BinaryReader } from "../BinaryReader";
 import {
   FRAME_DELTA,
@@ -61,6 +67,39 @@ interface Chunk {
 }
 
 export class ReplayReader {
+  private modernSystems: ModernState | null = null;
+  private modernForcesTick = -1;
+  private applyModernSystems(misc: MiscUpdates | null): void {
+    for (const raw of misc?.ModernSystems ?? []) {
+      const baseline = raw as { state: ModernState; forceTick?: number };
+      const tick = baseline.forceTick ?? baseline.state.tick;
+      if (tick < this.modernForcesTick) continue;
+      this.modernSystems = baseline.state;
+      this.modernForcesTick = tick;
+    }
+    for (const raw of misc?.ModernForcesFrame ?? []) {
+      const motion = raw as { tick: number; positions: number[] };
+      if (!this.modernSystems || motion.tick <= this.modernForcesTick) continue;
+      this.modernSystems = applyModernForcesFrame(
+        this.modernSystems,
+        motion,
+        this.modernForcesTick,
+        this.tileState.length,
+      );
+      this.modernForcesTick = motion.tick;
+    }
+  }
+  private aiStrategies = new Map<string, AIStatusUpdate>();
+  private applyAIStrategies(misc: MiscUpdates | null): void {
+    for (const raw of misc?.AIStatus ?? []) {
+      const status = raw as Omit<AIStatusUpdate, "type">;
+      if (typeof status.playerID === "string")
+        this.aiStrategies.set(status.playerID, {
+          type: GameUpdateType.AIStatus,
+          ...status,
+        });
+    }
+  }
   readonly header: ReplayHeader;
   private readonly ctx: DecodeCtx;
   private readonly constructionStart = new Map<number, number>();
@@ -225,6 +264,8 @@ export class ReplayReader {
       terrain: this.terrain,
       changedTerrain,
       miscUpdates: misc,
+      aiStrategies: this.aiStrategies,
+      modernSystems: this.modernSystems,
     };
   }
 
@@ -287,6 +328,11 @@ export class ReplayReader {
     this.readNames(r);
 
     const misc = readMisc(r);
+    this.aiStrategies = new Map();
+    this.applyAIStrategies(misc);
+    this.modernSystems = null;
+    this.modernForcesTick = -1;
+    this.applyModernSystems(misc);
     this.terrain = new Map();
     this.readTerrain(r);
     return misc;
@@ -369,6 +415,8 @@ export class ReplayReader {
 
     if (mask & SEC_NAMES) this.readNames(r);
     const misc = mask & SEC_MISC ? readMisc(r) : null;
+    this.applyAIStrategies(misc);
+    this.applyModernSystems(misc);
 
     if (mask & SEC_UNITS_REMOVED) {
       const count = r.readVarUint();

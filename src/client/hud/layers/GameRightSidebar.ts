@@ -70,6 +70,32 @@ export class GameRightSidebar extends LitElement implements Controller {
   private newLobbyRequested = false;
   private spawnBarVisible = false;
   private immunityBarVisible = false;
+  private subscribedEventBus: EventBus | null = null;
+  private pendingPause: boolean | null = null;
+  private readonly onSpawnBarVisible = (event: SpawnBarVisibleEvent) => {
+    this.spawnBarVisible = event.visible;
+    this.updateParentOffset();
+  };
+  private readonly onImmunityBarVisible = (event: ImmunityBarVisibleEvent) => {
+    this.immunityBarVisible = event.visible;
+    this.updateParentOffset();
+  };
+  private readonly onWinner = () => {
+    this.hasWinner = true;
+    this.requestUpdate();
+  };
+  private readonly onTogglePause = () => {
+    if (
+      this._isSinglePlayer ||
+      (this.isLobbyCreator && !this.game.config().listed)
+    ) {
+      this.onPauseButtonClick();
+    }
+  };
+  private readonly onPauseIntent = (event: PauseGameIntentEvent) => {
+    this.pendingPause = event.paused;
+    this.isPaused = event.paused;
+  };
 
   createRenderRoot() {
     // Stack the timer bar + doomsday-clock readout, centers aligned (the narrower
@@ -82,40 +108,46 @@ export class GameRightSidebar extends LitElement implements Controller {
   }
 
   init() {
+    this.dispose();
     this._isSinglePlayer =
       this.game?.config()?.gameConfig()?.gameType === GameType.Singleplayer ||
       this.game.config().isReplay();
     this.isPrivateLobby =
       this.game?.config()?.gameConfig()?.gameType === GameType.Private;
     this._isVisible = true;
+    this._isReplayVisible = false;
+    this.hasWinner = false;
+    this.isLobbyCreator = this.game.myPlayer()?.isLobbyCreator() ?? false;
+    this.newLobbyRequested = false;
     this.hasShownOneMinuteWarning = false;
-
-    this.eventBus.on(SpawnBarVisibleEvent, (e) => {
-      this.spawnBarVisible = e.visible;
-      this.updateParentOffset();
-    });
-    this.eventBus.on(ImmunityBarVisibleEvent, (e) => {
-      this.immunityBarVisible = e.visible;
-      this.updateParentOffset();
-    });
-
-    this.eventBus.on(SendWinnerEvent, () => {
-      this.hasWinner = true;
-      this.requestUpdate();
-    });
-
-    this.eventBus.on(TogglePauseIntentEvent, () => {
-      const isReplayOrSingleplayer =
-        this._isSinglePlayer || this.game?.config()?.isReplay();
-      if (
-        isReplayOrSingleplayer ||
-        (this.isLobbyCreator && !this.game.config().listed)
-      ) {
-        this.onPauseButtonClick();
-      }
-    });
-
+    this.spawnBarVisible = false;
+    this.immunityBarVisible = false;
+    this.updateParentOffset();
+    this.pendingPause = null;
+    this.isPaused = this.game.isPaused();
+    this.timer = 0;
+    this.subscribedEventBus = this.eventBus;
+    this.eventBus.on(SpawnBarVisibleEvent, this.onSpawnBarVisible);
+    this.eventBus.on(ImmunityBarVisibleEvent, this.onImmunityBarVisible);
+    this.eventBus.on(SendWinnerEvent, this.onWinner);
+    this.eventBus.on(TogglePauseIntentEvent, this.onTogglePause);
+    this.eventBus.on(PauseGameIntentEvent, this.onPauseIntent);
+    this.eventBus.emit(new ShowReplayPanelEvent(false, this._isSinglePlayer));
+    // A restored paused match may receive no tick until the player resumes it.
+    this.tick();
     this.requestUpdate();
+  }
+
+  dispose(): void {
+    this.subscribedEventBus?.off(SpawnBarVisibleEvent, this.onSpawnBarVisible);
+    this.subscribedEventBus?.off(
+      ImmunityBarVisibleEvent,
+      this.onImmunityBarVisible,
+    );
+    this.subscribedEventBus?.off(SendWinnerEvent, this.onWinner);
+    this.subscribedEventBus?.off(TogglePauseIntentEvent, this.onTogglePause);
+    this.subscribedEventBus?.off(PauseGameIntentEvent, this.onPauseIntent);
+    this.subscribedEventBus = null;
   }
 
   private onFullscreenChange = () => {
@@ -129,6 +161,7 @@ export class GameRightSidebar extends LitElement implements Controller {
   }
 
   disconnectedCallback() {
+    this.dispose();
     super.disconnectedCallback();
     document.removeEventListener("fullscreenchange", this.onFullscreenChange);
   }
@@ -138,6 +171,13 @@ export class GameRightSidebar extends LitElement implements Controller {
   }
 
   tick() {
+    const paused = this.game.isPaused();
+    // Keep a click's immediate feedback while queued worker updates still
+    // describe the old state. A matching core update acknowledges the intent.
+    if (this.pendingPause === null || paused === this.pendingPause) {
+      this.isPaused = paused;
+      this.pendingPause = null;
+    }
     // Timer logic
     // Check if the player is the lobby creator
     if (!this.isLobbyCreator && this.game.myPlayer()?.isLobbyCreator()) {
@@ -230,13 +270,13 @@ export class GameRightSidebar extends LitElement implements Controller {
   }
 
   private onPauseButtonClick() {
-    this.isPaused = !this.isPaused;
-    if (this.isPaused) {
+    const paused = !this.isPaused;
+    if (paused) {
       crazyGamesSDK.gameplayStop();
     } else {
       crazyGamesSDK.gameplayStart();
     }
-    this.eventBus.emit(new PauseGameIntentEvent(this.isPaused));
+    this.eventBus.emit(new PauseGameIntentEvent(paused));
   }
 
   private async onNewLobbyButtonClick() {
